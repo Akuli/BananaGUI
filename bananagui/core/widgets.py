@@ -21,7 +21,7 @@
 
 """Define baseclasses for the wrappers."""
 
-from gui import core
+from bananagui import core
 
 
 class Widget:
@@ -37,22 +37,28 @@ class Widget:
             The widget's tooltip text or None.
     """
 
-    def __init__(self, **kwargs):
-        """Initialize the widget.
-
-        Keyword arguments are passed to self.config.
-        """
+    def __init__(self):
+        """Initialize the widget."""
         self.real_widget = core.Property(None)
         self.tooltip = core.Property(None)
-        self.config(**kwargs)
 
-    def config(self, **kwargs):
-        """Configure properties from keyword arguments.
+    def __setitem__(self, propname, value):
+        """Set the property' value.
 
-        This is much like config in tkinter.
+        Example:
+            a_window['title'] = 'My title'
+            a_window['size'] = (300, 200)  # the parenthesis can be omitted
         """
-        for propname, value in kwargs.items():
-            getattr(self, propname)(value)
+        getattr(self, propname).set(value)
+
+    def __getitem__(self, propname):
+        """Return the current value of a property.
+
+        Example:
+            print('The window title is', a_window['title'])
+            print('The window size is', a_window['size'])
+        """
+        return getattr(self, propname).get()
 
     def __del__(self):
         """Destroy the widget to free up any resources used by it."""
@@ -68,11 +74,10 @@ class Bin(Widget):
             Setting this to None removes the child.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         """Initialize the bin."""
         super().__init__()
         self.child = core.Property(None)
-        self.config(**kwargs)
 
 
 class Window(Bin):
@@ -100,10 +105,10 @@ class Window(Bin):
             A two-tuple of width and height.
     """
 
-    def __init__(self, parentwindow=None, **kwargs):
+    def __init__(self, parentwindow=None):
         """Initialize the window."""
         if parentwindow is not None and not isinstance(parentwindow, Window):
-            raise TypeError("parentwindow must be a Window")
+            raise TypeError("parentwindow must be a Window or None")
         super().__init__()
         self.parentwindow = core.Property(parentwindow)
         self.title = core.Property('Window')
@@ -117,10 +122,6 @@ class Window(Bin):
         self.size = core.Property((200, 200))
         self.size._setter = self.__set_size
         self.size._getter = self.__get_size
-
-        # These were not passed to super().__init__() because the
-        # properties weren't set up when it was ran.
-        self.config(**kwargs)
 
     # These conflict with each other, but GUI implementations are
     # supposed to override some of these.
@@ -163,7 +164,7 @@ class Child(Widget):
             True if the widget is grayed out, False otherwise.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent):
         """Initialize the child and set parent as its parent.
 
         The parent cannot be changed afterwards.
@@ -171,7 +172,6 @@ class Child(Widget):
         super().__init__()
         self.parent = core.Property(parent)
         self.grayed_out = core.Property(False)
-        self.config(**kwargs)
 
 
 class Box(Child):
@@ -187,7 +187,7 @@ class Box(Child):
             initialization. It can be 'horizontal' or 'vertical'.
     """
 
-    def __init__(self, parent, orientation, **kwargs):
+    def __init__(self, parent, orientation):
         """Initialize the box.
 
         In most cases, it's convenient to use hbox() or vbox() instead.
@@ -198,7 +198,6 @@ class Box(Child):
         self.children = core.Property([])
         self.children.getter = self.__get_children
         self.orientation = core.Property(orientation)
-        self.config(**kwargs)
 
     @classmethod
     def hbox(cls, parent):
@@ -215,14 +214,14 @@ class Box(Child):
 
     def prepend(self, child, expand=False):
         """Add a widget to the beginning."""
-        if child.parent() is not self:
+        if child['parent'] is not self:
             raise ValueError("cannot prepend a child with the wrong parent")
         with self.children._run_callbacks():
             self.children._value.insert(0, child)
 
     def append(self, child, expand=False):
         """Add a widget to the end."""
-        if child.parent() is not self:
+        if child['parent'] is not self:
             raise ValueError("cannot append a child with the wrong parent")
         with self.children._run_callbacks():
             self.children._value.append(child)

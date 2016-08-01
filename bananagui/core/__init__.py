@@ -48,40 +48,26 @@ class Property:
     # changing its value with descriptor magic. `label.text('hello')`
     # would change the value.
 
-    def __init__(self, *value):
-        """Initialize the Property.
-
-        If value contains only one item, it's treated as the value.
-        Property(1) means that the value is 1, and Property(1, 2) means
-        that the value is (1, 2).
-        """
-        if len(value) == 1:
-            value, = value
+    def __init__(self, default_value):
+        """Initialize the Property."""
         self._setter = None
         self._getter = None
         self._value = default_value
         self.callbacks = []
 
-    def __call__(self, *value):
-        """Set or get the Property's value.
-
-        See the note for Property.__init__. If the value is not given,
-        return the current value.
-        """
-        if not value:
-            # Get the value.
-            if self._getter is None:
-                return self._value
-            return self._getter()
-        # Set the value.
-        if len(value) == 1:
-            value = value[0]
+    def set(self, value):
+        """Set the Property's value and run the callback functions."""
         if self._setter is None:
             raise ValueError("cannot set the value")
         with self._run_callbacks():
             self._setter(value)
             self._value = value
-        return None
+
+    def get(self):
+        """Return the current value."""
+        if self._getter is None:
+            return self._value
+        return self._getter()
 
     @contextlib.contextmanager
     def _run_callbacks(self):
@@ -91,9 +77,9 @@ class Property:
         end. If the values are not equal, call the callbacks with the
         new value as the only argument.
         """
-        old_value = self()
+        old_value = self.get()
         yield
-        new_value = self()
+        new_value = self.get()
         if old_value != new_value:
             for callback in self.callbacks:
                 callback(new_value)

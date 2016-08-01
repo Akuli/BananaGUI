@@ -23,10 +23,9 @@
 
 """Hello world program."""
 
-import gui
+import bananagui
 
-
-gui = gui.get('tkinter')
+gui = bananagui.get('tkinter')
 
 
 def click_callback(pressed):
@@ -39,21 +38,18 @@ def click_callback(pressed):
 
 window = gui.Window()
 
-mainbox = gui.Box.vbox(window)
-window.child(mainbox)
+box = gui.Box.vbox(window)
+window['child'] = box
 
-topbox = gui.Box.vbox(mainbox)
-mainbox.prepend(topbox)
+label = gui.Label(box)
+label['text'] = "Click this button:"
+box.append(label, expand=True)
 
-label = gui.Label(topbox)
-label.text("Enter something:")
-topbox.append(label, expand=True)
-
-button = gui.TextButton(topbox)
-button.text("Click me!")
+button = gui.TextButton(box)
+button['text'] = "Click me!"
 button.pressed.callbacks.append(click_callback)
-topbox.append(button)
+box.append(button)
 
-window.size((200, 200))
+window['size'] = (200, 200)
 window.showing.callbacks.append(gui.quit)
 gui.main()

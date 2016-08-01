@@ -38,8 +38,8 @@ def get(*toolkit_names):
         raise ValueError("no toolkit names were specified")
     for name in toolkit_names:
         try:
-            return importlib.import_module(
-                '{}.wrappers.{}'.format(__name__, name))
+            return importlib.import_module('bananagui.wrappers.' + name)
         except ImportError:
             pass
+            raise
     raise ImportError("cannot import any of the required toolkits")
