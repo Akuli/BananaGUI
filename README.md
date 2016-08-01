@@ -1,4 +1,4 @@
-# Banana GUI
+# Banana GUI :banana:
 
 This is a wrapper around the Python Tkinter, PyQt and GTK+ 3.0
 bindings. You can write code using BananaGUI, and then run the
