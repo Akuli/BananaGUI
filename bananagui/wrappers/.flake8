@@ -1,0 +1,4 @@
+[flake8]
+# Many overrides get their docstrings with `__doc__ = some_doc`
+# or @functools.wraps. flake8-docstrings doesn't detect that.
+ignore = D101,D102
