@@ -41,5 +41,4 @@ def get(*toolkit_names):
             return importlib.import_module('bananagui.wrappers.' + name)
         except ImportError:
             pass
-            raise
     raise ImportError("cannot import any of the required toolkits")
