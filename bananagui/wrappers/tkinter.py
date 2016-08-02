@@ -31,8 +31,6 @@ try:
     import idlelib.ToolTip      # noqa
     _ToolTipBase = idlelib.ToolTip.ToolTipBase
 except ImportError:
-    warnings.warn("idlelib is required to display tooltips",
-                  ImportWarning)
     idlelib = None
     _ToolTipBase = object
 
@@ -49,14 +47,16 @@ class _ToolTip(_ToolTipBase):
         By default, this doesn't do anything. Set the text attribute to
         a string to display a tooltip.
         """
-        if idlelib is not None:
-            super().__init__(widget)
+        assert idlelib is not None, "cannot create _ToolTips without idlelib"
+        super().__init__(widget)
         self.text = None
 
     def showcontents(self):
         """Show the tooltip."""
-        if idlelib is not None and self.text is not None:
-            # With my GTK+ theme, the original showcontents creates
+        if self.text is None:
+            return
+        else:
+            # With my dark GTK+ theme, the original showcontents creates
             # light text on light background. This always creates black
             # text on white background.
             label = tk.Label(self.tipwindow, text=self.text, justify='left',
@@ -77,9 +77,12 @@ class Widget(widgets.Widget):
     def __set_tooltip(self, tooltip):
         # The _ToolTip instance is created here because the __init__()
         # is called before the real_widget() property has a value.
-        if not hasattr(self, '__tooltip'):
-            self.__tooltip = _ToolTip(self['real_widget'])
-        self.__tooltip.text = tooltip
+        if idlelib is None and tooltip is not None:
+            warnings.warn("idlelib is required to display tooltips")
+        else:
+            if not hasattr(self, '__tooltip'):
+                self.__tooltip = _ToolTip(self['real_widget'])
+            self.__tooltip.text = tooltip
 
     @functools.wraps(widgets.Widget.__del__)
     def __del__(self):
@@ -125,10 +128,11 @@ class Window(widgets.Window, Bin):
     __doc__ = widgets.Bin.__doc__
 
     @functools.wraps(widgets.Window.__init__)
-    def __init__(self):
+    def __init__(self, parentwindow=None):
         """Initialize the window."""
-        super().__init__()
-        self.props['real_widget'].value = tk.Toplevel(_root)
+        super().__init__(parentwindow=parentwindow)
+        self.props['real_widget'].value = tk.Toplevel(
+            _root if parentwindow is None else parentwindow)
         self['real_widget'].title(self['title'])  # Set the default title.
         self['real_widget'].protocol('WM_DELETE_WINDOW',
                                      self.__on_wm_delete_window)
@@ -236,7 +240,6 @@ class Label(widgets.Label, Child):
 
     @functools.wraps(widgets.Label.__init__)
     def __init__(self, parent):
-        """Initialize the label."""
         super().__init__(parent)
         self.props['real_widget'].value = tk.Label(parent['real_widget'])
         self.props['text'].setter = self.__set_text
@@ -245,34 +248,21 @@ class Label(widgets.Label, Child):
         self['real_widget'].config(text=text)
 
 
-class ButtonBase(widgets.ButtonBase, Child, Bin):
+class ButtonBase(widgets.ButtonBase, Child):
 
     __doc__ = widgets.ButtonBase.__doc__
 
     @functools.wraps(widgets.ButtonBase.__init__)
     def __init__(self, parent):
-        """Initialize the button."""
         super().__init__(parent)
-        self.props['real_widget'].value = tk.Button(parent['real_widget'])
+        self.props['real_widget'].value = tk.Button(
+            parent['real_widget'],
+            command=self.__on_click,
+        )
 
-        # Tkinter's command option seems to run when the button is
-        # released. We need something to track presses and releases.
-        self['real_widget'].bind('<ButtonPress-1>', self.__on_press)
-        self['real_widget'].bind('<ButtonRelease-1>', self.__on_release)
-        self['real_widget'].bind('<KeyPress-Return>', self.__on_press)
-        self['real_widget'].bind('<KeyRelease-Return>', self.__on_release)
-
-        # Pressing the spacebar does the same thing as clicking the
-        # button, so disable it.
-        self['real_widget'].bind('<space>', lambda event: 'break')
-
-    def __on_press(self, event):
-        with self.props['pressed'].run_callbacks():
-            self.props['pressed'].value = True
-
-    def __on_release(self, event):
-        with self.props['pressed'].run_callbacks():
-            self.props['pressed'].value = False
+    def __on_click(self, event=None):
+        if self['on_click'] is not None:
+            self['on_click']()
 
 
 class TextButton(widgets.TextButton, ButtonBase):

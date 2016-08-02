@@ -229,18 +229,20 @@ class Label(Child):
         self.props['text'] = core.Property('')
 
 
-class ButtonBase(Child, Bin):
+class ButtonBase(Child):
     """A widget that can be pressed.
 
-    Properties:
-        pressed         RW
-            True if the button is pressed down, False if not.
+    Signals:
+        on_click        RW
+            The button is clicked.
     """
 
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.props['pressed'] = core.Property(False)
+        self.props['on_click'] = core.Property(None)
+        # The on_click property must be changable.
+        
 
 
 class TextButton(ButtonBase):

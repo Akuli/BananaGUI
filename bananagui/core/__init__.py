@@ -102,6 +102,7 @@ class BaseObject:
     def __init__(self):
         """Create the prop dict."""
         self.props = {}
+        self.signals = {}
         self.callbacks = _ItemGetter(self.__get_callback_list)
 
     def __get_callback_list(self, propname):

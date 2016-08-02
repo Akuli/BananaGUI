@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,36 +19,21 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
-
-import bananagui
-
-gui = bananagui.get('tkinter')
+"""Constants."""
 
 
-def click_callback(pressed):
-    """The user pressed or released the button."""
-    if pressed:
-        print("Pressed!")
-    else:
-        print("Released!")
+# The built-in enum module was introduced in Python 3.4, but this needs
+# to be backwards-compatible.
+
+class _IntEnum(int):
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self._name, int(self))
+
+    __str__ = __repr__
 
 
-window = gui.Window()
-
-box = gui.Box.vbox(window)
-window['child'] = box
-
-label = gui.Label(box)
-label['text'] = "Click this button:"
-box.append(label, expand=True)
-
-button = gui.TextButton(box)
-button['text'] = "Click me!"
-button['tooltip'] = "Yes, click me."
-button.signals['on_click'].append(click_callback)
-box.append(button)
-
-window['size'] = (200, 200)
-window.callbacks['showing'].append(gui.quit)
-gui.main()
+def _int_enum(name, value):
+    enum = _IntEnum(value)
+    enum._name = name
+    return enum
