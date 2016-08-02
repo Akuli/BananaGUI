@@ -21,6 +21,7 @@
 
 """The core of BananaGUI."""
 
+import collections
 import contextlib
 import copy
 
@@ -50,27 +51,27 @@ class Property:
 
     def __init__(self, default_value):
         """Initialize the Property."""
-        self._setter = None
-        self._getter = None
-        self._value = default_value
+        self.setter = None
+        self.getter = None
+        self.value = default_value
         self.callbacks = []
 
     def set(self, value):
         """Set the Property's value and run the callback functions."""
-        if self._setter is None:
+        if self.setter is None:
             raise ValueError("cannot set the value")
-        with self._run_callbacks():
-            self._setter(value)
-            self._value = value
+        with self.run_callbacks():
+            self.setter(value)
+            self.value = value
 
     def get(self):
         """Return the current value."""
-        if self._getter is None:
-            return self._value
-        return self._getter()
+        if self.getter is None:
+            return self.value
+        return self.getter()
 
     @contextlib.contextmanager
-    def _run_callbacks(self):
+    def run_callbacks(self):
         """Run the callbacks if the value changes.
 
         Get the value in the beginning, yield and get the value at the
@@ -83,3 +84,49 @@ class Property:
         if old_value != new_value:
             for callback in self.callbacks:
                 callback(new_value)
+
+
+class _ItemGetter:
+    """When an instance is subscripted, call a function given on __init__.
+
+    The function is given whatever is subscripted with the only
+    argument, and its return value will be returned.
+    """
+
+    def __init__(self, function):
+        """Assign function to self._function."""
+        self._function = function
+
+    def __getitem__(self, item):
+        """Return self._function(item)."""
+        return self._function(item)
+
+
+class BaseObject:
+    """An object that implements the properties."""
+
+    def __init__(self):
+        """Create the prop dict."""
+        self.props = {}
+        self.callbacks = _ItemGetter(self.__get_callback_list)
+
+    def __get_callback_list(self, propname):
+        return self.props[propname].callbacks
+
+    def __setitem__(self, propname, value):
+        """Set a property's value.
+
+        Example:
+            a_window['title'] = 'My title'
+            a_window['size'] = (300, 200)  # parenthesis can be omitted
+        """
+        self.props[propname].set(value)
+
+    def __getitem__(self, propname):
+        """Return the current value of a property.
+
+        Example:
+            print('The window title is', a_window['title'])
+            print('The window size is', a_window['size'])
+        """
+        return self.props[propname].get()

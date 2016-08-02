@@ -73,7 +73,7 @@ class Widget(widgets.Widget):
     @functools.wraps(widgets.Widget.__init__)
     def __init__(self):
         super().__init__()
-        self.tooltip._setter = self.__set_tooltip
+        self.props['tooltip'].setter = self.__set_tooltip
 
     def __set_tooltip(self, tooltip):
         # The _ToolTip instance is created here because the __init__()
@@ -99,23 +99,26 @@ class Bin(widgets.Bin, Widget):
     @functools.wraps(widgets.Bin.__init__)
     def __init__(self):
         super().__init__()
-        self.child._setter = self.__set_child
+        self.props['child'].setter = self.__set_child
 
     def __set_child(self, child):
         # Check if the child is already in the bin.
         if child is self['child']:
             return
+
         # Remove the old child if it's set.
         if self['child'] is not None:
             self['child']['real_widget'].pack_forget()
+
         # Check the new child and add it.
         if child is not None:
             if child['parent'] is not self:
                 raise ValueError("cannot add a child with the wrong parent")
             child['real_widget'].pack(fill='both', expand=True)
+
         # Change the property's value.
-        with self.child._run_callbacks():
-            self.child._value = child
+        with self.props['child'].run_callbacks():
+            self.props['child'].value = child
 
 
 class Window(widgets.Window, Bin):
@@ -126,20 +129,18 @@ class Window(widgets.Window, Bin):
     def __init__(self):
         """Initialize the window."""
         super().__init__()
-        self.real_widget._value = tk.Toplevel(_root)
+        self.props['real_widget'].value = tk.Toplevel(_root)
+        self['real_widget'].title(self['title'])  # Set the default title.
         self['real_widget'].protocol('WM_DELETE_WINDOW',
                                      self.__on_wm_delete_window)
-        self.title._setter = self.__set_title
-        self.showing._setter = self.__set_showing
-        self.size._setter = self.__set_size
-        self.size._getter = self.__get_size
-        self['title'] = self['title']  # Set the default title.
+        self.props['title'].setter = self['real_widget'].title
+        self.props['showing'].setter = self.__set_showing
+        self.props['size'].setter = self.__set_size
+        self.props['width'].getter = self['real_widget'].winfo_width
+        self.props['height'].getter = self['real_widget'].winfo_height
 
     def __on_wm_delete_window(self):
         self['showing'] = False
-
-    def __set_title(self, title):
-        self['real_widget'].title(title)
 
     def __set_showing(self, showing):
         # TODO: What if the window is minimized?
@@ -151,10 +152,6 @@ class Window(widgets.Window, Bin):
     def __set_size(self, size):
         self['real_widget'].geometry('{}x{}'.format(*size))
 
-    def __get_size(self):
-        matches = re.search('^(\d+)x(\d+)', self['real_widget'].geometry())
-        return int(matches.group(1)), int(matches.group(2))
-
 
 class Child(widgets.Child, Widget):
 
@@ -163,20 +160,21 @@ class Child(widgets.Child, Widget):
     @functools.wraps(widgets.Child.__init__)
     def __init__(self, parent):
         super().__init__(parent)
-        self.grayed_out._setter = self.__set_grayed_out
+        self.props['grayed_out'].setter = self.__set_grayed_out
 
     def __set_grayed_out(self, grayed_out):
         state = 'disable' if grayed_out else 'normal'
-        self['real_widget']['state'] = state
+        self['real_widget'].config(state=state)
 
 
 class Box(widgets.Box, Child):
 
     __doc__ = widgets.Box.__doc__
 
+    @functools.wraps(widgets.Box.__init__)
     def __init__(self, parent, orientation):
         super().__init__(parent, orientation)
-        self.real_widget._value = tk.Frame(parent['real_widget'])
+        self.props['real_widget'].value = tk.Frame(parent['real_widget'])
 
     def __get_pack_kwargs(self, method, expand):
         """Get keyword arguments for child['real_widget'].pack().
@@ -185,10 +183,10 @@ class Box(widgets.Box, Child):
         """
         sides = {
             # (orientation, method): size
-            # These may look like they're the wrong way, but when
-            # multiple widgets are packed tkinter packs the first one to
-            # the edge and works its way to the center instead of
-            # pushing each new widget all the way to the edge.
+            # These may look wrong way, but when multiple widgets are
+            # packed tkinter packs the first one to the edge and works
+            # its way to the center instead of pushing each new widget
+            # all the way to the edge.
             ('horizontal', 'prepend'): 'right',
             ('horizontal', 'append'): 'left',
             ('vertical', 'prepend'): 'bottom',
@@ -224,6 +222,14 @@ class Box(widgets.Box, Child):
         super().remove(child)
         child['real_widget'].pack_forget()
 
+    @functools.wraps(widgets.Box.clear)
+    def clear(self):
+        # The pack_forget calls must be before the super call because
+        # self['children'] is empty after the super call.
+        for child in self['children']:
+            child['real_widget'].pack_forget()
+        super().clear()
+
 
 class Label(widgets.Label, Child):
 
@@ -233,11 +239,11 @@ class Label(widgets.Label, Child):
     def __init__(self, parent):
         """Initialize the label."""
         super().__init__(parent)
-        self.real_widget._value = tk.Label(parent['real_widget'])
-        self.text._setter = self.__set_text
+        self.props['real_widget'].value = tk.Label(parent['real_widget'])
+        self.props['text'].setter = self.__set_text
 
     def __set_text(self, text):
-        self['real_widget']['text'] = text
+        self['real_widget'].config(text=text)
 
 
 class ButtonBase(widgets.ButtonBase, Child, Bin):
@@ -248,7 +254,7 @@ class ButtonBase(widgets.ButtonBase, Child, Bin):
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.real_widget._value = tk.Button(parent['real_widget'])
+        self.props['real_widget'].value = tk.Button(parent['real_widget'])
 
         # Tkinter's command option seems to run when the button is
         # released. We need something to track presses and releases.
@@ -262,12 +268,12 @@ class ButtonBase(widgets.ButtonBase, Child, Bin):
         self['real_widget'].bind('<space>', lambda event: 'break')
 
     def __on_press(self, event):
-        with self.pressed._run_callbacks():
-            self.pressed._value = True
+        with self.props['pressed'].run_callbacks():
+            self.props['pressed'].value = True
 
     def __on_release(self, event):
-        with self.pressed._run_callbacks():
-            self.pressed._value = False
+        with self.props['pressed'].run_callbacks():
+            self.props['pressed'].value = False
 
 
 class TextButton(widgets.TextButton, ButtonBase):
@@ -277,7 +283,7 @@ class TextButton(widgets.TextButton, ButtonBase):
     @functools.wraps(widgets.TextButton.__init__)
     def __init__(self, parent):
         super().__init__(parent)
-        self.text._setter = self.__set_text
+        self.props['text'].setter = self.__set_text
 
     def __set_text(self, text):
         self['real_widget'].config(text=text)

@@ -24,7 +24,7 @@
 from bananagui import core
 
 
-class Widget:
+class Widget(core.BaseObject):
     """A widget baseclass.
 
     There is no .destroy() method. The widgets are automatically
@@ -39,30 +39,12 @@ class Widget:
 
     def __init__(self):
         """Initialize the widget."""
-        self.real_widget = core.Property(None)
-        self.tooltip = core.Property(None)
-
-    def __setitem__(self, propname, value):
-        """Set the property' value.
-
-        Example:
-            a_window['title'] = 'My title'
-            a_window['size'] = (300, 200)  # the parenthesis can be omitted
-        """
-        getattr(self, propname).set(value)
-
-    def __getitem__(self, propname):
-        """Return the current value of a property.
-
-        Example:
-            print('The window title is', a_window['title'])
-            print('The window size is', a_window['size'])
-        """
-        return getattr(self, propname).get()
+        super().__init__()
+        self.props['real_widget'] = core.Property(None)
+        self.props['tooltip'] = core.Property(None)
 
     def __del__(self):
         """Destroy the widget to free up any resources used by it."""
-        super().__del__()
 
 
 class Bin(Widget):
@@ -77,7 +59,7 @@ class Bin(Widget):
     def __init__(self):
         """Initialize the bin."""
         super().__init__()
-        self.child = core.Property(None)
+        self.props['child'] = core.Property(None)
 
 
 class Window(Bin):
@@ -110,44 +92,40 @@ class Window(Bin):
         if parentwindow is not None and not isinstance(parentwindow, Window):
             raise TypeError("parentwindow must be a Window or None")
         super().__init__()
-        self.parentwindow = core.Property(parentwindow)
-        self.title = core.Property('Window')
-        self.showing = core.Property(True)
-        self.width = core.Property(200)
-        self.width._setter = self.__set_width
-        self.width._getter = self.__get_width
-        self.height = core.Property(200)
-        self.height._setter = self.__set_height
-        self.height._getter = self.__get_height
-        self.size = core.Property((200, 200))
-        self.size._setter = self.__set_size
-        self.size._getter = self.__get_size
+        self.props['parentwindow'] = core.Property(parentwindow)
+        self.props['title'] = core.Property('Window')
+        self.props['showing'] = core.Property(True)
+        self.props['width'] = core.Property(200)
+        self.props['width'].setter = self.__set_width
+        self.props['width'].getter = self.__get_width
+        self.props['height'] = core.Property(200)
+        self.props['height'].setter = self.__set_height
+        self.props['height'].getter = self.__get_height
+        self.props['size'] = core.Property((200, 200))
+        self.props['size'].setter = self.__set_size
+        self.props['size'].getter = self.__get_size
 
     # These conflict with each other, but GUI implementations are
     # supposed to override some of these.
     def __set_width(self, width):
-        size = width, self.height()
-        self.size(size)
+        self['size'] = width, self['height']
 
     def __get_width(self):
-        width, height = self.size()
+        width, height = self['size']
         return width
 
     def __set_height(self, height):
-        size = self.width(), height
-        self.size(size)
+        self['size'] = self['width'], height
 
     def __get_height(self):
-        width, height = self.size()
+        width, height = self['size']
         return height
 
     def __set_size(self, size):
-        width, height = size
-        self.width(width)
-        self.height(height)
+        self['width'], self['height'] = size
 
     def __get_size(self):
-        return self.width(), self.height()
+        return self['width'], self['height']
 
 
 class Child(Widget):
@@ -170,8 +148,8 @@ class Child(Widget):
         The parent cannot be changed afterwards.
         """
         super().__init__()
-        self.parent = core.Property(parent)
-        self.grayed_out = core.Property(False)
+        self.props['parent'] = core.Property(parent)
+        self.props['grayed_out'] = core.Property(False)
 
 
 class Box(Child):
@@ -195,9 +173,9 @@ class Box(Child):
         if orientation not in ('horizontal', 'vertical'):
             raise ValueError("unknown orientation {!r}".format(orientation))
         super().__init__(parent)
-        self.children = core.Property([])
-        self.children.getter = self.__get_children
-        self.orientation = core.Property(orientation)
+        self.props['children'] = core.Property([])
+        self.props['children'].getter = self.__get_children
+        self.props['orientation'] = core.Property(orientation)
 
     @classmethod
     def hbox(cls, parent):
@@ -210,26 +188,31 @@ class Box(Child):
         return cls(parent, 'vertical')
 
     def __get_children(self):
-        return self.children._value.copy()
+        return self.props['children'].value.copy()
 
     def prepend(self, child, expand=False):
         """Add a widget to the beginning."""
         if child['parent'] is not self:
             raise ValueError("cannot prepend a child with the wrong parent")
-        with self.children._run_callbacks():
-            self.children._value.insert(0, child)
+        with self.props['children'].run_callbacks():
+            self.props['children'].value.insert(0, child)
 
     def append(self, child, expand=False):
         """Add a widget to the end."""
         if child['parent'] is not self:
             raise ValueError("cannot append a child with the wrong parent")
-        with self.children._run_callbacks():
-            self.children._value.append(child)
+        with self.props['children'].run_callbacks():
+            self.props['children'].value.append(child)
 
     def remove(self, child):
         """Remove a widget from self."""
-        with self.children._run_callbacks():
-            self.children._value.remove(child)
+        with self.props['children'].run_callbacks():
+            self.props['children'].value.remove(child)
+
+    def clear(self):
+        """Remove all widgets from self."""
+        with self.props['children'].run_callbacks():
+            self.props['children'].value.clear()
 
 
 class Label(Child):
@@ -243,7 +226,7 @@ class Label(Child):
     def __init__(self, parent):
         """Initialize the label."""
         super().__init__(parent)
-        self.text = core.Property('')
+        self.props['text'] = core.Property('')
 
 
 class ButtonBase(Child, Bin):
@@ -257,7 +240,7 @@ class ButtonBase(Child, Bin):
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.pressed = core.Property(False)
+        self.props['pressed'] = core.Property(False)
 
 
 class TextButton(ButtonBase):
@@ -271,7 +254,7 @@ class TextButton(ButtonBase):
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.text = core.Property('')
+        self.props['text'] = core.Property('')
 
 
 def main():

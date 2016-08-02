@@ -47,9 +47,10 @@ box.append(label, expand=True)
 
 button = gui.TextButton(box)
 button['text'] = "Click me!"
-button.pressed.callbacks.append(click_callback)
+button['tooltip'] = "Yes, click me."
+button.callbacks['pressed'].append(click_callback)
 box.append(button)
 
 window['size'] = (200, 200)
-window.showing.callbacks.append(gui.quit)
+window.callbacks['showing'].append(gui.quit)
 gui.main()
