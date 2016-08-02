@@ -22,7 +22,6 @@
 """Tkinter interface."""
 
 import functools
-import re
 import tkinter as tk
 import warnings
 

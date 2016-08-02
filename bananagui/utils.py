@@ -21,7 +21,7 @@
 
 """Handy utilities."""
 
-import sys
+# TODO: Maybe I'm not going to use enums and not need this module?
 
 
 class _EnumInt(int):
@@ -68,6 +68,8 @@ class IntEnum(metaclass=_IntEnumMeta):
 
 
 class BananaPhone(IntEnum):
+    """Ring ring ring ring ring ring ring! Banana Phone."""
+
     banana = 1
     phone = 2
     bananaphone = banana | phone

@@ -21,13 +21,7 @@
 
 """The core of BananaGUI."""
 
-import collections
 import contextlib
-import copy
-
-
-# A constant to allow setting None as the value for properties.
-_NOTHING = object()
 
 
 class Property:
