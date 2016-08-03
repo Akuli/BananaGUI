@@ -21,19 +21,5 @@
 
 """Constants."""
 
-
-# The built-in enum module was introduced in Python 3.4, but this needs
-# to be backwards-compatible.
-
-class _IntEnum(int):
-
-    def __repr__(self):
-        return '<{}: {}>'.format(self._name, int(self))
-
-    __str__ = __repr__
-
-
-def _int_enum(name, value):
-    enum = _IntEnum(value)
-    enum._name = name
-    return enum
+HORIZONTAL = 'h'
+VERTICAL = 'v'

@@ -21,107 +21,85 @@
 
 """The core of BananaGUI."""
 
-import contextlib
+
+class Signal:
+    """A signal."""
+
+    def __init__(self):
+        """Initialize a signal with no callbacks."""
+        self._callbacks = []
+
+    def connect(self, callback):
+        """Add a callback."""
+        if not callable(callback):
+            raise ValueError("callbacks must be callable")
+        self._callbacks.append(callback)
+
+    def is_connected(self, callback):
+        """Check if callback has been added."""
+        return callback in self._callbacks
+
+    def disconnect(self, callback):
+        """Remove a callback."""
+        self._callbacks.remove(callback)
+
+    def emit(self, *args):
+        """Call the callbacks with args."""
+        for callback in self._callbacks:
+            callback(*args)
 
 
 class Property:
     """A Property.
 
     The Properties are more like properties in GUI toolkits like PyQt
-    and GTK+ than Python properties. Add these to class instances on
-    __init__, and document them in the class docstring.
-
-    When the value of the property is changed, everything in the
-    callback list will be called with the new value as the only
-    argument. Note that setting a value equal to the property's current
-    value doesn't trigger this.
+    and GTK+ than Python properties. When the value of the property is
+    changed with set(), its changed signal will be emitted with the new
+    value.
     """
 
     # The properties are called explicitly instead of using __set__ and
     # __get__ to avoid interference with other attributes in subclasses,
-    # e.g. `label.text = 'hello'` overwrites the property instead of
-    # changing its value with descriptor magic. `label.text('hello')`
-    # would change the value.
+    # e.g. label.text = 'hello' overwrites the property instead of
+    # changing its value with descriptor magic. label.text.set('hello')
+    # or label['text'] = 'hello' would change the value.
 
     def __init__(self, default_value):
         """Initialize the Property."""
-        self.setter = None
-        self.getter = None
-        self.value = default_value
-        self.callbacks = []
+        self._setter = None
+        self._getter = None
+        self._value = default_value
+        self.changed = Signal()
 
     def set(self, value):
-        """Set the Property's value and run the callback functions."""
-        if self.setter is None:
+        """Set the Property's value and emit the callback signal."""
+        if self._setter is None:
             raise ValueError("cannot set the value")
-        with self.run_callbacks():
-            self.setter(value)
-            self.value = value
+        self._setter(value)
+        self._value = value
+        self.emit_changed()
 
     def get(self):
         """Return the current value."""
-        if self.getter is None:
-            return self.value
-        return self.getter()
+        if self._getter is None:
+            return self._value
+        return self._getter()
 
-    @contextlib.contextmanager
-    def run_callbacks(self):
-        """Run the callbacks if the value changes.
+    def emit_changed(self):
+        """Emit the changed signal.
 
-        Get the value in the beginning, yield and get the value at the
-        end. If the values are not equal, call the callbacks with the
-        new value as the only argument.
+        This is equivalent to self.changed.emit(self.get()).
         """
-        old_value = self.get()
-        yield
-        new_value = self.get()
-        if old_value != new_value:
-            for callback in self.callbacks:
-                callback(new_value)
-
-
-class _ItemGetter:
-    """When an instance is subscripted, call a function given on __init__.
-
-    The function is given whatever is subscripted with the only
-    argument, and its return value will be returned.
-    """
-
-    def __init__(self, function):
-        """Assign function to self._function."""
-        self._function = function
-
-    def __getitem__(self, item):
-        """Return self._function(item)."""
-        return self._function(item)
+        self.changed.emit(self.get())
 
 
 class BaseObject:
-    """An object that implements the properties."""
-
-    def __init__(self):
-        """Create the prop dict."""
-        self.props = {}
-        self.signals = {}
-        self.callbacks = _ItemGetter(self.__get_callback_list)
-
-    def __get_callback_list(self, propname):
-        return self.props[propname].callbacks
+    """An object that allows using properties with subscripting."""
 
     def __setitem__(self, propname, value):
-        """Set a property's value.
-
-        Example:
-            a_window['title'] = 'My title'
-            a_window['size'] = (300, 200)  # parenthesis can be omitted
-        """
-        self.props[propname].set(value)
+        """Set a property's value."""
+        getattr(self, propname).set(value)
 
     def __getitem__(self, propname):
-        """Return the current value of a property.
-
-        Example:
-            print('The window title is', a_window['title'])
-            print('The window size is', a_window['size'])
-        """
-        return self.props[propname].get()
+        """Return a property's value."""
+        return getattr(self, propname).get()

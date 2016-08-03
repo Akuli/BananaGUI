@@ -21,7 +21,7 @@
 
 """Define baseclasses for the wrappers."""
 
-from bananagui import core
+from bananagui import core, constants
 
 
 class Widget(core.BaseObject):
@@ -40,8 +40,8 @@ class Widget(core.BaseObject):
     def __init__(self):
         """Initialize the widget."""
         super().__init__()
-        self.props['real_widget'] = core.Property(None)
-        self.props['tooltip'] = core.Property(None)
+        self.real_widget = core.Property(None)
+        self.tooltip = core.Property(None)
 
     def __del__(self):
         """Destroy the widget to free up any resources used by it."""
@@ -59,7 +59,7 @@ class Bin(Widget):
     def __init__(self):
         """Initialize the bin."""
         super().__init__()
-        self.props['child'] = core.Property(None)
+        self.child = core.Property(None)
 
 
 class Window(Bin):
@@ -76,15 +76,16 @@ class Window(Bin):
             The parent window set on initialization.
         title           RW
             The title of the window.
-        showing         RW
-            False if the window is hidden, True if not.
-            Setting this to True also unminimizes the window.
         width           RW
             The width of the widget.
         height          RW
             The height of the widget.
         size            RW
             A two-tuple of width and height.
+
+    Signals:
+        on_close
+            The window is closed.
     """
 
     def __init__(self, parentwindow=None):
@@ -92,18 +93,18 @@ class Window(Bin):
         if parentwindow is not None and not isinstance(parentwindow, Window):
             raise TypeError("parentwindow must be a Window or None")
         super().__init__()
-        self.props['parentwindow'] = core.Property(parentwindow)
-        self.props['title'] = core.Property('Window')
-        self.props['showing'] = core.Property(True)
-        self.props['width'] = core.Property(200)
-        self.props['width'].setter = self.__set_width
-        self.props['width'].getter = self.__get_width
-        self.props['height'] = core.Property(200)
-        self.props['height'].setter = self.__set_height
-        self.props['height'].getter = self.__get_height
-        self.props['size'] = core.Property((200, 200))
-        self.props['size'].setter = self.__set_size
-        self.props['size'].getter = self.__get_size
+        self.parentwindow = core.Property(parentwindow)
+        self.title = core.Property('Window')
+        self.width = core.Property(200)
+        self.width._setter = self.__set_width
+        self.width._getter = self.__get_width
+        self.height = core.Property(200)
+        self.height._setter = self.__set_height
+        self.height._getter = self.__get_height
+        self.size = core.Property((200, 200))
+        self.size._setter = self.__set_size
+        self.size._getter = self.__get_size
+        self.on_close = core.Signal()
 
     # These conflict with each other, but GUI implementations are
     # supposed to override some of these.
@@ -148,8 +149,8 @@ class Child(Widget):
         The parent cannot be changed afterwards.
         """
         super().__init__()
-        self.props['parent'] = core.Property(parent)
-        self.props['grayed_out'] = core.Property(False)
+        self.parent = core.Property(parent)
+        self.grayed_out = core.Property(False)
 
 
 class Box(Child):
@@ -162,7 +163,8 @@ class Box(Child):
             getter returns a copy of the actual list.
         orientation         R
             This is set as a second positional (or keyword) argument on
-            initialization. It can be 'horizontal' or 'vertical'.
+            initialization. It can be constants.HORIZONTAL or
+            constants.VERTICAL.
     """
 
     def __init__(self, parent, orientation):
@@ -170,49 +172,55 @@ class Box(Child):
 
         In most cases, it's convenient to use hbox() or vbox() instead.
         """
-        if orientation not in ('horizontal', 'vertical'):
+        if orientation not in (constants.HORIZONTAL, constants.VERTICAL):
             raise ValueError("unknown orientation {!r}".format(orientation))
         super().__init__(parent)
-        self.props['children'] = core.Property([])
-        self.props['children'].getter = self.__get_children
-        self.props['orientation'] = core.Property(orientation)
+        self.children = core.Property([])
+        self.children._getter = self.__get_children
+        self.orientation = core.Property(orientation)
 
     @classmethod
     def hbox(cls, parent):
-        """Equivalent to cls(parent, 'horizontal')."""
-        return cls(parent, 'horizontal')
+        """Create a horizontal box.
+
+        This is equivalent to cls(parent, constants.HORIZONTAL).
+        """
+        return cls(parent, constants.HORIZONTAL)
 
     @classmethod
     def vbox(cls, parent):
-        """Equivalent to cls(parent, 'vertical')."""
-        return cls(parent, 'vertical')
+        """Create a vertical box.
+
+        This is equivalent to cls(parent, constants.VERTICAL).
+        """
+        return cls(parent, constants.VERTICAL)
 
     def __get_children(self):
-        return self.props['children'].value.copy()
+        return self.children._value.copy()
 
     def prepend(self, child, expand=False):
         """Add a widget to the beginning."""
         if child['parent'] is not self:
             raise ValueError("cannot prepend a child with the wrong parent")
-        with self.props['children'].run_callbacks():
-            self.props['children'].value.insert(0, child)
+        self.children._value.insert(0, child)
+        self.children.emit_changed()
 
     def append(self, child, expand=False):
         """Add a widget to the end."""
         if child['parent'] is not self:
             raise ValueError("cannot append a child with the wrong parent")
-        with self.props['children'].run_callbacks():
-            self.props['children'].value.append(child)
+        self.children._value.append(child)
+        self.children.emit_changed()
 
     def remove(self, child):
         """Remove a widget from self."""
-        with self.props['children'].run_callbacks():
-            self.props['children'].value.remove(child)
+        self.children._value.remove(child)
+        self.children.emit_changed()
 
     def clear(self):
         """Remove all widgets from self."""
-        with self.props['children'].run_callbacks():
-            self.props['children'].value.clear()
+        self.children._value.clear()
+        self.children.emit_changed()
 
 
 class Label(Child):
@@ -226,7 +234,7 @@ class Label(Child):
     def __init__(self, parent):
         """Initialize the label."""
         super().__init__(parent)
-        self.props['text'] = core.Property('')
+        self.text = core.Property('')
 
 
 class ButtonBase(Child):
@@ -240,9 +248,7 @@ class ButtonBase(Child):
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.props['on_click'] = core.Property(None)
-        # The on_click property must be changable.
-        
+        self.on_click = core.Signal()
 
 
 class TextButton(ButtonBase):
@@ -256,12 +262,12 @@ class TextButton(ButtonBase):
     def __init__(self, parent):
         """Initialize the button."""
         super().__init__(parent)
-        self.props['text'] = core.Property('')
+        self.text = core.Property('')
 
 
 def main():
     """Run the mainloop until quit() is called."""
 
 
-def quit(*args):
-    """Quit the mainloop, and ignore all positional arguments."""
+def quit():
+    """Quit the mainloop."""

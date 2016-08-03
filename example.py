@@ -28,12 +28,9 @@ import bananagui
 gui = bananagui.get('tkinter')
 
 
-def click_callback(pressed):
-    """The user pressed or released the button."""
-    if pressed:
-        print("Pressed!")
-    else:
-        print("Released!")
+def on_click():
+    """The user clicked the button."""
+    print("Clicked!")
 
 
 window = gui.Window()
@@ -48,9 +45,9 @@ box.append(label, expand=True)
 button = gui.TextButton(box)
 button['text'] = "Click me!"
 button['tooltip'] = "Yes, click me."
-button.signals['on_click'].append(click_callback)
+button.on_click.connect(on_click)
 box.append(button)
 
-window['size'] = (200, 200)
-window.callbacks['showing'].append(gui.quit)
+window['size'] = (200, 200)     # the parenthesis can be omitted
+window.on_close.connect(gui.quit)
 gui.main()
