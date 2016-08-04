@@ -85,12 +85,12 @@ class Widget(widgets.Widget):
 
     @functools.wraps(widgets.Widget.__del__)
     def __del__(self):
-        if self['real_widget'] is not None:
-            try:
-                self['real_widget'].destroy()
-            except tk.TclError:
-                # The widget has probably been destroyed already.
-                pass
+        try:
+            self['real_widget'].destroy()
+        except (AttributeError, KeyError, tk.TclError):
+            # The widget was never created or it has been destroyed
+            # already.
+            pass
 
 
 class Bin(widgets.Bin, Widget):

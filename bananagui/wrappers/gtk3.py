@@ -27,7 +27,13 @@ import gi
 gi.require_version('Gtk', '3.0')    # noqa
 from gi.repository import Gtk
 
+from bananagui import constants
 from bananagui.core import widgets
+
+
+# All windows will be added here. They will be shown when the mainloop
+# is started.
+_windows = []
 
 
 class Widget(widgets.Widget):
@@ -37,16 +43,13 @@ class Widget(widgets.Widget):
     @functools.wraps(widgets.Widget.__init__)
     def __init__(self):
         super().__init__()
-        self.props['tooltip'].setter = self.__set_tooltip
+        self.tooltip._setter = self.__set_tooltip
 
     def __set_tooltip(self, tooltip):
         self['real_widget'].set_tooltip_text(tooltip)
 
-    @functools.wraps(widgets.Widget.__del__)
-    def __del__(self):
-        """Destroy the widget to free up any resources used by it."""
-        if self['real_widget'] is not None:
-            self['real_widget'].destroy()
+    # I had problems with implementing a __del__, and it seemed like the
+    # widgets were already destroyed by the time __del__ was ran.
 
 
 class Bin(widgets.Bin, Widget):
@@ -56,7 +59,7 @@ class Bin(widgets.Bin, Widget):
     @functools.wraps(widgets.Bin.__init__)
     def __init__(self):
         super().__init__()
-        self.props['child'].setter = self.__set_child
+        self.child._setter = self.__set_child
 
     def __set_child(self, child):
         # Check if the child is already in the bin.
@@ -71,11 +74,11 @@ class Bin(widgets.Bin, Widget):
         if child is not None:
             if child['parent'] is not self:
                 raise ValueError("cannot add a child with the wrong parent")
-            self['real_widget'].add(child)
+            self['real_widget'].add(child['real_widget'])
 
         # Change the property's value.
-        with self.props['child'].run_callbacks():
-            self.props['child'].value = child
+        self.child._value = child
+        self.child.emit_changed()
 
 
 class Window(widgets.Window, Bin):
@@ -85,23 +88,20 @@ class Window(widgets.Window, Bin):
     @functools.wraps(widgets.Window.__init__)
     def __init__(self, parentwindow=None):
         super().__init__(parentwindow=parentwindow)
-        self.props['real_widget'] = Gtk.Window(title=self['title'])
+        _windows.append(self)
+        self.real_widget._value = Gtk.Window(title=self['title'])
         if parentwindow is not None:
             self['real_widget'].set_transient_for(parentwindow['real_widget'])
         self['real_widget'].connect('delete-event', self.__on_delete_event)
-        self.props['title'].setter = self['real_widget'].set_title
-        self.props['showing'].setter = self.__set_showing
-        self.props['size'].setter = self.__set_size
-        self.props['size'].getter = self.__get_size
+        self.title._setter = self['real_widget'].set_title
+        self.size._setter = self.__set_size
+        self.size._getter = self['real_widget'].get_size
 
     def __on_delete_event(self, window, event):
-        self['showing'] = False
+        self.on_close.emit()
 
     def __set_size(self, size):
         self['real_widget'].resize(*size)
-
-    def __get_size(self):
-        return self['real_widget'].get_size()
 
 
 class Child(widgets.Child, Widget):
@@ -110,8 +110,8 @@ class Child(widgets.Child, Widget):
 
     @functools.wraps(widgets.Child.__init__)
     def __init__(self, parent):
-        super().__init__()
-        self.props['grayed_out'].setter = self.__set_grayed_out
+        super().__init__(parent)
+        self.grayed_out._setter = self.__set_grayed_out
 
     def __set_grayed_out(self, grayed_out):
         self['real_widget'].set_sensitive(not grayed_out)
@@ -125,21 +125,23 @@ class Box(widgets.Box, Child):
     def __init__(self, parent, orientation):
         super().__init__(parent, orientation)
         orientations = {
-            'horizontal': Gtk.Orientation.HORIZONTAL,
-            'vertical': Gtk.Orientation.VERTICAL,
+            constants.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
+            constants.VERTICAL: Gtk.Orientation.VERTICAL,
         }
-        self.props['real_widget'].value = Gtk.Box(
+        self.real_widget._value = Gtk.Box(
             orientation=orientations[orientation])
 
     @functools.wraps(widgets.Box.prepend)
     def prepend(self, child, expand=False):
         super().prepend(child, expand=expand)
-        self['real_widget'].pack_start(child['real_widget'], expand, expand, 0)
+        # For some reason, calling pack_end adds the widget to top or
+        # left.
+        self['real_widget'].pack_end(child['real_widget'], expand, expand, 0)
 
     @functools.wraps(widgets.Box.append)
     def append(self, child, expand=False):
         super().append(child, expand=expand)
-        self['real_widget'].pack_end(child['real_widget'], expand, expand, 0)
+        self['real_widget'].pack_start(child['real_widget'], expand, expand, 0)
 
     @functools.wraps(widgets.Box.remove)
     def remove(self, child):
@@ -154,8 +156,8 @@ class Label(widgets.Label, Child):
     @functools.wraps(widgets.Label.__init__)
     def __init__(self, parent):
         super().__init__(parent)
-        self.props['real_widget'].value = Gtk.Label(self.parent['real_widget'])
-        self.props['text'].setter = self['real_widget'].set_text
+        self.real_widget._value = Gtk.Label(self['parent']['real_widget'])
+        self.text._setter = self['real_widget'].set_text
 
 
 class ButtonBase(widgets.ButtonBase, Child):
@@ -169,9 +171,22 @@ class TextButton(widgets.TextButton, ButtonBase):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.props['real_widget'].value = Gtk.Button()
-        self.props['text'].setter = self['real_widget'].set_label
+        self.real_widget._value = Gtk.Button()
+        self['real_widget'].connect('clicked', self.__on_click)
+        self.text._setter = self['real_widget'].set_label
 
     def __on_click(self, widget):
-        if self['on_click'] is not None:
-            self['on_click']()
+        self.on_click.emit()
+
+
+@functools.wraps(widgets.main)
+def main():
+    for window in _windows:
+        window['real_widget'].show_all()
+    Gtk.main()
+    _windows.clear()
+
+
+@functools.wraps(widgets.quit)
+def quit():
+    Gtk.main_quit()

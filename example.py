@@ -48,6 +48,6 @@ button['tooltip'] = "Yes, click me."
 button.on_click.connect(on_click)
 box.append(button)
 
-window['size'] = (200, 200)     # the parenthesis can be omitted
+window['size'] = (150, 100)     # the parenthesis can be omitted
 window.on_close.connect(gui.quit)
 gui.main()

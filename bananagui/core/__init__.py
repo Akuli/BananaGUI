@@ -77,7 +77,7 @@ class Property:
             raise ValueError("cannot set the value")
         self._setter(value)
         self._value = value
-        self.emit_changed()
+        self.changed.emit(value)
 
     def get(self):
         """Return the current value."""
@@ -98,8 +98,16 @@ class BaseObject:
 
     def __setitem__(self, propname, value):
         """Set a property's value."""
-        getattr(self, propname).set(value)
+        try:
+            prop = getattr(self, propname)
+        except AttributeError as e:
+            raise KeyError(propname) from e
+        prop.set(value)
 
     def __getitem__(self, propname):
         """Return a property's value."""
-        return getattr(self, propname).get()
+        try:
+            prop = getattr(self, propname)
+        except AttributeError as e:
+            raise KeyError(propname) from e
+        return prop.get()
