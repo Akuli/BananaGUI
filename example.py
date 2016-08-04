@@ -50,4 +50,4 @@ box.append(button)
 
 window['size'] = (150, 100)     # the parenthesis can be omitted
 window.on_close.connect(gui.quit)
-gui.main()
+sys.exit(gui.main())
