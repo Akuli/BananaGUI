@@ -21,5 +21,3 @@
 
 """Constants."""
 
-HORIZONTAL = 'h'
-VERTICAL = 'v'

@@ -23,6 +23,8 @@
 
 """Hello world program."""
 
+import sys
+
 import bananagui
 
 gui = bananagui.get('tkinter')
@@ -36,18 +38,18 @@ def on_click():
 window = gui.Window()
 
 box = gui.Box.vbox(window)
-window['child'] = box
+window.set_child(box)
 
 label = gui.Label(box)
-label['text'] = "Click this button:"
+label.set_text("Click this button:")
 box.append(label, expand=True)
 
 button = gui.TextButton(box)
-button['text'] = "Click me!"
-button['tooltip'] = "Yes, click me."
+button.set_text("Click me!")
+button.set_tooltip("Yes, click me.")
 button.on_click.connect(on_click)
 box.append(button)
 
-window['size'] = (150, 100)     # the parenthesis can be omitted
+window.set_size([150, 100])
 window.on_close.connect(gui.quit)
 sys.exit(gui.main())

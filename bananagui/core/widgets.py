@@ -19,32 +19,43 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Define baseclasses for the wrappers."""
+"""Baseclasses for the wrappers."""
 
-from bananagui import core, constants
+import bananagui.core
+from bananagui.utils import descriptors
 
 
-class Widget(core.BaseObject):
+class Widget(bananagui.core.BaseObject):
     """A widget baseclass.
-
-    There is no .destroy() method. The widgets are automatically
-    destroyed when they are not needed anymore.
 
     Properties:
         real_widget     R
             The real GUI toolkit widget that's being wrapped.
         tooltip         RW
-            The widget's tooltip text or None.
+            The widget's tooltip text. None by default.
     """
 
-    def __init__(self):
-        """Initialize the widget."""
-        super().__init__()
-        self.real_widget = core.Property(None)
-        self.tooltip = core.Property(None)
+    properties = ['real_widget', 'tooltip']
 
-    def __del__(self):
-        """Destroy the widget to free up any resources used by it."""
+    __tooltip = descriptors.StringOrNone(default=None)
+
+    def get_real_widget(self):
+        """Get the real GUI toolkit widget that is being wrapped."""
+        raise NotImplementedError("override this")
+
+    def set_tooltip(self, tooltip):
+        """Set the tooltip."""
+        self.__tooltip = tooltip
+        self.tooltip.emit_changed()
+
+    def get_tooltip(self):
+        """Get the tooltip."""
+        return self.__tooltip
+
+
+_WidgetDescriptor = descriptors.IsInstance.from_type(Widget)
+_WidgetOrNoneDescriptor = descriptors.IsInstance.from_type(
+    Widget, or_none=True)
 
 
 class Bin(Widget):
@@ -52,14 +63,29 @@ class Bin(Widget):
 
     Properties:
         child           RW
-            The only child or None.
+            The only child or None. None by default.
             Setting this to None removes the child.
     """
 
-    def __init__(self):
-        """Initialize the bin."""
-        super().__init__()
-        self.child = core.Property(None)
+    properties = ['child']
+    __child = _WidgetOrNoneDescriptor(default=None)
+
+    def set_child(self, child):
+        """Set the child of the widget.
+
+        If child is None, remove the existing child.
+        """
+        if child is not None:
+            if not isinstance(child, Child):
+                raise TypeError("%r is not a Child" % (child,))
+            if child.get_parent() is not self:
+                raise ValueError("cannot add a child with the wrong parent")
+        self.__child = child
+        self.child.emit_changed()
+
+    def get_child(self):
+        """Return the current child or None."""
+        return self.__child
 
 
 class Window(Bin):
@@ -75,58 +101,78 @@ class Window(Bin):
         parentwindow    R
             The parent window set on initialization.
         title           RW
-            The title of the window.
+            The title of the window. 'Window' by default.
+        size            RWC
+            A two-tuple of the window's width and height.
+            This is (200, 200) by default. You can also use a list when
+            setting the size.
         width           RW
-            The width of the widget.
         height          RW
-            The height of the widget.
-        size            RW
-            A two-tuple of width and height.
+            The first and second item of size for convenience.
 
     Signals:
-        on_close
+        on_close()
             The window is closed.
     """
 
+    # TODO:
+    #   - A property called "resizable", True by default.
+    #   - A window icon property.
+
+    properties = ['parentwindow', 'title', 'size', 'width', 'height']
+    signals = ['on_close']
+
+    __parentwindow = _WidgetOrNoneDescriptor()
+    __title = descriptors.String(default="Window")
+    __size = descriptors.Tuple(types=(int, int), default=(200, 200))
+
     def __init__(self, parentwindow=None):
         """Initialize the window."""
-        if parentwindow is not None and not isinstance(parentwindow, Window):
-            raise TypeError("parentwindow must be a Window or None")
+        self.__parentwindow = parentwindow
         super().__init__()
-        self.parentwindow = core.Property(parentwindow)
-        self.title = core.Property('Window')
-        self.width = core.Property(200)
-        self.width._setter = self.__set_width
-        self.width._getter = self.__get_width
-        self.height = core.Property(200)
-        self.height._setter = self.__set_height
-        self.height._getter = self.__get_height
-        self.size = core.Property((200, 200))
-        self.size._setter = self.__set_size
-        self.size._getter = self.__get_size
-        self.on_close = core.Signal()
 
-    # These conflict with each other, but GUI implementations are
-    # supposed to override some of these.
-    def __set_width(self, width):
-        self['size'] = width, self['height']
+    def get_parentwindow(self):
+        """Get the parent window set on initialization."""
+        return self.__parentwindow
 
-    def __get_width(self):
-        width, height = self['size']
+    def set_title(self, title):
+        """Set the title."""
+        self.__title = title
+        self.title.emit_changed()
+
+    def get_title(self):
+        """Get the title."""
+        return self.__title
+
+    def set_size(self, size):
+        """Set the size."""
+        # This class keeps the size in a non-public instance variable,
+        # and classes inherited from this class should call this method
+        # every time the window is resized.
+        self.__size = size
+        self.size.emit_changed()
+
+    def get_size(self):
+        """Get the size."""
+        return self.__size
+
+    # Width and height for convinience.
+    # Don't override these in a subclass.
+    def set_width(self, width):
+        height = self.get_height()
+        self.set_size((width, height))
+
+    def get_width(self):
+        width, height = self.get_size()
         return width
 
-    def __set_height(self, height):
-        self['size'] = self['width'], height
+    def set_height(self, height):
+        width = self.get_width()
+        self.set_size((width, height))
 
-    def __get_height(self):
-        width, height = self['size']
+    def get_height(self):
+        width, height = self.get_size()
         return height
-
-    def __set_size(self, size):
-        self['width'], self['height'] = size
-
-    def __get_size(self):
-        return self['width'], self['height']
 
 
 class Child(Widget):
@@ -143,22 +189,38 @@ class Child(Widget):
             True if the widget is grayed out, False otherwise.
     """
 
+    properties = ['parent', 'grayed_out']
+
+    __grayed_out = descriptors.Boolean(default=False)
+
     def __init__(self, parent):
         """Initialize the child and set parent as its parent.
 
         The parent cannot be changed afterwards.
         """
         super().__init__()
-        self.parent = core.Property(parent)
-        self.grayed_out = core.Property(False)
+        self.__parent = parent
+
+    def get_parent(self):
+        """Get the parent."""
+        return self.__parent
+
+    def set_grayed_out(self, grayed_out):
+        """Gray out the widget or make it not grayed out."""
+        self.__grayed_out = grayed_out
+        self.grayed_out.emit_changed()
+
+    def get_grayed_out(self):
+        """Check if the widget is grayed out."""
+        return self.__grayed_out
 
 
 class Box(Child):
     """A widget that contains other widgets in a horizontal or vertical row.
 
     Properties:
-        children            R
-            A tuple of children in this widget.
+        children            RC
+            A list of children in this widget.
             Modify this with the prepend, append an remove methods. The
             getter returns a copy of the actual list.
         orientation         R
@@ -167,59 +229,65 @@ class Box(Child):
             constants.VERTICAL.
     """
 
+    properties = ['children', 'orientation']
+
     def __init__(self, parent, orientation):
         """Initialize the box.
 
         In most cases, it's convenient to use hbox() or vbox() instead.
         """
-        if orientation not in (constants.HORIZONTAL, constants.VERTICAL):
+        if orientation not in (bananagui.HORIZONTAL, bananagui.VERTICAL):
             raise ValueError("unknown orientation {!r}".format(orientation))
         super().__init__(parent)
-        self.children = core.Property([])
-        self.children._getter = self.__get_children
-        self.orientation = core.Property(orientation)
+        self.__orientation = orientation
+        self.__children = []  # This must be here in __init__.
 
     @classmethod
     def hbox(cls, parent):
         """Create a horizontal box.
 
-        This is equivalent to cls(parent, constants.HORIZONTAL).
+        This is equivalent to cls(parent, bananagui.HORIZONTAL).
         """
-        return cls(parent, constants.HORIZONTAL)
+        return cls(parent, bananagui.HORIZONTAL)
 
     @classmethod
     def vbox(cls, parent):
         """Create a vertical box.
 
-        This is equivalent to cls(parent, constants.VERTICAL).
+        This is equivalent to cls(parent, bananagui.VERTICAL).
         """
-        return cls(parent, constants.VERTICAL)
+        return cls(parent, bananagui.VERTICAL)
 
-    def __get_children(self):
-        return self.children._value.copy()
+    def get_orientation(self):
+        """Return the orientation set on initialization."""
+        return self.__orientation
+
+    def get_children(self):
+        """Get the children."""
+        return self.__children.copy()
 
     def prepend(self, child, expand=False):
         """Add a widget to the beginning."""
         if child['parent'] is not self:
             raise ValueError("cannot prepend a child with the wrong parent")
-        self.children._value.insert(0, child)
+        self.__children.insert(0, child)
         self.children.emit_changed()
 
     def append(self, child, expand=False):
         """Add a widget to the end."""
         if child['parent'] is not self:
             raise ValueError("cannot append a child with the wrong parent")
-        self.children._value.append(child)
+        self.__children.append(child)
         self.children.emit_changed()
 
     def remove(self, child):
         """Remove a widget from self."""
-        self.children._value.remove(child)
+        self.__children.remove(child)
         self.children.emit_changed()
 
     def clear(self):
         """Remove all widgets from self."""
-        self.children._value.clear()
+        self.__children.clear()
         self.children.emit_changed()
 
 
@@ -228,27 +296,31 @@ class Label(Child):
 
     Properties:
         text            RW
-            The label's text.
+            The label's text. An empty string by default.
     """
 
-    def __init__(self, parent):
-        """Initialize the label."""
-        super().__init__(parent)
-        self.text = core.Property('')
+    properties = ['text']
+    __text = ''
+
+    def set_text(self, text):
+        """Set the text in the label."""
+        self.__text = text
+        self.text.emit_changed()
+
+    def get_text(self):
+        """Get the text in the label."""
+        return self.__text
 
 
 class ButtonBase(Child):
     """A widget that can be pressed.
 
     Signals:
-        on_click        RW
+        on_click()
             The button is clicked.
     """
 
-    def __init__(self, parent):
-        """Initialize the button."""
-        super().__init__(parent)
-        self.on_click = core.Signal()
+    signals = ['on_click']
 
 
 class TextButton(ButtonBase):
@@ -256,17 +328,25 @@ class TextButton(ButtonBase):
 
     Properties:
         text            RW
-            Text in the button or None.
+            Text in the button. This is an empty string by default.
     """
 
-    def __init__(self, parent):
-        """Initialize the button."""
-        super().__init__(parent)
-        self.text = core.Property('')
+    properties = ['text']
+    __text = ''
+
+    def set_text(self, text):
+        """Set the button's text."""
+        self.__text = text
+
+    def get_text(self):
+        """Get the button's text."""
 
 
 def main():
-    """Run the mainloop until quit() is called."""
+    """Run the mainloop until quit() is called.
+
+    Return an exit status if the wrapped GUI toolkit supports it.
+    """
 
 
 def quit():

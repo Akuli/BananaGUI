@@ -21,26 +21,43 @@
 
 """The core of BananaGUI."""
 
+import functools
+
+import bananagui
+
 
 class Signal:
-    """A signal."""
+    """A signal that calls its callbacks when it's emitted.
+
+    The callbacks are internally stored in a list, and when the signal
+    is emitted, each callback in the is called in the order they are in
+    the list. Adding a callback appends to the list, and removing a
+    callback removes the first occurance in the list.
+    """
 
     def __init__(self):
         """Initialize a signal with no callbacks."""
         self._callbacks = []
 
     def connect(self, callback):
-        """Add a callback."""
+        """Add a callback.
+
+        If the same callback is added twice, it will be called twice.
+        """
         if not callable(callback):
-            raise ValueError("callbacks must be callable")
+            raise TypeError("callbacks must be callable")
         self._callbacks.append(callback)
 
     def is_connected(self, callback):
-        """Check if callback has been added."""
+        """Check if a callback has been added."""
         return callback in self._callbacks
 
     def disconnect(self, callback):
-        """Remove a callback."""
+        """Remove a callback.
+
+        If a callback is added twice, the first occurance will be
+        removed.
+        """
         self._callbacks.remove(callback)
 
     def emit(self, *args):
@@ -50,58 +67,78 @@ class Signal:
 
 
 class Property:
-    """A Property.
+    """Container for a setter, a getter and a changed signal."""
 
-    The Properties are more like properties in GUI toolkits like PyQt
-    and GTK+ than Python properties. When the value of the property is
-    changed with set(), its changed signal will be emitted with the new
-    value.
-    """
-
-    # The properties are called explicitly instead of using __set__ and
-    # __get__ to avoid interference with other attributes in subclasses,
-    # e.g. label.text = 'hello' overwrites the property instead of
-    # changing its value with descriptor magic. label.text.set('hello')
-    # or label['text'] = 'hello' would change the value.
-
-    def __init__(self, default_value):
+    def __init__(self, setter=None, getter=None):
         """Initialize the Property."""
-        self._setter = None
-        self._getter = None
-        self._value = default_value
+        self._setter = setter
+        self._getter = getter
         self.changed = Signal()
 
     def set(self, value):
-        """Set the Property's value and emit the callback signal."""
+        """Set the property's value.
+
+        Raise a PropertyError if the value cannot be set.
+        """
         if self._setter is None:
-            raise ValueError("cannot set the value")
+            raise bananagui.PropertyError("cannot set the value")
         self._setter(value)
-        self._value = value
-        self.changed.emit(value)
 
     def get(self):
-        """Return the current value."""
+        """Return the property's current value.
+
+        Raise a PropertyError if the value cannot be retrieved.
+        """
         if self._getter is None:
-            return self._value
+            raise bananagui.PropertyError("cannot get the value")
         return self._getter()
 
     def emit_changed(self):
-        """Emit the changed signal.
+        """Emit the changed signal with the current value.
 
-        This is equivalent to self.changed.emit(self.get()).
+        The getter should call this when changing the value succeeds.
         """
-        self.changed.emit(self.get())
+        self.changed.emit(self._getter())
 
 
-class BaseObject:
+class _BaseObjectMeta(type):
+    """A metaclass for BaseObject."""
+
+    def __new__(metaclass, name, bases, dictionary):
+        """Create and return a new BaseObject subclass."""
+        new_signals = dictionary.pop('signals', [])
+        new_properties = dictionary.pop('properties', [])
+        cls = super().__new__(metaclass, name, bases, dictionary)
+
+        cls.signals = getattr(cls, 'signals', []) + new_signals
+        cls.properties = getattr(cls, 'properties', []) + new_properties
+        return cls
+
+
+class BaseObject(metaclass=_BaseObjectMeta):
     """An object that allows using properties with subscripting."""
+
+    signals = []
+    properties = []
+
+    def __init__(self):
+        """Set up properties and signals."""
+        for signame in self.signals:
+            setattr(self, signame, Signal())
+        for propname in self.properties:
+            prop = Property(
+                getattr(self, 'set_' + propname, None),
+                getattr(self, 'get_' + propname, None),
+            )
+            setattr(self, propname, prop)
 
     def __setitem__(self, propname, value):
         """Set a property's value."""
         try:
             prop = getattr(self, propname)
         except AttributeError as e:
-            raise KeyError(propname) from e
+            raise bananagui.PropertyError("no such property: {!r}"
+                                          .format(propname)) from e
         prop.set(value)
 
     def __getitem__(self, propname):
@@ -109,5 +146,6 @@ class BaseObject:
         try:
             prop = getattr(self, propname)
         except AttributeError as e:
-            raise KeyError(propname) from e
+            raise bananagui.PropertyError("no such property: {!r}"
+                                          .format(propname)) from e
         return prop.get()
