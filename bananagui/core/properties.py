@@ -30,6 +30,8 @@ import functools
 from bananagui.core import signals
 
 
+# TODO: use a WeakKeyDictionary instead of id()'s
+
 class Anything:
     """A basic property.
 
