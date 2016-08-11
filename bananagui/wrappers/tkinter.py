@@ -26,7 +26,7 @@ import tkinter as tk
 import warnings
 
 import bananagui
-from bananagui.core import widgets
+from bananagui.core import properties, signals, widgets
 
 try:
     import idlelib.ToolTip      # noqa
@@ -69,6 +69,8 @@ class _ToolTip(_ToolTipBase):
 class Widget(widgets.Widget):
 
     __doc__ = widgets.Widget.__doc__
+
+    tooltip = properties.StringOrNone(default=lambda: None)
 
     @functools.wraps(widgets.Widget.set_tooltip)
     def set_tooltip(self, tooltip):

@@ -19,43 +19,31 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Baseclasses for the wrappers."""
+"""Baseclasses for the wrappers.
 
-import bananagui.core
-from bananagui.utils import descriptors
+The wrappers are supposed to create most of the properties and signals.
+"""
+
+from bananagui.core import BaseObject, properties
 
 
-class Widget(bananagui.core.BaseObject):
+class Widget(BaseObject):
     """A widget baseclass.
 
     Properties:
         real_widget     R
-            The real GUI toolkit widget that's being wrapped.
+            The real GUI toolkit widget that's being wrapped or None.
         tooltip         RW
             The widget's tooltip text. None by default.
     """
 
-    properties = ['real_widget', 'tooltip']
-
-    __tooltip = descriptors.StringOrNone(default=None)
-
-    def get_real_widget(self):
-        """Get the real GUI toolkit widget that is being wrapped."""
-        raise NotImplementedError("override this")
-
-    def set_tooltip(self, tooltip):
-        """Set the tooltip."""
-        self.__tooltip = tooltip
-        self.tooltip.emit_changed()
-
-    def get_tooltip(self):
-        """Get the tooltip."""
-        return self.__tooltip
-
-
-_WidgetDescriptor = descriptors.IsInstance.from_type(Widget)
-_WidgetOrNoneDescriptor = descriptors.IsInstance.from_type(
-    Widget, or_none=True)
+    real_widget = properties.Anything(
+        allow_none=True,
+    )
+    tooltip = properties.String(
+        allow_none=True,
+        get_default=lambda: None,
+    )
 
 
 class Bin(Widget):
@@ -63,29 +51,15 @@ class Bin(Widget):
 
     Properties:
         child           RW
-            The only child or None. None by default.
+            The child in the widget, None by default.
             Setting this to None removes the child.
     """
 
-    properties = ['child']
-    __child = _WidgetOrNoneDescriptor(default=None)
-
-    def set_child(self, child):
-        """Set the child of the widget.
-
-        If child is None, remove the existing child.
-        """
-        if child is not None:
-            if not isinstance(child, Child):
-                raise TypeError("%r is not a Child" % (child,))
-            if child.get_parent() is not self:
-                raise ValueError("cannot add a child with the wrong parent")
-        self.__child = child
-        self.child.emit_changed()
-
-    def get_child(self):
-        """Return the current child or None."""
-        return self.__child
+    child = properties.IsInstance(
+        required_type=Widget,
+        allow_none=True,
+        default=lambda: None,
+    )
 
 
 class Window(Bin):
@@ -109,70 +83,25 @@ class Window(Bin):
         width           RW
         height          RW
             The first and second item of size for convenience.
+        resizable       RW
+            True if the window can be resized, False otherwise.
 
     Signals:
         on_close()
             The window is closed.
     """
 
-    # TODO:
-    #   - A property called "resizable", True by default.
-    #   - A window icon property.
-
-    properties = ['parentwindow', 'title', 'size', 'width', 'height']
-    signals = ['on_close']
-
-    __parentwindow = _WidgetOrNoneDescriptor()
-    __title = descriptors.String(default="Window")
-    __size = descriptors.Tuple(types=(int, int), default=(200, 200))
-
-    def __init__(self, parentwindow=None):
-        """Initialize the window."""
-        self.__parentwindow = parentwindow
-        super().__init__()
-
-    def get_parentwindow(self):
-        """Get the parent window set on initialization."""
-        return self.__parentwindow
-
-    def set_title(self, title):
-        """Set the title."""
-        self.__title = title
-        self.title.emit_changed()
-
-    def get_title(self):
-        """Get the title."""
-        return self.__title
-
-    def set_size(self, size):
-        """Set the size."""
-        # This class keeps the size in a non-public instance variable,
-        # and classes inherited from this class should call this method
-        # every time the window is resized.
-        self.__size = size
-        self.size.emit_changed()
-
-    def get_size(self):
-        """Get the size."""
-        return self.__size
-
-    # Width and height for convinience.
-    # Don't override these in a subclass.
-    def set_width(self, width):
-        height = self.get_height()
-        self.set_size((width, height))
-
-    def get_width(self):
-        width, height = self.get_size()
-        return width
-
-    def set_height(self, height):
-        width = self.get_width()
-        self.set_size((width, height))
-
-    def get_height(self):
-        width, height = self.get_size()
-        return height
+    parentwindow = properties.Anything(
+        allow_none=True,
+    )
+    title = properties.String(
+        allow_none=False,
+    )
+    size = properties.Tuple(
+        types=(int, int),
+        convert=,
+        allow_none=False,
+    )
 
 
 class Child(Widget):
@@ -189,31 +118,6 @@ class Child(Widget):
             True if the widget is grayed out, False otherwise.
     """
 
-    properties = ['parent', 'grayed_out']
-
-    __grayed_out = descriptors.Boolean(default=False)
-
-    def __init__(self, parent):
-        """Initialize the child and set parent as its parent.
-
-        The parent cannot be changed afterwards.
-        """
-        super().__init__()
-        self.__parent = parent
-
-    def get_parent(self):
-        """Get the parent."""
-        return self.__parent
-
-    def set_grayed_out(self, grayed_out):
-        """Gray out the widget or make it not grayed out."""
-        self.__grayed_out = grayed_out
-        self.grayed_out.emit_changed()
-
-    def get_grayed_out(self):
-        """Check if the widget is grayed out."""
-        return self.__grayed_out
-
 
 class Box(Child):
     """A widget that contains other widgets in a horizontal or vertical row.
@@ -228,8 +132,6 @@ class Box(Child):
             initialization. It can be constants.HORIZONTAL or
             constants.VERTICAL.
     """
-
-    properties = ['children', 'orientation']
 
     def __init__(self, parent, orientation):
         """Initialize the box.

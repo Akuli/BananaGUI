@@ -21,131 +21,30 @@
 
 """The core of BananaGUI."""
 
-import functools
 
-import bananagui
+class BaseObject:
+    """An object that allows using properties and signals with subscripting.
 
-
-class Signal:
-    """A signal that calls its callbacks when it's emitted.
-
-    The callbacks are internally stored in a list, and when the signal
-    is emitted, each callback in the is called in the order they are in
-    the list. Adding a callback appends to the list, and removing a
-    callback removes the first occurance in the list.
+    To access a changed signal of a property, you can subscript with
+    'propertyname.changed'.
     """
 
-    def __init__(self):
-        """Initialize a signal with no callbacks."""
-        self._callbacks = []
+    @classmethod
+    def __prop_or_sig(cls, propertyname_or_signalname):
+        """Return a property or a signal."""
+        property_or_signal = cls
+        for attribute in str(propertyname_or_signalname).split('.'):
+            property_or_signal = getattr(property_or_signal, attribute)
+        return property_or_signal
 
-    def connect(self, callback):
-        """Add a callback.
+    def __setitem__(self, propertyname_or_signalname, value):
+        """Set the value of a property or a signal's callback list."""
+        self.__prop_or_sig(propertyname_or_signalname).set(self, value)
 
-        If the same callback is added twice, it will be called twice.
-        """
-        if not callable(callback):
-            raise TypeError("callbacks must be callable")
-        self._callbacks.append(callback)
+    def __getitem__(self, propertyname_or_signalname):
+        """Return the value of a property or a signal's callback list."""
+        return self.__prop_or_sig(propertyname_or_signalname).get(self)
 
-    def is_connected(self, callback):
-        """Check if a callback has been added."""
-        return callback in self._callbacks
-
-    def disconnect(self, callback):
-        """Remove a callback.
-
-        If a callback is added twice, the first occurance will be
-        removed.
-        """
-        self._callbacks.remove(callback)
-
-    def emit(self, *args):
-        """Call the callbacks with args."""
-        for callback in self._callbacks:
-            callback(*args)
-
-
-class Property:
-    """Container for a setter, a getter and a changed signal."""
-
-    def __init__(self, setter=None, getter=None):
-        """Initialize the Property."""
-        self._setter = setter
-        self._getter = getter
-        self.changed = Signal()
-
-    def set(self, value):
-        """Set the property's value.
-
-        Raise a PropertyError if the value cannot be set.
-        """
-        if self._setter is None:
-            raise bananagui.PropertyError("cannot set the value")
-        self._setter(value)
-
-    def get(self):
-        """Return the property's current value.
-
-        Raise a PropertyError if the value cannot be retrieved.
-        """
-        if self._getter is None:
-            raise bananagui.PropertyError("cannot get the value")
-        return self._getter()
-
-    def emit_changed(self):
-        """Emit the changed signal with the current value.
-
-        The getter should call this when changing the value succeeds.
-        """
-        self.changed.emit(self._getter())
-
-
-class _BaseObjectMeta(type):
-    """A metaclass for BaseObject."""
-
-    def __new__(metaclass, name, bases, dictionary):
-        """Create and return a new BaseObject subclass."""
-        new_signals = dictionary.pop('signals', [])
-        new_properties = dictionary.pop('properties', [])
-        cls = super().__new__(metaclass, name, bases, dictionary)
-
-        cls.signals = getattr(cls, 'signals', []) + new_signals
-        cls.properties = getattr(cls, 'properties', []) + new_properties
-        return cls
-
-
-class BaseObject(metaclass=_BaseObjectMeta):
-    """An object that allows using properties with subscripting."""
-
-    signals = []
-    properties = []
-
-    def __init__(self):
-        """Set up properties and signals."""
-        for signame in self.signals:
-            setattr(self, signame, Signal())
-        for propname in self.properties:
-            prop = Property(
-                getattr(self, 'set_' + propname, None),
-                getattr(self, 'get_' + propname, None),
-            )
-            setattr(self, propname, prop)
-
-    def __setitem__(self, propname, value):
-        """Set a property's value."""
-        try:
-            prop = getattr(self, propname)
-        except AttributeError as e:
-            raise bananagui.PropertyError("no such property: {!r}"
-                                          .format(propname)) from e
-        prop.set(value)
-
-    def __getitem__(self, propname):
-        """Return a property's value."""
-        try:
-            prop = getattr(self, propname)
-        except AttributeError as e:
-            raise bananagui.PropertyError("no such property: {!r}"
-                                          .format(propname)) from e
-        return prop.get()
+    def emit(self, signalname, *args):
+        """Emit a signal with args."""
+        self.__prop_or_sig(signalname).emit(*args)
