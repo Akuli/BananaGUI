@@ -1,6 +1,6 @@
 # Banana GUI :banana:
 
-This is a wrapper around the Python Tkinter, PyQt and GTK+ 3.0
+This is a wrapper around the Python Tkinter, PyQt 5 and GTK+ 3
 bindings. You can write code using BananaGUI, and then run the
 same code using any of the toolkits mentioned above.
 
