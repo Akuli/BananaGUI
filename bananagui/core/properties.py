@@ -26,11 +26,10 @@ This is in a separate file because there are many property classes.
 
 import collections
 import functools
+import weakref
 
 from bananagui.core import signals
 
-
-# TODO: use a WeakKeyDictionary instead of id()'s
 
 class Anything:
     """A basic property.
@@ -53,12 +52,10 @@ class Anything:
         """
         self._setter = None
         self._getter = None
-        self.changed = signals.Signal()
-        if get_default is None:
-            self._values = {}
-        else:
-            self._values = collections.defaultdict(get_default)
+        self._get_default = get_default
         self._allow_none = allow_none
+        self._values = weakref.WeakKeyDictionary()
+        self.changed = signals.Signal()
 
     def setter(self, setter):
         """Change the setter and return self.
@@ -79,7 +76,7 @@ class Anything:
 
     def raw_set(self, instance, value):
         """Set the value directly to the cache."""
-        self._values[id(instance)] = value
+        self._values[instance] = value
 
     def set(self, instance, value):
         """Set the value.
@@ -88,7 +85,7 @@ class Anything:
         not equal.
         """
         if self._setter is None:
-            raise RuntimeError("cannot set the value of %s" % self.name)
+            raise bananagui.ReadOnlyPropertyError("cannot set the value")
         if value is None and not self._allow_none:
             raise ValueError("None is not allowed")
         value = self._convert(instance, value)
@@ -100,7 +97,7 @@ class Anything:
 
     def raw_get(self, instance):
         """Get the value directly from the cache."""
-        return self._values[id(instance)]
+        return self._values[instance]
 
     def get(self, instance):
         """Get the value."""

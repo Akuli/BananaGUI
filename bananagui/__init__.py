@@ -36,31 +36,28 @@ from bananagui.core.structures import Font   # noqa
 HORIZONTAL = 'h'
 VERTICAL = 'v'
 
-RED = Color(255, 0, 0)
-ORANGE = Color(255, 127, 0)
-YELLOW = Color(255, 255, 0)
-GREEN = Color(0, 255, 0)
-CYAN = Color(0, 255, 255)
-BLUE = Color(0, 0, 255)
-PINK = Color(255, 0, 255)
-BLACK = Color(0, 0, 0)
-WHITE = Color(255, 255, 255)
-
-GRAY50 = BLACK + WHITE
-GRAY25 = GRAY50 + BLACK
-GRAY75 = GRAY50 + WHITE
+BLACK = '#000000'
+GRAY = '#7f7f7f'
+WHITE = '#ffffff'
+RED = '#ff0000'
+ORANGE = '#ff7f00'
+YELLOW = '#ffff00'
+GREEN = '#00ff00'
+CYAN = '#00ffff'
+BLUE = '#0000ff'
+PINK = '#ff00ff'
 
 
 class MissingFeatureWarning(UserWarning):
     """Warned when a GUI toolkit doesn't have the requested feature."""
 
 
-class PropertyError(AttributeError):
-    """Raised when a property related problem is detected.
+class NoSuchProperty(KeyError):
+    """Raised when a requested property is not found."""
 
-    Usually the property is not found, or the property doesn't have the
-    requested setter or getter.
-    """
+
+class ReadOnlyProperty(RuntimeError):
+    """Raised when a property's value cannot be changed as requested."""
 
 
 def get(*toolkit_names):
