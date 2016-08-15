@@ -19,71 +19,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Tkinter interface."""
+"""Tkinter wrapper."""
 
 import functools
 import tkinter as tk
 import warnings
 
-import bananagui
-from bananagui.core import properties, signals, widgets
-
-try:
-    import idlelib.ToolTip      # noqa
-    _ToolTipBase = idlelib.ToolTip.ToolTipBase
-except ImportError:
-    idlelib = None
-    _ToolTipBase = object
-
-
-class _ToolTip(_ToolTipBase):
-    """Tooltips for tkinter using idlelib.
-
-    http://stackoverflow.com/a/30021542
-    """
-
-    def __init__(self, widget):
-        """Initialize the tooltip.
-
-        By default, this doesn't do anything. Set the text attribute to
-        a string to display a tooltip.
-        """
-        assert idlelib is not None, "cannot create _ToolTips without idlelib"
-        super().__init__(widget)
-        self.text = None
-
-    def showcontents(self):
-        """Show the tooltip."""
-        if self.text is not None:
-            # With my dark GTK+ theme, the original showcontents creates
-            # light text on light background. This always creates black
-            # text on white background.
-            label = tk.Label(
-                self.tipwindow, text=str(self.text), justify='left',
-                foreground='black', background='white', relief='solid',
-                borderwidth=1,
-            )
-            label.pack()
-
-
-class Widget(widgets.Widget):
-
-    __doc__ = widgets.Widget.__doc__
-
-    tooltip = properties.StringOrNone(default=lambda: None)
-
-    @functools.wraps(widgets.Widget.set_tooltip)
-    def set_tooltip(self, tooltip):
-        # The _ToolTip instance is created here because the __init__()
-        # is called before the real_widget() property has a _value.
-        if idlelib is None and tooltip is not None:
-            warnings.warn("idlelib is required to display tooltips",
-                          bananagui.MissingFeatureWarning)
-        else:
-            if not hasattr(self, '__tkinter_tooltip'):
-                self.__tkinter_tooltip = _ToolTip(self['real_widget'])
-            self.__tkinter_tooltip.text = tooltip
-        super().set_tooltip(tooltip)
+from bananagui.core import Property, Signal, init, main, quit
 
 
 class Bin(widgets.Bin, Widget):
@@ -259,18 +201,18 @@ class TextButton(widgets.TextButton, ButtonBase):
         self['real_widget'].config(text=text)
 
 
-@functools.wraps(widgets.main)
-def main():
+@functools.wraps(init)
+def init():
     global _root
-    _root.mainloop()
     _root = tk.Tk()
     _root.withdraw()
 
 
-@functools.wraps(widgets.quit)
+@functools.wraps(main)
+def main():
+    _root.mainloop()
+
+
+@functools.wraps(quit)
 def quit():
     _root.destroy()
-
-
-_root = tk.Tk()
-_root.withdraw()

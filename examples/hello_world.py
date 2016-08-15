@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -19,37 +21,39 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""This module contains the signal class.
+"""Hello world program."""
 
-This is in a separate file to avoid circular imports.
-"""
+import bananagui
 
-import collections
+gui = bananagui.get_wrapper('bananagui.wrappers.tkinter')
 
 
-class Signal:
-    """A signal that contains callbacks and can be emitted."""
+def on_click():
+    print("Click!")
 
-    def __init__(self):
-        """Initialize a signal."""
-        self._callbacks = collections.defaultdict(list)
 
-    def set(self, instance, callback_list):
-        """Set the callbacks list."""
-        if self._callbacks[id(instance)] is not callback_list:
-            if not isinstance(callback_list, list):
-                callback_list = list(callback_list)
-            self._callbacks[id(instance)] = callback_list
+def main():
+    gui.init()
 
-    def get(self, instance):
-        """Return the callback list.
+    window = gui.Window()
 
-        The list can be modified, but it may be replaced with a new list
-        later.
-        """
-        return self._callbacks[id(instance)]
+    box = gui.Box.vbox(window)
+    window['child'] = box
 
-    def emit(self, instance, *args):
-        """Call the callbacks with args."""
-        for callback in self.get_callback_list(instance):
-            callback(*args)
+    label = gui.Label(box)
+    label['text'] = "Click this button:"
+    box.add_start(label, expand=True)
+
+    button = gui.TextButton(box)
+    button['text'] = "Click me!"
+    button['tooltip'] = "Yes, click me."
+    button['on_click'].append(on_click)
+    box.add_end(button)
+
+    window['size'] = (150, 100)     # the parentheses can be omitted
+    window['on_close'].append(gui.quit)
+    sys.exit(gui.main())
+
+
+if __name__ == '__main__':
+    main()

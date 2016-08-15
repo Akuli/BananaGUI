@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,35 +19,29 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
+"""BananaGUI buttons."""
 
-import sys
-
-import bananagui
-
-gui = bananagui.get('tkinter')
+from bananagui.core import Signal
+from bananagui.core.widgets import bases
 
 
-def on_click():
-    """The user clicked the button."""
-    print("Clicked!")
+class ButtonBase(bases.ChildBase):
+    """A widget that can be pressed.
+
+    Signals:
+        on_click()
+            The button is clicked.
+    """
+
+    on_click = Signal()
 
 
-window = gui.Window()
+class TextButton(ButtonBase):
+    """A button with text.
 
-box = gui.Box.vbox(window)
-window.set_child(box)
+    Properties:
+        text            RW
+            Text in the button. This is an empty string by default.
+    """
 
-label = gui.Label(box)
-label.set_text("Click this button:")
-box.append(label, expand=True)
-
-button = gui.TextButton(box)
-button.set_text("Click me!")
-button.set_tooltip("Yes, click me.")
-button.on_click.connect(on_click)
-box.append(button)
-
-window.set_size([150, 100])
-window.on_close.connect(gui.quit)
-sys.exit(gui.main())
+    text = Property(converter=str, default='')
