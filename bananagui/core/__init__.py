@@ -22,92 +22,29 @@
 """The core of BananaGUI."""
 
 
-class Signal:
-    """A signal."""
+class BaseObject:
+    """An object that allows using properties and signals with subscripting.
 
-    def __init__(self):
-        """Initialize a signal with no callbacks."""
-        self._callbacks = []
-
-    def connect(self, callback):
-        """Add a callback."""
-        if not callable(callback):
-            raise ValueError("callbacks must be callable")
-        self._callbacks.append(callback)
-
-    def is_connected(self, callback):
-        """Check if callback has been added."""
-        return callback in self._callbacks
-
-    def disconnect(self, callback):
-        """Remove a callback."""
-        self._callbacks.remove(callback)
-
-    def emit(self, *args):
-        """Call the callbacks with args."""
-        for callback in self._callbacks:
-            callback(*args)
-
-
-class Property:
-    """A Property.
-
-    The Properties are more like properties in GUI toolkits like PyQt
-    and GTK+ than Python properties. When the value of the property is
-    changed with set(), its changed signal will be emitted with the new
-    value.
+    To access a changed signal of a property, you can subscript with
+    'propertyname.changed'.
     """
 
-    # The properties are called explicitly instead of using __set__ and
-    # __get__ to avoid interference with other attributes in subclasses,
-    # e.g. label.text = 'hello' overwrites the property instead of
-    # changing its value with descriptor magic. label.text.set('hello')
-    # or label['text'] = 'hello' would change the value.
+    @classmethod
+    def __prop_or_sig(cls, propertyname_or_signalname):
+        """Return a property or a signal."""
+        property_or_signal = cls
+        for attribute in str(propertyname_or_signalname).split('.'):
+            property_or_signal = getattr(property_or_signal, attribute)
+        return property_or_signal
 
-    def __init__(self, default_value):
-        """Initialize the Property."""
-        self._setter = None
-        self._getter = None
-        self._value = default_value
-        self.changed = Signal()
+    def __setitem__(self, propertyname_or_signalname, value):
+        """Set the value of a property or a signal's callback list."""
+        self.__prop_or_sig(propertyname_or_signalname).set(self, value)
 
-    def set(self, value):
-        """Set the Property's value and emit the callback signal."""
-        if self._setter is None:
-            raise ValueError("cannot set the value")
-        self._setter(value)
-        self._value = value
-        self.changed.emit(value)
+    def __getitem__(self, propertyname_or_signalname):
+        """Return the value of a property or a signal's callback list."""
+        return self.__prop_or_sig(propertyname_or_signalname).get(self)
 
-    def get(self):
-        """Return the current value."""
-        if self._getter is None:
-            return self._value
-        return self._getter()
-
-    def emit_changed(self):
-        """Emit the changed signal.
-
-        This is equivalent to self.changed.emit(self.get()).
-        """
-        self.changed.emit(self.get())
-
-
-class BaseObject:
-    """An object that allows using properties with subscripting."""
-
-    def __setitem__(self, propname, value):
-        """Set a property's value."""
-        try:
-            prop = getattr(self, propname)
-        except AttributeError as e:
-            raise KeyError(propname) from e
-        prop.set(value)
-
-    def __getitem__(self, propname):
-        """Return a property's value."""
-        try:
-            prop = getattr(self, propname)
-        except AttributeError as e:
-            raise KeyError(propname) from e
-        return prop.get()
+    def emit(self, signalname, *args):
+        """Emit a signal with args."""
+        self.__prop_or_sig(signalname).emit(*args)
