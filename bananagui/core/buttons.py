@@ -19,37 +19,29 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""This module contains the signal class.
+"""BananaGUI buttons."""
 
-This is in a separate file to avoid circular imports.
-"""
-
-import collections
+from bananagui.core import Signal
+from bananagui.core.widgets import bases
 
 
-class Signal:
-    """A signal that contains callbacks and can be emitted."""
+class ButtonBase(bases.ChildBase):
+    """A widget that can be pressed.
 
-    def __init__(self):
-        """Initialize a signal."""
-        self._callbacks = collections.defaultdict(list)
+    Signals:
+        on_click()
+            The button is clicked.
+    """
 
-    def set(self, instance, callback_list):
-        """Set the callbacks list."""
-        if self._callbacks[id(instance)] is not callback_list:
-            if not isinstance(callback_list, list):
-                callback_list = list(callback_list)
-            self._callbacks[id(instance)] = callback_list
+    on_click = Signal()
 
-    def get(self, instance):
-        """Return the callback list.
 
-        The list can be modified, but it may be replaced with a new list
-        later.
-        """
-        return self._callbacks[id(instance)]
+class TextButton(ButtonBase):
+    """A button with text.
 
-    def emit(self, instance, *args):
-        """Call the callbacks with args."""
-        for callback in self.get_callback_list(instance):
-            callback(*args)
+    Properties:
+        text            RW
+            Text in the button. This is an empty string by default.
+    """
+
+    text = Property(converter=str, default='')

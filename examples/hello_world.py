@@ -25,28 +25,35 @@
 
 import bananagui
 
-gui = bananagui.get('bananagui.wrappers.tkinter')
+gui = bananagui.get_wrapper('bananagui.wrappers.tkinter')
 
 
 def on_click():
     print("Click!")
 
 
-window = gui.Window()
+def main():
+    gui.init()
 
-box = gui.Box.vbox(window)
-window['child'] = box
+    window = gui.Window()
 
-label = gui.Label(box)
-label['text'] = "Click this button:"
-box.append(label, expand=True)
+    box = gui.Box.vbox(window)
+    window['child'] = box
 
-button = gui.TextButton(box)
-button['text'] = "Click me!"
-button['tooltip'] = "Yes, click me."
-button['on_click'].append(on_click)
-box.append(button)
+    label = gui.Label(box)
+    label['text'] = "Click this button:"
+    box.add_start(label, expand=True)
 
-window['size'] = (150, 100)     # the parentheses can be omitted
-window['on_close'].append(gui.quit)
-sys.exit(gui.main())
+    button = gui.TextButton(box)
+    button['text'] = "Click me!"
+    button['tooltip'] = "Yes, click me."
+    button['on_click'].append(on_click)
+    box.add_end(button)
+
+    window['size'] = (150, 100)     # the parentheses can be omitted
+    window['on_close'].append(gui.quit)
+    sys.exit(gui.main())
+
+
+if __name__ == '__main__':
+    main()
