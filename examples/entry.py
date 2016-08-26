@@ -21,7 +21,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
+"""BananaGUI entry example."""
 
 import sys
 
@@ -31,30 +31,37 @@ from bananagui import gui
 bananagui.load_guiwrapper('.tkinter')
 
 
-def on_click(button):
-    print("You clicked me!")
+class EntryExample(gui.Window):
+
+    def __init__(self):
+        super().__init__()
+
+        box = gui.VBox(self)
+        self['child'] = box
+
+        # This entry is attached to self because the on_click method
+        # needs it.
+        self.entry = gui.Entry(box)
+        self.entry['text'] = "Enter something here..."
+#        self.entry['hidden'] = True
+        box.add_start(self.entry)
+
+        button = gui.Button(box)
+        button['text'] = "Print it"
+        button['on_click'].append(self.on_click)
+        box.add_start(button, expand=True)
+
+    def on_click(self, button):
+        print(self.entry['text'])
 
 
 def main():
     gui.init()
-
-    with gui.Window() as window:
-        box = gui.VBox(window)
-        window['child'] = box
-
-        label = gui.Label(box)
-        label['text'] = "Hello World!"
-        box.add_start(label, expand=True)
-
-        button = gui.Button(box)
-        button['text'] = "Click me!"
-        button['tooltip'] = "Yes, click me."
-        button['on_click'].append(on_click)
-        box.add_end(button)
-
-        window['title'] = "Hello"
-        window['size'] = (150, 100)    # the parentheses can be omitted
-        window['minimum_size'] = (100, 70)
+    with EntryExample() as window:
+        window['title'] = "Entry example"
+        window['size'] = (200, 100)
+        window['minimum_size'] = (100, 50)
+        window['maximum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
 

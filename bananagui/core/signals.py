@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,43 +19,43 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
+"""Simple signal class for BananaGUI."""
 
-import sys
-
-import bananagui
-from bananagui import gui
-
-bananagui.load_guiwrapper('.tkinter')
+import weakref
 
 
-def on_click(button):
-    print("You clicked me!")
+class Signal:
+    """A signal that contains callbacks and can be emitted."""
 
+    def __init__(self, name):
+        """Initialize a signal."""
+        self._name = name
+        self._callbacks = weakref.WeakKeyDictionary()
 
-def main():
-    gui.init()
+    def __repr__(self):
+        """Return a string representation of the signal."""
+        return '<BananaGUI signal %r>' % self._name
 
-    with gui.Window() as window:
-        box = gui.VBox(window)
-        window['child'] = box
+    def copy(self):
+        """Return a copy of self."""
+        return type(self)()
 
-        label = gui.Label(box)
-        label['text'] = "Hello World!"
-        box.add_start(label, expand=True)
+    def set(self, instance, callback_list):
+        """Set the callbacks list.
 
-        button = gui.Button(box)
-        button['text'] = "Click me!"
-        button['tooltip'] = "Yes, click me."
-        button['on_click'].append(on_click)
-        box.add_end(button)
+        Actually, set the content of the callback list.
+        """
+        self.get(instance)[:] = callback_list
 
-        window['title'] = "Hello"
-        window['size'] = (150, 100)    # the parentheses can be omitted
-        window['minimum_size'] = (100, 70)
-        window['destroyed.changed'].append(gui.quit)
-        sys.exit(gui.main())
+    def get(self, instance):
+        """Return the callback list.
 
+        The list can be mutated or stored in another variable. It is
+        never replaced with another list.
+        """
+        return self._callbacks.setdefault(instance, [])
 
-if __name__ == '__main__':
-    main()
+    def emit(self, instance):
+        """Call the callbacks with args."""
+        for callback in self.get(instance):
+            callback(instance)

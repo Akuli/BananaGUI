@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -19,29 +21,45 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI buttons."""
+"""BananaGUI Checkbox example."""
 
-from bananagui.core import Signal
-from bananagui.core.widgets import bases
+import sys
 
+import bananagui
+from bananagui import gui
 
-class ButtonBase(bases.ChildBase):
-    """A widget that can be pressed.
-
-    Signals:
-        on_click()
-            The button is clicked.
-    """
-
-    on_click = Signal()
+bananagui.load_guiwrapper('.tkinter')
 
 
-class TextButton(ButtonBase):
-    """A button with text.
+class CheckboxExample(gui.Window):
 
-    Properties:
-        text            RW
-            Text in the button. This is an empty string by default.
-    """
+    def __init__(self):
+        super().__init__()
 
-    text = Property(converter=str, default='')
+        checkbox = gui.Checkbox(self)
+        checkbox['text'] = "Check me!"
+        checkbox['checked.changed'].append(self.on_check)
+        self['child'] = checkbox
+
+    def on_check(self, checkbox):
+        if checkbox['checked']:
+            print("You checked me!")
+            checkbox['text'] = "Uncheck me!"
+        else:
+            print("You unchecked me!")
+            checkbox['text'] = "Check me!"
+
+
+def main():
+    bananagui.gui.init()
+
+    with CheckboxExample() as window:
+        window['title'] = "Checkbox example"
+        window['size'] = (200, 50)
+        window['resizable'] = False
+        window['destroyed.changed'].append(gui.quit)
+        sys.exit(gui.main())
+
+
+if __name__ == '__main__':
+    main()

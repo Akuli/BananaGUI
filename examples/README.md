@@ -17,5 +17,7 @@ Python's `-m` option:
         import bananagui
     ImportError: No module named 'bananagui'
     $ cd ..
+    $ pwd
+    /some/place/BananaGUI
     $ python3 -m examples.hello_world
     (the hello world program runs)

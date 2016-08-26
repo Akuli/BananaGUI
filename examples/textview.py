@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -19,8 +21,47 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Color converting functions."""
+"""BananaGUI TextView example."""
 
-import re
+import sys
+
+import bananagui
+from bananagui import gui
+
+bananagui.load_guiwrapper('.tkinter')
 
 
+class TextViewExample(gui.Window):
+
+    def __init__(self):
+        super().__init__()
+
+        box = gui.VBox(self)
+        self['child'] = box
+
+        # This textview is attached to self because the on_click method
+        # needs it.
+        self.textview = gui.TextView(box)
+        self.textview['text'] = "Enter something here..."
+        box.add_start(self.textview, expand=True)
+
+        button = gui.Button(box)
+        button['text'] = "Print it"
+        button['on_click'].append(self.on_click)
+        box.add_start(button)
+
+    def on_click(self, button):
+        print(self.textview['text'])
+
+
+def main():
+    gui.init()
+    with TextViewExample() as window:
+        window['title'] = "TextView example"
+        window['minimum_size'] = (300, 200)
+        window['destroyed.changed'].append(gui.quit)
+        sys.exit(gui.main())
+
+
+if __name__ == '__main__':
+    main()
