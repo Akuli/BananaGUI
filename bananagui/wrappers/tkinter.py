@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Base widgets for other widgets."""
+"""Tkinter wrapper for BananaGUI."""
 
 import tkinter as tk
 import warnings
@@ -133,7 +133,6 @@ class BinBase:
 class LabelBase:
 
     def __init__(self, parent):
-        """Initialize the label."""
         super().__init__(parent)
         self.raw_set('real_widget', tk.Label(parent['real_widget']))
 
