@@ -24,5 +24,9 @@
 This file sets up a BananaGUI wrapper. If you use the -m option to run
 tests, this file will always be ran also.
 """
+
 import bananagui
-bananagui.load_guiwrapper('.tkinter')
+
+
+# Change this to load a different wrappper
+bananagui.load_guiwrapper('.gtk3')
