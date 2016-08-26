@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,17 +19,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI Checkbox example."""
+"""BananaGUI checkbox test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
-
-class CheckboxExample(gui.Window):
+class CheckboxWindow(gui.Window):
 
     def __init__(self):
         super().__init__()
@@ -51,10 +46,10 @@ class CheckboxExample(gui.Window):
 
 
 def main():
-    bananagui.gui.init()
+    gui.init()
 
-    with CheckboxExample() as window:
-        window['title'] = "Checkbox example"
+    with CheckboxWindow() as window:
+        window['title'] = "Checkbox test"
         window['size'] = (200, 50)
         window['resizable'] = False
         window['destroyed.changed'].append(gui.quit)

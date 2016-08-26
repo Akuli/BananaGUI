@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,18 +19,15 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
+"""BananaGUI hello world test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
-
-bananagui.load_guiwrapper('.tkinter')
 
 
 def on_click(button):
-    print("You clicked me!")
+    print("You clicked the %r button!" % button['text'])
 
 
 def main():
@@ -52,7 +47,7 @@ def main():
         button['on_click'].append(on_click)
         box.add_end(button)
 
-        window['title'] = "Hello"
+        window['title'] = "Hello World"
         window['size'] = (150, 100)    # the parentheses can be omitted
         window['minimum_size'] = (100, 70)
         window['destroyed.changed'].append(gui.quit)

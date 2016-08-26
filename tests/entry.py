@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,17 +19,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI entry example."""
+"""BananaGUI entry test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
-
-class EntryExample(gui.Window):
+class EntryWindow(gui.Window):
 
     def __init__(self):
         super().__init__()
@@ -57,8 +52,8 @@ class EntryExample(gui.Window):
 
 def main():
     gui.init()
-    with EntryExample() as window:
-        window['title'] = "Entry example"
+    with EntryWindow() as window:
+        window['title'] = "Entry test"
         window['size'] = (200, 100)
         window['minimum_size'] = (100, 50)
         window['maximum_size'] = (300, 200)

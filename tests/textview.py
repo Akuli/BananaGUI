@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,17 +19,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI TextView example."""
+"""BananaGUI TextView test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
-
-class TextViewExample(gui.Window):
+class TextViewTest(gui.Window):
 
     def __init__(self):
         super().__init__()
@@ -56,8 +51,8 @@ class TextViewExample(gui.Window):
 
 def main():
     gui.init()
-    with TextViewExample() as window:
-        window['title'] = "TextView example"
+    with TextViewTest() as window:
+        window['title'] = "TextView test"
         window['minimum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
