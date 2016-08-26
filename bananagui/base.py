@@ -319,7 +319,6 @@ class WindowBase:
     BASES = ('BinBase',)
     title = core.Property('title', converter=str, default="BananaGUI Window")
     resizable = core.Property('resizable', converter=bool, default=True)
-    showing = core.Property('showing', converter=bool, default=False)
     size = core.Property('size', converter=_convert2size, default=(200, 200))
     minimum_size = core.Property('minimum_size', converter=_convert2size,
                                  default=None, allow_none=True)

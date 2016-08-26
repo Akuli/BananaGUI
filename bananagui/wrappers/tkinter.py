@@ -346,11 +346,6 @@ class WindowBase:
             size = (1, 1)
         self['real_widget'].minsize(*size)
 
-    def _bananagui_set_maximum_size(self, size):
-        if size is None:
-            size = self.__default_maxsize
-        self['real_widget'].maxsize(*size)
-
 
 class Window:
 
