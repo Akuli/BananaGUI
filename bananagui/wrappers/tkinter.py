@@ -21,6 +21,7 @@
 
 """Tkinter wrapper for BananaGUI."""
 
+import contextlib
 import tkinter as tk
 import warnings
 
@@ -197,51 +198,59 @@ class Checkbox:
 # ~~~~~~~~~~~~
 
 class TextBase:  # TODO: rename 2 EditableBase
-
-    def __init__(self, parent):
-        print('*')
-        super().__init__(parent)
-        self._bananagui_tkinter_var = tk.StringVar()
-        self._bananagui_tkinter_var.trace('w', self.__var_changed)
-
-    def __var_changed(self, name, empty_string, mode):
-        self.raw_set('text', self._bananagui_tkinter_var.get())
-
-    def _bananagui_set_text(self, text):
-        self._bananagui_tkinter_var.set(text)
+    pass
 
 
 class Entry:
 
     def __init__(self, parent):
         super().__init__(parent)
-        widget = tk.Entry(parent['real_widget'],
-                          textvariable=self._bananagui_tkinter_var)
-        self.raw_set('real_widget', widget)
+        self.__var = tk.StringVar()
+        self.__var.trace('w', self.__var_changed)
+        widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
         widget.bind('<Control-A>', self.__select_all)
         widget.bind('<Control-a>', self.__select_all)
+        self.raw_set('real_widget', widget)
+
+    def __var_changed(self, name, empty_string, mode):
+        self.raw_set('text', self.__var.get())
 
     def __select_all(self, event):
         event.widget.selection_range(0, 'end')
         return 'break'
 
+    def _bananagui_set_text(self, text):
+        self.__var.set(text)
+
 
 class TextView:
 
     def __init__(self, parent):
-        # TODO: Add shortcuts like Ctrl+A.
+        # TODO: Add more keyboard shortcuts.
         super().__init__(parent)
-        widget = tk.Text(parent['real_widget'],
-                         textvariable=self._banagui_tkinter_var,
-                         width=1, height=1)
+
+        # A larger width or height would prevent the widget from
+        # shrinking when needed.
+        widget = tk.Text(parent['real_widget'], width=1, height=1)
+        widget.bind('<Control-A>', self.__select_all)
+        widget.bind('<Control-a>', self.__select_all)
+        widget.bind('<<Modified>>', self.__modified)
         self.raw_set('real_widget', widget)
-        self['real_widget'].bind('<Control-A>', self.__select_all)
-        self['real_widget'].bind('<Control-a>', self.__select_all)
 
     def __select_all(self, event):
         # The end-1c doesn't get the last character, which is a newline.
         event.widget.tag_add('sel', 1.0, 'end-1c')
         return 'break'
+
+    def __modified(self, event):
+        self.raw_set('text', event.widget.get(0.0, 'end-1c'))
+        event.widget.unbind('<<Modified>>')
+        event.widget.edit_modified(False)
+        event.widget.bind('<<Modified>>', self.__modified)
+
+    def _bananagui_set_text(self, text):
+        self['real_widget'].delete(0.0, 'end')
+        self['real_widget'].insert(0.0, text)
 
 
 # Layout widgets
@@ -269,9 +278,10 @@ class BoxBase:
             ('v', False): 'x',
         }
 
+        orientation = type(self)._bananagui_tkinter_orientation
         return {
-            'side': sides[(self._bananagui_tkinter_orientation, startorend)],
-            'fill': fills[(self._bananagui_tkinter_orientation, expand)],
+            'side': sides[(orientation, startorend)],
+            'fill': fills[(orientation, expand)],
             'expand': expand,
         }
 

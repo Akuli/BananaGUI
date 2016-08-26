@@ -26,32 +26,18 @@ import sys
 from bananagui import gui
 
 
-class TextViewTest(gui.Window):
-
-    def __init__(self):
-        super().__init__()
-
-        box = gui.VBox(self)
-        self['child'] = box
-
-        # This textview is attached to self because the on_click method
-        # needs it.
-        self.textview = gui.TextView(box)
-        self.textview['text'] = "Enter something here..."
-        box.add_start(self.textview, expand=True)
-
-        button = gui.Button(box)
-        button['text'] = "Print it"
-        button['on_click'].append(self.on_click)
-        box.add_start(button)
-
-    def on_click(self, button):
-        print(self.textview['text'])
+def text_changed(textview):
+    print(textview['text'])
 
 
 def main():
     gui.init()
-    with TextViewTest() as window:
+    with gui.Window() as window:
+        textview = gui.TextView(window)
+        textview['text'] = "Enter something..."
+        textview['text.changed'].append(text_changed)
+        window['child'] = textview
+
         window['title'] = "TextView test"
         window['minimum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
