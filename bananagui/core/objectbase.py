@@ -21,16 +21,20 @@
 
 """A base object for BananaGUI widgets."""
 
+from bananagui import exceptions
 from bananagui.core import properties, signals
 
 
 class ObjectBase:
     """An object that allows using properties and signals with subscripting."""
 
-    def __prop_or_sig(self, propertyname_or_signalname):
-        property_or_signal = type(self)
-        for attribute in propertyname_or_signalname.split('.'):
-            property_or_signal = getattr(property_or_signal, attribute)
+    def __prop_or_sig(self, property_or_signal_name):
+        result = type(self)
+        try:
+            for attribute in property_or_signal_name.split('.'):
+                result = getattr(result, attribute)
+        except AttributeError as e:
+            raise exceptions.NoSuchPropertyOrSignal(property_or_signal) from e
         if not isinstance(property_or_signal,
                           (properties.Property, signals.Signal)):
             raise TypeError("expected a Property or a Signal, got %r"
@@ -53,6 +57,6 @@ class ObjectBase:
         """Get a property's value directly from its cache."""
         return self.__prop_or_sig(propertyname).raw_get(self)
 
-    def emit(self, signalname, *args):
-        """Emit a signal with args."""
-        self.__prop_or_sig(signalname).emit(self, *args)
+    def emit(self, signalname):
+        """Emit a signal."""
+        self.__prop_or_sig(signalname).emit(self)
