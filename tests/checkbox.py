@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,40 +19,39 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Hello world program."""
+"""BananaGUI checkbox test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
+class CheckboxWindow(gui.Window):
 
-def on_click(button):
-    print("You clicked me!")
+    def __init__(self):
+        super().__init__()
+
+        checkbox = gui.Checkbox(self)
+        checkbox['text'] = "Check me!"
+        checkbox['checked.changed'].append(self.on_check)
+        self['child'] = checkbox
+
+    def on_check(self, checkbox):
+        if checkbox['checked']:
+            print("You checked me!")
+            checkbox['text'] = "Uncheck me!"
+        else:
+            print("You unchecked me!")
+            checkbox['text'] = "Check me!"
 
 
 def main():
     gui.init()
 
-    with gui.Window() as window:
-        box = gui.VBox(window)
-        window['child'] = box
-
-        label = gui.Label(box)
-        label['text'] = "Hello World!"
-        box.add_start(label, expand=True)
-
-        button = gui.Button(box)
-        button['text'] = "Click me!"
-        button['tooltip'] = "Yes, click me."
-        button['on_click'].append(on_click)
-        box.add_end(button)
-
-        window['title'] = "Hello"
-        window['size'] = (150, 100)    # the parentheses can be omitted
-        window['minimum_size'] = (100, 70)
+    with CheckboxWindow() as window:
+        window['title'] = "Checkbox test"
+        window['size'] = (200, 50)
+        window['resizable'] = False
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
 

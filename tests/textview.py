@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,47 +19,27 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI entry example."""
+"""BananaGUI TextView test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
-
-class EntryExample(gui.Window):
-
-    def __init__(self):
-        super().__init__()
-
-        box = gui.VBox(self)
-        self['child'] = box
-
-        # This entry is attached to self because the on_click method
-        # needs it.
-        self.entry = gui.Entry(box)
-        self.entry['text'] = "Enter something here..."
-#        self.entry['hidden'] = True
-        box.add_start(self.entry)
-
-        button = gui.Button(box)
-        button['text'] = "Print it"
-        button['on_click'].append(self.on_click)
-        box.add_start(button, expand=True)
-
-    def on_click(self, button):
-        print(self.entry['text'])
+def text_changed(textview):
+    print(textview['text'])
 
 
 def main():
     gui.init()
-    with EntryExample() as window:
-        window['title'] = "Entry example"
-        window['size'] = (200, 100)
-        window['minimum_size'] = (100, 50)
-        window['maximum_size'] = (300, 200)
+    with gui.Window() as window:
+        textview = gui.TextView(window)
+        textview['text'] = "Enter something..."
+        textview['text.changed'].append(text_changed)
+        window['child'] = textview
+
+        window['title'] = "TextView test"
+        window['minimum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
 

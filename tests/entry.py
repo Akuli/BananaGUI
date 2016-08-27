@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # Copyright (c) 2016 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -21,42 +19,44 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI Checkbox example."""
+"""BananaGUI entry test."""
 
 import sys
 
-import bananagui
 from bananagui import gui
 
-bananagui.load_guiwrapper('.tkinter')
 
-
-class CheckboxExample(gui.Window):
+class EntryWindow(gui.Window):
 
     def __init__(self):
         super().__init__()
 
-        checkbox = gui.Checkbox(self)
-        checkbox['text'] = "Check me!"
-        checkbox['checked.changed'].append(self.on_check)
-        self['child'] = checkbox
+        box = gui.VBox(self)
+        self['child'] = box
 
-    def on_check(self, checkbox):
-        if checkbox['checked']:
-            print("You checked me!")
-            checkbox['text'] = "Uncheck me!"
-        else:
-            print("You unchecked me!")
-            checkbox['text'] = "Check me!"
+        # This entry is attached to self because the on_click method
+        # needs it.
+        self.entry = gui.Entry(box)
+        self.entry['text'] = "Enter something here..."
+#        self.entry['hidden'] = True
+        box.add_start(self.entry)
+
+        button = gui.Button(box)
+        button['text'] = "Print it"
+        button['on_click'].append(self.on_click)
+        box.add_start(button, expand=True)
+
+    def on_click(self, button):
+        print(self.entry['text'])
 
 
 def main():
-    bananagui.gui.init()
-
-    with CheckboxExample() as window:
-        window['title'] = "Checkbox example"
-        window['size'] = (200, 50)
-        window['resizable'] = False
+    gui.init()
+    with EntryWindow() as window:
+        window['title'] = "Entry test"
+        window['size'] = (200, 100)
+        window['minimum_size'] = (100, 50)
+        window['maximum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
 
