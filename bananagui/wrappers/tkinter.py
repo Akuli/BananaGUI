@@ -105,11 +105,6 @@ class WidgetBase:
         self.__tkinter_tooltip.text = tooltip
 
 
-# TODO: Are empty classes required?
-class ParentBase:
-    pass
-
-
 class ChildBase:
 
     def _bananagui_set_grayed_out(self, grayed_out):
@@ -196,53 +191,69 @@ class Checkbox:
 
 # Text widgets
 # ~~~~~~~~~~~~
-
-class TextBase:  # TODO: rename 2 EditableBase
-
-    def __init__(self, parent):
-        print('*')
-        super().__init__(parent)
-        self._bananagui_tkinter_var = tk.StringVar()
-        self._bananagui_tkinter_var.trace('w', self.__var_changed)
-
-    def __var_changed(self, name, empty_string, mode):
-        self.raw_set('text', self._bananagui_tkinter_var.get())
-
-    def _bananagui_set_text(self, text):
-        self._bananagui_tkinter_var.set(text)
-
+#
+# TODO: rename TextBase 2 EditableBase
 
 class Entry:
 
     def __init__(self, parent):
         super().__init__(parent)
-        widget = tk.Entry(parent['real_widget'],
-                          textvariable=self._bananagui_tkinter_var)
-        self.raw_set('real_widget', widget)
+        self.__var = tk.StringVar()
+        self.__var.trace('w', self.__var_changed)
+        widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
         widget.bind('<Control-A>', self.__select_all)
         widget.bind('<Control-a>', self.__select_all)
+        self.raw_set('real_widget', widget)
+
+    def __var_changed(self, tkname, empty_string, mode):
+        self.raw_set('text', self.__var.get())
+
+    def _bananagui_set_text(self, text):
+        self._bananagui_tkinter_var.set(text)
 
     def __select_all(self, event):
         event.widget.selection_range(0, 'end')
         return 'break'
 
 
-class TextView:
+class PlainTextView:
 
     def __init__(self, parent):
-        # TODO: Add shortcuts like Ctrl+A.
+        # TODO: Add more keyboard shortcuts.
         super().__init__(parent)
-        widget = tk.Text(parent['real_widget'],
-                         textvariable=self._banagui_tkinter_var,
-                         width=1, height=1)
+        widget = tk.Text(parent['real_widget'], width=1, height=1)
+        widget.bind('<Control-A>', self.__select_all)
+        widget.bind('<Control-a>', self.__select_all)
+        widget.bind('<<Modified>>', self.__edit_modified)
         self.raw_set('real_widget', widget)
-        self['real_widget'].bind('<Control-A>', self.__select_all)
-        self['real_widget'].bind('<Control-a>', self.__select_all)
 
     def __select_all(self, event):
+        """Select all text in the widget."""
         # The end-1c doesn't get the last character, which is a newline.
         event.widget.tag_add('sel', 1.0, 'end-1c')
         return 'break'
+
+    def __edit_modified(self, event):
+        """Update the widget's text property."""
+        self.raw_set('text', event.widget.get(0.0, 'end'))
+
+        # This function will be called twice if the event is not unbound
+        # first.
+        event.widget.unbind('<<Modified>>')
+
+        # Tell tkinter that the text in the widget has not been
+        # modified. This will run again when the text is modified.
+        event.widget.edit_modified(False)
+
+        # Rebind.
+        event.widget.bind('<<Modified>>', self.__edit_modified)
+
+    def clear(self):
+        self['real_widget'].delete(0.0, 'end')
+
+    def write(self, text):
+        self['real_widget'].insert('end', text)
+        return super().write(text)
 
 
 # Layout widgets
@@ -316,10 +327,6 @@ class WindowBase:
         self['real_widget'].protocol('WM_DELETE_WINDOW', self.destroy)
         self['real_widget'].title(self['title'])
 
-        # Tkinter uses the size of the screen as the default maximum
-        # size. Let's save it so we can restore it later.
-        self.__default_maxsize = self['real_widget'].maxsize()
-
     def destroy(self):
         if self['destroyed']:
             return
@@ -345,11 +352,6 @@ class WindowBase:
             # Tkinter uses (1, 1) as a default minimum size.
             size = (1, 1)
         self['real_widget'].minsize(*size)
-
-    def _bananagui_set_maximum_size(self, size):
-        if size is None:
-            size = self.__default_maxsize
-        self['real_widget'].maxsize(*size)
 
 
 class Window:
