@@ -209,7 +209,7 @@ class Entry:
         self.raw_set('text', self.__var.get())
 
     def _bananagui_set_text(self, text):
-        self._bananagui_tkinter_var.set(text)
+        self.__var.set(text)
 
     def __select_all(self, event):
         event.widget.selection_range(0, 'end')
