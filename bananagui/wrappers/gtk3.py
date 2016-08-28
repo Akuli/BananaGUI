@@ -44,20 +44,13 @@ def quit(*args):
 # Base classes
 # ~~~~~~~~~~~~
 
-class WidgetBase:
-
-    def _bananagui_set_tooltip(self, tooltip):
-        self['real_widget'].set_tooltip_text(tooltip)
-
-
-class ParentBase:
-    pass
-
-
 class ChildBase:
 
     def _bananagui_set_grayed_out(self, grayed_out):
         self['real_widget'].set_sensitive(not grayed_out)
+
+    def _bananagui_set_tooltip(self, tooltip):
+        self['real_widget'].set_tooltip_text(tooltip)
 
 
 class BinBase:

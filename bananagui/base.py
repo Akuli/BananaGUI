@@ -54,14 +54,10 @@ class WidgetBase:
     Properties:
         real_widget     R
             The real GUI toolkit widget that's being wrapped.
-        tooltip         RW
-            The widget's tooltip text. None by default.
     """
 
     BASES = (core.ObjectBase,)
     real_widget = core.Property('real_widget')
-    tooltip = core.Property('tooltip', converter=str, allow_none=True,
-                            default=None)
 
 
 class ParentBase:
@@ -82,11 +78,15 @@ class ChildBase:
             The parent of this widget.
         grayed_out      RW
             True if the widget is grayed out, False otherwise.
+        tooltip         RW
+            The widget's tooltip text. None by default.
     """
 
     BASES = ('WidgetBase',)
     parent = core.Property('parent')
     grayed_out = core.Property('grayed_out', converter=bool, default=False)
+    tooltip = core.Property('tooltip', converter=str, allow_none=True,
+                            default=None)
 
     def __init__(self, parent):
         super().__init__()

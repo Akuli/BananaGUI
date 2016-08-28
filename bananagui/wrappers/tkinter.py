@@ -94,7 +94,7 @@ class _ToolTip(ToolTipBase or object):
             label.pack()
 
 
-class WidgetBase:
+class ChildBase:
 
     def _bananagui_set_tooltip(self, tooltip):
         # The _ToolTip instance is created here because the __init__ is
@@ -104,9 +104,6 @@ class WidgetBase:
         if tooltip is not None and not hasattr(self, '__tkinter_tooltip'):
             self.__tkinter_tooltip = _ToolTip(self['real_widget'])
         self.__tkinter_tooltip.text = tooltip
-
-
-class ChildBase:
 
     def _bananagui_set_grayed_out(self, grayed_out):
         state = 'disable' if grayed_out else 'normal'
