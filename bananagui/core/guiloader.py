@@ -51,15 +51,12 @@ class _Loader:
             return
 
         baseclass = getattr(self._basemodule, classname)
-        try:
-            wrapperclass = getattr(self._wrappermodule, classname)
-        except AttributeError:
-            # The wrapper doesn't have this class.
-            self._classes[classname] = baseclass
-            return
+        wrapperclass = getattr(self._wrappermodule, classname, None)
 
         # Create a list of the bases.
-        bases = [wrapperclass, baseclass]
+        bases = [baseclass]
+        if wrapperclass is not None:
+            bases.insert(0, wrapperclass)
         if hasattr(baseclass, 'BASES'):
             for base in baseclass.BASES:
                 if isinstance(base, str):
@@ -73,7 +70,7 @@ class _Loader:
         self._classes[classname] = type(
             baseclass.__name__,
             tuple(bases),
-            {'__doc__': baseclass.__doc__},
+            {'__doc__': baseclass.__doc__, '__module__': 'bananagui.gui'},
         )
 
     def _load_function(self, functionname):

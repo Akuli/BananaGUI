@@ -33,7 +33,7 @@ def text_changed(textview):
 def main():
     gui.init()
     with gui.Window() as window:
-        textview = gui.TextView(window)
+        textview = gui.PlainTextView(window)
         print("Enter something...", file=textview)
         textview['text.changed'].append(text_changed)
         window['child'] = textview
