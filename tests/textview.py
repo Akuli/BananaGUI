@@ -38,7 +38,7 @@ def main():
         textview['text.changed'].append(text_changed)
         window['child'] = textview
 
-        window['title'] = "TextView test"
+        window['title'] = "Textview test"
         window['minimum_size'] = (300, 200)
         window['destroyed.changed'].append(gui.quit)
         sys.exit(gui.main())
