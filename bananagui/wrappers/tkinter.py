@@ -257,7 +257,6 @@ class PlainTextView:
         self['real_widget'].delete(0.0, 'end')
 
     def append_text(self, text):
-        text = str(text)
         super().append_text(text)
         self['real_widget'].insert('end', text)
 
