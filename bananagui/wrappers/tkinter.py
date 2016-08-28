@@ -235,7 +235,7 @@ class PlainTextView:
 
     def __edit_modified(self, event):
         """Update the widget's text property."""
-        self.raw_set('text', event.widget.get(0.0, 'end'))
+        self.raw_set('text', event.widget.get(0.0, 'end-1c'))
 
         # This function will be called twice if the event is not unbound
         # first.
