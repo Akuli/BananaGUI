@@ -139,10 +139,6 @@ class Label:
 # Buttons
 # ~~~~~~~
 
-class ButtonBase:
-    pass
-
-
 class Button:
 
     def __init__(self, parent):

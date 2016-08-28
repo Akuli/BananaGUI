@@ -21,6 +21,8 @@
 
 """GTK+ 3.0 wrapper for BananaGUI."""
 
+# TODO: Clipboard functions.
+
 import gi
 gi.require_version('Gtk', '3.0')  # noqa
 from gi.repository import Gtk
@@ -66,10 +68,6 @@ class BinBase:
 # Labels
 # ~~~~~~
 
-class LabelBase:
-    pass
-
-
 class Label:
 
     def __init__(self, parent):
@@ -82,10 +80,6 @@ class Label:
 
 # Buttons
 # ~~~~~~~
-
-class ButtonBase:
-    pass
-
 
 class Button:
 
@@ -122,9 +116,60 @@ class Checkbox:
     def _bananagui_set_text(self, text):
         self['real_widget'].set_label(text)
 
-# Window classes
+
+# Text widgets
+# ~~~~~~~~~~~~
+
+class Entry:
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        widget = Gtk.Entry()
+        widget.connect('changed', self.__changed)
+        self.raw_set('real_widget', widget)
+
+    def __changed(self, entry):
+        self.raw_set('text', entry.get_text())
+
+    def _bananagui_set_text(self, text):
+        self['real_widget'].set_text(text)
+        # Setting the text will emit the GTK+ changed signal, and the
+        # BananaGUI text property will be updated.
+
+    # TODO: maybe select_all() shouldn't be just a tkinter thing and
+    #       other wrappers should also provide it?
+
+    # TODO: BananaGUI property called editable. With that and
+    #       select_all(), entries could be used for displaying text that
+    #       that the user can highlight and copy-paste somewhere else.
+
+
+class PlainTextView:
+    # TODO: Selecting between spaces and tabs.
+    # TODO: In base.py, setting the text first clears the widget and
+    #       then sets the text. It should block the text.changed signal
+    #       so that it's only emitted once.
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        widget = Gtk.TextView()
+        self.__buf = widget.get_buffer()
+        self.raw_set('real_widget', widget)
+
+    def clear(self):
+        self.__buf.delete(self.__buf.get_start_iter(),
+                          self.__buf.get_end_iter(),
+                          True)
+
+
+# Layout widgets
 # ~~~~~~~~~~~~~~
 
+
+# Window classes
+# ~~~~~~~~~~~~~~
 
 class WindowBase:
 
@@ -139,8 +184,8 @@ class WindowBase:
     def destroy(self):
         if self['destroyed']:
             return
-        super().destroy()
         self['real_widget'].destroy()
+        super().destroy()
 
     def _bananagui_set_title(self, title):
         self['real_widget'].set_title(title)
