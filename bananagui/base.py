@@ -21,6 +21,8 @@
 
 """Base classes for GUI toolkit wrappers."""
 
+import io
+
 from bananagui import core
 
 
