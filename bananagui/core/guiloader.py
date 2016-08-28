@@ -57,6 +57,7 @@ class _Loader:
         bases = [baseclass]
         if wrapperclass is not None:
             bases.insert(0, wrapperclass)
+
         if hasattr(baseclass, 'BASES'):
             for base in baseclass.BASES:
                 if isinstance(base, str):

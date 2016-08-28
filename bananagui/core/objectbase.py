@@ -21,29 +21,32 @@
 
 """A base object for BananaGUI widgets."""
 
+from bananagui import exceptions
 from bananagui.core import properties, signals
 
 
 class ObjectBase:
     """An object that allows using properties and signals with subscripting."""
 
-    def __prop_or_sig(self, propertyname_or_signalname):
-        property_or_signal = type(self)
-        for attribute in propertyname_or_signalname.split('.'):
-            property_or_signal = getattr(property_or_signal, attribute)
-        if not isinstance(property_or_signal,
-                          (properties.Property, signals.Signal)):
-            raise TypeError("expected a Property or a Signal, got %r"
-                            % (property_or_signal,))
-        return property_or_signal
+    def __prop_or_sig(self, name):
+        result = type(self)
+        try:
+            for attribute in name.split('.'):
+                result = getattr(result, attribute)
+        except AttributeError as e:
+            raise exceptions.NoSuchPropertyOrSignal(name) from e
+        if not isinstance(result, (properties.Property, signals.Signal)):
+            raise TypeError("expected a BananaGUI property or signal, got %r"
+                            % (result,))
+        return result
 
-    def __setitem__(self, propertyname_or_signalname, value):
+    def __setitem__(self, property_or_signal_name, value):
         """Set the value of a property or a signal's callback list."""
-        self.__prop_or_sig(propertyname_or_signalname).set(self, value)
+        self.__prop_or_sig(property_or_signal_name).set(self, value)
 
-    def __getitem__(self, propertyname_or_signalname):
+    def __getitem__(self, property_or_signal_name):
         """Return the value of a property or a signal's callback list."""
-        return self.__prop_or_sig(propertyname_or_signalname).get(self)
+        return self.__prop_or_sig(property_or_signal_name).get(self)
 
     def raw_set(self, propertyname, value):
         """Set a property's value directly to its cache."""
@@ -53,6 +56,6 @@ class ObjectBase:
         """Get a property's value directly from its cache."""
         return self.__prop_or_sig(propertyname).raw_get(self)
 
-    def emit(self, signalname, *args):
-        """Emit a signal with args."""
-        self.__prop_or_sig(signalname).emit(self, *args)
+    def emit(self, signalname):
+        """Emit a signal."""
+        self.__prop_or_sig(signalname).emit(self)

@@ -23,6 +23,7 @@
 
 import weakref
 
+from bananagui import exceptions
 from bananagui.core import signals
 
 
@@ -33,8 +34,9 @@ _NOTHING = object()
 class Property:
     """A basic property.
 
-    The properties are not like Python properties. They are more like
-    properties in large GUI toolkits like Qt and GTK+.
+    The properties are not like Python properties with descriptor magic.
+    They are more like properties in large GUI toolkits like Qt and
+    GTK+.
     """
 
     def __init__(self, name, *,
@@ -110,7 +112,7 @@ class Property:
         """
         setter = getattr(type(instance), '_bananagui_set_'+self._name, None)
         if setter is None:
-            raise ValueError("the value of %r cannot be set" % self._name)
+            raise exceptions.NotSettable(self._name)
 
         if value is None:
             # Bypass the converting, type checking and whitelist

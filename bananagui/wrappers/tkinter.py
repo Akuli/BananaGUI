@@ -19,8 +19,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Base widgets for other widgets."""
+"""Tkinter wrapper for BananaGUI."""
 
+import contextlib
 import tkinter as tk
 import warnings
 
@@ -128,7 +129,6 @@ class BinBase:
 class LabelBase:
 
     def __init__(self, parent):
-        """Initialize the label."""
         super().__init__(parent)
         self.raw_set('real_widget', tk.Label(parent['real_widget']))
 
@@ -200,6 +200,7 @@ class Entry:
         super().__init__(parent)
         self.__var = tk.StringVar()
         self.__var.trace('w', self.__var_changed)
+
         widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
         widget.bind('<Control-A>', self.__select_all)
         widget.bind('<Control-a>', self.__select_all)
@@ -221,6 +222,9 @@ class PlainTextView:
     def __init__(self, parent):
         # TODO: Add more keyboard shortcuts.
         super().__init__(parent)
+
+        # A larger width or height would prevent the widget from
+        # shrinking when needed.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
         widget.bind('<Control-A>', self.__select_all)
         widget.bind('<Control-a>', self.__select_all)
@@ -281,9 +285,10 @@ class BoxBase:
             ('v', False): 'x',
         }
 
+        orientation = type(self)._bananagui_tkinter_orientation
         return {
-            'side': sides[(self._bananagui_tkinter_orientation, startorend)],
-            'fill': fills[(self._bananagui_tkinter_orientation, expand)],
+            'side': sides[(orientation, startorend)],
+            'fill': fills[(orientation, expand)],
             'expand': expand,
         }
 

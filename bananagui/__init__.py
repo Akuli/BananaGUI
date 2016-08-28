@@ -31,7 +31,7 @@ import types
 
 # The bananagui.wrappers module is needed for relative imports in
 # load_guiwrapper.
-from bananagui import base, core, gui, wrappers  # noqa
+from bananagui import base, core, exceptions, gui, wrappers  # noqa
 
 
 BLACK = '#000000'
