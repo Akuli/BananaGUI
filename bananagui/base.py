@@ -215,15 +215,7 @@ class Entry:
 
 
 class PlainTextView(io.TextIOBase):
-    """A multiline text widget.
-
-    An easy way to write to a text widget is to use it as a target file
-    when printing:
-
-        print("Hello!", file=some_textview)
-
-    You can use the text property to get the current text.
-    """
+    """A multiline text widget."""
 
     BASES = ('TextBase',)
 
@@ -231,19 +223,17 @@ class PlainTextView(io.TextIOBase):
         # Don't overwrite this in a GUI toolkit.
         self.clear()
         if text:
-            self.write(text)
-
-    def write(self, text):
-        """Add text to the end of what is already in the text widget."""
-        # Override this in a GUI toolkit, and be sure to do a
-        # `return super().write(text)` at the end of the override.
-        self.raw_set('text', self['text'] + text)
-        return len(text)
+            self.append_text(text)
 
     def clear(self):
         """Remove everything from the textview."""
         # Override this in GUI toolkits, and call this with super().
         self.raw_set('text', '')
+
+    def append_text(self, text):
+        """Add text to the end of what is already in the text widget."""
+        # Override this in a GUI toolkit, and call super().
+        self.raw_set('text', self['text'] + text)
 
 
 # Layout widgets

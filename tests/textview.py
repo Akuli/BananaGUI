@@ -34,7 +34,7 @@ def main():
     gui.init()
     with gui.Window() as window:
         textview = gui.PlainTextView(window)
-        print("Enter something...", file=textview)
+        textview['text'] = "Enter something..."
         textview['text.changed'].append(text_changed)
         window['child'] = textview
 

@@ -220,11 +220,11 @@ class Entry:
 class PlainTextView:
 
     def __init__(self, parent):
-        # TODO: Add more keyboard shortcuts.
         super().__init__(parent)
 
         # A larger width or height would prevent the widget from
         # shrinking when needed.
+        # TODO: Add more keyboard shortcuts.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
         widget.bind('<Control-A>', self.__select_all)
         widget.bind('<Control-a>', self.__select_all)
@@ -234,7 +234,7 @@ class PlainTextView:
     def __select_all(self, event):
         """Select all text in the widget."""
         # The end-1c doesn't get the last character, which is a newline.
-        event.widget.tag_add('sel', 1.0, 'end-1c')
+        event.widget.tag_add('sel', 0.0, 'end-1c')
         return 'break'
 
     def __edit_modified(self, event):
@@ -249,15 +249,17 @@ class PlainTextView:
         # modified. This will run again when the text is modified.
         event.widget.edit_modified(False)
 
-        # Rebind.
+        # Bind again.
         event.widget.bind('<<Modified>>', self.__edit_modified)
 
     def clear(self):
+        super().clear()
         self['real_widget'].delete(0.0, 'end')
 
-    def write(self, text):
+    def append_text(self, text):
+        text = str(text)
+        super().append_text(text)
         self['real_widget'].insert('end', text)
-        return super().write(text)
 
 
 # Layout widgets
