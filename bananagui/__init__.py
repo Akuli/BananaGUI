@@ -30,8 +30,10 @@ import importlib
 import types
 
 # The bananagui.wrappers module is needed for relative imports in
-# load_guiwrapper.
-from bananagui import base, core, exceptions, gui, wrappers  # noqa
+# load_guiwrapper. The exceptions submodule is also imported to make it
+# easier to access BananaGUI exceptions.
+from bananagui import exceptions, wrappers  # noqa
+from bananagui import base, core, gui
 
 
 BLACK = '#000000'
@@ -46,7 +48,11 @@ BLUE = '#0000ff'
 PINK = '#ff00ff'
 
 
-def load_guiwrapper(*wrappers):
+# These bananagui.gui attributes won't be changed.
+_ORIGINAL_GUIDIR = frozenset(dir(gui))
+
+
+def load_wrapper(*guiwrappers):
     """Load a BananaGUI wrapper module into bananagui.gui.
 
     The wrappers can be Python modules or module names. If they are
@@ -57,20 +63,27 @@ def load_guiwrapper(*wrappers):
     If multiple wrappers are given, attempt to load each one until
     loading one of them succeeds.
     """
-    if not wrappers:
+    if not guiwrappers:
         raise ValueError("specify at least one wrapper")
 
-    if len(wrappers) == 1:
+    if len(guiwrappers) == 1:
         # Load the wrapper.
-        wrapper = wrappers[0]
+        wrapper = guiwrappers[0]
         if not isinstance(wrapper, types.ModuleType):
             wrapper = importlib.import_module(wrapper, 'bananagui.wrappers')
-        core.load_wrapper(base, wrapper)
+
+        for name in set(dir(gui)) - _ORIGINAL_GUIDIR:
+            delattr(gui, name)
+
+        loader = core.WrapperLoader(base, wrapper)
+        loader.load()
+        loader.install(gui)
+
     else:
         # Attempt to load each wrapper.
-        for wrapper in wrappers:
+        for wrapper in guiwrappers:
             try:
-                load_guiwrapper(wrapper)
+                load_wrapper(wrapper)
                 return
             except ImportError:
                 pass
