@@ -59,3 +59,16 @@ class Signal:
         """Call the callbacks with args."""
         for callback in self.get(instance):
             callback(instance)
+
+    @contextlib.contextmanager
+    def blocked(self, instance):
+        """Block the signal from emitting temporarily.
+
+        Blocking is instance-specific. Use this as a context manager.
+        """
+        callbacks = self.get(instance)
+        self.set(instance, [])
+        try:
+            yield
+        finally:
+            self.set(instance, callbacks)

@@ -28,16 +28,30 @@ from bananagui.core import properties, signals
 class ObjectBase:
     """An object that allows using properties and signals with subscripting."""
 
-    def __prop_or_sig(self, name):
+    def __prop_or_sig(self, name, props=True, sigs=True):
+        """Get a property or a signal."""
+        assert props or sigs
+
         result = type(self)
         try:
             for attribute in name.split('.'):
                 result = getattr(result, attribute)
         except AttributeError as e:
             raise exceptions.NoSuchPropertyOrSignal(name) from e
-        if not isinstance(result, (properties.Property, signals.Signal)):
-            raise TypeError("expected a BananaGUI property or signal, got %r"
-                            % (result,))
+
+        if props and sigs:
+            if not isinstance(result, (properties.Property, signals.Signal)):
+                raise ValueError("excepted a BananaGUI property or signal, "
+                                 "got %r" % (result,))
+        elif props:
+            if not isinstance(result, properties.Property):
+                raise ValueError("expected a BananaGUI property, got %r"
+                                 % (result,))
+        elif sigs:
+            if not isinstance(result, signals.Signal):
+                raise ValueError("excepted a BananaGUI signal, got %r"
+                                 % (result,))
+
         return result
 
     def __setitem__(self, property_or_signal_name, value):
@@ -59,3 +73,9 @@ class ObjectBase:
     def emit(self, signalname):
         """Emit a signal."""
         self.__prop_or_sig(signalname).emit(self)
+
+    @contextlib.contextmanager
+    def blocked(self, signalname):
+        """Block a signal temporarily."""
+        with self.__prop_or_sig(signalname).blocked(self):
+            yield

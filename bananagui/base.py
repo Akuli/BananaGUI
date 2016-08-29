@@ -188,17 +188,34 @@ class Checkbox:
 # Text widgets
 # ~~~~~~~~~~~~
 
-class TextBase:
+def _convert2char(s):
+    s = str(s)
+    if len(s) != 1:
+        raise ValueError("expected length 1, got length %d" % len(s))
+    return s
+
+
+class EditableBase:
     """A base class for Entry and TextView.
 
     Properties:
         text            RWC
             The text in the entry.
+        tabchar         RW
+            The character that will be inserted when the user presses tab.
+        editable        RW
+            True if the content of the widget can be edited, False otherwise.
     """
 
     # TODO: Add fonts and colors.
     BASES = ('ChildBase',)
     text = core.Property('text', converter=str, default='')
+    tabchar = core.Property('tabchar', converter=_convert2char, default='\t')
+    editable = core.Property('editable', converter=bool, default=True)
+
+    def select_all(self):
+        """Select all text in the widget."""
+        # Override this in a wrapper.
 
 
 class Entry:
@@ -210,29 +227,29 @@ class Entry:
             False by default.
     """
 
-    BASES = ('TextBase',)
+    BASES = ('EditableBase',)
     hidden = core.Property('hidden', converter=bool, default=False)
 
 
 class PlainTextView(io.TextIOBase):
     """A multiline text widget."""
 
-    BASES = ('TextBase',)
+    BASES = ('EditableBase',)
 
     def _bananagui_set_text(self, text):
-        # Don't overwrite this in a GUI toolkit.
-        self.clear()
+        # Don't overwrite this in a wrapper.
+        self.clear()  # TODO: block the text.changed signal here
         if text:
             self.append_text(text)
 
     def clear(self):
         """Remove everything from the textview."""
-        # Override this in GUI toolkits, and call this with super().
+        # Override this in BananaGUI wrappers, and call this with super().
         self.raw_set('text', '')
 
     def append_text(self, text):
         """Add text to the end of what is already in the text widget."""
-        # Override this in a GUI toolkit, and call super().
+        # Override this in a wrapper, and call super().
         self.raw_set('text', self['text'] + text)
 
 

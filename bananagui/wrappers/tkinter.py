@@ -184,20 +184,28 @@ class Checkbox:
 
 # Text widgets
 # ~~~~~~~~~~~~
-#
-# TODO: rename TextBase 2 EditableBase
+
+class EditableBase:
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        widget = self['real_widget']
+        widget.bind('<Control-A>', lambda event: self.select_all())
+        widget.bind('<Control-a>', lambda event: self.select_all())
+
 
 class Entry:
 
     def __init__(self, parent):
-        super().__init__(parent)
         self.__var = tk.StringVar()
         self.__var.trace('w', self.__var_changed)
 
         widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
-        widget.bind('<Control-A>', self.__select_all)
-        widget.bind('<Control-a>', self.__select_all)
+        widget.bind('<Control-A>', lambda event: self.select_all())
+        widget.bind('<Control-a>', lambda event: self.select_all())
         self.raw_set('real_widget', widget)
+
+        super().__init__(parent)
 
     def __var_changed(self, tkname, empty_string, mode):
         self.raw_set('text', self.__var.get())
@@ -205,30 +213,26 @@ class Entry:
     def _bananagui_set_text(self, text):
         self.__var.set(text)
 
-    def __select_all(self, event):
-        event.widget.selection_range(0, 'end')
-        return 'break'
+    def select_all(self):
+        self['real_widget'].selection_range(0, 'end')
 
 
 class PlainTextView:
 
     def __init__(self, parent):
-        super().__init__(parent)
-
         # A larger width or height would prevent the widget from
         # shrinking when needed.
         # TODO: Add more keyboard shortcuts.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
-        widget.bind('<Control-A>', self.__select_all)
-        widget.bind('<Control-a>', self.__select_all)
         widget.bind('<<Modified>>', self.__edit_modified)
         self.raw_set('real_widget', widget)
+        super().__init__(parent)
 
-    def __select_all(self, event):
+    def select_all(self, event):
         """Select all text in the widget."""
-        # The end-1c doesn't get the last character, which is a newline.
+        # The end-1c doesn't get what tkinter thinks of as the last
+        # character, which is a newline.
         event.widget.tag_add('sel', 0.0, 'end-1c')
-        return 'break'
 
     def __edit_modified(self, event):
         """Update the widget's text property."""

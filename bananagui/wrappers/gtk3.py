@@ -120,6 +120,7 @@ class Checkbox:
 # Text widgets
 # ~~~~~~~~~~~~
 
+
 class Entry:
 
     def __init__(self, parent):
