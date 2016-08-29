@@ -29,4 +29,4 @@ import bananagui
 
 
 # Change this to load a different wrappper
-bananagui.load_guiwrapper('.tkinter')
+bananagui.load_wrapper('.tkinter')
