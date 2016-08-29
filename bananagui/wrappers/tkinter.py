@@ -21,7 +21,6 @@
 
 """Tkinter wrapper for BananaGUI."""
 
-import contextlib
 import tkinter as tk
 import warnings
 
@@ -190,8 +189,12 @@ class EditableBase:
     def __init__(self, parent):
         super().__init__(parent)
         widget = self['real_widget']
-        widget.bind('<Control-A>', lambda event: self.select_all())
-        widget.bind('<Control-a>', lambda event: self.select_all())
+        widget.bind('<Control-A>', self.__select_all)
+        widget.bind('<Control-a>', self.__select_all)
+
+    def __select_all(self, event):
+        self.select_all()
+        return 'break'
 
 
 class Entry:
@@ -201,8 +204,6 @@ class Entry:
         self.__var.trace('w', self.__var_changed)
 
         widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
-        widget.bind('<Control-A>', lambda event: self.select_all())
-        widget.bind('<Control-a>', lambda event: self.select_all())
         self.raw_set('real_widget', widget)
 
         super().__init__(parent)
@@ -228,11 +229,11 @@ class PlainTextView:
         self.raw_set('real_widget', widget)
         super().__init__(parent)
 
-    def select_all(self, event):
+    def select_all(self):
         """Select all text in the widget."""
         # The end-1c doesn't get what tkinter thinks of as the last
         # character, which is a newline.
-        event.widget.tag_add('sel', 0.0, 'end-1c')
+        self['real_widget'].tag_add('sel', 0.0, 'end-1c')
 
     def __edit_modified(self, event):
         """Update the widget's text property."""

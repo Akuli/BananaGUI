@@ -238,9 +238,11 @@ class PlainTextView(io.TextIOBase):
 
     def _bananagui_set_text(self, text):
         # Don't overwrite this in a wrapper.
-        self.clear()  # TODO: block the text.changed signal here
-        if text:
-            self.append_text(text)
+        with self.blocked('text.changed'):
+            self.clear()
+            if text:
+                self.append_text(text)
+        self.emit('text.changed')
 
     def clear(self):
         """Remove everything from the textview."""

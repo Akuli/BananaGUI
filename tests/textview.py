@@ -30,13 +30,23 @@ def text_changed(textview):
     print(textview['text'])
 
 
+def on_click(textview):
+    textview['text'] = "Click!"
+
+
 def main():
     gui.init()
     with gui.Window() as window:
+        box = gui.HBox(window)
+        window['child'] = box
+
         textview = gui.PlainTextView(window)
         textview['text'] = "Enter something..."
         textview['text.changed'].append(text_changed)
-        window['child'] = textview
+        box.add_start(textview, expand=True)
+
+        button = gui.Button(window)
+        button['clicked'].append(lambda button: on_click(textview))
 
         window['title'] = "Textview test"
         window['minimum_size'] = (300, 200)
