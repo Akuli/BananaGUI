@@ -14,62 +14,6 @@ except ImportError:
     from argparse import Namespace as NamespaceBase  # noqa
 
 
-@Mapping.register
-class FrozenDict:
-    """An immutable-ish dictionary-like object."""
-
-    __slots__ = ('_dict',)
-
-    def __init__(self, *args, **kwargs):
-        self._dict = dict(*args, **kwargs)
-
-    def __repr__(self):
-        # printf-formatting can actually handle dictionaries just fine
-        # even without wrapping the dictionary in a tuple or another
-        # dictionary of length one.
-        return 'FrozenDict(%r)' % self._dict
-
-    @classmethod
-    def fromkeys(cls, iterable, value=None):
-        return cls(dict.fromkeys(iterable, value))
-
-    def __contains__(self, item):
-        return item in self._dict
-
-    def __getitem__(self, item):
-        return self._dict[item]
-
-    def __iter__(self):
-        return iter(self._dict)
-
-    def __len__(self):
-        return len(self._dict)
-
-    def get(self, key, default=None):
-        return self._dict.get(key, default)
-
-    def items(self):
-        return self._dict.items()
-
-    def keys(self):
-        return self._dict.keys()
-
-    def values(self):
-        return self._dict.values()
-
-    def __eq__(self, other):
-        if isinstance(other, Mapping):
-            # This will actually make two FrozenDicts compare each
-            # other's _dicts.
-            return self._dict == other
-        return NotImplemented
-
-    def __ne__(self, other):
-        if isinstance(other, Mapping):
-            return self._dict != other
-        return NotImplemented
-
-
 def check(value, *, allow_none=False, required_type=None, length=None,
           minimum=None, maximum=None):
     if value is None:

@@ -23,7 +23,7 @@
 
 # TODO: Add a grid widget.
 
-from bananagui import Property, utils
+from bananagui import types, utils
 from . import bases
 
 
@@ -48,7 +48,7 @@ class BoxBase:
     """
 
     _bananagui_bases = ('ParentBase', 'ChildBase')
-    children = Property('children', required_type=tuple, default=())
+    children = types.Property('children', required_type=tuple, default=())
 
     def _bananagui_set_children(self, children):
         # This method is more complex than other methods in this class
@@ -143,7 +143,7 @@ class BoxBase:
         return super().__getitem__(item)
 
     def __delitem__(self, item):
-        """Delete widget(s) from self and call super()."""
+        """Delete widget(s) from self or call super()."""
         if isinstance(item, (int, slice)):
             children = self[:]
             del children[item]
