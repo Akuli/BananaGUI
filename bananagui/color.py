@@ -21,57 +21,27 @@
 
 """A color class and color constants."""
 
-# If you modify functions in this module, don't remove the calls to
-# _check_rgb(). The tests in the docstrings assume that it's called.
-
 import collections
 import re
 
 
-def _check_rgb(rgb):
-    """Raise an exception if an RGB tuple is not valid.
-
-    Return the tuple unchanged.
-
-    >>> _check_rgb((255, 255, 0))
-    (255, 255, 0)
-    >>> _check_rgb([255, 255, 0])
-    Traceback (most recent call last):
-      ...
-    TypeError: expected a tuple, got [255, 255, 0]
-    >>> _check_rgb((-1, 0, 0))
-    Traceback (most recent call last):
-      ...
-    ValueError: invalid r/g/b value -1
-    >>> _check_rgb((0, 0, 256))
-    Traceback (most recent call last):
-      ...
-    ValueError: invalid r/g/b value 256
-    >>> _check_rgb((0, 0, 'lol'))
-    Traceback (most recent call last):
-      ...
-    ValueError: invalid r/g/b value 'lol'
-    """
-    if not isinstance(rgb, tuple):
-        raise TypeError("expected a tuple, got %r" % (rgb,))
-    if len(rgb) != 3:
-        raise ValueError("length of %r is not 3" % (rgb,))
-    for value in rgb:
-        if value not in range(256):
-            raise ValueError("invalid r/g/b value %r" % (value,))
-    return rgb
-
-
 class Color(collections.namedtuple('Color', 'r g b')):
+    """An immutable color.
 
-    def __new__(cls, r, g, b):
-        """Check the values, then create and return a new color."""
-        _check_rgb((r, g, b))
-        return super().__new__(cls, r, g, b)
+    The colors are based on a namedtuple, so they behave a lot like
+    (r, g, b) tuples.
+    """
+
+    def __init__(self, r, g, b):
+        """Check the r, g and b values."""
+        # Most of the initialization is done by the namedtuple's
+        # __new__. See Color._source.
+        for value in (r, g, b):
+            assert value in range(256), "invalid r/g/b value %r" % (value,)
 
     @property
     def brightness(self):
-        """The brightness of the color in percents.
+        """Brightness of the color.
 
         >>> Color(0, 0, 0).brightness
         0.0
@@ -80,7 +50,7 @@ class Color(collections.namedtuple('Color', 'r g b')):
         >>> Color(51, 51, 51).brightness
         0.2
         """
-        return sum(value for value in self) / 3 / 255
+        return sum(self) / 3 / 255
 
     @classmethod
     def from_hex(cls, hexstring):
@@ -95,35 +65,23 @@ class Color(collections.namedtuple('Color', 'r g b')):
         Color(r=255, g=255, b=0)
         >>> Color.from_hex('#ff0')
         Color(r=255, g=255, b=0)
-        >>> Color.from_hex('@ff0')
-        Traceback (most recent call last):
-          ...
-        ValueError: invalid hexadecimal color string '@ff0'
-        >>> Color.from_hex('#xxxxxx')
-        Traceback (most recent call last):
-          ...
-        ValueError: invalid hexadecimal color string '#xxxxxx'
-        >>> Color.from_hex(123)
-        Traceback (most recent call last):
-          ...
-        TypeError: expected a string, got 123
         """
         if not isinstance(hexstring, str):
             raise TypeError("expected a string, got %r" % (hexstring,))
         if len(hexstring) == 4:
             # It's a 4-character hexadecimal color, like '#fff'.
-            regex = r'^#([0-9a-f])([0-9a-f])([0-9a-f])$'
-            multiplier = 2
+            real_hexstring = hexstring[0]
+            for character in hexstring[1:]:
+                real_hexstring += character * 2
         else:
-            # It's a 6-character hexadecimal color.
-            regex = r'^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$'
-            multiplier = 1
-        match = re.search(regex, hexstring.lower())
+            real_hexstring = hexstring
+
+        match = re.search('^#' + '([0-9a-f]{2})'*3 + '$',
+                          real_hexstring, flags=re.IGNORECASE)
         if match is None:
             raise ValueError("invalid hexadecimal color string %r"
                              % (hexstring,))
-        rgb = tuple(int(value * multiplier, 16) for value in match.groups())
-        return cls(*_check_rgb(rgb))
+        return cls(*(int(value, 16) for value in match.groups()))
 
     @property
     def hex(self):
@@ -144,16 +102,8 @@ class Color(collections.namedtuple('Color', 'r g b')):
 
         >>> Color.from_rgbstring('rgb(255,100%,0)')
         Color(r=255, g=255, b=0)
-        >>> Color.from_rgbstring('rgb ( 255 , 100% ,0) ')
+        >>> Color.from_rgbstring('rGB ( 255 , 100% ,0) ')
         Color(r=255, g=255, b=0)
-        >>> Color.from_rgbstring('lol')
-        Traceback (most recent call last):
-          ...
-        ValueError: invalid RGB color string 'lol'
-        >>> Color.from_rgbstring(123)
-        Traceback (most recent call last):
-          ...
-        TypeError: expected a string, got 123
         """
         if not isinstance(rgbstring, str):
             raise TypeError("expected a string, got %r" % (rgbstring,))
@@ -161,9 +111,10 @@ class Color(collections.namedtuple('Color', 'r g b')):
         # Remove whitespace.
         rgbstring = ''.join(rgbstring.split())
 
-        match = re.search(r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$', rgbstring)
+        match = re.search(r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$', rgbstring,
+                          flags=re.IGNORECASE)
         if match is None:
-            raise ValueError("invalid RGB color string %r" % (rgbstring,))
+            raise ValueError("invalid RGB color string %r" % rgbstring)
 
         rgb = []
         for value in match.groups():
@@ -171,7 +122,7 @@ class Color(collections.namedtuple('Color', 'r g b')):
                 rgb.append(int(value[:-1]) * 255 // 100)
             else:
                 rgb.append(int(value))
-        return cls(*_check_rgb(tuple(rgb)))
+        return cls(*rgb)
 
     @property
     def rgbstring(self):
@@ -182,6 +133,8 @@ class Color(collections.namedtuple('Color', 'r g b')):
         """
         return 'rgb(%d,%d,%d)' % self
 
+
+# TODO: Add a BROWN.
 
 BLACK = Color(0, 0, 0)
 GRAY = Color(127, 127, 127)

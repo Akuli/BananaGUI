@@ -51,79 +51,21 @@ class BoxBase:
     children = types.Property('children', required_type=tuple, default=())
 
     def _bananagui_set_children(self, children):
-        # This method is more complex than other methods in this class
-        # because the children cannot be inserted in the middle, they
-        # can only be prepended, appended or removed.
-
         assert len(children) == len(set(children)), \
             "cannot add the same child twice"
 
-        def check(child):
+        common_beginning = utils.common_beginning(self, children)
+
+        # TODO: Maybe self and children have something else in common
+        # than the beginning? Optimize this.
+        for child in self[common_beginning:]:
+            super().remove(child)
+        for child in children[common_beginning:]:
             assert isinstance(child, bases.ChildBase), \
                 "invalid child type %r" % type(child).__name__
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
-
-        common_beginning = utils.common_beginning(self, children)
-        common_end = utils.common_beginning(reversed(self), reversed(children))
-
-        if common_beginning + common_end == len(children):
-            # Widgets are being removed from the middle and nothing else
-            # is done.
-            #
-            #       do nothing       remove       do nothing
-            # |--------------------|--------|--------------------|
-            #    common_beginning                 common_end
-            if common_end == 0:
-                # Don't screw up with slicing.
-                to_be_removed = self[common_beginning:]
-            else:
-                to_be_removed = self[common_beginning:-common_end]
-            for child in to_be_removed:
-                super().remove(child)
-
-        # If this code runs, something is added to the middle of the box
-        # and we need to remove other widgets temporarily to be able to
-        # do that.
-        elif common_beginning > common_end:
-            # Many common items in the beginning, modify the end.
-            #
-            #                            add/remove    remove
-            #         do nothing          children   temporarily
-            # |-------------------------|----------|-------------|
-            #       common_beginning                  common_end
-            for child in self[common_beginning:]:
-                super().remove(child)
-            for child in children[common_beginning:]:
-                check(child)
-                super().append(child)
-        else:
-            # Many common items in the end, modify the beginning.
-            # Python's lists aren't good at adding items to or removing
-            # items from the beginning repeatedly, but lists aren't used
-            # for that here.
-            #
-            #     remove     add/remove
-            #   temporarily   children          do nothing
-            # |-------------|----------|------------------------|
-            # common_beginning                 common_end
-            if common_end == 0:
-                # We need to handle this specially because -0 == 0 and
-                # slicing gets screwed up. Earlier common_beginning was
-                # not bigger than common_end, so it is also 0. So
-                # there's nothing in common, and we need to remove
-                # everything and add everything again.
-                for child in self:
-                    super().remove(child)
-                for child in children:
-                    check(child)
-                    super().prepend(child)
-            else:
-                for child in self[:-common_end]:
-                    super().remove(child)
-                for child in reversed(children[:-common_end]):
-                    check(child)
-                    super().prepend(child)
+            super().append(child)
 
     def __setitem__(self, item, value):
         """Set widget(s) to self or call super()."""
@@ -139,7 +81,7 @@ class BoxBase:
         if isinstance(item, int):
             return self['children'][item]
         if isinstance(item, slice):
-            return list(self['children'])[item]
+            return list(self['children'][item])
         return super().__getitem__(item)
 
     def __delitem__(self, item):
@@ -147,27 +89,13 @@ class BoxBase:
         if isinstance(item, (int, slice)):
             children = self[:]
             del children[item]
-            self['children'] = tuple(children)
+            self[:] = children
         else:
             super().__delitem__(item)
 
     # More list-like behavior. Some of these methods avoid indexing and
     # slicing self because that way there's no need to create a list in
     # __setitem__, __getitem__ or __delitem__
-
-    def prepend(self, child):
-        """Add a widget to the beginning of the box."""
-        self['children'] = (child,) + self['children']
-
-    def append(self, child):
-        """Add a widget to the end of the box."""
-        self['children'] += (child,)
-
-    def remove(self, child):
-        """Remove a widget from self."""
-        children = self[:]
-        children.remove(child)
-        self[:] = children
 
     def __contains__(self, item):
         return item in self['children']
@@ -178,14 +106,20 @@ class BoxBase:
     def __reversed__(self):
         return reversed(self['children'])
 
+    def append(self, child):
+        """Add a widget to the box."""
+        self['children'] += (child,)
+
     def clear(self):
         """Remove all widgets from self."""
-        self['children'] = ()
+        self[:] = []
 
     def count(self, child):
         """Check how many times a child has been added.
 
-        This is always 0 or 1 because children can only be added once.
+        This always returns 0 or 1 because children can be added once
+        only. This method is provided just for compatibility with lists
+        and using `child in self` instead is recommended.
         """
         result = self['children'].count(child)
         assert result in (0, 1)
@@ -215,14 +149,22 @@ class BoxBase:
         del self[index]
         return result
 
+    def remove(self, child):
+        """Remove a widget from self."""
+        children = self[:]
+        children.remove(child)
+        self[:] = children
+
     def reverse(self):
         """Reverse the box, making last items first and first items last.
 
-        Note that unlike with lists, modifying the beginning of a box is
-        usually more efficient than reversing the box, modifying the end
-        of the box and reversing again.
+        Unlike with lists, this isn't very efficient.
         """
-        self['children'] = self['children'][::-1]
+        self[:] = self[::-1]
+
+    def sort(self, **kwargs):
+        """Sort self."""
+        self[:] = sorted(self, **kwargs)
 
 
 class HBox:

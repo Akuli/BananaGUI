@@ -93,3 +93,18 @@ def common_beginning(*iterables):
     except StopIteration:
         pass
     return result
+
+
+class ClassProperty:
+    """Like @property, but for classes.
+
+    Unfortunately these don't support setters and deleters.
+    """
+
+    def __init__(self, getter):
+        """Initialize the class property."""
+        self._getter = getter
+
+    def __get__(self, instance, cls):
+        """Return the value."""
+        return self._getter(cls)

@@ -24,50 +24,45 @@
 import tkinter as tk
 
 
+_tkinter_fills = {
+    # child['expand']: fill
+    (True, True): 'both',
+    (True, False): 'x',
+    (False, True): 'y',
+    (False, False): 'none',
+}
+
 class BoxBase:
 
     def __init__(self, parent):
         super().__init__(parent)
         self.raw_set('real_widget', tk.Frame(parent['real_widget']))
 
-    def __get_pack_kwargs(self, startorend, expand):
-        sides = {
-            # (orientation, startorend): side
-            ('h', 'start'): 'left',
-            ('h', 'end'): 'right',
-            ('v', 'start'): 'top',
-            ('v', 'end'): 'bottom',
-        }
-        fills = {
-            # (orientation, expand): fill
-            ('h', True): 'both',
-            ('v', True): 'both',
-            ('h', False): 'y',
-            ('v', False): 'x',
-        }
+    # See also bases.py for more details about _bananagui_tkinter_expand
+    # and _bananagui_tkinter_geometry.
 
-        orientation = type(self)._bananagui_tkinter_orientation
-        return {
-            'side': sides[(orientation, startorend)],
-            'fill': fills[(orientation, expand)],
-            'expand': expand,
-        }
+    def append(self, child):
+        child['real_widget'].pack(
+            side=self._bananagui_tkinter_appendside,
+            fill=_tkinter_fills[child['expand']],
+        )
+        child._bananagui_tkinter_packed = True
 
-    def add_start(self, child, expand):
-        kwargs = self.__get_pack_kwargs('start', expand)
-        child['real_widget'].pack(**kwargs)
-
-    def add_end(self, child, expand):
-        kwargs = self.__get_pack_kwargs('end', expand)
-        child['real_widget'].pack(**kwargs)
+        # Set the pack expanding, see ChildBase._bananagui_set_expand
+        # in bases.py.
+        child._bananagui_set_expand(child['expand'])
 
     def remove(self, child):
         child['real_widget'].pack_forget()
+        child._bananagui_tkinter_packed = False
 
 
 class HBox:
-    _bananagui_tkinter_orientation = 'h'
+    # These sides are correct. Appending to a box adds a child to the
+    # beginning of the box, and then the next child towards the center
+    # from the first child etc.
+    _bananagui_tkinter_appendside = 'left'
 
 
 class VBox:
-    _bananagui_tkinter_orientation = 'v'
+    _bananagui_tkinter_appendside = 'top'

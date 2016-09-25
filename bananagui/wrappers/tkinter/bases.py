@@ -32,6 +32,12 @@ except ImportError:
     except ImportError:
         ToolTipBase = None
 
+from . import layouts
+
+
+# I know, I know, relying on falsiness of None sucks.
+assert ToolTipBase is None or ToolTipBase
+
 
 class _ToolTip(ToolTipBase or object):
     """Tooltips for tkinter using idlelib.
@@ -42,51 +48,62 @@ class _ToolTip(ToolTipBase or object):
     def __init__(self, widget):
         """Initialize the tooltip.
 
-        By default, this doesn't do anything. Set the text attribute to
-        a string to display a tooltip.
+        By default, this doesn't do anything. Set the text attribute 
+        to a string to display a tooltip.
         """
-        if ToolTipBase is None:
-            warnings.warn("idlelib is required to display tkinter tooltips")
-        else:
-            super().__init__(widget)
-        self.text = None
+            if ToolTipBase:
+                super().__init__(widget)
+            else:
+                warnings.warn("idlelib is required to display tkinter tooltips")
+            self.text = None
 
-    def showcontents(self):
-        """Show the tooltip."""
-        if self.text is not None and ToolTipBase is not None:
-            # With my dark GTK+ theme, the original showcontents creates
-            # light text on light background. This always creates black
-            # text on white background.
-            label = tk.Label(
-                self.tipwindow,
-                text=self.text,
-                #justify='left',
-                foreground='black',
-                background='white',
-                #relief='solid',
-                #borderwidth=1,
-            )
-            label.pack()
-
-
-class WidgetBase:
-    pass
+        def showcontents(self):
+            """Show the tooltip."""
+            if self.text is not None and ToolTipBase:
+                # With my dark GTK+ theme, the original showcontents
+                # creates light text on a light background. This
+                # always creates black text on a white background.
+                label = tk.Label(
+                    self.tipwindow,
+                    text=self.text,
+                    #justify='left',
+                    foreground='black',
+                    background='white',
+                    #relief='solid',
+                    #borderwidth=1,
+                )
+                label.pack()
 
 
-class ParentBase:
-    pass
-
+_pack_fills = {
+    # child['expand']: fill
+    (True, True): 'both',
+    (True, False): 'x',
+    (False, True): 'y',
+    (False, False): 'none',
+}
 
 class ChildBase:
 
     def __init__(self):
         super().__init__()
-        self.__tkinter_tooltip = None
+        self.__tooltip = None
+        self._bananagui_tkinter_packed = False  # See also layouts.py.
+
+    def _bananagui_set_expand(self, expand):
+        if self._bananagui_tkinter_packed:
+            # Update the pack expanding. By having this here we can make
+            # sure that the pack options are changed when the expand is
+            # changed.
+            if isinstance(self['parent'], layouts.HBox):
+                self['real_widget'].pack(expand=expand[0])
+            if isinstance(self['parent'], layouts.VBox):
+                self['real_widget'].pack(expand=expand[1])
 
     def _bananagui_set_tooltip(self, tooltip):
-        if self.__tkinter_tooltip is None and tooltip is not None:
-            self.__tkinter_tooltip = _ToolTip(self['real_widget'])
-        self.__tkinter_tooltip.text = tooltip
+        if self.__tooltip is None and tooltip is not None:
+            self.__tooltip = _ToolTip(self['real_widget'])
+        self.__tooltip.text = tooltip
 
     def _bananagui_set_grayed_out(self, grayed_out):
         state = 'disable' if grayed_out else 'normal'
@@ -99,4 +116,4 @@ class BinBase:
         if self['child'] is not None:
             self['child']['real_widget'].pack_forget()
         if child is not None:
-            child['real_widget'].pack(fill='both', expand=True)
+            self['child']._bananagui_tkinter_add('pack')
