@@ -30,12 +30,23 @@ GTK+ 3 and tkinter.
 
 # This module will be filled with other things when load() is called,
 # but it doesn't clear anything so we can import things now.
-from bananagui.color import (
-    Color, BLACK, GRAY, WHITE, RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PINK)
-from bananagui.font import Font
 from bananagui.guiloader import load
-from bananagui.structures import FrozenDict
+from bananagui.structures import FrozenDict, Font, Color
 from bananagui.types import Property, Event, Signal, ObjectBase
+
+
+# Constants.
+# TODO: Add a BROWN.
+BLACK = Color(0, 0, 0)
+GRAY = Color(127, 127, 127)
+WHITE = Color(255, 255, 255)
+RED = Color(255, 0, 0)
+ORANGE = Color(255, 127, 0)
+YELLOW = Color(255, 255, 0)
+GREEN = Color(0, 255, 0)
+CYAN = Color(0, 255, 255)
+BLUE = Color(0, 0, 255)
+PINK = Color(255, 0, 255)
 
 
 def main():

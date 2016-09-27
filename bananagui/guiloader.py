@@ -23,14 +23,12 @@
 
 import importlib
 
-import bananagui.base
-import bananagui.wrappers  # noqa
-
 
 class _WrapperLoader:
 
-    def __init__(self):
+    def __init__(self, base):
         """Initialize the loader."""
+        self._base = base
         self._not_loaded = {}  # {name: (base, wrapper), ...}
         self._loaded = {}      # {name: loaded_class, ...}
 
@@ -59,11 +57,11 @@ class _WrapperLoader:
 
     def load(self, wrappermodule):
         """Load the wrapper's classes, functions and other values."""
-        for name in dir(bananagui.base):
+        for name in dir(self._base):
             if name.startswith('_'):
                 # Something non-public.
                 continue
-            baseclass = getattr(bananagui.base, name)
+            baseclass = getattr(self._base, name)
             if not isinstance(baseclass, type):
                 # It's not a class.
                 continue
@@ -102,13 +100,13 @@ def load(*guiwrappers):
         if _wrapper_loaded:
             raise RuntimeError("a wrapper cannot be loaded twice")
 
-        # Automatically importing parent modules is new in Python 3.3.
-        # This is also why bananagui.wrappers is imported in the
-        # beginning of this file.
+        # TODO: import parent modules on Pythons older than 3.3. See
+        # importlib.import_module documentation.
+        basemodule = importlib.import_module('bananagui.base')
         wrappermodule = importlib.import_module(
             guiwrappers[0], 'bananagui.wrappers')
 
-        loader = _WrapperLoader()
+        loader = _WrapperLoader(basemodule)
         loader.load(wrappermodule)
         loader.install(bananagui)
         bananagui.MainLoop.init()
