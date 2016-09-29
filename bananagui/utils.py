@@ -13,11 +13,25 @@ except ImportError:
     from argparse import Namespace as NamespaceBase  # noqa
 
 
+def baseclass(class_):
+    """Prevent creating instances of cls.
+
+    Subclasses can be instantiated normally. Use this as a decorator.
+    """
+    def new(cls, *args, **kwargs):
+        if class_ is cls:
+            # It hasn't been subclassed.
+            raise TypeError("cannot create instances of %r" % cls.__name__)
+        return super(class_, cls).__new__(cls, *args, **kwargs)
+    class_.__new__ = new
+    return class_
+
+
 def copy_doc(source):
     """Copy __doc__ to another object.
 
     Unlike functools.wraps, this only copies __doc__ so this also works
-    with classes. Use this as a context manager.
+    with classes. Use this as a decorator.
     """
     def inner(destination):
         destination.__doc__ = source.__doc__

@@ -1,14 +1,27 @@
 """Value and type assertion functions."""
 
+import functools
 
-def check(value, *, allow_none=False, required_type=None, length=None,
-          minimum=None, maximum=None):
+
+def check(value, *, pair=False, allow_none=False, required_type=None,
+          length=None, minimum=None, maximum=None):
+    if pair:
+        # Everything is different.
+        kwargs = locals()
+        del kwargs['pair']
+        assert isinstance(value, tuple), "expected a tuple, got %r" % (pair,)
+        assert len(pair) == 2, "length of %r is not 2" % (pair,)
+        first, second = pair
+        check(first, **kwargs)
+        check(second, **kwargs)
+        return
+
     if value is None:
         assert allow_none, "the value must not be None"
         return
     if required_type is not None:
         assert isinstance(value, required_type), \
-            ("expected an instance of %s, got %r"
+            ("expected an instance of %r, got %r"
              % (required_type.__name__, value))
     if length is not None:
         assert len(value) == length, \
@@ -35,5 +48,5 @@ def deprecated(f):
     return doit
 
 intpair = deprecated(functools.partial(pair, required_type=int))
-positive_intpair = deprecated(functools.partial(intpair, minimum=1)
+positive_intpair = deprecated(functools.partial(intpair, minimum=1))
 boolpair = deprecated(functools.partial(pair, required_type=bool))

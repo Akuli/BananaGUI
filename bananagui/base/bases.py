@@ -21,10 +21,10 @@
 
 """Base classes for various widgets."""
 
-from bananagui import Property, check
+from bananagui import Property, ObjectBase, check
 
 
-class WidgetBase(types.ObjectBase):
+class WidgetBase(ObjectBase):
     """A widget baseclass.
 
     Properties:
@@ -33,12 +33,6 @@ class WidgetBase(types.ObjectBase):
     """
 
     real_widget = Property('real_widget')
-
-
-class ParentBase:
-    """A widget that child widgets can use as their parent."""
-
-    _bananagui_bases = ('WidgetBase',)
 
 
 class ChildBase:
@@ -72,23 +66,3 @@ class ChildBase:
     def __init__(self, parent):
         super().__init__()
         self.raw_set('parent', parent)
-
-
-class BinBase:
-    """A widget that contains one child widget or no children at all.
-
-    Properties:
-        child           RW
-            The child in the widget, None by default. Setting this to
-            None removes the child.
-    """
-
-    _bananagui_bases = ('ParentBase',)
-    child = Property('child', allow_none=True, default=None)
-
-    def _bananagui_set_child(self, child):
-        # This isinstance check works because the loaded ChildBase
-        # inherits from the ChildBase in this module.
-        assert isinstance(child, ChildBase)
-        assert child is None or child['parent'] is self
-        super()._bananagui_set_child(child)
