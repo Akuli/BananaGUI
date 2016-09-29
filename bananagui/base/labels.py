@@ -21,7 +21,7 @@
 
 """BananaGUI labels."""
 
-from bananagui import types
+from bananagui import Property
 
 
 class LabelBase:
@@ -41,4 +41,14 @@ class Label:
 
     # TODO: Add fonts and colors?
     _bananagui_bases = ('LabelBase',)
-    text = types.Property('text', required_type=str, default='')
+    text = Property('text', required_type=str, default='')
+
+
+class ImageLabel:
+    _bananagui_bases = ('LabelBase',)
+    imagepath = Property('imagepath', required_type=str,
+                         allow_none=True, default=None)
+
+    def _bananagui_set_imagepath(self, imagepath):
+        assert imagepath is None or os.path.isfile(imagepath)
+        super()._bananagui_set_imagepath(imagepath)

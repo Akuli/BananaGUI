@@ -21,8 +21,7 @@
 
 """Base classes for various widgets."""
 
-import bananagui
-from bananagui import check, types
+from bananagui import Property, check
 
 
 class WidgetBase(types.ObjectBase):
@@ -33,7 +32,7 @@ class WidgetBase(types.ObjectBase):
             The real GUI toolkit widget that's being wrapped.
     """
 
-    real_widget = types.Property('real_widget')
+    real_widget = Property('real_widget')
 
 
 class ParentBase:
@@ -64,13 +63,11 @@ class ChildBase:
     """
 
     _bananagui_bases = ('WidgetBase',)
-    parent = bananagui.Property('parent')
-    expand = bananagui.Property('expand', checker=check.boolpair,
-                                default=(False, False))
-    grayed_out = bananagui.Property('grayed_out', required_type=bool,
-                                    default=False)
-    tooltip = bananagui.Property('tooltip', required_type=str,
-                                 allow_none=True, default=None)
+    parent = Property('parent')
+    expand = Property('expand', checker=check.boolpair, default=(False, False))
+    grayed_out = Property('grayed_out', required_type=bool, default=False)
+    tooltip = Property('tooltip', required_type=str,
+                       allow_none=True, default=None)
 
     def __init__(self, parent):
         super().__init__()
@@ -87,14 +84,11 @@ class BinBase:
     """
 
     _bananagui_bases = ('ParentBase',)
-    child = bananagui.Property('child', allow_none=True, default=None)
+    child = Property('child', allow_none=True, default=None)
 
     def _bananagui_set_child(self, child):
-        # This isinstance check actually works because the loaded
-        # ChildBase in bananagui.gui inherits from the ChildBase in this
-        # module.
-        assert isinstance(child, ChildBase), \
-            "children must be BananaaGUI child widgets"
-        assert child is None or child['parent'] is self, \
-            "the child has the wrong parent"
+        # This isinstance check works because the loaded ChildBase
+        # inherits from the ChildBase in this module.
+        assert isinstance(child, ChildBase)
+        assert child is None or child['parent'] is self
         super()._bananagui_set_child(child)

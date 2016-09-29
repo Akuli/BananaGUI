@@ -37,7 +37,7 @@ class BoxBase:
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.raw_set('real_widget', tk.Frame(parent['real_widget']))
+        self.real_widget.raw_set(tk.Frame(parent['real_widget']))
 
     def append(self, child):
         child['real_widget'].pack(

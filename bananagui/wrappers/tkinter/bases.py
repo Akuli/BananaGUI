@@ -73,12 +73,12 @@ class _ToolTip(ToolTipBase):
                 label.pack()
 
 
-class WidgetBase:
-    pass
+#class WidgetBase:
+#    pass
 
 
-class ParentBase:
-    pass
+#class ParentBase:
+#    pass
 
 
 class ChildBase:
@@ -104,8 +104,7 @@ class ChildBase:
         self.__tooltip.text = tooltip
 
     def _bananagui_set_grayed_out(self, grayed_out):
-        state = 'disable' if grayed_out else 'normal'
-        self['real_widget'].config(state=state)
+        self['real_widget']['state'] = 'disable' if grayed_out else 'normal'
 
 
 class BinBase:
@@ -113,5 +112,9 @@ class BinBase:
     def _bananagui_set_child(self, child):
         if self['child'] is not None:
             self['child']['real_widget'].pack_forget()
+            self['child']._bananagui_tkinter_
+        if child is not None:
+            child['real_widget'].pack()
+            
         if child is not None:
             self['child']._bananagui_tkinter_add('pack')

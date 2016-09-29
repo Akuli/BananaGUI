@@ -1,4 +1,4 @@
-from bananagui import types
+from bananagui import Property, Signal
 
 
 class ButtonBase:
@@ -11,7 +11,7 @@ class ButtonBase:
     """
 
     _bananagui_bases = ('ChildBase',)
-    on_click = types.Signal('on_click')
+    on_click = Signal('on_click')
 
 
 class Button:
@@ -23,4 +23,4 @@ class Button:
     """
 
     _bananagui_bases = ('ButtonBase',)
-    text = types.Property('text', required_type=str, default='')
+    text = Property('text', required_type=str, default='')

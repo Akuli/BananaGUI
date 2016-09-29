@@ -170,12 +170,18 @@ class Signal(Property):
                          add_changed=False)
         self._blocked = weakref.WeakSet()
 
+    def connect(self, widget, *args):
+        """Append bananagui.Callback(*args) to self."""
+        callback = bananagui.Callback(*args)
+        self.get(widget).append(callback)
+
     def emit(self, widget, **kwargs):
         """Call the callbacks with an event created from arguments."""
-        if widget not in self._blocked:
-            event = Event(widget=widget, **kwargs)
-            for callback in self.get(widget):
-                callback(event)
+        if widget in self._blocked:
+            return
+        event = Event(widget=widget, **kwargs)
+        for callback in self.get(widget):
+            callback(event)
 
     @contextlib.contextmanager
     def blocked(self, widget):
@@ -193,38 +199,25 @@ class Signal(Property):
 class ObjectBase:
     """A base class for using BananaGUI properties and signals."""
 
-    @classmethod
-    def __get(cls, propertyname):
+    def __get_prop(self, propertyname):
         """Return a BananaGUI property."""
-        assert isinstance(propertyname, str), \
-            "expected a string, got %r" % (propertyname,)
-        result = cls
+        assert isinstance(propertyname, str)
+
+        result = self
         try:
             for attribute in propertyname.split('.'):
                 result = getattr(result, attribute)
         except AttributeError as e:
             raise ValueError("no such property: %r" % propertyname) from e
-        if not isinstance(result, Property):
-            raise TypeError("expected a BananaGUI property, got %r"
-                            % (result,))
-        return result
 
-    @utils.copy_doc(Property.raw_set)
-    def raw_set(self, name, value):
-        self.__get(name).raw_set(self, value)
+        assert isinstance(result, _PropertyWrapper), \
+            "%r is not a BananaGUI property" % propertyname
+        return result
 
     @utils.copy_doc(Property.set)
     def __setitem__(self, name, value):
-        self.__get(name).set(self, value)
+        self.__get_prop(name).set(value)
 
     @utils.copy_doc(Property.get)
     def __getitem__(self, name):
-        return self.__get(name).get(self)
-
-    @utils.copy_doc(Signal.emit)
-    def emit(self, name, **kwargs):
-        self.__get(name).emit(self, **kwargs)
-
-    @utils.copy_doc(Signal.blocked)
-    def blocked(self, name):
-        return self.__get(name).blocked(self)
+        return self.__get_prop(name).get()

@@ -21,7 +21,7 @@
 
 """A checkbox widget."""
 
-from bananagui import types
+from bananagui.types import Property
 
 
 class Checkbox:
@@ -38,5 +38,5 @@ class Checkbox:
     """
 
     _bananagui_bases = ('ChildBase',)
-    text = types.Property('text', required_type=str, default='')
-    checked = types.Property('checked', required_type=bool, default=False)
+    text = Property('text', required_type=str, default='')
+    checked = Property('checked', required_type=bool, default=False)

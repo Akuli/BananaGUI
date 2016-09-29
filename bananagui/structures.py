@@ -98,13 +98,13 @@ class FrozenDict:
         #                  self.__eq__(other)
         #                           |
         #                           |
-        #                  self._dict == other
+        #                  self._data == other
         #                /                     \
         #               /                       \
-        #    self._dict.__eq__(other)   other.__eq__(self._dict)
+        #    self._data.__eq__(other)   other.__eq__(self._data)
         #              |                          |
         #              |            ,---------------------------.
-        #       NotImplemented      | other._dict == self._dict |
+        #       NotImplemented      | other._data == self._data |
         #                           `---------------------------'
         return self._data == other
 
@@ -179,17 +179,16 @@ class Font(collections.namedtuple(
     def from_string(cls, string):
         """Parse a font from a string and return it.
 
-        >>> Font.from_string('Sans, 16, bold italic')   # doctest: +ELLIPSIS
+        >>> Font.from_string('Sans, 16, bold italic')      # doctest: +ELLIPSIS
         Font(family='Sans', size=16, bold=True, italic=True, ...)
-        >>> Font.from_string(' Sans ,16,bOlD ItALic ')  # doctest: +ELLIPSIS
+        >>> Font.from_string(' Sans ,16,bOlD ItALic ')     # doctest: +ELLIPSIS
         Font(family='Sans', size=16, bold=True, italic=True, ...)
-        >>> Font.from_string('Sans, 16')  # doctest: +ELLIPSIS
+        >>> Font.from_string('Sans, 16')                   # doctest: +ELLIPSIS
         Font(family='Sans', size=16, bold=False, italic=False, ...)
         >>> Font.from_string('default family, default size')
         Font(family=None, size=None, bold=False, italic=False, underline=False)
         """
-        if not isinstance(string, str):
-            raise TypeError("expected a string, got %r" % (string,))
+        assert isinstance(string, str)
 
         try:
             if string.count(',') == 2:
@@ -227,8 +226,8 @@ class Font(collections.namedtuple(
         >>> Font('Sans', 123, underline=True).to_string()
         'Sans, 123, underline'
         """
-        # It's OK to rely on falsiness of None because family and size
-        # are checked in __new__.
+        # This relies on falsiness of None because family and size are
+        # checked in __new__.
         result = [self.family or 'default family',
                   str(self.size or 'default size')]
 
@@ -282,8 +281,8 @@ class Color(collections.namedtuple('Color', 'r g b')):
         >>> Color.from_hex('#ff0')
         Color(r=255, g=255, b=0)
         """
-        if not isinstance(hexstring, str):
-            raise TypeError("expected a string, got %r" % (hexstring,))
+        assert isinstance(hexstring, str)
+
         if len(hexstring) == 4:
             # It's a 4-character hexadecimal color, like '#fff'.
             real_hexstring = hexstring[0]
@@ -295,9 +294,9 @@ class Color(collections.namedtuple('Color', 'r g b')):
         match = re.search('^#' + '([0-9a-f]{2})'*3 + '$',
                           real_hexstring, flags=re.IGNORECASE)
         if match is None:
-            raise ValueError("invalid hexadecimal color string %r"
-                             % (hexstring,))
-        return cls(*(int(value, 16) for value in match.groups()))
+            raise ValueError("invalid hexadecimal color string %r" % hexstring)
+        rgbgen = (int(value, 16) for value in match.groups())
+        return cls(*rgbgen)
 
     @property
     def hex(self):
@@ -318,17 +317,16 @@ class Color(collections.namedtuple('Color', 'r g b')):
 
         >>> Color.from_rgbstring('rgb(255,100%,0)')
         Color(r=255, g=255, b=0)
-        >>> Color.from_rgbstring('rGB ( 255 , 100% ,0) ')
+        >>> Color.from_rgbstring('rG B ( 255 , 100% ,0) ')
         Color(r=255, g=255, b=0)
         """
-        if not isinstance(rgbstring, str):
-            raise TypeError("expected a string, got %r" % (rgbstring,))
+        assert isinstance(rgbstring, str)
 
-        # Remove whitespace.
-        rgbstring = ''.join(rgbstring.split())
-
-        match = re.search(r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$', rgbstring,
-                          flags=re.IGNORECASE)
+        match = re.search(
+            r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$',
+            ''.join(rgbstring.split()),  # Remove whitespace.
+            flags=re.IGNORECASE,
+        )
         if match is None:
             raise ValueError("invalid RGB color string %r" % rgbstring)
 
@@ -354,7 +352,8 @@ class Callback:
     """Much like functools.partial.
 
     The difference is that the initializatoin arguments are added to the
-    end instead of the beginning.
+    end instead of the beginning. This also doesn't allow keyword
+    arguments.
 
     >>> c = Callback(print, "World!")
     >>> # Typically BananaGUI would call this internally with something
@@ -364,16 +363,20 @@ class Callback:
     """
 
     def __init__(self, function, *extra_args):
+        """Initialize the callback."""
+        assert callable(function)
         self._function = function
         self._extra_args = extra_args
 
     def __call__(self, *beginning_args):
+        """Call the function."""
         all_args = beginning_args + self._extra_args
         return self._function(*all_args)
 
     def __repr__(self):
-        init_args = 
-        arglist = ', '.join(map(repr, self._extra_args))
+        """Return a nice string representation of the function."""
+        init_args = (self._function,) + self._extra_args
+        arglist = ', '.join(map(repr, init_args))
         return 'Callback(%s)' % arglist
 
 

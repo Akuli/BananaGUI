@@ -28,10 +28,27 @@ class LabelBase:
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.raw_set('real_widget', tk.Label(parent['real_widget']))
+        self.real_widget.raw_set(tk.Label(parent['real_widget']))
 
 
 class Label:
 
     def _bananagui_set_text(self, text):
-        self['real_widget'].config(text=text)
+        self['real_widget']['text'] = text
+
+
+class ImageLabel:
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.__photo = None
+
+    def _bananagui_set_imagepath(self, imagepath):
+        if imagepath is None:
+            # Remove the old image if any.
+            self['real_widget']['image'] = ''
+            self.__photo = None
+        else:
+            # Tkinter needs a reference to the PhotoImage.
+            self.__photo = tk.PhotoImage(file=imagepath)
+            self['real_widget']['image'] = self.__photo

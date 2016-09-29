@@ -19,24 +19,21 @@ def check(value, *, allow_none=False, required_type=None, length=None,
         assert value <= maximum, "%r is larger than %r" % (value, maximum)
 
 
-def intpair(pair):
-    """Make sure that two items of a pair are positive integers."""
-    check(pair, required_type=tuple, length=2)
+def pair(pair, **check_kwargs):
+    """Check a pair."""
+    assert isinstance(pair, tuple), "expected a tuple, got %r" % (pair,)
+    assert len(pair) == 2, "length of %r is not 2" % (pair,)
     first, second = pair
-    assert isinstance(first, int), "expected an integer, got %r" % (pair,)
-    assert isinstance(second, int), "expected an integer, got %r" % (pair,)
+    check(first, **check_kwargs)
+    check(second, **check_kwargs)
 
 
-def positive_intpair(pair):
-    """Make sure that two items of a pair are positive integers."""
-    intpair(pair)
-    first, second = pair
-    assert first > 0, "expected a positive value, got %r" % (first,)
-    assert second > 0, "expected a positive value, got %r" % (second,)
+def deprecated(f):
+    def doit(*a,**k):
+        __import__('warnings').warn('%s is deprecated'%f.__name__,DeprecationWarning)
+        return f(*a,**k)
+    return doit
 
-
-def boolpair(pair):
-    check(pair, required_type=tuple, length=2)
-    first, second = pair
-    assert isinstance(first, bool), "%r is not a Boolean" % (first,)
-    assert isinstance(second, bool), "%r is not a Boolean" % (second,)
+intpair = deprecated(functools.partial(pair, required_type=int))
+positive_intpair = deprecated(functools.partial(intpair, minimum=1)
+boolpair = deprecated(functools.partial(pair, required_type=bool))
