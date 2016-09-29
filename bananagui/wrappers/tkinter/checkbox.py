@@ -23,7 +23,7 @@
 
 import tkinter as tk
 
-import bananagui.color
+import bananagui
 
 
 class Checkbox:
@@ -35,13 +35,12 @@ class Checkbox:
         self.__var.trace('w', self.__var_changed)
 
         widget = tk.Checkbutton(parent['real_widget'], variable=self.__var)
-        self.raw_set('real_widget', widget)
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        widget_bg = bananagui.color.Color.from_hex(widget.cget('bg'))
-        box_bg = bananagui.color.Color.from_hex(widget.cget('selectcolor'))
-        checkmark = bananagui.color.Color.from_hex(widget.cget('fg'))
+        widget_bg = bananagui.Color.from_hex(widget.cget('bg'))
+        box_bg = bananagui.Color.from_hex(widget.cget('selectcolor'))
+        checkmark = bananagui.Color.from_hex(widget.cget('fg'))
         if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
@@ -50,6 +49,8 @@ class Checkbox:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
             widget.config(selectcolor='#000000')
+
+        self.raw_set('real_widget', widget)
 
     def __var_changed(self, name, empty_string, mode):
         self.raw_set('checked', bool(self.__var.get()))

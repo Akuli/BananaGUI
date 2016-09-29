@@ -24,7 +24,7 @@
 import contextlib
 import weakref
 
-from bananagui import utils
+from bananagui import check, utils
 
 
 class Property:
@@ -43,17 +43,16 @@ class Property:
         instead. See the set and get docstrings for explanations about
         other arguments.
         """
-        if default is not None and getdefault is not None:
-            raise ValueError("don't specify both default and getdefault")
-        if check_kwargs and checker is not None:
-            raise ValueError("specify checker or additional keyword "
-                             "arguments, not both")
+        assert default is None or getdefault is None, \
+            "both default and getdefault were specified"
+        assert checker is None or not check_kwargs, \
+            "both checker and additional keyword arguments were specified"
 
         self._name = name
         self._default = default
         self._getdefault = getdefault
         if checker is None:
-            self._checker = lambda value: utils.check(value, **check_kwargs)
+            self._checker = lambda value: check.check(value, **check_kwargs)
         else:
             self._checker = checker
 

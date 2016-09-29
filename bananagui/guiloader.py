@@ -68,7 +68,7 @@ class _WrapperLoader:
             wrapperclass = getattr(wrappermodule, name, None)
             self._not_loaded[name] = (baseclass, wrapperclass)
 
-        for name in self._objects:
+        for name in self._not_loaded:
             self._load_class(name)
 
     def install(self, target):
@@ -95,18 +95,25 @@ def load(*guiwrappers):
 
     if len(guiwrappers) == 1:
         # Load the wrapper.
-        global _wrapper_loaded
 
+        # These imports are here because bananagui.base and
+        # bananagui.wrappers need things defined in __init__.py and the
+        # __init__.py imports this file. Usually this is thought of as a
+        # bad thing, but this function does advanced importlib things
+        # anyway so I don't think it matters. Using everything that
+        # __init__.py imports in bananagui.base is worth doing this.
+        import bananagui.base
+        import bananagui.wrappers  # noqa
+
+        global _wrapper_loaded
         if _wrapper_loaded:
             raise RuntimeError("a wrapper cannot be loaded twice")
 
-        # TODO: import parent modules on Pythons older than 3.3. See
-        # importlib.import_module documentation.
-        basemodule = importlib.import_module('bananagui.base')
+        wrappername = guiwrappers[0]
         wrappermodule = importlib.import_module(
-            guiwrappers[0], 'bananagui.wrappers')
+            wrappername, 'bananagui.wrappers')
 
-        loader = _WrapperLoader(basemodule)
+        loader = _WrapperLoader(bananagui.base)
         loader.load(wrappermodule)
         loader.install(bananagui)
         bananagui.MainLoop.init()

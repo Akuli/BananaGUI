@@ -21,7 +21,8 @@
 
 """Base classes for various widgets."""
 
-from bananagui import types, utils
+import bananagui
+from bananagui import check, types
 
 
 class WidgetBase(types.ObjectBase):
@@ -63,13 +64,13 @@ class ChildBase:
     """
 
     _bananagui_bases = ('WidgetBase',)
-    parent = types.Property('parent')
-    expand = types.Property('expand', checker=utils.check_bool_pair,
-                            default=(False, False))
-    grayed_out = types.Property('grayed_out', required_type=bool,
-                                default=False)
-    tooltip = types.Property('tooltip', required_type=str,
-                             allow_none=True, default=None)
+    parent = bananagui.Property('parent')
+    expand = bananagui.Property('expand', checker=check.boolpair,
+                                default=(False, False))
+    grayed_out = bananagui.Property('grayed_out', required_type=bool,
+                                    default=False)
+    tooltip = bananagui.Property('tooltip', required_type=str,
+                                 allow_none=True, default=None)
 
     def __init__(self, parent):
         super().__init__()
@@ -86,14 +87,14 @@ class BinBase:
     """
 
     _bananagui_bases = ('ParentBase',)
-    child = types.Property('child', allow_none=True, default=None)
+    child = bananagui.Property('child', allow_none=True, default=None)
 
     def _bananagui_set_child(self, child):
         # This isinstance check actually works because the loaded
         # ChildBase in bananagui.gui inherits from the ChildBase in this
         # module.
-        if not isinstance(child, ChildBase):
-            raise TypeError("expected a child, got %r" % (child,))
-        if child is not None and child['parent'] is not self:
-            raise ValueError("can't add a child with the wrong parent")
+        assert isinstance(child, ChildBase), \
+            "children must be BananaaGUI child widgets"
+        assert child is None or child['parent'] is self, \
+            "the child has the wrong parent"
         super()._bananagui_set_child(child)

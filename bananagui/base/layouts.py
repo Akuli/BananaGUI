@@ -23,7 +23,9 @@
 
 # TODO: Add a grid widget.
 
-from bananagui import types, utils
+#from bananagui import types, utils
+import bananagui
+from bananagui import utils
 from . import bases
 
 
@@ -48,7 +50,7 @@ class BoxBase:
     """
 
     _bananagui_bases = ('ParentBase', 'ChildBase')
-    children = types.Property('children', required_type=tuple, default=())
+    children = bananagui.Property('children', required_type=tuple, default=())
 
     def _bananagui_set_children(self, children):
         assert len(children) == len(set(children)), \
@@ -61,10 +63,35 @@ class BoxBase:
         for child in self[common_beginning:]:
             super().remove(child)
         for child in children[common_beginning:]:
-            assert isinstance(child, bases.ChildBase), \
-                "invalid child type %r" % type(child).__name__
-            assert child['parent'] is self, \
-                "cannot add a child with the wrong parent"
+            assert isinstance(child, bases.ChildBase), "invalid child type"
+            assert child['parent'] is self
+            super().append(child)
+
+    def _bananagui_set_children(self, children):
+        assert len(children) == len(set(children)), \
+            "cannot add the same child twice"
+
+        # We don't need to do anything to children that both child lists
+        # have, so let's throw them away here.
+        old = self[::-1]
+        new = list(children[::-1])
+
+        while old and new:
+            if old[-1] == new[-1]:
+                # We're ready to add a child and move on.
+                assert isinstance(new[-1], bases.ChildBase), \
+                    "invalid child type %r" % type(child).__name__
+                super().append(new.pop())
+                del old[-1]
+            else:
+                # Try to make it match.
+                super().remove(old.pop())
+
+        for child in self[common_beginning:]:
+            super().remove(child)
+        for child in children[common_beginning:]:
+            assert isinstance(child, bases.ChildBase), "invalid child type"
+            assert child['parent'] is self
             super().append(child)
 
     def __setitem__(self, item, value):
@@ -144,7 +171,7 @@ class BoxBase:
 
         The index must be an integer.
         """
-        assert isinstance(index, int), "pop indices must be integers"
+        assert isinstance(index, int)
         result = self[index]
         del self[index]
         return result

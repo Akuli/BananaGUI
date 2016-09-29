@@ -14,39 +14,53 @@ except ImportError:
 
 @Mapping.register
 class FrozenDict:
-    """An immutable-ish dictionary-like object."""
+    """An immutable-ish dictionary-like object.
 
-    __slots__ = ('_dict',)
+    >>> d = FrozenDict(a=1, b=2, c=3)   # arguments like for dict()
+    >>> d == {'a': 1, 'b': 2, 'c': 3}   # comparing to dicts
+    True
+    >>> d == FrozenDict(a=1, b=2, c=3)  # comparing to FrozenDicts
+    True
+    >>> from collections.abc import Mapping
+    >>> isinstance(d, Mapping)  # they are mappings
+    True
+    >>> isinstance(d, dict)   # but they aren't instances of built-in dict
+    False
+    >>> {d: 123}              # can be used as dict keys  # doctest: +ELLIPSIS
+    {...: 123}
+    """
+
+    __slots__ = ('_data',)
 
     def __init__(self, *args, **kwargs):
         """Initialize the new FrozenDict.
 
         All arguments are treated like for a regular dictionary.
         """
-        self._dict = dict(*args, **kwargs)
+        self._data = dict(*args, **kwargs)
 
     @functools.wraps(dict.__repr__)
     def __repr__(self):
         # printf-formatting can actually handle dictionaries just fine
         # even without wrapping the dictionary in a tuple or another
         # dictionary of length one.
-        return 'FrozenDict(%r)' % self._dict
+        return 'FrozenDict(%r)' % self._data
 
     @functools.wraps(dict.__contains__)
     def __contains__(self, item):
-        return item in self._dict
+        return item in self._data
 
     @functools.wraps(dict.__getitem__)
     def __getitem__(self, item):
-        return self._dict[item]
+        return self._data[item]
 
     @functools.wraps(dict.__iter__)
     def __iter__(self):
-        return iter(self._dict)
+        return iter(self._data)
 
     @functools.wraps(dict.__len__)
     def __len__(self):
-        return len(self._dict)
+        return len(self._data)
 
     @classmethod
     @functools.wraps(dict.fromkeys)
@@ -55,44 +69,48 @@ class FrozenDict:
 
     @functools.wraps(dict.get)
     def get(self, key, default=None):
-        return self._dict.get(key, default)
+        return self._data.get(key, default)
 
     @functools.wraps(dict.items)
     def items(self):
-        return self._dict.items()
+        return self._data.items()
 
     @functools.wraps(dict.keys)
     def keys(self):
-        return self._dict.keys()
+        return self._data.keys()
 
     @functools.wraps(dict.values)
     def values(self):
-        return self._dict.values()
+        return self._data.values()
+
+    # We can't wrap this because dict.__hash__ is None.
+    def __hash__(self):
+        """Return a hash of items in the dictionary."""
+        # Dictionaries don't rely entirely on hashes of their keys, so
+        # they can have FrozenDict({'a': 1}) and frozenset({('a', 1)})
+        # as their keys.
+        return hash(frozenset(self.items()))
 
     @functools.wraps(dict.__eq__)
     def __eq__(self, other):
-        if isinstance(other, Mapping):
-            # This will make two FrozenDicts compare their _dicts.
-            #
-            #                  self.__eq__(other)
-            #                           |
-            #                           |
-            #                  self._dict == other
-            #                /                     \
-            #               /                       \
-            #    self._dict.__eq__(other)   other.__eq__(self._dict)
-            #              |                          |
-            #              |            ,---------------------------.
-            #       NotImplemented      | other._dict == self._dict |
-            #                           `---------------------------'
-            return self._dict == other
-        return NotImplemented
+        # This will make two FrozenDicts compare their _dicts.
+        #
+        #                  self.__eq__(other)
+        #                           |
+        #                           |
+        #                  self._dict == other
+        #                /                     \
+        #               /                       \
+        #    self._dict.__eq__(other)   other.__eq__(self._dict)
+        #              |                          |
+        #              |            ,---------------------------.
+        #       NotImplemented      | other._dict == self._dict |
+        #                           `---------------------------'
+        return self._data == other
 
     @functools.wraps(dict.__ne__)
     def __ne__(self, other):
-        if isinstance(other, Mapping):
-            return self._dict != other
-        return NotImplemented
+        return self._data != other
 
 
 class Font(collections.namedtuple(
@@ -330,6 +348,32 @@ class Color(collections.namedtuple('Color', 'r g b')):
         'rgb(255,255,0)'
         """
         return 'rgb(%d,%d,%d)' % self
+
+
+class Callback:
+    """Much like functools.partial.
+
+    The difference is that the initializatoin arguments are added to the
+    end instead of the beginning.
+
+    >>> c = Callback(print, "World!")
+    >>> # Typically BananaGUI would call this internally with something
+    >>> # like an event as an argument.
+    >>> c("Hello")
+    Hello World!
+    """
+
+    def __init__(self, function, *extra_args):
+        self._function = function
+        self._extra_args = extra_args
+
+    def __call__(self, *beginning_args):
+        all_args = beginning_args + self._extra_args
+        return self._function(*all_args)
+
+    def __repr__(self):
+        arglist = ', '.join(map(repr, self._extra_args))
+        return 'Callback(%s)' % arglist
 
 
 if __name__ == '__main__':

@@ -27,12 +27,12 @@ GTK+ 3 and tkinter.
 """
 
 # flake8: noqa
-
 # This module will be filled with other things when load() is called,
 # but it doesn't clear anything so we can import things now.
+
 from bananagui.guiloader import load
-from bananagui.structures import FrozenDict, Font, Color
-from bananagui.types import Property, Event, Signal, ObjectBase
+from bananagui.structures import Callback, Color, Font, FrozenDict
+from bananagui.types import Event, ObjectBase, Property, Signal
 
 
 # Constants.
@@ -59,5 +59,4 @@ def quit(*args):
 
     This ignores positional arguments.
     """
-    # TODO: Modify the MainLoop class not to ignore positional arguments.
     MainLoop.quit()

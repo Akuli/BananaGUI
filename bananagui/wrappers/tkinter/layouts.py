@@ -32,14 +32,12 @@ _tkinter_fills = {
     (False, False): 'none',
 }
 
+
 class BoxBase:
 
     def __init__(self, parent):
         super().__init__(parent)
         self.raw_set('real_widget', tk.Frame(parent['real_widget']))
-
-    # See also bases.py for more details about _bananagui_tkinter_expand
-    # and _bananagui_tkinter_geometry.
 
     def append(self, child):
         child['real_widget'].pack(
@@ -58,9 +56,9 @@ class BoxBase:
 
 
 class HBox:
-    # These sides are correct. Appending to a box adds a child to the
-    # beginning of the box, and then the next child towards the center
-    # from the first child etc.
+    # Appending to a box adds a child to the beginning of the box, and
+    # then the next child towards the center from the first child and
+    # so on.
     _bananagui_tkinter_appendside = 'left'
 
 

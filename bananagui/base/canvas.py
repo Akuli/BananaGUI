@@ -1,8 +1,7 @@
 """Canvas widget for BananaGUI."""
 
 import bananagui
-from bananagui import utils, check
-#from bananagui import structures, types, utils
+from bananagui import check
 
 
 class Canvas:
@@ -37,37 +36,40 @@ class Canvas:
         for pos in (pos1, pos2):
             check.intpair(pos)
         assert isinstance(thickness, int), "the thickness must be an integer"
-        assert thickness >= 0, "negative thicknesses aren't allowed"
+        assert thickness >= 0, "negative thickness"
         assert isinstance(color, bananagui.Color), \
-            "%r is not a BananaGUI color" % color
+            "a BananaGUI color is required"
         if thickness != 0:
             super().draw_line(pos1, pos2, thickness, color)
 
     def draw_polygon(self, *positions, fillcolor=None, linethickness=1,
-                     linecolor=structures.BLACK):
+                     linecolor=bananagui.BLACK):
         """Draw a polygon."""
-        if len(positions) < 3:
-            raise ValueError("at least 3 positions are needed for "
-                             "drawing a polygon")
+        assert len(positions) > 2, "use draw_line"
         for pos in positions:
-            utils.check_integer_pair(pos)
+            check.intpair(pos)
         for color in (fillcolor, linecolor):
-            assert isinstance(fillcolor, bananagui.Color), \
-                "fillcolor must be a BananaGUI Color"
-        self.draw_line(*positions[:2], 0, linecolor)  # Check the arguments.
-        utils.check(linethickness, required_type=int, minimum=0)
+            assert isinstance(fillcolor, bananagui.Color)
+        assert isinstance(linethickness, int)
+        assert linethickness >= 0
+        assert isinstance(color, bananagui.Color)
         super().draw_polygon(*positions, fillcolor=fillcolor,
                              linethickness=linethickness, linecolor=linecolor)
 
     def draw_oval(self, centerpos, xradius, yradius, *, fillcolor=None,
-                  linecolor=structures.BLACK, linethickness=1):
+                  linecolor=bananagui.BLACK, linethickness=1):
         """Draw an oval on the canvas."""
-        utils.check_integer_pair(centerpos)
-        utils.check(xradius, required_type=int, minimum=1)
-        utils.check(yradius, required_type=int, minimum=1)
-        utils.check(fillcolor, required_type=structures.Color, allow_none=True)
-        utils.check(linecolor, required_type=structures.Color)
-        utils.check(linethickness, required_type=int, minimum=0)
+        check.intpair(centerpos)
+        for radius in (xradius, yradius):
+            assert isinstance(radius, int), "radiuses must be integers"
+            assert radius > 0, "too small radius"
+        assert fillcolor is None or isinstance(fillcolor, bananagui.Color), \
+            "None or a BananaGUI color is required"
+        assert isinstance(linecolor, bananagui.Color), \
+            "a BananaGUI color is required"
+        assert isinstance(linethickness, int), \
+            "line thickness must be an integer"
+        assert linethickness >= 0, "negative line thickness"
         super().draw_oval(centerpos, xradius, yradius, fillcolor,
                           linecolor, linethickness)
 

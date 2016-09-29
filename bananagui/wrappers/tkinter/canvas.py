@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from bananagui import color as _color
+import bananagui
 
 
 def _flatten(iterables):

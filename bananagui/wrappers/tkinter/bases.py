@@ -23,6 +23,7 @@
 
 import tkinter as tk
 
+_has_tooltips = True
 try:
     from idlelib.ToolTip import ToolTipBase
 except ImportError:
@@ -30,16 +31,13 @@ except ImportError:
         # Maybe idlelib's modules will be renamed later?
         from idlelib.tooltip import ToolTipBase
     except ImportError:
-        ToolTipBase = None
+        ToolTipBase = object
+        _has_tooltips = False
 
 from . import layouts
 
 
-# I know, I know, relying on falsiness of None sucks.
-assert ToolTipBase is None or ToolTipBase
-
-
-class _ToolTip(ToolTipBase or object):
+class _ToolTip(ToolTipBase):
     """Tooltips for tkinter using idlelib.
 
     http://stackoverflow.com/a/30021542
@@ -51,15 +49,15 @@ class _ToolTip(ToolTipBase or object):
         By default, this doesn't do anything. Set the text attribute 
         to a string to display a tooltip.
         """
-            if ToolTipBase:
-                super().__init__(widget)
-            else:
-                warnings.warn("idlelib is required to display tkinter tooltips")
-            self.text = None
+        if _has_tooltips:
+            super().__init__(widget)
+        else:
+            warnings.warn("idlelib is required to display tkinter tooltips")
+        self.text = None
 
         def showcontents(self):
             """Show the tooltip."""
-            if self.text is not None and ToolTipBase:
+            if self.text is not None and _has_tooltips:
                 # With my dark GTK+ theme, the original showcontents
                 # creates light text on a light background. This
                 # always creates black text on a white background.
@@ -75,13 +73,13 @@ class _ToolTip(ToolTipBase or object):
                 label.pack()
 
 
-_pack_fills = {
-    # child['expand']: fill
-    (True, True): 'both',
-    (True, False): 'x',
-    (False, True): 'y',
-    (False, False): 'none',
-}
+class WidgetBase:
+    pass
+
+
+class ParentBase:
+    pass
+
 
 class ChildBase:
 
@@ -97,7 +95,7 @@ class ChildBase:
             # changed.
             if isinstance(self['parent'], layouts.HBox):
                 self['real_widget'].pack(expand=expand[0])
-            if isinstance(self['parent'], layouts.VBox):
+            elif isinstance(self['parent'], layouts.VBox):
                 self['real_widget'].pack(expand=expand[1])
 
     def _bananagui_set_tooltip(self, tooltip):
