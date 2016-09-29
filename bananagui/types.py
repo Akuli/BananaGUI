@@ -22,9 +22,36 @@
 """BananaGUI events and signals."""
 
 import contextlib
+import functools
 import weakref
 
 from bananagui import check, utils
+
+
+class _PropertyWrapper:
+    """Like types.MethodType but for BananaGUI properties."""
+
+    def __init__(self, prop, instance):
+        self.__prop = prop
+        self.__instance = instance
+
+    def __dir__(self):
+        return dir(self.__prop)
+
+    def __getattr__(self, attribute):
+        value = getattr(self.__prop, attribute)
+        if callable(value):
+            # It's a method, create a partial.
+            return functools.partial(value, self.__instance)
+        if isinstance(value, Property):
+            # It's a nested BananaGUI property, create another wrapper.
+            return _PropertyWrapper(value, self.__instance)
+        # It's something else.
+        return value
+
+    def __repr__(self):
+        return ('<BananaGUI property wrapper of %r and %r>'
+                % (self.__prop, self.__instance))
 
 
 class Property:
@@ -56,9 +83,13 @@ class Property:
         else:
             self._checker = checker
 
+        self._propertywrappers = weakref.WeakKeyDictionary()
         self._values = weakref.WeakKeyDictionary()
         if add_changed:
             self.changed = Signal(name + '.changed')
+
+    def __repr__(self):
+        return '<BananaGUI property %r>' % self._name
 
     def raw_set(self, widget, value):
         """Set the value of the BananaGUI property.
@@ -87,11 +118,11 @@ class Property:
           - Call raw_set().
         """
         try:
-            setter = getattr(type(widget), '_bananagui_set_' + self._name)
+            setter = getattr(widget, '_bananagui_set_' + self._name)
         except AttributeError as e:
             msg = "the value of the BananaGUI property %r cannot be set"
             raise ValueError(msg % self._name) from e
-        setter(widget, value)
+        setter(value)
         self.raw_set(widget, value)
 
     def get(self, widget):
@@ -112,6 +143,18 @@ class Property:
                 value = self._default
             self._values[widget] = value
         return value
+
+    def __get__(self, instance, cls):
+        """Make the BananaGUI property behave like functions in classes."""
+        if instance is None:
+            # This is invoked from a class.
+            return self
+        try:
+            wrapper = self._propertywrappers[instance]
+        except KeyError:
+            wrapper = _PropertyWrapper(self, instance)
+            self._propertywrappers[instance] = wrapper
+        return wrapper
 
 
 class Event(utils.NamespaceBase):

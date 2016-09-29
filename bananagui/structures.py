@@ -372,6 +372,7 @@ class Callback:
         return self._function(*all_args)
 
     def __repr__(self):
+        init_args = 
         arglist = ', '.join(map(repr, self._extra_args))
         return 'Callback(%s)' % arglist
 

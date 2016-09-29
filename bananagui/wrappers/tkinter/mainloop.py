@@ -4,7 +4,7 @@ import tkinter as tk
 class MainLoop:
 
     @classmethod
-    def init(cls, args):
+    def init(cls):
         cls.__root = tk.Tk()
         cls.__root.withdraw()
 
