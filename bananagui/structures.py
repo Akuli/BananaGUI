@@ -353,31 +353,35 @@ class Callback:
 
     The difference is that the initializatoin arguments are added to the
     end instead of the beginning. This also doesn't allow keyword
-    arguments.
+    arguments when calling.
 
-    >>> c = Callback(print, "World!")
+    >>> c = Callback(print, "World!", sep='-')
+    >>> c
+    Callback(<built-in function print>, 'World!', sep='-')
     >>> # Typically BananaGUI would call this internally with something
     >>> # like an event as an argument.
     >>> c("Hello")
-    Hello World!
+    Hello-World!
     """
 
-    def __init__(self, function, *extra_args):
+    def __init__(self, function, *extra_args, **extra_kwargs):
         """Initialize the callback."""
         assert callable(function)
         self._function = function
         self._extra_args = extra_args
+        self._extra_kwargs = extra_kwargs
 
     def __call__(self, *beginning_args):
         """Call the function."""
         all_args = beginning_args + self._extra_args
-        return self._function(*all_args)
+        return self._function(*all_args, **self._extra_kwargs)
 
     def __repr__(self):
-        """Return a nice string representation of the function."""
-        init_args = (self._function,) + self._extra_args
-        arglist = ', '.join(map(repr, init_args))
-        return 'Callback(%s)' % arglist
+        """Return a nice string representation of the callback."""
+        words = [repr(self._function)]
+        words.extend(map(repr, self._extra_args))
+        words.extend('%s=%r' % item for item in self._extra_kwargs.items())
+        return 'Callback(%s)' % ', '.join(words)
 
 
 if __name__ == '__main__':

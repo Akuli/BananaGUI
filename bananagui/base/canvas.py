@@ -1,6 +1,13 @@
 """Canvas widget for BananaGUI."""
 
-from bananagui import Property, check
+from bananagui import Color, Property, WHITE
+from bananagui.check import check
+
+
+def _check_fillable_args(fillcolor, linecolor, linethickness):
+    assert fillcolor is None or isinstance(fillcolor, bananagui.Color)
+    assert linecolor is None or isinstance(linecolor, bananagui.Color)
+    assert isinstance(linethickness, int) and linethickness > 0
 
 
 class Canvas:
@@ -21,47 +28,39 @@ class Canvas:
     """
 
     _bananagui_bases = ('ChildBase',)
-    size = Property('size', checker=check.positive_intpair, default=(300, 200))
-    background = Property('background', required_type=bananagui.Color,
-                          default=bananagui.WHITE)
+    size = Property('size', pair=True, required_type=int, minimum=1,
+                    default=(300, 200))
+    background = Property('background', required_type=Color, default=WHITE)
 
     def draw_line(self, pos1, pos2, *, thickness=1, color=bananagui.BLACK):
         """Draw a line from start to end on the canvas.
 
         Thickness needs to be a non-negative integer, but it can be 0.
         """
-        for pos in (pos1, pos2):
-            check.intpair(pos)
-        assert isinstance(thickness, int)
-        assert thickness >= 0
-        assert isinstance(color, bananagui.Color)
+        check(pos1, pair=True, required_type=int)
+        check(pos2, pair=True, required_type=int)
+        check(thickness, required_type=int, minimum=0)
+        check(color, required_type=Color)
         if thickness != 0:
             super().draw_line(pos1, pos2, thickness, color)
-
-    def __check_fillable_kwargs(self, fillcolor, linecolor, linethickness):
-        assert fillcolor is None or isinstance(fillcolor, bananagui.Color)
-        assert linecolor is None or isinstance(linecolor, bananagui.Color)
-        assert isinstance(linethickness, int)
-        assert linethickness >= 0
 
     def draw_polygon(self, *positions, fillcolor=None,
                      linecolor=bananagui.BLACK, linethickness=1):
         """Draw a polygon."""
         assert len(positions) > 2, "use draw_line"
         for pos in positions:
-            check.pair(pos, required_type=int)
-        self.__check_fillable_kwargs(fillcolor, linecolor, linethickness)
+            check(pos, pair=True, required_type=int)
+        _check_fillable_args(fillcolor, linecolor, linethickness)
         super().draw_polygon(*positions, fillcolor=fillcolor,
                              linecolor=linecolor, linethickness=linethickness)
 
     def draw_oval(self, centerpos, xradius, yradius, *, fillcolor=None,
                   linecolor=bananagui.BLACK, linethickness=1):
         """Draw an oval on the canvas."""
-        check.pair(centerpos, required_type=int)
-        for radius in (xradius, yradius):
-            assert isinstance(radius, int)
-            assert radius > 0
-        self.__check_fillable_kwargs(fillcolor, linecolor, linethickness)
+        check(centerpos, pair=True, required_type=int)
+        check(xradius, required_type=int, minimum=1)
+        check(yradius, required_type=int, minimum=2)
+        _check_fillable_args(fillcolor, linecolor, linethickness)
         super().draw_oval(centerpos, xradius, yradius, fillcolor,
                           linecolor, linethickness)
 

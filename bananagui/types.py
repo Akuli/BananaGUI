@@ -35,6 +35,10 @@ class _PropertyWrapper:
         self.__prop = prop
         self.__instance = instance
 
+    def __repr__(self):
+        return ('<BananaGUI property wrapper of %r and %r>'
+                % (self.__prop, self.__instance))
+
     def __dir__(self):
         return dir(self.__prop)
 
@@ -48,10 +52,6 @@ class _PropertyWrapper:
             return _PropertyWrapper(value, self.__instance)
         # It's something else.
         return value
-
-    def __repr__(self):
-        return ('<BananaGUI property wrapper of %r and %r>'
-                % (self.__prop, self.__instance))
 
 
 class Property:
@@ -79,11 +79,10 @@ class Property:
         self._default = default
         self._getdefault = getdefault
         if checker is None:
-            self._checker = lambda value: check.check(value, **check_kwargs)
+            self._checker = functools.partial(check.check, **check_kwargs)
         else:
             self._checker = checker
 
-        self._propertywrappers = weakref.WeakKeyDictionary()
         self._values = weakref.WeakKeyDictionary()
         if add_changed:
             self.changed = Signal(name + '.changed')
@@ -149,12 +148,8 @@ class Property:
         if instance is None:
             # This is invoked from a class.
             return self
-        try:
-            wrapper = self._propertywrappers[instance]
-        except KeyError:
-            wrapper = _PropertyWrapper(self, instance)
-            self._propertywrappers[instance] = wrapper
-        return wrapper
+        # This is invoked from an instance.
+        return _PropertyWrapper(self, instance)
 
 
 class Event(utils.NamespaceBase):
@@ -210,8 +205,8 @@ class ObjectBase:
         except AttributeError as e:
             raise ValueError("no such property: %r" % propertyname) from e
 
-        assert isinstance(result, _PropertyWrapper), \
-            "%r is not a BananaGUI property" % propertyname
+        if not isinstance(result, _PropertyWrapper):
+            raise TypeError("%r is not a BananaGUI property" % propertyname)
         return result
 
     @utils.copy_doc(Property.set)
