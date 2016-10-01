@@ -1,1 +1,2 @@
 make expandiness a child's property instead of a pack arg
+Sound class for playing sounds and music!

@@ -1,4 +1,5 @@
 import ast
+import bananagui
 from gettext import gettext as _
 import configparser
 import io
@@ -63,6 +64,20 @@ class _Loader:
         return self._loaded
 
 
+class _NonClosingTextIOWrapper(io.TextIOWrapper):
+    """Like io.TextIOWrapper, but without __del__ magic.
+
+    The problem with io.TextIOWrapper is that when its instances are
+    destroyed it automatically closes the stream it's wrapping. This
+    class doesn't do that.
+    """
+
+    # This can't be written as __del__ = object.__del__ because there is
+    # no object.__del__.
+    def __del__(self):
+        pass
+
+
 def load_ini(source):
     """Load a GUI from source.
 
@@ -72,11 +87,20 @@ def load_ini(source):
     """
     loader = _Loader(interpolation=None)
     if isinstance(source, str):
+        # It's a string.
         loader.parser.read_string(source)
     elif isinstance(source, dict):
+        # It's a dictionary.
         loader.parser.read_dict(source)
     elif isinstance(source, io.TextIOBase):
+        # It's a file-like object that returns strings when it's read.
         loader.parser.read_file(source)
+    elif isinstance(source, io.IOBase):
+        # It's a file-like object that returns bytes when it's read.
+        # io.TextIOWrapper can't be used as is because the temporary
+        # wrapper is garbage collected when we're done using it and
+        # we're not supposed to close the source file.
+        loader.parser.read_file(_NonClosingTextIOWrapper(source))
     else:
         raise TypeError("cannot read from a source of type %s"
                         % type(source).__name__)
@@ -91,9 +115,6 @@ if __name__ == '__main__':
 
     bananagui.load('.tkinter')
     with open('hello-world.ini', 'r') as f:
-        widgets = load(f)
+        widgets = load_ini(f)
     pprint.pprint(widgets)
-    widgets['box'].add_start(result['label'], expand=True)
-    widgets['box'].add_start(result['button'])
     bananagui.main()
-    bananagui.MainLoop.run()
