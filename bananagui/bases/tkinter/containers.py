@@ -19,9 +19,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Layout widgets."""
-
 import tkinter as tk
+
+
+class ParentBase:
+    pass
+
+
+class BinBase:
+
+    def _bananagui_set_child(self, child):
+        if self['child'] is not None:
+            self['child']['real_widget'].pack_forget()
+            self['child']._bananagui_tkinter_packed = False
+        if child is not None:
+            child['real_widget'].pack()
+            child['real_widget']._bananagui_tkinter_packed = True
 
 
 _tkinter_fills = {

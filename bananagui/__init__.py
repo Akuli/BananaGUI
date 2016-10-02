@@ -26,37 +26,43 @@ the same code using any of the supported GUI toolkits, including PyQt5,
 GTK+ 3 and tkinter.
 """
 
-# flake8: noqa
-# This module will be filled with other things when load() is called,
-# but it doesn't clear anything so we can import things now.
+import importlib
 
-from bananagui.guiloader import load
-from bananagui.structures import Callback, Color, Font, FrozenDict
-from bananagui.types import Event, ObjectBase, Property, Signal
+# This is imported because importlib.import_module() doesn't import
+# parent modules as needed with relative imports.
+import bananagui.bases  # noqa
 
 
-# Constants.
-# TODO: Add a BROWN.
-BLACK = Color(0, 0, 0)
-GRAY = Color(127, 127, 127)
-WHITE = Color(255, 255, 255)
-RED = Color(255, 0, 0)
-ORANGE = Color(255, 127, 0)
-YELLOW = Color(255, 255, 0)
-GREEN = Color(0, 255, 0)
-CYAN = Color(0, 255, 255)
-BLUE = Color(0, 0, 255)
-PINK = Color(255, 0, 255)
+_base = None
 
 
-def main():
-    """Run the mainloop."""
-    return MainLoop.run()
+def load(*args):
+    """Load bananagui.gui.
 
+    The arguments should be Python module names. If they are relative,
+    they will be treated as relative to bananagui.bases. For example,
+    '.tkinter' is equivalent to 'bananagui.bases.tkinter'.
 
-def quit(*args):
-    """Quit the mainloop.
-
-    This ignores positional arguments.
+    If multiple wrappers are given, attempt to load each one until
+    loading one of them succeeds. You can import `bananagui.gui` after
+    calling this.
     """
-    MainLoop.quit()
+    if not args:
+        raise ValueError("specify at least one wrapper")
+
+    if len(args) == 1:
+        # Load the wrapper.
+        global _base
+        if _base is not None:
+            raise RuntimeError("don't call bananagui.load() twice")
+        _base = importlib.import_module(args[0], 'bananagui.bases')
+
+    else:
+        # Attempt to load each base.
+        for arg in args:
+            try:
+                load(arg)
+                return
+            except ImportError:
+                pass
+        raise ImportError("cannot load any of the requested base modules")

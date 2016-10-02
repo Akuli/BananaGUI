@@ -19,23 +19,40 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Button widgets."""
+"""BananaGUI labels."""
 
-import tkinter as tk
-
-
-class ButtonBase:
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        widget = tk.Button(parent['real_widget'], command=self.__on_click)
-        self.raw_set('real_widget', widget)
-
-    def __on_click(self):
-        self.emit('on_click')
+from bananagui import _base
+from bananagui.types import Property, bananadoc
+from bananagui.utils import baseclass
+from .bases import ChildBase
 
 
-class Button:
+@bananadoc
+class LabelBase(_base.LabelBase, ChildBase):
+    """A label base class."""
 
-    def _bananagui_set_text(self, text):
-        self['real_widget'].config(text=text)
+
+@bananadoc
+class Label(_base.Label, LabelBase):
+    """A label with text in it."""
+
+    # TODO: Add fonts and colors?
+    text = Property('text', required_type=str, default='',
+                    doc="Text in the label.")
+
+
+@bananadoc
+class ImageLabel(_base.ImageLabel, LabelBase):
+    """A label that contains an image."""
+    imagepath = Property(
+        'imagepath', required_type=str, allow_none=True, default=None,
+        doc="""Path to an image file.
+
+        Supported filetypes depend on the GUI toolkit. I recommend using
+        `.png` and `.jpg` images because they are well supported by most
+        GUI toolkits.
+        """)
+
+    def _bananagui_set_path(self, path):
+        assert path is None or os.path.isfile(path)
+        super()._bananagui_set_path(path)

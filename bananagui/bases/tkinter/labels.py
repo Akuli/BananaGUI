@@ -19,36 +19,36 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
+"""Labels for the BananaGUI tkinter wrapper."""
 
-from bananagui import Property
+import tkinter as tk
 
 
 class LabelBase:
-    """A label base widget."""
 
-    _bananagui_bases = ('ChildBase',)
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.real_widget.raw_set(tk.Label(parent['real_widget']))
 
 
 class Label:
 
-    """A label with text in it.
-
-    Properties:
-        text            RW
-            The label's text. An empty string by default.
-    """
-
-    # TODO: Add fonts and colors?
-    _bananagui_bases = ('LabelBase',)
-    text = Property('text', required_type=str, default='')
+    def _bananagui_set_text(self, text):
+        self['real_widget']['text'] = text
 
 
 class ImageLabel:
-    _bananagui_bases = ('LabelBase',)
-    imagepath = Property('imagepath', required_type=str,
-                         allow_none=True, default=None)
 
-    def _bananagui_set_imagepath(self, imagepath):
-        assert imagepath is None or os.path.isfile(imagepath)
-        super()._bananagui_set_imagepath(imagepath)
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.__photoimage = None
+
+    def _bananagui_set_path(self, path):
+        if path is None:
+            # Remove the old image if any.
+            self['real_widget']['image'] = ''
+            self.__photoimage = None
+        else:
+            # Tkinter needs a reference to the PhotoImage.
+            self.__photoimage = tk.PhotoImage(file=path)
+            self['real_widget']['image'] = self.__photoimage

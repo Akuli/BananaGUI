@@ -21,74 +21,63 @@
 
 """Widgets that contain text."""
 
-from bananagui import types
+from bananagui import _base
+from bananagui.types import Property, bananadoc
+from bananagui.utils import baseclass
+from .bases import ChildBase
 
 
-class EditableBase:
-    """A base class for Entry and TextView.
-
-    Properties:
-        text            RWC
-            The text in the entry.
-            An empty string by default.
-        read_only       RW
-            True if the content of the widget cannot be edited.
-            False by default.
-    """
+@bananadoc
+class TextBase(_base.TextBase, ChildBase):
+    """A base class for text editing widgets."""
 
     # TODO: Add fonts and colors.
-    _bananagui_bases = ('ChildBase',)
-    text = types.Property('text', required_type=str, default='')
-    read_only = types.Property('read_only', required_type=bool,
-                               default=True)
+    text = Property('text', required_type=str, default='',
+                    doc="Text in the entry.")
+    read_only = Property(
+        'read_only', required_type=bool, default=True,
+        doc="True if the content of the widget cannot be edited.")
 
+    # This is overrided just to make sure it has a docstring.
     def select_all(self):
         """Select all text in the widget."""
         super().select_all()
 
 
-class Entry:
-    """A one-line text widget.
+@bananadoc
+class Entry(_base.Entry, TextBase):
+    """A one-line text widget."""
 
-    Properties:
-        hidden          RW
-            True if the entry's content is hidden with asterisks or balls.
-            False by default.
-    """
-
-    _bananagui_bases = ('EditableBase',)
-    hidden = types.Property('hidden', required_type=bool, default=False)
+    hidden = Property(
+        'hidden', required_type=bool, default=False,
+        doc="True if the entry's content is hidden with asterisks or balls.")
 
 
-class PlainTextView:
-    """A multiline text widget.
+@bananadoc
+class PlainTextView(_base.PlainTextView, TextBase):
+    """A multiline text widget."""
 
-    Properties:
-        tab_inserts     RW
-            The character(s) that will be inserted when tab is pressed.
-            '\t' by default.
-    """
-
-    _bananagui_bases = ('EditableBase',)
-    tab_inserts = types.Property('tab_inserts', required_type=str,
-                                 default='\t')
+    tab_inserts = Property(
+        'tab_inserts', required_type=str, default='\t',
+        doc="The character(s) that will be inserted when tab is pressed.")
 
     def _bananagui_set_text(self, text):
         old_text = self['text']
-        with self.blocked('text.changed'):
+
+        # The changed signal needs to be emitted once only.
+        with self.text.changed.blocked():
             self.clear()
             if text:
                 self.append_text(text)
-        self.emit('text.changed', old_value=old_text, new_value=text)
+        self.text.changed.emit(old_value=old_text, new_value=text)
 
     def clear(self):
         """Remove everything from the textview."""
         super().clear()
-        self.raw_set('text', '')
+        self.text.raw_set('')
 
     def append_text(self, text):
         """Add text to the end of what is already in the text widget."""
-        if not isinstance(text, str):
-            raise TypeError("expected a string, got %r" % (text,))
+        assert isinstance(text, str)
         super().append_text(text)
-        self.raw_set('text', self['text'] + text)
+        self.text.raw_set(self['text'] + text)

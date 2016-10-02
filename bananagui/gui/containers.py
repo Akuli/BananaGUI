@@ -23,34 +23,48 @@
 
 # TODO: Add a grid widget.
 
-#from bananagui import types, utils
-import bananagui
-from bananagui import utils
-from . import bases
+from bananagui import _base
+from bananagui.types import Property, bananadoc
+from bananagui.utils import baseclass
+from bananagui.gui import bases
+from .bases import ChildBase, WidgetBase
 
 
-class LayoutBase:
-    pass
+@bananadoc
+class ParentBase(_base.ParentBase, WidgetBase):
+    """A widget that child widgets can use as their parent."""
 
 
-class BoxBase:
+@bananadoc
+class BinBase(_base.BinBase, ParentBase):
+    """A widget that contains one child widget or no children at all."""
+
+    child = Property(
+        'child', allow_none=True, default=None,
+        doc="""The child in the widget, None by default.
+
+        Setting this to None removes the child.
+        """)
+
+    def _bananagui_set_child(self, child):
+        if child is not None:
+            assert isinstance(child, ChildBase)
+            assert child['parent'] is self
+        super()._bananagui_set_child(child)
+
+
+@bananadoc
+class BoxBase(_base.BoxBase, ParentBase, ChildBase):
     """A widget that contains other widgets in a row.
 
     Boxes can be indexed and sliced like lists to modify their children,
     and slicing a box returns a list of children. Subscripting with a
     string still sets or gets the value of a property like for any other
     BananaGUI object.
-
-    Properties:
-        children        RC
-            A tuple of children in this widget.
-            At least one of these widgets should always be expanding in
-            the box's direction, for example, horizontally if the box is
-            a HBox. Otherwise the result is unspecified.
     """
 
-    _bananagui_bases = ('ParentBase', 'ChildBase')
-    children = bananagui.Property('children', required_type=tuple, default=())
+    children = Property('children', required_type=tuple, default=(),
+                        doc="A tuple of children in this widget.")
 
     def _bananagui_set_children(self, children):
         assert len(children) == len(set(children)), \
@@ -60,33 +74,6 @@ class BoxBase:
 
         # TODO: Maybe self and children have something else in common
         # than the beginning? Optimize this.
-        for child in self[common_beginning:]:
-            super().remove(child)
-        for child in children[common_beginning:]:
-            assert isinstance(child, bases.ChildBase), "invalid child type"
-            assert child['parent'] is self
-            super().append(child)
-
-    def _bananagui_set_children(self, children):
-        assert len(children) == len(set(children)), \
-            "cannot add the same child twice"
-
-        # We don't need to do anything to children that both child lists
-        # have, so let's throw them away here.
-        old = self[::-1]
-        new = list(children[::-1])
-
-        while old and new:
-            if old[-1] == new[-1]:
-                # We're ready to add a child and move on.
-                assert isinstance(new[-1], bases.ChildBase), \
-                    "invalid child type %r" % type(child).__name__
-                super().append(new.pop())
-                del old[-1]
-            else:
-                # Try to make it match.
-                super().remove(old.pop())
-
         for child in self[common_beginning:]:
             super().remove(child)
         for child in children[common_beginning:]:
@@ -125,12 +112,15 @@ class BoxBase:
     # __setitem__, __getitem__ or __delitem__
 
     def __contains__(self, item):
+        """Check if item is a child in the box."""
         return item in self['children']
 
     def __len__(self):
+        """Return the number of children in the box."""
         return len(self['children'])
 
     def __reversed__(self):
+        """Iterate the children of the box in reverse."""
         return reversed(self['children'])
 
     def append(self, child):
@@ -164,6 +154,7 @@ class BoxBase:
 
     def insert(self, index, child):
         """Insert a child at the given index."""
+        # This doesn't break if index is negative.
         self[index:index] = [child]
 
     def pop(self, index=-1):
@@ -194,15 +185,11 @@ class BoxBase:
         self[:] = sorted(self, **kwargs)
 
 
-class HBox:
+@bananadoc
+class HBox(_base.HBox, BoxBase):
     """A horizontal box."""
 
-    _bananagui_bases = ('BoxBase',)
-    _bananagui_orientation = 'h'  # Convinience attribute for wrappers.
 
-
-class VBox:
+@bananadoc
+class VBox(_base.VBox, BoxBase):
     """A vertical box."""
-
-    _bananagui_bases = ('BoxBase',)
-    _bananagui_orientation = 'v'

@@ -34,7 +34,7 @@ except ImportError:
         ToolTipBase = object
         _has_tooltips = False
 
-from . import layouts
+from .containers import HBox, VBox
 
 
 class _ToolTip(ToolTipBase):
@@ -46,7 +46,7 @@ class _ToolTip(ToolTipBase):
     def __init__(self, widget):
         """Initialize the tooltip.
 
-        By default, this doesn't do anything. Set the text attribute 
+        By default, this doesn't do anything. Set the text attribute
         to a string to display a tooltip.
         """
         if _has_tooltips:
@@ -55,30 +55,26 @@ class _ToolTip(ToolTipBase):
             warnings.warn("idlelib is required to display tkinter tooltips")
         self.text = None
 
-        def showcontents(self):
-            """Show the tooltip."""
-            if self.text is not None and _has_tooltips:
-                # With my dark GTK+ theme, the original showcontents
-                # creates light text on a light background. This
-                # always creates black text on a white background.
-                label = tk.Label(
-                    self.tipwindow,
-                    text=self.text,
-                    #justify='left',
-                    foreground='black',
-                    background='white',
-                    #relief='solid',
-                    #borderwidth=1,
-                )
-                label.pack()
+    def showcontents(self):
+        """Show the tooltip."""
+        if self.text is not None and _has_tooltips:
+            # With my dark GTK+ theme, the original showcontents
+            # creates light text on a light background. This
+            # always creates black text on a white background.
+            label = tk.Label(
+                self.tipwindow,
+                text=self.text,
+                #justify='left',
+                foreground='black',
+                background='white',
+                #relief='solid',
+                #borderwidth=1,
+            )
+            label.pack()
 
 
-#class WidgetBase:
-#    pass
-
-
-#class ParentBase:
-#    pass
+class WidgetBase:
+    pass
 
 
 class ChildBase:
@@ -93,10 +89,13 @@ class ChildBase:
             # Update the pack expanding. By having this here we can make
             # sure that the pack options are changed when the expand is
             # changed.
-            if isinstance(self['parent'], layouts.HBox):
-                self['real_widget'].pack(expand=expand[0])
-            elif isinstance(self['parent'], layouts.VBox):
-                self['real_widget'].pack(expand=expand[1])
+            if isinstance(self['parent'], BoxBase):
+                if self['parent']._bananagui_tkinter_orientation == 'h':
+                    # It's a horizontal box.
+                    self['real_widget'].pack(expand=expand[0])
+                elif self['parent']._bananagui_tkinter_orientation == 'v':
+                    # It's a vertical box.
+                    self['real_widget'].pack(expand=expand[1])
 
     def _bananagui_set_tooltip(self, tooltip):
         if self.__tooltip is None and tooltip is not None:
@@ -107,14 +106,8 @@ class ChildBase:
         self['real_widget']['state'] = 'disable' if grayed_out else 'normal'
 
 
-class BinBase:
+class Dummy:
 
-    def _bananagui_set_child(self, child):
-        if self['child'] is not None:
-            self['child']['real_widget'].pack_forget()
-            self['child']._bananagui_tkinter_
-        if child is not None:
-            child['real_widget'].pack()
-            
-        if child is not None:
-            self['child']._bananagui_tkinter_add('pack')
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.real_widget.raw_set(tk.Frame(parent['real_widget']))

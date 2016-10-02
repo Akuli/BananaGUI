@@ -19,36 +19,23 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Labels for the BananaGUI tkinter wrapper."""
+"""A checkbox widget."""
 
-import tkinter as tk
-
-
-class LabelBase:
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.real_widget.raw_set(tk.Label(parent['real_widget']))
+from bananagui import _base
+from bananagui.types import Property, bananadoc
+from .bases import ChildBase
 
 
-class Label:
+@bananadoc
+class Checkbox(_base.Checkbox, ChildBase):
+    """A widget that can be checked.
 
-    def _bananagui_set_text(self, text):
-        self['real_widget']['text'] = text
+    Note that the Checkbox class has nothing to do with BoxBase, HBox
+    and VBox.
+    """
 
-
-class ImageLabel:
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.__photo = None
-
-    def _bananagui_set_imagepath(self, imagepath):
-        if imagepath is None:
-            # Remove the old image if any.
-            self['real_widget']['image'] = ''
-            self.__photo = None
-        else:
-            # Tkinter needs a reference to the PhotoImage.
-            self.__photo = tk.PhotoImage(file=imagepath)
-            self['real_widget']['image'] = self.__photo
+    text = Property('text', required_type=str, default='',
+                    doc="The text next to the box that can be checked.")
+    checked = Property(
+        'checked', required_type=bool, default=False,
+        doc="True if the box is currently checked, False if not.")

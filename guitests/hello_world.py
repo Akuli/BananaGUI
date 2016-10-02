@@ -23,7 +23,7 @@
 
 import sys
 
-import bananagui as gui
+from bananagui import gui
 
 
 def main():

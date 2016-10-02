@@ -22,7 +22,7 @@
 import tkinter as tk
 
 
-class EditableBase:
+class TextBase:
 
     def __init__(self, parent):
         super().__init__(parent)

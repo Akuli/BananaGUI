@@ -1,5 +1,7 @@
 import tkinter as tk
 
+from . import mainloop
+
 
 class WindowBase:
 
@@ -37,14 +39,18 @@ class Window:
     def __init__(self):
         # This relies on tkinter's default root, which is created in the
         # mainloop.py file.
-        widget = tk.Toplevel()
-        self.raw_set('real_widget', widget)
+        widget = tk.Toplevel(mainloop._root)
+        self.real_widget.raw_set(widget)
         super().__init__()
 
 
-class ChildWindow:
+class Dialog:
 
     def __init__(self, parentwindow):
         widget = tk.Toplevel(parentwindow['real_widget'])
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
         super().__init__(parentwindow)
+
+
+def messagedialog(icon, parentwindow, text, title, buttons, defaultbutton):
+    raise NotImplementedError  # TODO
