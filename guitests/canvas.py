@@ -17,11 +17,12 @@ def main():
                          linecolor=color.ORANGE, linethickness=5)
         canvas.draw_circle((300, 300), 50, fillcolor=color.ORANGE,
                            linecolor=color.RED, linethickness=10)
-        canvas.clear()
+
+        canvas['expand'] = (True, True)
 
         window['title'] = "Canvas test"
-        window['destroyed.changed'].append(gui.MainLoop.quit)
-        sys.exit(gui.MainLoop.run())
+        window['destroyed.changed'].append(gui.quit)
+        sys.exit(gui.main())
 
 
 if __name__ == '__main__':

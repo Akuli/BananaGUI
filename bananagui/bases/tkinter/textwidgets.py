@@ -41,12 +41,12 @@ class Entry:
         self.__var.trace('w', self.__var_changed)
 
         widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
 
         super().__init__(parent)
 
     def __var_changed(self, tkname, empty_string, mode):
-        self.raw_set('text', self.__var.get())
+        self.text.raw_set(self.__var.get())
 
     def _bananagui_set_text(self, text):
         self.__var.set(text)

@@ -8,9 +8,9 @@ from .bases import ChildBase
 
 
 def _check_fillable_args(fillcolor, linecolor, linethickness):
-    assert fillcolor is None or isinstance(fillcolor, Color)
-    assert linecolor is None or isinstance(linecolor, Color)
-    assert isinstance(linethickness, int) and linethickness > 0
+    check(fillcolor, required_type=Color, allow_none=True)
+    check(linecolor, required_type=Color, allow_none=True)
+    check(linethickness, required_type=int, minimum=0)
 
 
 @bananadoc
@@ -46,7 +46,8 @@ class Canvas(_base.Canvas, ChildBase):
         and clearing the canvas fills it with this color.
         """)
 
-    def draw_line(self, pos1, pos2, *, thickness=1, color=BLACK):
+    def draw_line(self, pos1: tuple, pos2: tuple, *, thickness: int = 1,
+                  color: Color = BLACK):
         """Draw a line from start to end on the canvas.
 
         Thickness needs to be a non-negative integer. If it's 0, this

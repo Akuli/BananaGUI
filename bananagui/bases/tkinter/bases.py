@@ -77,6 +77,14 @@ class WidgetBase:
     pass
 
 
+_tkinter_fills = {
+    (True, True): 'both',
+    (True, False): 'x',
+    (False, True): 'y',
+    (False, False): 'none',
+}
+
+
 class ChildBase:
 
     def __init__(self):
@@ -89,13 +97,15 @@ class ChildBase:
             # Update the pack expanding. By having this here we can make
             # sure that the pack options are changed when the expand is
             # changed.
-            if isinstance(self['parent'], BoxBase):
-                if self['parent']._bananagui_tkinter_orientation == 'h':
-                    # It's a horizontal box.
-                    self['real_widget'].pack(expand=expand[0])
-                elif self['parent']._bananagui_tkinter_orientation == 'v':
-                    # It's a vertical box.
-                    self['real_widget'].pack(expand=expand[1])
+            pack_kwargs = {'fill': _tkinter_fills[expand]}
+            if isinstance(self['parent'], HBox):
+                pack_kwargs['expand'] = expand[0]
+            elif isinstance(self['parent'], VBox):
+                pack_kwargs['expand'] = expand[1]
+            else:
+                pack_kwargs['expand'] = (expand == (True, True))
+            self['real_widget'].pack(**pack_kwargs)
+        print('tkinter _bananagui_set_expand', expand, locals().get('pack_kwargs'))
 
     def _bananagui_set_tooltip(self, tooltip):
         if self.__tooltip is None and tooltip is not None:

@@ -16,7 +16,7 @@ class Canvas:
         super().__init__(parent)
         widget = tk.Canvas(parent['real_widget'], width=300, height=200,
                            bg='#ffffff')
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
 
     def _bananagui_set_size(self, size):
         width, height = size

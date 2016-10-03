@@ -34,7 +34,8 @@ class BinBase:
             self['child']._bananagui_tkinter_packed = False
         if child is not None:
             child['real_widget'].pack()
-            child['real_widget']._bananagui_tkinter_packed = True
+            child._bananagui_tkinter_packed = True
+            child._bananagui_set_expand(child['expand'])  # See bases.py.
 
 
 _tkinter_fills = {

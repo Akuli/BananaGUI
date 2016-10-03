@@ -21,8 +21,6 @@
 
 """BananaGUI hello world test."""
 
-import sys
-
 from bananagui import gui
 
 
@@ -30,11 +28,12 @@ def main():
     with gui.Window() as window:
         label = gui.Label(window)
         label['text'] = "Hello World!"
+        label['expand'] = (True, True)
         window['child'] = label
         window['title'] = "Hello World"
-        window['destroyed.changed'].append(gui.quit)
+        window.destroyed.changed.connect(gui.quit)
 #        window['real_widget'].show_all()
-        sys.exit(gui.main())
+        gui.main()
 
 
 if __name__ == '__main__':

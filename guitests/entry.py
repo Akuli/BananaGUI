@@ -38,24 +38,22 @@ class EntryWindow(gui.Window):
         # needs it.
         self.entry = gui.Entry(box)
         self.entry['text'] = "Enter something here..."
-#        self.entry['hidden'] = True
-        box.add_start(self.entry, expand=True)
 
         checkbox = gui.Checkbox(box)
         checkbox['text'] = "Read only"
-        checkbox['checked.changed'].append(self.on_check)
-        box.add_start(checkbox)
+        checkbox.checked.changed.connect(self.on_check, self.entry)
 
         button = gui.Button(box)
         button['text'] = "Print it"
         button['on_click'].append(self.on_click)
-        box.add_start(button)
+
+        box.extend([self.entry, checkbox, button])
 
     def on_click(self, event):
         print(self.entry['text'])
 
-    def on_check(self, event):
-        self.entry['read_only'] = event.widget['checked']
+    def on_check(self, event, entry):
+        entry['read_only'] = event.widget['checked']
 
 
 def main():
@@ -63,8 +61,8 @@ def main():
         window['title'] = "Entry test"
         window['size'] = (200, 100)
         window['minimum_size'] = (100, 50)
-        window['destroyed.changed'].append(gui.MainLoop.quit)
-        sys.exit(gui.MainLoop.run())
+        window['destroyed.changed'].append(gui.quit)
+        sys.exit(gui.main())
 
 
 if __name__ == '__main__':

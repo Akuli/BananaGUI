@@ -25,8 +25,8 @@
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from bananagui.utils import baseclass
-from bananagui.gui import bases
+from bananagui.utils import check, common_beginning
+#from bananagui.gui import bases
 from .bases import ChildBase, WidgetBase
 
 
@@ -48,8 +48,9 @@ class BinBase(_base.BinBase, ParentBase):
 
     def _bananagui_set_child(self, child):
         if child is not None:
-            assert isinstance(child, ChildBase)
-            assert child['parent'] is self
+            check(child, required_type=ChildBase)
+            assert child['parent'] is self, \
+                "cannot add a child with the wrong parent"
         super()._bananagui_set_child(child)
 
 
@@ -70,14 +71,14 @@ class BoxBase(_base.BoxBase, ParentBase, ChildBase):
         assert len(children) == len(set(children)), \
             "cannot add the same child twice"
 
-        common_beginning = utils.common_beginning(self, children)
+        common = common_beginning(self, children)
 
         # TODO: Maybe self and children have something else in common
         # than the beginning? Optimize this.
-        for child in self[common_beginning:]:
+        for child in self[common:]:
             super().remove(child)
-        for child in children[common_beginning:]:
-            assert isinstance(child, bases.ChildBase), "invalid child type"
+        for child in children[common:]:
+            check(child, required_type=ChildBase)
             assert child['parent'] is self
             super().append(child)
 

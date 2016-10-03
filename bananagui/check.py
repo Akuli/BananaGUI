@@ -12,7 +12,7 @@ def check(value, *, pair=False, allow_none=False, required_type=None,
         del kwargs['pair']
         assert isinstance(value, tuple), "%r is not a tuple" % (value,)
         assert len(value) == 2, "length of %r is not 2" % (value,)
-        first, second = pair
+        first, second = value
         check(first, **kwargs)
         check(second, **kwargs)
         return

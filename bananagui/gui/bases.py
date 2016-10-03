@@ -75,9 +75,16 @@ class ChildBase(_base.ChildBase, WidgetBase):
             |  widget  |  widget  |                          |
             `------------------------------------------------'
 
-        This way the children behave similarly with all GUI
+        This way the children behave consistently with all GUI
         toolkits. You can use a Dummy widget to fill the empty
-        space.
+        space:
+
+            ,------------------------------------------------.
+            |   non-   |   non-   |                          |
+            |expanding |expanding |       Dummy widget       |
+            |  widget  |  widget  |                          |
+            `------------------------------------------------'
+
         """)
     grayed_out = Property(
         'grayed_out', required_type=bool, default=False,
@@ -90,7 +97,6 @@ class ChildBase(_base.ChildBase, WidgetBase):
         """)
 
     def __init__(self, parent):
-        print('**', 'gui.bases.ChildBase init', parent)
         super().__init__()
         self.parent.raw_set(parent)
 
