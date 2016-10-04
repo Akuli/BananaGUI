@@ -1,12 +1,11 @@
 from gi.repository import GLib
 
 
-class Timeout:
+def add_timeout(milliseconds, callback):
 
-    @classmethod
-    def add_timeout(cls, seconds, callback):
-        milliseconds = int(seconds * 1000)
-        def real_callback():
-            return callback() == cls.RUN_AGAIN
+    milliseconds = int(seconds * 1000)
+    def real_callback():
+        # See bananagui.gui.timeouts.
+        return callback() == add_timeout.RUN_AGAIN
 
-        GLib.timeout_add(milliseconds, real_callback)
+    GLib.timeout_add(milliseconds, real_callback)

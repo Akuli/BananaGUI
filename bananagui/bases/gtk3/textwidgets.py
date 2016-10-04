@@ -1,7 +1,7 @@
 from gi.repository import Gtk
 
 
-class EditableBase:
+class TextBase:
     pass
 
 
@@ -12,10 +12,10 @@ class Entry:
 
         widget = Gtk.Entry()
         widget.connect('changed', self.__changed)
-        self.raw_set('widget', widget)
+        self.real_widget.raw_set(widget)
 
     def __changed(self, entry):
-        self.raw_set('text', entry.get_text())
+        self.text.raw_set(entry.get_text())
 
     def _bananagui_set_text(self, text):
         self['real_widget'].set_text(text)
@@ -29,26 +29,25 @@ class Entry:
 
 class PlainTextView:
     # TODO: tabchar
-    # TODO: In bases.py, setting the text first clears the widget and
-    #       then sets the text. It should block the text.changed signal
-    #       so that it's only emitted once.
 
     def __init__(self, parent):
         super().__init__(parent)
-
         widget = Gtk.TextView()
         self.__buf = widget.get_buffer()
         self.__buf.connect('changed', self.__changed)
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
 
     def __changed(self, buf):
-        self.raw_set('text', buf.get_text())
+        self.text.raw_set(buf.get_text())
 
-    def __get_bufiters(self):
+    def __bounds(self):
         return self.__buf.get_start_iter(), self.__buf.get_end_iter()
 
     def select_all(self):
-        self.__buf.select_range(*self.__get_bufiters())
+        self.__buf.select_range(*self.__bounds())
 
     def clear(self):
-        self.__buf.delete(*self.__get_bufiters())
+        self.__buf.delete(*self.__bounds())
+
+    def append_text(self):
+        raise NotImplementedError("TODO")

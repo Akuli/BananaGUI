@@ -7,10 +7,10 @@ class Checkbox:
         super().__init__(parent)
         widget = Gtk.CheckButton()
         widget.connect('notify::active', self.__on_check)
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
 
     def __on_check(self, real_widget, gparam):
-        self.raw_set('checked', real_widget.get_active())
+        self.checked.raw_set(real_widget.get_active())
 
     def _bananagui_set_text(self, text):
         self['real_widget'].set_label(text)

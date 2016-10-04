@@ -9,7 +9,7 @@ class Button:
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.raw_set('real_widget', Gtk.Button())
+        self.real_widget.raw_set(Gtk.Button())
 
     def _bananagui_set_text(self, text):
         self['real_widget'].set_label(text)

@@ -1,17 +1,17 @@
 from gi.repository import GLib
 
 
-class MainLoop:
+def init():
+    # Gtk.main() cannot be interrupted with Ctrl+C.
+    global loop
+    loop = GLib.MainLoop()
 
-    @classmethod
-    def init(cls, args):
-        # Gtk.main() cannot be interrupted with Ctrl+C.
-        cls.__loop = GLib.MainLoop()
 
-    @classmethod
-    def run(cls):
-        cls.__loop.run()
+def main():
+    loop.run()
 
-    @classmethod
-    def quit(cls):
-        cls.__loop.quit()
+
+def quit():
+    global loop
+    loop.quit()
+    loop = None

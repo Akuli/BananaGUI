@@ -11,6 +11,11 @@ class ParentBase:
 
 class ChildBase:
 
+    def _bananagui_set_expand(self, expand):
+        h, v = expand
+        self['real_widget'].set_hexpand(horizontal)
+        self['real_widget'].set_vexpand(vertical)
+
     def _bananagui_set_tooltip(self, tooltip):
         self['real_widget'].set_tooltip_text(tooltip)
 
@@ -18,10 +23,8 @@ class ChildBase:
         self['real_widget'].set_sensitive(not grayed_out)
 
 
-class BinBase:
+class Dummy:
 
-    def _bananagui_set_child(self, child):
-        if self['child'] is not None:
-            self['real_widget'].remove(self['child']['real_widget'])
-        if child is not None:
-            self['real_widget'].add(child['real_widget'])
+    def __init__(self, parent):
+        #super().__init__(parent)
+        raise NotImplementedError  # TODO

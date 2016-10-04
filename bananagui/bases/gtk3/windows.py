@@ -31,12 +31,12 @@ class WindowBase:
 class Window:
 
     def __init__(self):
-        self.raw_set('real_widget', Gtk.Window())
+        self.real_widget.raw_set(Gtk.Window())
         super().__init__()
 
 
-class ChildWindow:
+class Dialog:
 
     def __init__(self, parentwindow):
-        self.raw_set('real_widget', Gtk.Dialog(parentwindow['real_widget']))
         super().__init__()
+        self.real_widget.raw_set(Gtk.Dialog(parentwindow['real_widget']))
