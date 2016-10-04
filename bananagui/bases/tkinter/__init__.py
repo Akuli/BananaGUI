@@ -8,7 +8,6 @@ from .containers import ParentBase, BinBase, BoxBase, HBox, VBox
 from .labels import LabelBase, Label, ImageLabel
 from .mainloop import init, main, quit
 from .textwidgets import TextBase, Entry, PlainTextView
-
 from .windows import WindowBase, Window, Dialog, messagedialog
 
 # Other things that tkinter provides.

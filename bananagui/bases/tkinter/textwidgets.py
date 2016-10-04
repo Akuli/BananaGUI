@@ -62,13 +62,13 @@ class Entry:
 class PlainTextView:
 
     def __init__(self, parent):
+        # TODO: Add more keyboard shortcuts.
+        super().__init__(parent)
         # A larger width or height would prevent the widget from
         # shrinking when needed.
-        # TODO: Add more keyboard shortcuts.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
         widget.bind('<<Modified>>', self.__edit_modified)
         self.raw_set('real_widget', widget)
-        super().__init__(parent)
 
     def select_all(self):
         """Select all text in the widget."""
