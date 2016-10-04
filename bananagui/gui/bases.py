@@ -51,7 +51,7 @@ class ChildBase(_base.ChildBase, WidgetBase):
 
     parent = Property('parent', doc="The parent set on initialization.")
     expand = Property(
-        'expand', pair=True, required_type=bool, default=(False, False),
+        'expand', pair=True, required_type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.
 
         For example, (True, True) will make the widget expand in
