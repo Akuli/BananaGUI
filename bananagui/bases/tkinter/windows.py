@@ -39,7 +39,7 @@ class Window:
     def __init__(self):
         # This relies on tkinter's default root, which is created in the
         # mainloop.py file.
-        widget = tk.Toplevel(mainloop._root)
+        widget = tk.Toplevel(mainloop.root)
         self.real_widget.raw_set(widget)
         super().__init__()
 
