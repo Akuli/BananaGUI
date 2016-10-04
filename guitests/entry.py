@@ -26,43 +26,40 @@ import sys
 from bananagui import gui
 
 
-class EntryWindow(gui.Window):
+def on_check(event, entry):
+    entry['read_only'] = event.widget['checked']
 
-    def __init__(self):
-        super().__init__()
 
-        box = gui.HBox(self)
-        self['child'] = box
-
-        # This entry is attached to self because the on_click method
-        # needs it.
-        self.entry = gui.Entry(box)
-        self.entry['text'] = "Enter something here..."
-
-        checkbox = gui.Checkbox(box)
-        checkbox['text'] = "Read only"
-        checkbox.checked.changed.connect(self.on_check, self.entry)
-
-        button = gui.Button(box)
-        button['text'] = "Print it"
-        button['on_click'].append(self.on_click)
-
-        box.extend([self.entry, checkbox, button])
-
-    def on_click(self, event):
-        print(self.entry['text'])
-
-    def on_check(self, event, entry):
-        entry['read_only'] = event.widget['checked']
+def on_click(event, entry):
+    print(entry['text'])
 
 
 def main():
-    with EntryWindow() as window:
+    with gui.Window() as window:
+        vbox = gui.VBox(window)
+        window['child'] = vbox
+
+        entry = gui.Entry(vbox)
+        vbox.append(entry)
+
+        hbox = gui.HBox(vbox)
+        vbox.append(hbox)
+
+        button = gui.Button(hbox)
+        button['text'] = "Print it"
+        button.on_click.connect(on_click, entry)
+        hbox.append(button)
+
+        checkbox = gui.Checkbox(hbox)
+        checkbox['text'] = "Read only"
+        checkbox.checked.changed.connect(on_check, entry)
+        hbox.append(checkbox)
+
         window['title'] = "Entry test"
-        window['size'] = (200, 100)
-        window['minimum_size'] = (100, 50)
-        window['destroyed.changed'].append(gui.quit)
-        sys.exit(gui.main())
+        window['size'] = (200, 50)
+        window['resizable'] = False
+        window.destroyed.changed.connect(gui.quit)
+        gui.main()
 
 
 if __name__ == '__main__':
