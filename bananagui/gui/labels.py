@@ -21,9 +21,10 @@
 
 """BananaGUI labels."""
 
+import os
+
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from bananagui.utils import baseclass
 from .bases import ChildBase
 
 

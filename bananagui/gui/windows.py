@@ -32,8 +32,6 @@ except ImportError:
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from bananagui.utils import baseclass
-from .bases import ChildBase
 from .containers import BinBase
 
 

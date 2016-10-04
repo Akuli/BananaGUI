@@ -1,5 +1,7 @@
 from gi.repository import GLib
 
+loop = None
+
 
 def init():
     # Gtk.main() cannot be interrupted with Ctrl+C.

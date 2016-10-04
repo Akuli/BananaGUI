@@ -36,7 +36,6 @@ class Checkbox:
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        widget_bg = Color.from_hex(widget.cget('bg'))
         box_bg = Color.from_hex(widget.cget('selectcolor'))
         checkmark = Color.from_hex(widget.cget('fg'))
         if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:

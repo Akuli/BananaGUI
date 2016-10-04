@@ -1,6 +1,5 @@
 from bananagui import _base
 from bananagui.types import Property, Signal, bananadoc
-from bananagui.utils import baseclass
 from .bases import ChildBase
 
 

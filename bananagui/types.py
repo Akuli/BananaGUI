@@ -25,7 +25,7 @@ import contextlib
 import functools
 import weakref
 
-from bananagui import check, utils, structures
+from bananagui import utils, structures
 
 
 class _PropertyWrapper:
@@ -93,7 +93,7 @@ class Property:
         else:
             self.getdefault = getdefault
         if checker is None:
-            self.checker = functools.partial(check.check, **check_kwargs)
+            self.checker = functools.partial(utils.check, **check_kwargs)
         else:
             self.checker = checker
         self.doc = doc

@@ -1,3 +1,0 @@
-[flake8]
-# The wrappers aren't supposed to have docstrings.
-ignore = D101,D102,D103

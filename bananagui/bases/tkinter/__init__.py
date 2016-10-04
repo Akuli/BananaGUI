@@ -1,5 +1,7 @@
 """BananaGUI tkinter base."""
 
+# flake8: noqa
+
 from .bases import WidgetBase, ChildBase, Dummy
 from .buttons import ButtonBase, Button
 from .canvas import Canvas

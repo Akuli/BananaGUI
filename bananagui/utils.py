@@ -4,13 +4,6 @@ It's not recommended to rely on this submodule. It's meant only for
 being used internally by BananaGUI and it can be changed in the future.
 """
 
-import functools
-
-
-def baseclass(cls):
-    print('!', cls)
-    return cls
-
 
 def copy_doc(source):
     """Copy __doc__ to another object.
@@ -73,16 +66,3 @@ def check(value, *, pair=False, allow_none=False, required_type=None,
         assert value >= minimum, "%r is smaller than %r" % (value, minimum)
     if maximum is not None:
         assert value <= maximum, "%r is larger than %r" % (value, maximum)
-
-
-def deprecated(f):
-    def doit(*a,**kw):
-        __import__('warnings').warn(f.__name__+' is deprecated')
-        return f(*a,**kw)
-    return doit
-
-
-pair = deprecated(functools.partial(check, pair=True))
-boolpair = deprecated(functools.partial(pair, required_type=bool))
-intpair = deprecated(functools.partial(pair, required_type=int))
-positive_intpair = deprecated(functools.partial(intpair, minimum=1))

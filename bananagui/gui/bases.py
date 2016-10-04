@@ -21,9 +21,8 @@
 
 """Base classes for various widgets."""
 
-from bananagui import check, _base
+from bananagui import _base
 from bananagui.types import Property, BananaObject, bananadoc
-from bananagui.utils import baseclass
 
 
 @bananadoc

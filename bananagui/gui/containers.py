@@ -25,8 +25,7 @@
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from bananagui.utils import check, common_beginning
-#from bananagui.gui import bases
+from bananagui.utils import common_beginning
 from .bases import ChildBase, WidgetBase
 
 
@@ -48,7 +47,6 @@ class BinBase(_base.BinBase, ParentBase):
 
     def _bananagui_set_child(self, child):
         if child is not None:
-            check(child, required_type=ChildBase)
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
         super()._bananagui_set_child(child)
@@ -78,8 +76,8 @@ class BoxBase(_base.BoxBase, ParentBase, ChildBase):
         for child in self[common:]:
             super().remove(child)
         for child in children[common:]:
-            check(child, required_type=ChildBase)
-            assert child['parent'] is self
+            assert child['parent'] is self, \
+                "cannot add a child with the wrong parent"
             super().append(child)
 
     def __setitem__(self, item, value):

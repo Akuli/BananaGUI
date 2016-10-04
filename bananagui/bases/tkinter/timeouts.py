@@ -1,5 +1,3 @@
-import tkinter as tk
-
 from . import mainloop
 
 

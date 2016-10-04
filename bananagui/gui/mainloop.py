@@ -1,7 +1,5 @@
 """Main loop."""
 
-import sys
-
 from bananagui import _base
 
 
@@ -15,6 +13,7 @@ def init():
     This is called automatically when bananagui.gui is imported for the
     first time.
     """
+    # TODO: Take arguments here?
     global initialized
     if not initialized:
         _base.init()

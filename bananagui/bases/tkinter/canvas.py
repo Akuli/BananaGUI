@@ -1,7 +1,5 @@
 import tkinter as tk
 
-import bananagui
-
 
 def _flatten(iterables):
     for iterable in iterables:

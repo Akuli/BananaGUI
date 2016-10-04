@@ -1,8 +1,6 @@
 """Handy classes for BananaGUI."""
 
-import collections
 import functools
-import re
 
 try:
     from collections.abc import Mapping
@@ -26,7 +24,7 @@ class FrozenDict:
     >>> from collections.abc import Mapping
     >>> isinstance(d, Mapping)  # they are mappings
     True
-    >>> isinstance(d, dict)     # but not instances of built-in dict
+    >>> isinstance(d, dict)     # but not regular dicts
     False
     >>> {d: 123}         # can be used as dict keys  # doctest: +ELLIPSIS
     {FrozenDict(...): 123}

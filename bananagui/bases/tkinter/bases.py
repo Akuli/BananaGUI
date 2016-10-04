@@ -22,6 +22,7 @@
 """Base classes."""
 
 import tkinter as tk
+import warnings
 
 _has_tooltips = True
 try:
@@ -34,7 +35,7 @@ except ImportError:
         ToolTipBase = object
         _has_tooltips = False
 
-from .containers import HBox, VBox
+from .containers import HBox, VBox  # noqa
 
 
 class _ToolTip(ToolTipBase):
@@ -64,11 +65,11 @@ class _ToolTip(ToolTipBase):
             label = tk.Label(
                 self.tipwindow,
                 text=self.text,
-                #justify='left',
+                # justify='left',
                 foreground='black',
                 background='white',
-                #relief='solid',
-                #borderwidth=1,
+                # relief='solid',
+                # borderwidth=1,
             )
             label.pack()
 
@@ -105,7 +106,6 @@ class ChildBase:
             else:
                 pack_kwargs['expand'] = (expand == (True, True))
             self['real_widget'].pack(**pack_kwargs)
-        print('tkinter _bananagui_set_expand', expand, locals().get('pack_kwargs'))
 
     def _bananagui_set_tooltip(self, tooltip):
         if self.__tooltip is None and tooltip is not None:
