@@ -1,10 +1,12 @@
 from bananagui import _base
 from bananagui.types import Property, Signal, bananadoc
-from .bases import ChildBase
+from bananagui.utils import baseclass
+from .bases import Child
 
 
+@baseclass
 @bananadoc
-class ButtonBase(_base.ButtonBase, ChildBase):
+class BaseButton(_base.ButtonBase, Child):
     """Base for other buttons."""
 
     on_click = Signal(
@@ -12,7 +14,7 @@ class ButtonBase(_base.ButtonBase, ChildBase):
 
 
 @bananadoc
-class Button(_base.Button, ButtonBase):
+class Button(_base.Button, BaseButton):
     """A button that displays text in it.
 
     Properties:
@@ -20,7 +22,7 @@ class Button(_base.Button, ButtonBase):
             The text of the button.
     """
 
-    text = Property('text', required_type=str, default='',
+    text = Property('text', type=str, default='', settable=True,
                     doc="The text in the button.")
 
 

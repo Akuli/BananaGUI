@@ -106,7 +106,7 @@ class Property:
 
     def __repr__(self):
         """Clearly tell the user that this is not a Python @property."""
-        return '<BananaGUI property %r>' % self.name
+        return '<BananaGUI %s %r>' % (type(self).__name__.lower(), self.name)
 
     def raw_set(self, widget, value):
         """Set the value of the BananaGUI property.
@@ -176,7 +176,7 @@ class Signal(Property):
 
     def __init__(self, name, *, doc):
         """Initialize a signal."""
-        super().__init__(name, getdefault=list, required_type=list,
+        super().__init__(name, getdefault=list, type=list,
                          add_changed=False, doc=doc)
         self._blocked = weakref.WeakSet()
 

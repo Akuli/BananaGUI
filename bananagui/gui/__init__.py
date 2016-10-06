@@ -10,19 +10,19 @@ import bananagui
 if bananagui._base is None:
     raise ImportError("call bananagui.load() before importing bananagui.gui")
 
-from .bases import WidgetBase, ChildBase, Dummy
-from .buttons import ButtonBase, Button
+from .bases import Widget, Parent, Child, Dummy
+from .buttons import BaseButton, Button
 from .canvas import Canvas
 from .checkbox import Checkbox
-from .containers import ParentBase, BinBase, BoxBase, HBox, VBox
-from .labels import LabelBase, Label, ImageLabel
+from .containers import Bin, Box, HBox, VBox
+from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
-from .textwidgets import TextBase, Entry, PlainTextView
+from .textwidgets import BaseText, Entry, PlainTextView
 
 # Bases don't need to provide infodialog, questiondialog, warningdialog
 # or errordialog. See windows.py for more info.
 from .windows import (
-    WindowBase, Window, Dialog, messagedialog,
+    BaseWindow, Window, Dialog, messagedialog,
     infodialog, questiondialog, warningdialog, errordialog)
 
 # Some things in this module aren't actually GUI widgets but other

@@ -25,32 +25,34 @@ import os
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from .bases import ChildBase
+from bananagui.utils import baseclass
+from .bases import Child
 
 
+@baseclass
 @bananadoc
-class LabelBase(_base.LabelBase, ChildBase):
+class BaseLabel(_base.BaseLabel, Child):
     """A label base class."""
 
 
 @bananadoc
-class Label(_base.Label, LabelBase):
+class Label(_base.Label, BaseLabel):
     """A label with text in it."""
 
     # TODO: Add fonts and colors?
-    text = Property('text', required_type=str, default='',
+    text = Property('text', type=str, default='', settable=True,
                     doc="Text in the label.")
 
 
 @bananadoc
-class ImageLabel(_base.ImageLabel, LabelBase):
+class ImageLabel(_base.ImageLabel, BaseLabel):
     """A label that contains an image."""
     imagepath = Property(
-        'imagepath', required_type=str, allow_none=True, default=None,
+        'imagepath', type=str, allow_none=True, default=None, settable=True,
         doc="""Path to an image file.
 
         Supported filetypes depend on the GUI toolkit. I recommend using
-        `.png` and `.jpg` images because they are well supported by most
+        `.png` and `.jpg` files because they are well supported by most
         GUI toolkits.
         """)
 

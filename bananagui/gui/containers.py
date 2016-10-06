@@ -25,21 +25,17 @@
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from bananagui.utils import common_beginning
-from .bases import ChildBase, WidgetBase
+from bananagui.utils import baseclass, common_beginning
+from .bases import Parent, Child
 
 
+@baseclass
 @bananadoc
-class ParentBase(_base.ParentBase, WidgetBase):
-    """A widget that child widgets can use as their parent."""
-
-
-@bananadoc
-class BinBase(_base.BinBase, ParentBase):
+class Bin(_base.Bin, Parent):
     """A widget that contains one child widget or no children at all."""
 
     child = Property(
-        'child', allow_none=True, default=None,
+        'child', allow_none=True, default=None, type=Child, settable=True,
         doc="""The child in the widget, None by default.
 
         Setting this to None removes the child.
@@ -52,18 +48,21 @@ class BinBase(_base.BinBase, ParentBase):
         super()._bananagui_set_child(child)
 
 
+@baseclass
 @bananadoc
-class BoxBase(_base.BoxBase, ParentBase, ChildBase):
+class Box(_base.Box, Parent, Child):
     """A widget that contains other widgets in a row.
 
     Boxes can be indexed and sliced like lists to modify their children,
     and slicing a box returns a list of children. Subscripting with a
     string still sets or gets the value of a property like for any other
-    BananaGUI object.
+    BananaGUI object. You can also set the value of the children
+    property directly, it's a tuple of children.
     """
 
-    children = Property('children', required_type=tuple, default=(),
-                        doc="A tuple of children in this widget.")
+    children = Property(
+        'children', type=tuple, default=(), settable=True,
+        doc="A tuple of children in this widget.")
 
     def _bananagui_set_children(self, children):
         assert len(children) == len(set(children)), \
@@ -185,10 +184,10 @@ class BoxBase(_base.BoxBase, ParentBase, ChildBase):
 
 
 @bananadoc
-class HBox(_base.HBox, BoxBase):
+class HBox(_base.HBox, Box):
     """A horizontal box."""
 
 
 @bananadoc
-class VBox(_base.VBox, BoxBase):
+class VBox(_base.VBox, Box):
     """A vertical box."""

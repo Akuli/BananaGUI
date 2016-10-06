@@ -23,19 +23,22 @@
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from .bases import ChildBase
+from .bases import Child
+
+
+# TODO: A RadioButton.
 
 
 @bananadoc
-class Checkbox(_base.Checkbox, ChildBase):
+class Checkbox(_base.Checkbox, Child):
     """A widget that can be checked.
 
     Note that the Checkbox class has nothing to do with BoxBase, HBox
     and VBox.
     """
 
-    text = Property('text', required_type=str, default='',
+    text = Property('text', type=str, default='', settable=True,
                     doc="The text next to the box that can be checked.")
     checked = Property(
-        'checked', required_type=bool, default=False,
+        'checked', type=bool, default=False, settable=True,
         doc="True if the box is currently checked, False if not.")

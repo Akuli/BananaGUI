@@ -23,15 +23,17 @@
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from .bases import ChildBase
+from bananagui.utils import baseclass
+from .bases import Child
 
 
+@baseclass
 @bananadoc
-class TextBase(_base.TextBase, ChildBase):
+class BaseText(_base.BaseText, Child):
     """A base class for text editing widgets."""
 
     # TODO: Add fonts and colors.
-    text = Property('text', required_type=str, default='',
+    text = Property('text', type=str, default='', settable=True,
                     doc="Text in the entry.")
     read_only = Property(
         'read_only', required_type=bool, default=True,
@@ -44,11 +46,11 @@ class TextBase(_base.TextBase, ChildBase):
 
 
 @bananadoc
-class Entry(_base.Entry, TextBase):
+class Entry(_base.Entry, BaseText):
     """A one-line text widget."""
 
     hidden = Property(
-        'hidden', required_type=bool, default=False,
+        'hidden', type=bool, default=False, settable=True,
         doc="True if the entry's content is hidden with asterisks or balls.")
 
 
@@ -57,7 +59,7 @@ class PlainTextView(_base.PlainTextView, TextBase):
     """A multiline text widget."""
 
     tab_inserts = Property(
-        'tab_inserts', required_type=str, default='\t',
+        'tab_inserts', type=str, default='\t', settable=True,
         doc="The character(s) that will be inserted when tab is pressed.")
 
     def _bananagui_set_text(self, text):
@@ -75,8 +77,7 @@ class PlainTextView(_base.PlainTextView, TextBase):
         super().clear()
         self.text.raw_set('')
 
-    def append_text(self, text):
+    def append_text(self, text: str):
         """Add text to the end of what is already in the text widget."""
-        assert isinstance(text, str)
         super().append_text(text)
         self.text.raw_set(self['text'] + text)

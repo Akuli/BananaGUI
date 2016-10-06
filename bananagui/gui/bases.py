@@ -23,10 +23,12 @@
 
 from bananagui import _base
 from bananagui.types import Property, BananaObject, bananadoc
+from bananagui.utils import baseclass
 
 
+@baseclass
 @bananadoc
-class WidgetBase(_base.WidgetBase, BananaObject):
+class Widget(_base.Widget, BananaObject):
     """A widget baseclass."""
 
     real_widget = Property(
@@ -34,8 +36,15 @@ class WidgetBase(_base.WidgetBase, BananaObject):
         doc="The real GUI toolkit's widget that BananaGUI uses.")
 
 
+@baseclass
 @bananadoc
-class ChildBase(_base.ChildBase, WidgetBase):
+class Parent(_base.Parent, Widget):
+    """A widget that child widgets can use as their parent."""
+
+
+@baseclass
+@bananadoc
+class Child(_base.Child, Widget):
     """A widget that can be added to a container.
 
     Children take a parent argument on initialization. The parent
@@ -48,9 +57,10 @@ class ChildBase(_base.ChildBase, WidgetBase):
             Two-tuple of horizontal and vertical expanding.
     """
 
-    parent = Property('parent', doc="The parent set on initialization.")
+    parent = Property('parent', type=Parent,
+                      doc="The parent set on initialization.")
     expand = Property(
-        'expand', pair=True, required_type=bool, default=(True, True),
+        'expand', pair=True, type=bool, default=(True, True), settable=True,
         doc="""Two-tuple of horizontal and vertical expanding.
 
         For example, (True, True) will make the widget expand in
@@ -74,7 +84,7 @@ class ChildBase(_base.ChildBase, WidgetBase):
             |  widget  |  widget  |                          |
             `------------------------------------------------'
 
-        This way the children behave consistently with all GUI
+        This way the children will behave consistently with all GUI
         toolkits. You can use a Dummy widget to fill the empty
         space:
 
@@ -86,20 +96,20 @@ class ChildBase(_base.ChildBase, WidgetBase):
 
         """)
     grayed_out = Property(
-        'grayed_out', required_type=bool, default=False,
+        'grayed_out', type=bool, default=False, settable=True,
         doc="True if the widget is grayed out, False otherwise.")
     tooltip = Property(
-        'tooltip', required_type=str, allow_none=True, default=None,
+        'tooltip', type=str, allow_none=True, default=None, settable=True,
         doc="""Text in the widget's tooltip.
 
         This is None if the widget doesn't have a tooltip.
         """)
 
-    def __init__(self, parent):
+    def __init__(self, parent: Parent):
         super().__init__()
         self.parent.raw_set(parent)
 
 
 @bananadoc
-class Dummy(_base.Dummy, ChildBase):
+class Dummy(_base.Dummy, Child):
     """An empty widget."""

@@ -32,11 +32,11 @@ except ImportError:
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
-from .containers import BinBase
+from .containers import Bin
 
 
 @bananadoc
-class WindowBase(_base.WindowBase, BinBase):
+class BaseWindow(_base.BaseWindow, Bin):
     """A window baseclass.
 
     BananaGUI windows have a destroy() method, and it should be called
@@ -45,41 +45,26 @@ class WindowBase(_base.WindowBase, BinBase):
 
         with Window() as my_window:
             ...
-
-    Properties:
-        resizable       RW
-            True if the window can be resized, False otherwise.
-        size            RWC
-            Two-tuple of the width and height of the window.
-            (200, 200) by default.
-        minimum_size    RW
-            The minimum size of the window or None.
-            Like size, this is a two-tuple of width and height. The
-            window cannot be resized to be smaller than this.
-        showing         RW
-            True if the window is visible. True by default.
-        destroyed       RC
-            True if the widget has been destroyed, False if not.
     """
     # There is no maximum_size because X doesn't support it. Tkinter
     # implements it on X, but it does that by moving the window with a
     # maximum size to the upper left corner when it's maximized.
 
-    resizable = Property('resizable', required_type=bool, default=True,
+    resizable = Property('resizable', type=bool, default=True, settable=True,
                          doc="True if the window can be resized.")
-    size = Property(
-        'size', pair=True, required_type=int, minimum=1, default=(200, 200),
-        doc="Two-tuple of the window's current width and height.")
+    size = Property('size', pair=True, type=int, minimum=1,
+                    default=(200, 200), settable=True,
+                    doc="Two-tuple of the window's current width and height.")
     minimum_size = Property(
-        'minimum_size', default=None, pair=True, required_type=int,
-        minimum=1, allow_none=True,
+        'minimum_size', default=None, pair=True, type=int, minimum=1,
+        allow_none=True, settable=True,
         doc="""Two-tuple of minimum width and height or None.
 
         The window cannot be resized to be smaller than this.
         """)
-    showing = Property('showing', required_type=bool, default=True,
+    showing = Property('showing', type=bool, default=True, settable=True,
                        doc="True if the window is visible.")
-    destroyed = Property('destroyed', required_type=bool, default=False,
+    destroyed = Property('destroyed', type=bool, default=False,
                          doc="True if the window has been destroyed.")
 
     def __enter__(self):
@@ -102,19 +87,19 @@ class WindowBase(_base.WindowBase, BinBase):
 
 
 @bananadoc
-class Window(_base.Window, WindowBase):
+class Window(_base.Window, BaseWindow):
     """A window that can have child windows.
 
     The windows don't have a parent window. You can create multiple
     windows like this.
     """
 
-    title = Property('title', required_type=str, default="BananaGUI Window",
-                     doc="The title of the window.")
+    title = Property('title', type=str, default="BananaGUI Window",
+                     settable=True, doc="The title of the window.")
 
 
 @bananadoc
-class Dialog(_base.Dialog, WindowBase):
+class Dialog(_base.Dialog, BaseWindow):
     """A window that has a parent window.
 
     This class takes a parentwindow argument on initialization. The
@@ -123,17 +108,18 @@ class Dialog(_base.Dialog, WindowBase):
     toolkit supports. It's None by default.
     """
 
-    title = Property('title', required_type=str, default="BananaGUI Dialog",
-                     doc="The title of the window.")
-    parentwindow = Property('parentwindow', required_type=Window,
+    title = Property('title', type=str, default="BananaGUI Dialog",
+                     settable=True, doc="The title of the window.")
+    parentwindow = Property('parentwindow', type=Window,
                             doc="The parent window set on initialization.")
 
     def __init__(self, parentwindow):
         self.parentwindow.raw_set(parentwindow)
 
 
-def messagedialog(icon, parentwindow, text, *, title=None,
-                  buttons=None, defaultbutton=None):
+def messagedialog(icon, parentwindow: Window, text: str, *,
+                  title: str = None, buttons: list = None,
+                  defaultbutton: str = None):
     """Display a message dialog.
 
     icon should be 'info', 'question', 'warning' or 'error'.
@@ -154,31 +140,23 @@ def messagedialog(icon, parentwindow, text, *, title=None,
     closed the dialog.
     """
     assert icon in ('info', 'question', 'warning', 'error')
-    assert isinstance(parentwindow, Window)
-    assert isinstance(text, str)
 
     if title is None:
         title = parentwindow['title']
-    else:
-        assert isinstance(title, str)
 
     if buttons is None:
         buttons = [_("OK")]
-    else:
-        assert isinstance(buttons, Sequence)
-        assert buttons, "at least one button is required"
-        assert all(isinstance(b, str) for b in buttons)
+    assert buttons, "at least one button is required"
 
     if defaultbutton is None:
         defaultbutton = buttons[0]
-    else:
-        assert defaultbutton in buttons
+    assert defaultbutton in buttons
 
     return _base.messagedialog(icon, parentwindow, text, title,
                                buttons, defaultbutton)
 
 
-# The bases shouldn't define these.
+# The bases don't need to define these.
 infodialog = partial(messagedialog, 'info')
 questiondialog = partial(messagedialog, 'question')
 warningdialog = partial(messagedialog, 'warning')
