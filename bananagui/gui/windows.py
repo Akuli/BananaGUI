@@ -32,9 +32,11 @@ except ImportError:
 
 from bananagui import _base
 from bananagui.types import Property, bananadoc
+from bananagui.utils import baseclass
 from .containers import Bin
 
 
+@baseclass
 @bananadoc
 class BaseWindow(_base.BaseWindow, Bin):
     """A window baseclass.
@@ -74,6 +76,10 @@ class BaseWindow(_base.BaseWindow, Bin):
     def __exit__(self, exception_type, exception_value, traceback):
         """Call self.destroy()."""
         self.destroy()
+
+    def wait(self):
+        """Wait until the window is destroyed."""
+        super().wait()
 
     def destroy(self):
         """Destroy the window and set self['destroyed'] to True.

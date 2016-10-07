@@ -13,7 +13,7 @@ RUN_AGAIN = 2
 _base.add_timeout.RUN_AGAIN = RUN_AGAIN
 
 
-def add_timeout(milliseconds, callback, *args, **kwargs):
+def add_timeout(milliseconds: int, function, *args, **kwargs):
     """Run callback(*args, **kwargs) after waiting.
 
     milliseconds needs to be an integer. If the callback returns
@@ -25,7 +25,5 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
     for most purposes. Use something like time.time() if you need to
     measure time in the callbacks.
     """
-    assert isinstance(milliseconds, int)
-    assert milliseconds > 0
-    assert callable(callback)
+    assert milliseconds > 0, "non-positive timeout %r" % (milliseconds,)
     _base.add_timeout(milliseconds, Callback(callback, *args, **kwargs))

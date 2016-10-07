@@ -29,7 +29,7 @@ from .bases import Child
 
 @baseclass
 @bananadoc
-class BaseText(_base.BaseText, Child):
+class TextBase(_base.TextBase, Child):
     """A base class for text editing widgets."""
 
     # TODO: Add fonts and colors.

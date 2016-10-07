@@ -42,8 +42,8 @@ class FrozenDict:
 
     @functools.wraps(dict.__repr__)
     def __repr__(self):
-        # printf-formatting can actually handle dictionaries just fine
-        # even without wrapping the dictionary in a tuple or another
+        # printf-formatting can handle dictionaries just fine even
+        # without wrapping the dictionary in a tuple or another
         # dictionary of length one.
         return 'FrozenDict(%r)' % self._data
 

@@ -72,7 +72,8 @@ class Property:
     """
 
     def __init__(self, name, *, doc, default=None, getdefault=None,
-                 checker=None, add_changed=True, **check_kwargs):
+                 checker=None, add_changed=True, settable=False,
+                 **check_kwargs):
         """Initialize the property.
 
         If checker is None, bananagui.utils.check will be called with
@@ -97,6 +98,7 @@ class Property:
         else:
             self.checker = checker
         self.doc = doc
+        self.settable = settable
 
         self._values = weakref.WeakKeyDictionary()
         if add_changed:
@@ -106,7 +108,7 @@ class Property:
 
     def __repr__(self):
         """Clearly tell the user that this is not a Python @property."""
-        return '<BananaGUI %s %r>' % (type(self).__name__.lower(), self.name)
+        return '<BananaGUI %s %r>' % (type(self).__name__, self.name)
 
     def raw_set(self, widget, value):
         """Set the value of the BananaGUI property.
@@ -126,19 +128,23 @@ class Property:
 
         This is a higher-level alternative to raw_set, and it works like
         this:
-          - Make sure the widget's type has a setter. The setter is
-            widget._bananagui_set_NAME.
+          - Make sure the property is settable.
+          - Get the setter. It is the widget's attribute
+            _bananagui_set_<name of this property>.
           - Run the checker. It should raise an exception if the value
             is not correct.
           - Call the setter with the widget and the converted value
             as arguments.
           - Call self.raw_set.
         """
+        if not self.settable:
+            raise ValueError("the value of the BananaGUI %r %r cannot be set"
+                             % (type(self).__name__, self.name))
         try:
             setter = getattr(widget, '_bananagui_set_' + self.name)
         except AttributeError as e:
-            msg = "the value of the BananaGUI property %r cannot be set"
-            raise ValueError(msg % self.name) from e
+            raise NotImplementedError("no setter was defined for %r"
+                                      % self.name) from e
         setter(value)
         self.raw_set(widget, value)
 
@@ -158,7 +164,8 @@ class Property:
             value = self._values[widget] = self.getdefault()
         return value
 
-    def __get__(self, instance, cls):
+    # cls=None allows calling directly with prop.__get__(instance).
+    def __get__(self, instance, cls=None):
         """Make the BananaGUI property behave like functions in classes."""
         if instance is None:
             # This is invoked from a class.
@@ -168,7 +175,7 @@ class Property:
 
 
 class Event(structures.NamespaceBase):
-    pass
+    """An attribute container."""
 
 
 class Signal(Property):
@@ -211,27 +218,28 @@ class BananaObject:
 
     def __get_prop(self, propertyname):
         """Return a BananaGUI property."""
-        assert isinstance(propertyname, str)
-
         result = self
         try:
             for attribute in propertyname.split('.'):
                 result = getattr(result, attribute)
         except AttributeError as e:
-            msg = "no such BananaGUI property: %r" % propertyname
-            raise ValueError(msg) from e
-
+            raise ValueError("no such BananaGUI property: %r"
+                             % propertyname) from e
         if not isinstance(result, _PropertyWrapper):
             raise TypeError("%r is not a BananaGUI property" % propertyname)
         return result
 
     @utils.copy_doc(Property.set)
-    def __setitem__(self, name, value):
+    def __setitem__(self, name: str, value):
         self.__get_prop(name).set(value)
 
     @utils.copy_doc(Property.get)
-    def __getitem__(self, name):
+    def __getitem__(self, name: str):
         return self.__get_prop(name).get()
+
+
+def _bool2string(value):
+    return 'yes' if value else 'no'
 
 
 def bananadoc(bananaclass):
@@ -255,6 +263,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        None
             Has a changed signal: yes
+            Settable:             no
     >>> @bananadoc
     ... class Thingy(Thing):
     ...     """Thingy doc.
@@ -262,7 +271,7 @@ def bananadoc(bananaclass):
     ...     This thingy doc is multiple lines long.
     ...     """
     ...     b = Property(
-    ...         'b', default="hello",
+    ...         'b', default="hello", settable=True,
     ...         doc="""Here's the b doc.
     ...
     ...         It's multiple lines long also.
@@ -281,6 +290,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        None
             Has a changed signal: yes
+            Settable:             no
     <BLANKLINE>
           b
             Here's the b doc.
@@ -289,6 +299,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        'hello'
             Has a changed signal: yes
+            Settable:             yes
     >>>
     '''
     if bananaclass.__doc__ is None:
@@ -314,17 +325,18 @@ def bananadoc(bananaclass):
             continue
 
         something_found = True
-
         result += '''\
       %(propname)s
         %(propdoc)s
 
         Default value:        %(default)r
-        Has a changed signal: %(has-changed)s\n\n''' % {
+        Has a changed signal: %(has-changed)s
+        Settable:             %(settable)s\n\n''' % {
             'propname': prop.name,
             'propdoc': prop.doc.strip(),
             'default': prop.getdefault(),
-            'has-changed': 'yes' if hasattr(prop, 'changed') else 'no',
+            'has-changed': _bool2string(hasattr(prop, 'changed')),
+            'settable': _bool2string(prop.settable),
         }
 
     if something_found:
