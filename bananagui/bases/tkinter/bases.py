@@ -22,6 +22,22 @@
 import tkinter as tk
 import warnings
 
+# TODO: Implement better tooltips and stop relying on idlelib.
+#       idlelib's tooltips fail when there are two widgets inside each
+#       other. This window would display two tooltips if I would move
+#       the mouse first on the window but outside the button, wait for a
+#       tooltip and then move the mouse on the button:
+#
+#       ,------------------------------.
+#       |                  | _ |[o]| X |
+#       |------------------------------|
+#       |         ,----------.         |
+#       |         |  Button  |         |
+#       |         `----------'         |
+#       |                              |
+#       |                              |
+#       |                              |
+#       `------------------------------'
 _has_tooltips = True
 try:
     from idlelib.ToolTip import ToolTipBase
@@ -72,7 +88,11 @@ class _ToolTip(ToolTipBase):
             label.pack()
 
 
-class WidgetBase:
+class Widget:
+    pass
+
+
+class Parent:
     pass
 
 
@@ -84,7 +104,7 @@ _tkinter_fills = {
 }
 
 
-class ChildBase:
+class Child:
 
     def __init__(self):
         super().__init__()
@@ -97,11 +117,17 @@ class ChildBase:
             # sure that the pack options are changed when the expand is
             # changed.
             pack_kwargs = {'fill': _tkinter_fills[expand]}
-            if isinstance(self['parent'], HBox):
+            box_orientation = getattr(self['parent'],
+                                      '_bananagui_tkinter_orientation',
+                                      None)
+            if box_orientation == 'h':
+                # It's a HBox.
                 pack_kwargs['expand'] = expand[0]
-            elif isinstance(self['parent'], VBox):
+            elif box_orientation == 'v':
+                # It's a VBox.
                 pack_kwargs['expand'] = expand[1]
             else:
+                # It's something else.
                 pack_kwargs['expand'] = (expand == (True, True))
             self['real_widget'].pack(**pack_kwargs)
 

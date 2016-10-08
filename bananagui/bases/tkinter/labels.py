@@ -24,7 +24,7 @@
 import tkinter as tk
 
 
-class LabelBase:
+class BaseLabel:
 
     def __init__(self, parent):
         super().__init__(parent)

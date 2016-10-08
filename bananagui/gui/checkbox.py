@@ -26,7 +26,7 @@ from bananagui.types import Property, bananadoc
 from .bases import Child
 
 
-# TODO: A RadioButton.
+# TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
 
 @bananadoc
@@ -37,8 +37,8 @@ class Checkbox(_base.Checkbox, Child):
     and VBox.
     """
 
-    text = Property('text', type=str, default='', settable=True,
+    text = Property('text', type=str, default='',
                     doc="The text next to the box that can be checked.")
     checked = Property(
-        'checked', type=bool, default=False, settable=True,
+        'checked', type=bool, default=False,
         doc="True if the box is currently checked, False if not.")

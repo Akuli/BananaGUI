@@ -52,22 +52,22 @@ class BaseWindow(_base.BaseWindow, Bin):
     # implements it on X, but it does that by moving the window with a
     # maximum size to the upper left corner when it's maximized.
 
-    resizable = Property('resizable', type=bool, default=True, settable=True,
+    resizable = Property('resizable', type=bool, default=True,
                          doc="True if the window can be resized.")
-    size = Property('size', pair=True, type=int, minimum=1,
-                    default=(200, 200), settable=True,
+    size = Property('size', pair=True, type=int, minimum=1, default=(200, 200),
                     doc="Two-tuple of the window's current width and height.")
     minimum_size = Property(
         'minimum_size', default=None, pair=True, type=int, minimum=1,
-        allow_none=True, settable=True,
+        allow_none=True,
         doc="""Two-tuple of minimum width and height or None.
 
         The window cannot be resized to be smaller than this.
         """)
-    showing = Property('showing', type=bool, default=True, settable=True,
+    showing = Property('showing', type=bool, default=True,
                        doc="True if the window is visible.")
-    destroyed = Property('destroyed', type=bool, default=False,
-                         doc="True if the window has been destroyed.")
+    destroyed = Property(
+        'destroyed', type=bool, default=False, settable=False,
+        doc="True if the window has been destroyed.")
 
     def __enter__(self):
         """Return the window."""
@@ -101,7 +101,7 @@ class Window(_base.Window, BaseWindow):
     """
 
     title = Property('title', type=str, default="BananaGUI Window",
-                     settable=True, doc="The title of the window.")
+                     doc="The title of the window.")
 
 
 @bananadoc
@@ -115,11 +115,12 @@ class Dialog(_base.Dialog, BaseWindow):
     """
 
     title = Property('title', type=str, default="BananaGUI Dialog",
-                     settable=True, doc="The title of the window.")
-    parentwindow = Property('parentwindow', type=Window,
+                     doc="The title of the window.")
+    parentwindow = Property('parentwindow', type=Window, settable=False,
                             doc="The parent window set on initialization.")
 
     def __init__(self, parentwindow):
+        super().__init__()
         self.parentwindow.raw_set(parentwindow)
 
 

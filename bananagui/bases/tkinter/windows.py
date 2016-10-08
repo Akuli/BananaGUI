@@ -3,13 +3,17 @@ import tkinter as tk
 from . import mainloop
 
 
-class WindowBase:
+class BaseWindow:
 
     def __init__(self):
         super().__init__()
+        print('basewindow init')
         self['real_widget'].title(self['title'])
-        self['real_widget'].bind('<<Configure>>', print)  # TODO
+        self['real_widget'].bind('<Configure>', self.__configure)
         self['real_widget'].protocol('WM_DELETE_WINDOW', self.destroy)
+
+    def __configure(self, event):
+        self.size.raw_set((event.width, event.height))
 
     def _bananagui_set_title(self, title):
         self['real_widget'].title(title)

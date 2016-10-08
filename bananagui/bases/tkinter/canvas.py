@@ -1,19 +1,14 @@
+import itertools
 import tkinter as tk
-
-
-def _flatten(iterables):
-    for iterable in iterables:
-        # yield from is new in Python 3.3.
-        for item in iterable:
-            yield item
 
 
 class Canvas:
 
     def __init__(self, parent):
         super().__init__(parent)
-        widget = tk.Canvas(parent['real_widget'], width=300, height=200,
-                           bg='#ffffff')
+        width, height = self['size']
+        widget = tk.Canvas(parent['real_widget'], bg=self['background'].hex,
+                           width=width, height=height)
         self.real_widget.raw_set(widget)
 
     def _bananagui_set_size(self, size):
@@ -24,8 +19,9 @@ class Canvas:
         self['real_widget'].config(bg=background.hex)
 
     def draw_line(self, pos1, pos2, thickness, color):
-        self['real_widget'].create_line(*_flatten((pos1, pos2)),
-                                        fill=color.hex, width=thickness)
+        self['real_widget'].create_line(
+            *itertools.chain(pos1, pos2),
+            fill=color.hex, width=thickness)
 
     def draw_polygon(self, *positions, fillcolor, linecolor, linethickness):
         if fillcolor is None:
@@ -33,8 +29,8 @@ class Canvas:
         else:
             kwargs = {'fill': fillcolor.hex}
         self['real_widget'].create_polygon(
-            *_flatten(positions), outline=linecolor.hex,
-            width=linethickness, **kwargs)
+            *itertools.chain.from_iterable(positions),
+            outline=linecolor.hex, width=linethickness, **kwargs)
 
     def draw_oval(self, centerpos, xradius, yradius, fillcolor,
                   linecolor, linethickness):

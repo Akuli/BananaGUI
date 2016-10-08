@@ -1,7 +1,7 @@
 from gi.repository import Gtk
 
 
-class LabelBase:
+class BaseLabel:
     pass
 
 

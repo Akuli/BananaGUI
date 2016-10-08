@@ -40,7 +40,7 @@ class Label(_base.Label, BaseLabel):
     """A label with text in it."""
 
     # TODO: Add fonts and colors?
-    text = Property('text', type=str, default='', settable=True,
+    text = Property('text', type=str, default='',
                     doc="Text in the label.")
 
 
@@ -48,14 +48,14 @@ class Label(_base.Label, BaseLabel):
 class ImageLabel(_base.ImageLabel, BaseLabel):
     """A label that contains an image."""
     imagepath = Property(
-        'imagepath', type=str, allow_none=True, default=None, settable=True,
+        'imagepath', type=str, allow_none=True, default=None,
         doc="""Path to an image file.
 
         Supported filetypes depend on the GUI toolkit. I recommend using
-        `.png` and `.jpg` files because they are well supported by most
-        GUI toolkits.
+        `.png` and `.jpg` files because most GUI toolkits support them.
         """)
 
-    def _bananagui_set_path(self, path):
-        assert path is None or os.path.isfile(path)
-        super()._bananagui_set_path(path)
+    def _bananagui_set_imagepath(self, path):
+        assert path is None or os.path.isfile(path), \
+            "%r is not a path to a file" % (path,)
+        super()._bananagui_set_imagepath(path)

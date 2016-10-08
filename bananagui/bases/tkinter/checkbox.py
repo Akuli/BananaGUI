@@ -53,7 +53,7 @@ class Checkbox:
         self.checked.raw_set(bool(self.__var.get()))
 
     def _bananagui_set_text(self, text):
-        self['real_widget'].config(text=text)
+        self['real_widget']['text'] = text
 
     def _bananagui_set_checked(self, checked):
         self.__var.set(1 if checked else 0)

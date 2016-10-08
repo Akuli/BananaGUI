@@ -34,6 +34,10 @@ def on_click(event, entry):
     print(entry['text'])
 
 
+def select_all(event, entry):
+    entry.select_all()
+
+
 def main():
     with gui.Window() as window:
         vbox = gui.VBox(window)
@@ -45,10 +49,15 @@ def main():
         hbox = gui.HBox(vbox)
         vbox.append(hbox)
 
-        button = gui.Button(hbox)
-        button['text'] = "Print it"
-        button.on_click.connect(on_click, entry)
-        hbox.append(button)
+        printbutton = gui.Button(hbox)
+        printbutton['text'] = "Print it"
+        printbutton.on_click.connect(on_click, entry)
+        hbox.append(printbutton)
+
+        selectallbutton = gui.Button(hbox)
+        selectallbutton['text'] = "Select all"
+        selectallbutton.on_click.connect(select_all, entry)
+        hbox.append(selectallbutton)
 
         checkbox = gui.Checkbox(hbox)
         checkbox['text'] = "Read only"

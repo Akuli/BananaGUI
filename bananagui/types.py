@@ -23,6 +23,7 @@
 
 import contextlib
 import functools
+import types
 import weakref
 
 from bananagui import utils, structures
@@ -50,8 +51,11 @@ class _PropertyWrapper:
         #
         # https://docs.python.org/3/reference/datamodel.html#object.__getattr__
         value = getattr(self.__prop, attribute)
-        if callable(value):
-            # It's a method, create a partial.
+        if (isinstance(value, types.MethodType)
+                and value.__self__ is self.__prop):
+            # It's a bound method, create a partial. This is done to
+            # methods only instead of all callables because there's also
+            # callable instance attributes like getdefault.
             result = functools.partial(value, self.__instance)
         elif isinstance(value, Property):
             # It's a nested BananaGUI property, create another wrapper.
@@ -72,7 +76,7 @@ class Property:
     """
 
     def __init__(self, name, *, doc, default=None, getdefault=None,
-                 checker=None, add_changed=True, settable=False,
+                 checker=None, add_changed=True, settable=True,
                  **check_kwargs):
         """Initialize the property.
 
@@ -263,7 +267,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        None
             Has a changed signal: yes
-            Settable:             no
+            Settable:             yes
     >>> @bananadoc
     ... class Thingy(Thing):
     ...     """Thingy doc.
@@ -271,7 +275,7 @@ def bananadoc(bananaclass):
     ...     This thingy doc is multiple lines long.
     ...     """
     ...     b = Property(
-    ...         'b', default="hello", settable=True,
+    ...         'b', default="hello", settable=False,
     ...         doc="""Here's the b doc.
     ...
     ...         It's multiple lines long also.
@@ -290,7 +294,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        None
             Has a changed signal: yes
-            Settable:             no
+            Settable:             yes
     <BLANKLINE>
           b
             Here's the b doc.
@@ -299,7 +303,7 @@ def bananadoc(bananaclass):
     <BLANKLINE>
             Default value:        'hello'
             Has a changed signal: yes
-            Settable:             yes
+            Settable:             no
     >>>
     '''
     if bananaclass.__doc__ is None:

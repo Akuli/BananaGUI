@@ -22,11 +22,7 @@
 import tkinter as tk
 
 
-class ParentBase:
-    pass
-
-
-class BinBase:
+class Bin:
 
     def _bananagui_set_child(self, child):
         if self['child'] is not None:
@@ -47,7 +43,7 @@ _tkinter_fills = {
 }
 
 
-class BoxBase:
+class Box:
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -63,13 +59,13 @@ class BoxBase:
         # Set the pack expanding, see ChildBase._bananagui_set_expand
         # in bases.py.
         child._bananagui_set_expand(child['expand'])
-
     def remove(self, child):
         child['real_widget'].pack_forget()
         child._bananagui_tkinter_packed = False
 
 
 class HBox:
+    _bananagui_tkinter_orientation = 'h'
     # Appending to a box adds a child to the beginning of the box, and
     # then the next child towards the center from the first child and
     # so on.
@@ -77,4 +73,6 @@ class HBox:
 
 
 class VBox:
+
+    _bananagui_tkinter_orientation = 'v'
     _bananagui_tkinter_appendside = 'top'

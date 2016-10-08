@@ -32,7 +32,7 @@ class Widget(_base.Widget, BananaObject):
     """A widget baseclass."""
 
     real_widget = Property(
-        'real_widget',
+        'real_widget', settable=False,
         doc="The real GUI toolkit's widget that BananaGUI uses.")
 
 
@@ -57,10 +57,10 @@ class Child(_base.Child, Widget):
             Two-tuple of horizontal and vertical expanding.
     """
 
-    parent = Property('parent', type=Parent,
+    parent = Property('parent', type=Parent, settable=False,
                       doc="The parent set on initialization.")
     expand = Property(
-        'expand', pair=True, type=bool, default=(True, True), settable=True,
+        'expand', pair=True, type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.
 
         For example, (True, True) will make the widget expand in
@@ -96,10 +96,10 @@ class Child(_base.Child, Widget):
 
         """)
     grayed_out = Property(
-        'grayed_out', type=bool, default=False, settable=True,
+        'grayed_out', type=bool, default=False,
         doc="True if the widget is grayed out, False otherwise.")
     tooltip = Property(
-        'tooltip', type=str, allow_none=True, default=None, settable=True,
+        'tooltip', type=str, allow_none=True, default=None,
         doc="""Text in the widget's tooltip.
 
         This is None if the widget doesn't have a tooltip.

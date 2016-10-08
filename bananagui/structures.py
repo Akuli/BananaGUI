@@ -42,10 +42,7 @@ class FrozenDict:
 
     @functools.wraps(dict.__repr__)
     def __repr__(self):
-        # printf-formatting can handle dictionaries just fine even
-        # without wrapping the dictionary in a tuple or another
-        # dictionary of length one.
-        return 'FrozenDict(%r)' % self._data
+        return 'FrozenDict(%r)' % (self._data,)
 
     @functools.wraps(dict.__contains__)
     def __contains__(self, item):
@@ -132,7 +129,7 @@ class Callback:
 
     def __init__(self, function, *extra_args, **extra_kwargs):
         """Initialize the callback."""
-        assert callable(function)
+        assert callable(function), "%r is not callable" % (function,)
         self._function = function
         self._extra_args = extra_args
         self._extra_kwargs = extra_kwargs

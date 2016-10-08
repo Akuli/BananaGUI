@@ -31,5 +31,5 @@ import bananagui
 
 
 # Change this to load a different base.
-bananagui.load('.tkinter')
-#bananagui.load('.gtk3')
+#bananagui.load('.tkinter')
+bananagui.load('.gtk3')

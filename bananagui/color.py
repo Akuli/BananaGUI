@@ -1,6 +1,7 @@
 """A color class for BananaGUI."""
 
 import collections
+import functools
 import re
 
 
@@ -32,7 +33,7 @@ class Color(collections.namedtuple('Color', 'r g b')):
         return sum(self) / 3 / 255
 
     @classmethod
-    def from_hex(cls, hexstring):
+    def from_hex(cls, hexstring: str):
         """Create a color from a hexadecimal color string.
 
         This also supports 4-character hexadecmial colors. For example,
@@ -45,8 +46,6 @@ class Color(collections.namedtuple('Color', 'r g b')):
         >>> Color.from_hex('#ff0')
         Color(r=255, g=255, b=0)
         """
-        assert isinstance(hexstring, str)
-
         if len(hexstring) == 4:
             # It's a 4-character hexadecimal color, like '#fff'.
             real_hexstring = hexstring[0]
@@ -58,9 +57,10 @@ class Color(collections.namedtuple('Color', 'r g b')):
         match = re.search('^#' + '([0-9a-f]{2})'*3 + '$',
                           real_hexstring, flags=re.IGNORECASE)
         if match is None:
-            raise ValueError("invalid hexadecimal color string %r" % hexstring)
-        rgbgen = (int(value, 16) for value in match.groups())
-        return cls(*rgbgen)
+            raise ValueError("invalid hexadecimal color string %r"
+                             % (hexstring,))
+        int16 = functools.partial(int, base=16)
+        return cls(*map(int16, match.groups()))
 
     @property
     def hex(self):
@@ -74,7 +74,7 @@ class Color(collections.namedtuple('Color', 'r g b')):
         return '#%02x%02x%02x' % self
 
     @classmethod
-    def from_rgbstring(cls, rgbstring):
+    def from_rgbstring(cls, rgbstring: str):
         """Create a color from a CSS-compatible color string.
 
         This supports percents.
@@ -84,15 +84,13 @@ class Color(collections.namedtuple('Color', 'r g b')):
         >>> Color.from_rgbstring('rG B ( 255 , 100% ,0) ')
         Color(r=255, g=255, b=0)
         """
-        assert isinstance(rgbstring, str)
-
         match = re.search(
             r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$',
             ''.join(rgbstring.split()),  # Remove whitespace.
             flags=re.IGNORECASE,
         )
         if match is None:
-            raise ValueError("invalid RGB color string %r" % rgbstring)
+            raise ValueError("invalid RGB color string %r" % (rgbstring,))
 
         rgb = []
         for value in match.groups():

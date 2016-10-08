@@ -10,10 +10,6 @@ class Font:
     Traceback (most recent call last):
       ...
     AttributeError: can't set attribute
-    >>> Font('Sans', 16, bold=True) == Font('Sans', 16, bold=True)
-    True
-    >>> Font('Sans', 16, bold=True) == Font('Sans', 16)
-    False
 
     Fonts can also be stored in strings using from_string() and
     to_string().
@@ -23,7 +19,7 @@ class Font:
     to choose the fonts they want to use with a font dialog.
     """
 
-    # Try to make these immutable.
+    # Try to make the fonts immutable.
     __slots__ = ('_family', '_size', '_bold', '_italic', '_underline')
     family = property(operator.attrgetter('_family'),
                       doc="The font's family as a string or None.")
@@ -72,11 +68,29 @@ class Font:
         return '<BananaGUI font %s>' % ' '.join(words)
 
     def __eq__(self, other):
+        """Implement self == other using to_string().
+
+        >>> Font('Sans', 16, bold=True) == Font('Sans', 16, bold=True)
+        True
+        >>> Font('Sans', 16, bold=True) == Font('Sans', 16)
+        False
+        >>> Font() == "Hello"
+        False
+        """
         if not isinstance(other, Font):
             return NotImplemented
         return self.to_string() == other.to_string()
 
     def __ne__(self, other):
+        """Implement self != other using to_string().
+
+        >>> Font('Sans', 16, bold=True) != Font('Sans', 16, bold=True)
+        False
+        >>> Font('Sans', 16, bold=True) != Font('Sans', 16)
+        True
+        >>> Font() != "Hello"
+        True
+        """
         if not isinstance(other, Font):
             return NotImplemented
         return self.to_string() != other.to_string()
@@ -113,7 +127,7 @@ class Font:
             return cls(**kwargs)
 
         except (AttributeError, IndexError, TypeError, ValueError) as e:
-            raise ValueError("invalid font string %r" % string) from e
+            raise ValueError("invalid font string %r" % (string,)) from e
 
     def to_string(self):
         """Convert the font to a string.

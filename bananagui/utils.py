@@ -24,17 +24,40 @@ def baseclass(cls):
     Subclasses of cls can be instantiated normally, and cls may contain
     an __init__ method. Use this as a decorator.
     """
-    old_init = cls.__init__
-
-    def new_init(self, *args, **kwargs):
-        if type(self) is cls:   # isinstance() can't be used here
-            raise TypeError("cannot create instances of %r" % cls.__name__)
-        if old_init is not object.__init__:
+    if 'DEBUG' not in os.environ:
+        def new_init(self, *args, **kwargs):
+            if type(self) is cls:   # isinstance() can't be used here
+                raise TypeError("cannot create instances of %r" % cls.__name__)
             # object.__init__ doesn't take arguments.
-            old_init(*args, **kwargs)
+            if old_init is not None and old_init is not object.__init__:
+                old_init(self, *args, **kwargs)
 
-    cls.__init__ = new_init
+        # hasattr doesn't work here because we need to check if the
+        # __init__ is defined in cls or a baseclass.
+        old_init = cls.__dict__.get('__init__', None)
+        cls.__init__ = new_init
+
     return cls
+
+
+def baseclass(base):
+    """Modify a class to prevent creating instances and return it.
+
+    Subclasses of the class can be instantiated normally, and the class
+    may define an __init__ method. Use this as a decorator.
+    """
+    def new_new(cls, *args, **kwargs):
+        if cls is base:   # issubclass() can't be used here
+            raise TypeError("cannot create instances of %r directly"
+                            % cls.__name__)
+        if old_new is object.__new__:
+            # object.__new__ takes no arguments.
+            return old_new(cls)
+        return old_new(cls, *args, **kwargs)
+
+    old_new = base.__new__
+    base.__new__ = new_new
+    return base
 
 
 def common_beginning(*iterables):

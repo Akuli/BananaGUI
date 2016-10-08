@@ -29,13 +29,14 @@ from bananagui.utils import baseclass, common_beginning
 from .bases import Parent, Child
 
 
+# This is not a Child because Window and Dialog are based on this.
 @baseclass
 @bananadoc
 class Bin(_base.Bin, Parent):
     """A widget that contains one child widget or no children at all."""
 
     child = Property(
-        'child', allow_none=True, default=None, type=Child, settable=True,
+        'child', allow_none=True, default=None, type=Child,
         doc="""The child in the widget, None by default.
 
         Setting this to None removes the child.
@@ -61,7 +62,7 @@ class Box(_base.Box, Parent, Child):
     """
 
     children = Property(
-        'children', type=tuple, default=(), settable=True,
+        'children', type=tuple, default=(),
         doc="A tuple of children in this widget.")
 
     def _bananagui_set_children(self, children):

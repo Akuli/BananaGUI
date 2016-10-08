@@ -15,15 +15,14 @@ class Canvas(_base.Canvas, Child):
     """
 
     size = Property(
-        'size', pair=True, type=int, minimum=1,
-        default=(300, 200), settable=True,
+        'size', pair=True, type=int, minimum=1, default=(300, 200),
         doc="""Two-tuple of the width and height of the canvas.
 
         The actual size may be bigger than this if the canvas is set to
         expand in its parent.
         """)
     background = Property(
-        'background', type=Color, default=WHITE, settable=True,
+        'background', type=Color, default=WHITE,
         doc="""The background color of the canvas.
 
         This is the color of the canvas before anything is drawn to it,

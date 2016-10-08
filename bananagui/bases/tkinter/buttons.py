@@ -24,7 +24,7 @@
 import tkinter as tk
 
 
-class ButtonBase:
+class BaseButton:
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -36,3 +36,20 @@ class Button:
 
     def _bananagui_set_text(self, text):
         self['real_widget'].config(text=text)
+
+
+class ImageButton:
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        # This is needed to avoid garbage collection.
+        self.__image = None
+
+    def _bananagui_set_imagepath(self, path):
+        if path is None:
+            self['real_widget']['image'] = ''
+            self.__image = None
+        else:
+            self.__image = tk.PhotoImage(file=path)
+            self['real_widget']['image'] = self.__image

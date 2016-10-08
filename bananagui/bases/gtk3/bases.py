@@ -1,12 +1,12 @@
-class WidgetBase:
+class Widget:
     pass
 
 
-class ParentBase:
+class Parent:
     pass
 
 
-class ChildBase:
+class Child:
 
     def _bananagui_set_expand(self, expand):
         horizontal, vertical = expand
@@ -23,5 +23,5 @@ class ChildBase:
 class Dummy:
 
     def __init__(self, parent):
-        # super().__init__(parent)
-        raise NotImplementedError  # TODO
+        super().__init__(parent)
+        self.real_widget.raw_set(Gtk.Label())

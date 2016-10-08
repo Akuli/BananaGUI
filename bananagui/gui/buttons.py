@@ -6,7 +6,7 @@ from .bases import Child
 
 @baseclass
 @bananadoc
-class BaseButton(_base.ButtonBase, Child):
+class BaseButton(_base.BaseButton, Child):
     """Base for other buttons."""
 
     on_click = Signal(
@@ -15,15 +15,24 @@ class BaseButton(_base.ButtonBase, Child):
 
 @bananadoc
 class Button(_base.Button, BaseButton):
-    """A button that displays text in it.
+    """A button that displays text in it."""
 
-    Properties:
-        text            RW
-            The text of the button.
-    """
-
-    text = Property('text', type=str, default='', settable=True,
+    text = Property('text', type=str, default='',
                     doc="The text in the button.")
 
 
-# TODO: A button type suitable for toolbars. A toolbar class somewhere.
+@bananadoc
+class ImageButton(_base.ImageButton, BaseButton):
+    # TODO: The imagepath property is just like in labels.py.
+    imagepath = Property(
+        'imagepath', type=str, allow_none=True, default=None,
+        doc="""Path to an image file.
+
+        Supported filetypes depend on the GUI toolkit. I recommend using
+        `.png` and `.jpg` files because most GUI toolkits support them.
+        """)
+
+    def _bananagui_set_imagepath(self, path):
+        assert path is None or os.path.isfile(path), \
+            "%r is not a path to a file" % (path,)
+        super()._bananagui_set_imagepath(path)
