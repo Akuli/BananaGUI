@@ -23,6 +23,8 @@ def add_timeout(milliseconds: int, callback):
     for most purposes. Use something like time.time() if you need to
     measure time in the callback function.
     """
+    # TODO: in bases, generate a warning if the function returns
+    # something else than None or RUN_AGAIN.
     assert milliseconds > 0, "non-positive timeout %r" % (milliseconds,)
     assert callable(callback), "non-callable callback"
     _base.add_timeout(milliseconds, callback)

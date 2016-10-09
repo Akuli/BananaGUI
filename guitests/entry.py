@@ -26,43 +26,49 @@ import sys
 from bananagui import gui
 
 
-def on_check(event, entry):
-    entry['read_only'] = event.widget['checked']
+class EntryWindow(gui.Window):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-def on_click(event, entry):
-    print(entry['text'])
+        vbox = gui.VBox(self)
+        self['child'] = vbox
 
+        # This is attached to self because we need it in other methods.
+        self.entry = gui.Entry(vbox, expand=(True, False))
+        vbox.append(self.entry)
 
-def select_all(event, entry):
-    entry.select_all()
+        dummy = gui.Dummy(vbox)
+        vbox.append(dummy)
 
-
-def main():
-    with gui.Window(title="Entry test", size=(200, 50),
-                    resizable=False) as window:
-        vbox = gui.VBox(window)
-        window['child'] = vbox
-
-        entry = gui.Entry(vbox)
-        vbox.append(entry)
-
-        hbox = gui.HBox(vbox)
+        hbox = gui.HBox(vbox, expand=(True, False))
         vbox.append(hbox)
 
-        printbutton = gui.Button(hbox, text="Print it")
-        printbutton.on_click.connect(on_click, entry)
+        printbutton = gui.Button(hbox, text="Print it!",
+                                 on_click=[self.print_it])
         hbox.append(printbutton)
 
-        selectallbutton = gui.Button(hbox, text="Select all")
-        selectallbutton.on_click.connect(select_all, entry)
+        selectallbutton = gui.Button(hbox, text="Select all",
+                                     on_click=[self.select_all])
         hbox.append(selectallbutton)
 
         checkbox = gui.Checkbox(hbox, text="Read only")
-        checkbox.checked.changed.connect(on_check, entry)
+        checkbox['checked.changed'].append(self.read_only_toggled)
         hbox.append(checkbox)
 
-        window.destroyed.changed.connect(gui.quit)
+    def print_it(self, event):
+        print(self.entry['text'])
+
+    def select_all(self, event):
+        self.entry.select_all()
+
+    def read_only_toggled(self, event):
+        self.entry['read_only'] = event.new_value
+
+
+def main():
+    with EntryWindow(title="Entry test", size=(200, 50)) as window:
+        window['destroyed.changed'].append(gui.quit)
         gui.main()
 
 

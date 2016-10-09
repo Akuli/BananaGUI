@@ -49,11 +49,7 @@ class Bin(_base.Bin, Parent):
 
 
 class _BoxBase:
-    """A base class for Box.
-
-    This class assumes that super().append and super().remove are
-    _base.Box.append() and _base.Box.remove().
-    """
+    """A base class for Box."""
 
     children = Property(
         'children', type=tuple, default=(),

@@ -37,16 +37,19 @@ class PlainTextView:
         super().__init__(parent, **kwargs)
 
     def __changed(self, buf):
-        self.text.raw_set(buf.get_text())
+        self.text.raw_set(buf.get_text(buf.get_start_iter(),
+                                       buf.get_end_iter(), True))
 
     def __bounds(self):
         return self.__buf.get_start_iter(), self.__buf.get_end_iter()
 
     def select_all(self):
-        self.__buf.select_range(*self.__bounds())
+        self.__buf.select_range(self.__buf.get_start_iter(),
+                                self.__buf.get_end_iter())
 
     def clear(self):
-        self.__buf.delete(*self.__bounds())
+        self.__buf.delete(self.__buf.get_start_iter(),
+                          self.__buf.get_end_iter())
 
-    def append_text(self):
-        raise NotImplementedError("TODO")
+    def append_text(self, text):
+        self.__buf.insert(self.__buf.get_end_iter(), text)

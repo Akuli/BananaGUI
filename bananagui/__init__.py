@@ -63,17 +63,18 @@ def load(*args):
     '.tkinter' is equivalent to 'bananagui.bases.tkinter'.
 
     If multiple wrappers are given, attempt to load each one until
-    loading one of them succeeds. You can import `bananagui.gui` after
+    loading one of them succeeds. You can import bananagui.gui after
     calling this.
     """
     if not args:
-        raise ValueError("specify at least one wrapper")
+        raise ValueError("specify at least one module")
+
+    global _base
+    if _base is not None:
+        raise RuntimeError("don't call bananagui.load() twice")
 
     if len(args) == 1:
-        # Load the wrapper.
-        global _base
-        if _base is not None:
-            raise RuntimeError("don't call bananagui.load() twice")
+        # Load the base.
         _base = importlib.import_module(args[0], 'bananagui.bases')
 
     else:

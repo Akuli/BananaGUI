@@ -109,6 +109,13 @@ class ListLikeBase:
     """
     # TODO: example in docstring.
 
+    def __repr__(self):
+        return '<%s, %s: %r>' % (
+            super().__repr__().lstrip('<').rstrip('>'),
+            self._bananagui_contentproperty,
+            self[:],
+        )
+
     def __set(self, content: tuple):
         self[self._bananagui_contentproperty] = content
 

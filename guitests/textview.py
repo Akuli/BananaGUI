@@ -26,34 +26,33 @@ import sys
 from bananagui import gui
 
 
-class TextViewWindow(gui.Window):
+class TextviewWindow(gui.Window):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         box = gui.VBox(self)
         self['child'] = box
 
         self.textview = gui.PlainTextView(box, text="Enter something...")
-        self.textview.text.changed.connect(self.text_changed)
+        self.textview['text.changed'].append(self.text_changed)
         box.append(self.textview)
 
-        button = gui.Button(box, text="Click me", expand=(False, False))
-        button.on_click.connect(self.on_click)
-        box.add_start(button)
+        button = gui.Button(box, text="Click me", expand=(False, False),
+                            on_click=[self.on_click])
+        box.append(button)
 
     def text_changed(self, event):
         print(event.new_value)
 
     def on_click(self, event):
-        with self.textview.blocked('text.changed'):
-            self.textview.append_text("\nClick!")
+        self.textview.append_text(" Click!")
 
 
 def main():
-    with TextViewWindow(title="Textview test",
+    with TextviewWindow(title="Textview test",
                         minimum_size=(300, 200)) as window:
-        window.destroyed.changed.connect(gui.quit)
+        window['destroyed.changed'].append(gui.quit)
         gui.main()
 
 

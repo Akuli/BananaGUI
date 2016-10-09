@@ -2,6 +2,7 @@
 
 import collections
 import functools
+from gettext import gettext as _
 import operator
 import re
 
@@ -114,42 +115,6 @@ class FrozenDict:
         return self._data != other
 
 
-class Callback:
-    """Much like functools.partial.
-
-    The difference is that the initializatoin arguments are added to the
-    end instead of the beginning. This also doesn't allow keyword
-    arguments when calling.
-
-    >>> c = Callback(print, "World!", sep='-')
-    >>> c
-    Callback(<built-in function print>, 'World!', sep='-')
-    >>> # Typically BananaGUI would call this internally with something
-    >>> # like an event as an argument.
-    >>> c("Hello")
-    Hello-World!
-    """
-
-    def __init__(self, function, *extra_args, **extra_kwargs):
-        """Initialize the callback."""
-        assert callable(function), "%r is not callable" % (function,)
-        self._function = function
-        self._extra_args = extra_args
-        self._extra_kwargs = extra_kwargs
-
-    def __call__(self, *beginning_args):
-        """Call the function."""
-        all_args = beginning_args + self._extra_args
-        return self._function(*all_args, **self._extra_kwargs)
-
-    def __repr__(self):
-        """Return a nice string representation of the callback."""
-        words = [repr(self._function)]
-        words.extend(map(repr, self._extra_args))
-        words.extend('%s=%r' % item for item in self._extra_kwargs.items())
-        return 'Callback(%s)' % ', '.join(words)
-
-
 class Font:
     """An immutable font type.
 
@@ -157,9 +122,6 @@ class Font:
     Traceback (most recent call last):
       ...
     AttributeError: can't set attribute
-
-    Fonts can also be stored in strings using from_string() and
-    to_string().
 
     Usually it's a bad idea to use hard-coded fonts in your projects. If
     you want to customize the fonts it's recommended to allow your users
@@ -190,9 +152,9 @@ class Font:
         available.
 
         >>> Font(' mONoSpACe   ')
-        <BananaGUI font family='monospace' size=None>
+        <BananaGUI font, family='monospace' size=None>
         >>> Font('Sans')
-        <BananaGUI font family='Sans' size=None>
+        <BananaGUI font, family='Sans' size=None>
         """
         if family is not None:
             assert family, "family cannot be empty"
@@ -212,7 +174,7 @@ class Font:
             value = getattr(self, attribute)
             if value:
                 words.append('%s=%r' % (attribute, value))
-        return '<BananaGUI font %s>' % ' '.join(words)
+        return '<BananaGUI font, %s>' % ' '.join(words)
 
     def __eq__(self, other):
         """Implement self == other using to_string().
@@ -247,15 +209,15 @@ class Font:
         """Parse a font from a string and return it.
 
         >>> Font.from_string('Sans, 16, bold italic')
-        <BananaGUI font family='Sans' size=16 bold=True italic=True>
+        <BananaGUI font, family='Sans' size=16 bold=True italic=True>
         >>> Font.from_string(' Sans ,16,bOlD ItALic ')
-        <BananaGUI font family='Sans' size=16 bold=True italic=True>
+        <BananaGUI font, family='Sans' size=16 bold=True italic=True>
         >>> Font.from_string('Sans, 16')
-        <BananaGUI font family='Sans' size=16>
+        <BananaGUI font, family='Sans' size=16>
         >>> Font.from_string('default family, 16')
-        <BananaGUI font family=None size=16>
+        <BananaGUI font, family=None size=16>
         >>> Font.from_string('default family, default size')
-        <BananaGUI font family=None size=None>
+        <BananaGUI font, family=None size=None>
         """
         try:
             if string.count(',') == 2:
@@ -276,6 +238,26 @@ class Font:
         except (AttributeError, IndexError, TypeError, ValueError) as e:
             raise ValueError("invalid font string %r" % (string,)) from e
 
+    def _to_string(self, translations):
+        def translate(string):
+            return translations.get(string, string)
+
+        result = []
+        if self.family is None:
+            result.append(translate("default family"))
+        else:
+            result.append(self.family)
+        if self.size is None:
+            result.append(translate("default size"))
+        else:
+            result.append(str(self.size))
+        attributes = [translate(attribute)
+                      for attribute in ('bold', 'italic', 'underline')
+                      if getattr(self, attribute)]
+        if attributes:
+            result.append(' '.join(attributes))
+        return ', '.join(result)
+
     def to_string(self):
         """Convert the font to a string.
 
@@ -289,21 +271,21 @@ class Font:
         >>> Font('Sans', 123, italic=True).to_string()
         'Sans, 123, italic'
         """
-        result = []
-        if self.family is None:
-            result.append('default family')
-        else:
-            result.append(self.family)
-        if self.size is None:
-            result.append('default size')
-        else:
-            result.append(str(self.size))
-        attributes = [attribute
-                      for attribute in ('bold', 'italic', 'underline')
-                      if getattr(self, attribute)]
-        if attributes:
-            result.append(' '.join(attributes))
-        return ', '.join(result)
+        return self._to_string({})
+
+    def to_translated_string(self):
+        """Like to_string, but translates the string also.
+
+        The translating is done with gettext.gettext. Use this for
+        displaying fonts to the user. There is no from_translated_string.
+        """
+        return self._to_string({
+            "default family": _("default family"),
+            "default size": _("default size"),
+            "bold": _("bold"),
+            "italic": _("italic"),
+            "underline": _("underline"),
+        })
 
 
 class Color(collections.namedtuple('Color', 'r g b')):

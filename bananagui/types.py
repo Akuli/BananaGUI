@@ -216,10 +216,9 @@ class Signal(Property):
                          add_changed=False, doc=doc)
         self._blocked = weakref.WeakSet()
 
-    def connect(self, widget, function, *args, **kwargs):
-        """Add bananagui.Callback(function, *args, **kwargs) to self."""
-        callback = structures.Callback(function, *args, **kwargs)
-        self.get(widget).append(callback)
+    def set(self, widget, value):
+        """Set the content of the current value to a new value."""
+        self.raw_set(widget, value)
 
     def emit(self, widget, **kwargs):
         """Call the callbacks with an event created from arguments."""

@@ -12,12 +12,20 @@ class Canvas(_base.Canvas, Child):
     greater than the width of the canvas.
     """
 
-    size = Property(
-        'size', pair=True, type=int, minimum=1, default=(300, 200),
-        doc="""Two-tuple of the width and height of the canvas.
+    minimum_size = Property(
+        'size', pair=True, type=int, minimum=0, default=(300, 200),
+        doc="""Two-tuple of the minimum width and height of the canvas.
 
-        The actual size may be bigger than this if the canvas is set to
-        expand in its parent.
+        The canvas is smaller than this only if the window is resized
+        to something smaller than this.
+        """)
+    size = Property(
+        'size', pair=True, type=int, minimum=0, default=(300, 200),
+        settable=False,
+        doc="""Two-tuple of the current width and height of the canvas.
+
+        This is updated when the canvas gets resized. The value is
+        undefined when the canvas isn't in a visible container.
         """)
     background = Property(
         'background', type=Color, default=WHITE,

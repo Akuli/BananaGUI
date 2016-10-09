@@ -5,7 +5,6 @@ class BaseWindow:
 
     def __init__(self, **kwargs):
         self['real_widget'].set_title(self['title'])
-        # TODO: resizing.
         self['real_widget'].connect('delete-event', self.__delete_event)
         self['real_widget'].show()
         super().__init__(**kwargs)
@@ -13,6 +12,8 @@ class BaseWindow:
     def _bananagui_set_title(self, title):
         self['real_widget'].set_title(title)
 
+    # TODO: resizable and size don't work correctly if resizable is
+    # False but size is set.
     def _bananagui_set_resizable(self, resizable):
         self['real_widget'].set_resizable(resizable)
 

@@ -8,10 +8,14 @@ class Canvas:
         width, height = self['size']
         widget = tk.Canvas(parent['real_widget'], bg=self['background'].hex,
                            width=width, height=height)
+        widget.bind('<Configure>', self.__configure)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_size(self, size):
+    def __configure(self, event):
+        self.size.raw_set((event.width, event.height))
+
+    def _bananagui_set_minimum_size(self, size):
         width, height = size
         self['real_widget'].config(width=width, height=height)
 

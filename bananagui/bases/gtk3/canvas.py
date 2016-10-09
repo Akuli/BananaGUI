@@ -4,7 +4,7 @@ class Canvas:
         raise NotImplementedError  # TODO
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_size(self, size):
+    def _bananagui_set_minimum_size(self, size):
         ...
 
     def _bananagui_set_background(self, background):
