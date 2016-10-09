@@ -21,8 +21,7 @@
 
 """A checkbox widget."""
 
-from bananagui import _base
-from bananagui.types import Property, bananadoc
+from bananagui import _base, Property, bananadoc
 from .bases import Child
 
 

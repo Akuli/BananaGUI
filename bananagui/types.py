@@ -21,9 +21,9 @@
 
 """BananaGUI events and signals."""
 
-import collections
 import contextlib
 import functools
+import os
 import types
 import weakref
 

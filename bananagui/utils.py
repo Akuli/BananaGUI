@@ -163,7 +163,7 @@ class ListLikeBase:
 
     def count(self, item):
         """Check how many times an item has been added."""
-        return self.__get().count(child)
+        return self.__get().count(item)
 
     def extend(self, new_items):
         """Append each item in new_items to self."""

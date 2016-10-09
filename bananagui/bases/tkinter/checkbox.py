@@ -21,7 +21,7 @@
 
 import tkinter as tk
 
-from bananagui.color import Color
+from bananagui import Color
 
 
 class Checkbox:

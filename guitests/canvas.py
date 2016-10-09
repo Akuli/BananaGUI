@@ -1,6 +1,7 @@
 import sys
 
-from bananagui import color, gui
+import bananagui
+from bananagui import gui
 
 
 def main():
@@ -10,15 +11,15 @@ def main():
 
         canvas.draw_line((100, 100), (200, 100))
         canvas.draw_polygon((100, 100), (100, 200), (200, 200),
-                            fillcolor=color.RED, linecolor=color.BLUE,
+                            fillcolor=bananagui.RED, linecolor=bananagui.BLUE,
                             linethickness=3)
-        canvas.draw_oval((300, 300), 200, 100, fillcolor=color.CYAN,
-                         linecolor=color.ORANGE, linethickness=5)
-        canvas.draw_circle((300, 300), 50, fillcolor=color.ORANGE,
-                           linecolor=color.RED, linethickness=10)
+        canvas.draw_oval((300, 300), 200, 100, fillcolor=bananagui.CYAN,
+                         linecolor=bananagui.ORANGE, linethickness=5)
+        canvas.draw_circle((300, 300), 50, fillcolor=bananagui.ORANGE,
+                           linecolor=bananagui.RED, linethickness=10)
 
         window.destroyed.changed.connect(gui.quit)
-        sys.exit(gui.main())
+        gui.main()
 
 
 if __name__ == '__main__':

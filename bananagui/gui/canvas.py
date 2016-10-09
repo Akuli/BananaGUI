@@ -1,8 +1,6 @@
 """Canvas widget for BananaGUI."""
 
-from bananagui import _base
-from bananagui.color import Color, BLACK, WHITE
-from bananagui.types import Property, bananadoc
+from bananagui import _base, Color, BLACK, WHITE, Property, bananadoc
 from .bases import Child
 
 

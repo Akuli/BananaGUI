@@ -24,14 +24,7 @@
 from functools import partial
 from gettext import gettext as _
 
-try:
-    from collections.abc import Sequence
-except ImportError:
-    # Python 3.2.
-    from collections import Sequence
-
-from bananagui import _base
-from bananagui.types import Property, bananadoc
+from bananagui import _base, Property, bananadoc
 from bananagui.utils import baseclass
 from .containers import Bin
 

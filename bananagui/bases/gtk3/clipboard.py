@@ -1,7 +1,7 @@
 from gi.repository import Gtk, Gdk
 
-
 clipboard = None
+
 
 def init_clipboard():
     global clipboard

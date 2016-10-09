@@ -1,7 +1,6 @@
 """Timeout class."""
 
 from bananagui import _base
-from bananagui.structures import Callback
 
 
 # Don't allow returning True to run again.
@@ -13,10 +12,10 @@ RUN_AGAIN = 2
 _base.add_timeout.RUN_AGAIN = RUN_AGAIN
 
 
-def add_timeout(milliseconds: int, function, *args, **kwargs):
-    """Run callback(*args, **kwargs) after waiting.
+def add_timeout(milliseconds: int, callback):
+    """Run callback() after waiting.
 
-    If the callback returns RUN_AGAIN it will be called again after
+    If the function returns RUN_AGAIN it will be called again after
     waiting again. Depending on the GUI toolkit, the timing may start
     when bananagui.main() is started or before it.
 
@@ -25,4 +24,5 @@ def add_timeout(milliseconds: int, function, *args, **kwargs):
     measure time in the callback function.
     """
     assert milliseconds > 0, "non-positive timeout %r" % (milliseconds,)
-    _base.add_timeout(milliseconds, Callback(callback, *args, **kwargs))
+    assert callable(callback), "non-callable callback"
+    _base.add_timeout(milliseconds, callback)

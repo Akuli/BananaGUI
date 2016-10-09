@@ -59,6 +59,7 @@ class Box:
         # Set the pack expanding, see ChildBase._bananagui_set_expand
         # in bases.py.
         child._bananagui_set_expand(child['expand'])
+
     def remove(self, child):
         child['real_widget'].pack_forget()
         child._bananagui_tkinter_packed = False

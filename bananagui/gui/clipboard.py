@@ -1,5 +1,4 @@
 from bananagui import _base
-from bananagui.types import Property
 
 
 def set_clipboard_text(text: str):

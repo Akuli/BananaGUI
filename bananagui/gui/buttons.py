@@ -1,5 +1,4 @@
-from bananagui import _base
-from bananagui.types import Property, Signal, bananadoc
+from bananagui import _base, Property, Signal, bananadoc
 from bananagui.utils import baseclass
 from .bases import Child
 
@@ -27,8 +26,3 @@ class ImageButton(_base.ImageButton, BaseButton):
     imagepath = Property.imagepath(
         'imagepath',
         doc="Path to the image that will be displayed in the button.")
-
-    def _bananagui_set_imagepath(self, path):
-        assert path is None or os.path.isfile(path), \
-            "%r is not a path to a file" % (path,)
-        super()._bananagui_set_imagepath(path)

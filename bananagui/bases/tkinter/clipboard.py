@@ -4,7 +4,6 @@ from . import mainloop
 
 
 def set_clipboard_text(text):
-    clear_clipboard()
     mainloop.root.clipboard_clear()
     mainloop.root.clipboard_append(text)
 
