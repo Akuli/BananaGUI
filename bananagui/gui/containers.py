@@ -23,9 +23,8 @@
 
 # TODO: Add a grid widget.
 
-from bananagui import _base
-from bananagui.types import Property, bananadoc
-from bananagui.utils import baseclass, common_beginning
+from bananagui import _base, Property, bananadoc
+from bananagui.utils import baseclass, common_beginning, ListLikeBase
 from .bases import Parent, Child
 
 
@@ -49,9 +48,38 @@ class Bin(_base.Bin, Parent):
         super()._bananagui_set_child(child)
 
 
+class _BoxBase:
+    """A base class for Box.
+
+    This class assumes that super().append and super().remove are
+    _base.Box.append() and _base.Box.remove().
+    """
+
+    children = Property(
+        'children', type=tuple, default=(),
+        doc="A tuple of children in this widget.")
+    _bananagui_contentproperty = 'children'
+
+    def _bananagui_set_children(self, children):
+        assert len(children) == len(set(children)), \
+            "cannot add the same child twice"
+
+        # TODO: Maybe self and children have something else in common
+        # than the beginning? Optimize this.
+        common = common_beginning(self, children)
+        for child in self[common:]:
+            # This assumes that super().remove and super().append
+            # come from _base.Box.
+            super().remove(child)
+        for child in children[common:]:
+            assert child['parent'] is self, \
+                "cannot add a child with the wrong parent"
+            super().append(child)
+
+
 @baseclass
 @bananadoc
-class Box(_base.Box, Parent, Child):
+class Box(ListLikeBase, _BoxBase, _base.Box, Parent, Child):
     """A widget that contains other widgets in a row.
 
     Boxes can be indexed and sliced like lists to modify their children,
@@ -60,128 +88,6 @@ class Box(_base.Box, Parent, Child):
     BananaGUI object. You can also set the value of the children
     property directly, it's a tuple of children.
     """
-
-    children = Property(
-        'children', type=tuple, default=(),
-        doc="A tuple of children in this widget.")
-
-    def _bananagui_set_children(self, children):
-        assert len(children) == len(set(children)), \
-            "cannot add the same child twice"
-
-        common = common_beginning(self, children)
-
-        # TODO: Maybe self and children have something else in common
-        # than the beginning? Optimize this.
-        for child in self[common:]:
-            super().remove(child)
-        for child in children[common:]:
-            assert child['parent'] is self, \
-                "cannot add a child with the wrong parent"
-            super().append(child)
-
-    def __setitem__(self, item, value):
-        """Set widget(s) to self or call super()."""
-        if isinstance(item, (int, slice)):
-            children = self[:]
-            children[item] = value
-            self['children'] = tuple(children)
-        else:
-            super().__setitem__(item, value)
-
-    def __getitem__(self, item):
-        """Get widget(s) from self or call super()."""
-        if isinstance(item, int):
-            return self['children'][item]
-        if isinstance(item, slice):
-            return list(self['children'][item])
-        return super().__getitem__(item)
-
-    def __delitem__(self, item):
-        """Delete widget(s) from self or call super()."""
-        if isinstance(item, (int, slice)):
-            children = self[:]
-            del children[item]
-            self[:] = children
-        else:
-            super().__delitem__(item)
-
-    # More list-like behavior. Some of these methods avoid indexing and
-    # slicing self because that way there's no need to create a list in
-    # __setitem__, __getitem__ or __delitem__
-
-    def __contains__(self, item):
-        """Check if item is a child in the box."""
-        return item in self['children']
-
-    def __len__(self):
-        """Return the number of children in the box."""
-        return len(self['children'])
-
-    def __reversed__(self):
-        """Iterate the children of the box in reverse."""
-        return reversed(self['children'])
-
-    def append(self, child):
-        """Add a widget to the box."""
-        self['children'] += (child,)
-
-    def clear(self):
-        """Remove all widgets from self."""
-        self[:] = []
-
-    def count(self, child):
-        """Check how many times a child has been added.
-
-        This always returns 0 or 1 because children can be added once
-        only. This method is provided just for compatibility with lists
-        and using `child in self` instead is recommended.
-        """
-        result = self['children'].count(child)
-        assert result in (0, 1)
-        return result
-
-    def extend(self, new_children):
-        """Append each child in new_children to self."""
-        # The built-in list.extend() allows extending by anything
-        # iterable, so this allows it also.
-        self['children'] += tuple(new_children)
-
-    def index(self, child):
-        """Return the index of child in self."""
-        return self['children'].index(child)
-
-    def insert(self, index, child):
-        """Insert a child at the given index."""
-        # This doesn't break if index is negative.
-        self[index:index] = [child]
-
-    def pop(self, index=-1):
-        """Delete self[index] and return the removed item.
-
-        The index must be an integer.
-        """
-        assert isinstance(index, int)
-        result = self[index]
-        del self[index]
-        return result
-
-    def remove(self, child):
-        """Remove a widget from self."""
-        children = self[:]
-        children.remove(child)
-        self[:] = children
-
-    def reverse(self):
-        """Reverse the box, making last items first and first items last.
-
-        Unlike with lists, this isn't very efficient.
-        """
-        self[:] = self[::-1]
-
-    def sort(self, **kwargs):
-        """Sort self."""
-        self[:] = sorted(self, **kwargs)
 
 
 @bananadoc

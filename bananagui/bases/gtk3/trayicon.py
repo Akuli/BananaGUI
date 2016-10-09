@@ -11,7 +11,7 @@ else:
     AppIndicator3 = None
 
 
-class Trayicon:
+class TrayIcon:
 
     def __init__(self, iconpath):
         if has_appindicator:

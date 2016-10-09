@@ -4,6 +4,17 @@ It's not recommended to rely on this submodule. It's meant only for
 being used internally by BananaGUI and it can be changed in the future.
 """
 
+try:
+    from collections.abc import MutableSequence
+except ImportError:
+    # The abstract base classes in collections were moved to
+    # collections.abc in Python 3.3.
+    from collections import MutableSequence
+
+
+# Allow None as a non-default value.
+_NOTHING = object()
+
 
 def copy_doc(source):
     """Copy __doc__ to another object.
@@ -16,28 +27,6 @@ def copy_doc(source):
         return destination
 
     return inner
-
-
-def baseclass(cls):
-    """Modify cls to prevent creating instances and return it.
-
-    Subclasses of cls can be instantiated normally, and cls may contain
-    an __init__ method. Use this as a decorator.
-    """
-    if 'DEBUG' not in os.environ:
-        def new_init(self, *args, **kwargs):
-            if type(self) is cls:   # isinstance() can't be used here
-                raise TypeError("cannot create instances of %r" % cls.__name__)
-            # object.__init__ doesn't take arguments.
-            if old_init is not None and old_init is not object.__init__:
-                old_init(self, *args, **kwargs)
-
-        # hasattr doesn't work here because we need to check if the
-        # __init__ is defined in cls or a baseclass.
-        old_init = cls.__dict__.get('__init__', None)
-        cls.__init__ = new_init
-
-    return cls
 
 
 def baseclass(base):
@@ -108,3 +97,107 @@ def check(value, *, pair=False, allow_none=False, type=None,
         assert value >= minimum, "%r is smaller than %r" % (value, minimum)
     if maximum is not None:
         assert value <= maximum, "%r is larger than %r" % (value, maximum)
+
+
+@MutableSequence.register
+class ListLikeBase:
+    """A base class that implements list-like methods.
+
+    A property called self._bananagui_contentproperty will be set to a
+    tuple of the new content when the content is changed and it will be
+    used to get the current content.
+    """
+    # TODO: example in docstring.
+
+    def __set(self, content: tuple):
+        self[self._bananagui_contentproperty] = content
+
+    def __get(self):
+        return self[self._bananagui_contentproperty]
+
+    def __setitem__(self, item, value):
+        """Behave like a list if item's type allows that or call super."""
+        if isinstance(item, (int, slice)):
+            content = self[:]
+            content[item] = value
+            self.__set(tuple(content))
+        else:
+            super().__setitem__(item, value)
+
+    def __getitem__(self, item):
+        """Behave like a list if item's type allows that or call super."""
+        if isinstance(item, int):
+            return self.__get()[item]
+        if isinstance(item, slice):
+            return list(self.__get()[item])
+        return super().__getitem__(item)
+
+    def __delitem__(self, item):
+        """Behave like a list if item's type allows that or call super."""
+        if isinstance(item, (int, slice)):
+            items = self[:]
+            del items[item]
+            self[:] = items
+        else:
+            super().__delitem__(item)
+
+    def __contains__(self, item):
+        """Check if item is in self."""
+        return item in self.__get()
+
+    def __len__(self):
+        """Return the number of items in self."""
+        return len(self.__get())
+
+    def __reversed__(self):
+        """Iterate the content of self reversed."""
+        return reversed(self.__get())
+
+    def append(self, item):
+        """Add an item to end of self."""
+        self.__set(self.__get() + (item,))
+
+    def clear(self):
+        """Remove all items from self."""
+        del self[:]
+
+    def count(self, item):
+        """Check how many times an item has been added."""
+        return self.__get().count(child)
+
+    def extend(self, new_items):
+        """Append each item in new_items to self."""
+        # The built-in list.extend allows extending by anything
+        # iterable, so this allows it also.
+        self.__set(self.__get() + tuple(new_items))
+
+    def index(self, item):
+        """Return the index of item in self."""
+        return self.__get().index(item)
+
+    def insert(self, index, item):
+        """Insert an item at the given index."""
+        self[index:index] = [item]
+
+    def pop(self, index: int = -1):
+        """Delete self[index] and return the removed item.
+
+        The index must be an integer.
+        """
+        result = self[index]
+        del self[index]
+        return result
+
+    def remove(self, item):
+        """Remove an item from self."""
+        content = self[:]
+        content.remove(item)
+        self[:] = content
+
+    def reverse(self):
+        """Reverse self, making last items first and first items last."""
+        self[:] = reversed(self)
+
+    def sort(self, **kwargs):
+        """Sort self."""
+        self[:] = sorted(self, **kwargs)

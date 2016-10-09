@@ -90,18 +90,14 @@ class Property:
         """
         assert default is None or getdefault is None, \
             "both default and getdefault were specified"
-        assert checker is None or not check_kwargs, \
-            "both checker and additional keyword arguments were specified"
 
         self.name = name
         if getdefault is None:
             self.getdefault = lambda: default
         else:
             self.getdefault = getdefault
-        if checker is None:
-            self.checker = functools.partial(utils.check, **check_kwargs)
-        else:
-            self.checker = checker
+        self._checker = checker
+        self._check_kwargs = check_kwargs
         self.doc = doc
         self.settable = settable
 
@@ -122,7 +118,10 @@ class Property:
         dictionary of set values. This also checks the value and emits
         the changed signal.
         """
-        self.checker(value)
+        if self._checker is not None:
+            self._checker(value)
+        if self._check_kwargs:
+            utils.check(value, **self._check_kwargs)
         old_value = self.get(widget)
         self._values[widget] = value
         if hasattr(self, 'changed'):
@@ -191,7 +190,7 @@ class Property:
         real_kwargs = {'type': str, 'allow_none': True, 'default': None,
                        'checker': check_filepath}
         real_kwargs.update(kwargs)
-        return cls(**real_kwargs)
+        return cls(name, **real_kwargs)
 
     @classmethod
     def imagepath(cls, name, **kwargs):

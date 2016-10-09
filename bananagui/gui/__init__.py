@@ -18,6 +18,7 @@ from .containers import Bin, Box, HBox, VBox
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
 from .textwidgets import TextBase, Entry, PlainTextView
+from .trayicon import TrayIcon
 
 # Bases don't need to provide infodialog, questiondialog, warningdialog
 # or errordialog. See windows.py for more info.

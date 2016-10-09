@@ -26,11 +26,30 @@ the same code using any of the supported GUI toolkits, including PyQt5,
 GTK+ 3 and tkinter.
 """
 
+# flake8: noqa
+
 import importlib
 
 # This is imported because importlib.import_module() doesn't import
 # parent modules as needed with relative imports.
-import bananagui.bases  # noqa
+import bananagui.bases
+
+# Importing other things.
+from bananagui.structures import Color, Font, FrozenDict
+from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
+
+
+# TODO: Add a BROWN.
+BLACK = Color(0, 0, 0)
+GRAY = Color(127, 127, 127)
+WHITE = Color(255, 255, 255)
+RED = Color(255, 0, 0)
+ORANGE = Color(255, 127, 0)
+YELLOW = Color(255, 255, 0)
+GREEN = Color(0, 255, 0)
+CYAN = Color(0, 255, 255)
+BLUE = Color(0, 0, 255)
+PINK = Color(255, 0, 255)
 
 
 _base = None

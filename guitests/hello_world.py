@@ -32,7 +32,6 @@ def main():
         window['child'] = label
         window['title'] = "Hello World"
         window.destroyed.changed.connect(gui.quit)
-#        window['real_widget'].show_all()
         gui.main()
 
 
