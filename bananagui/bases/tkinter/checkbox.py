@@ -26,9 +26,7 @@ from bananagui.color import Color
 
 class Checkbox:
 
-    def __init__(self, parent):
-        super().__init__(parent)
-
+    def __init__(self, parent, **kwargs):
         self.__var = tk.IntVar()
         self.__var.trace('w', self.__var_changed)
 
@@ -48,6 +46,7 @@ class Checkbox:
             widget.config(selectcolor='#000000')
 
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
     def __var_changed(self, name, empty_string, mode):
         self.checked.raw_set(bool(self.__var.get()))

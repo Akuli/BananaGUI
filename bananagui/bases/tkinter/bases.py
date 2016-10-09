@@ -90,9 +90,9 @@ class _ToolTip(ToolTipBase):
 
 class Widget:
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
         self.__tooltip = None
+        super().__init__(**kwargs)
 
     def _bananagui_set_tooltip(self, tooltip):
         if self.__tooltip is None and tooltip is not None:
@@ -114,9 +114,9 @@ _tkinter_fills = {
 
 class Child:
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
         self._bananagui_tkinter_packed = False  # See also layouts.py.
+        super().__init__(**kwargs)
 
     def _bananagui_set_expand(self, expand):
         if self._bananagui_tkinter_packed:
@@ -144,6 +144,6 @@ class Child:
 
 class Dummy:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         self.real_widget.raw_set(tk.Frame(parent['real_widget']))
+        super().__init__(parent, **kwargs)

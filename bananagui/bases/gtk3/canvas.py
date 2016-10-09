@@ -1,8 +1,8 @@
 class Canvas:
 
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         raise NotImplementedError  # TODO
-        super().__init__(parent)
+        super().__init__(parent, **kwargs)
 
     def _bananagui_set_size(self, size):
         ...

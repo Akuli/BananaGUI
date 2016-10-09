@@ -13,10 +13,10 @@ class Bin:
 
 class Box:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         widget = Gtk.Box(orientation=type(self)._bananagui_gtk_orientation)
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
     def append(self, child):
         # TODO: What if the widget is added and then its expandiness is

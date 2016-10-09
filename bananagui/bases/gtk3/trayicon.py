@@ -13,7 +13,7 @@ else:
 
 class TrayIcon:
 
-    def __init__(self, iconpath):
+    def __init__(self, iconpath, **kwargs):
         if has_appindicator:
             widget = AppIndicator3.Indicator.new(
                 # Unfortunately there's no good way to get the name of
@@ -32,7 +32,7 @@ class TrayIcon:
             widget = Gtk.StatusIcon()
             widget.set_from_file(iconpath)
         self.real_widget.raw_set(widget)
-        super().__init__()
+        super().__init__(**kwargs)
 
     def _bananagui_set_tooltip(self, tooltip):
         if has_appindicator:

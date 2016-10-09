@@ -24,10 +24,10 @@ import tkinter as tk
 
 class TextBase:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         self['real_widget'].bind('<Control-A>', self.__select_all)
         self['real_widget'].bind('<Control-a>', self.__select_all)
+        super().__init__(parent, **kwargs)
 
     def __select_all(self, event):
         self.select_all()
@@ -36,14 +36,12 @@ class TextBase:
 
 class Entry:
 
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         self.__var = tk.StringVar()
         self.__var.trace('w', self.__var_changed)
-
         widget = tk.Entry(parent['real_widget'], textvariable=self.__var)
         self.real_widget.raw_set(widget)
-
-        super().__init__(parent)
+        super().__init__(parent, **kwargs)
 
     def __var_changed(self, tkname, empty_string, mode):
         self.text.raw_set(self.__var.get())
@@ -53,7 +51,7 @@ class Entry:
 
     def _bananagui_set_read_only(self, read_only):
         state = 'readonly' if read_only else 'normal'
-        self['real_widget'].config(state=state)
+        self['real_widget']['state'] = state
 
     def select_all(self):
         self['real_widget'].selection_range(0, 'end')
@@ -61,14 +59,14 @@ class Entry:
 
 class PlainTextView:
 
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         # TODO: Add more keyboard shortcuts.
-        super().__init__(parent)
         # A larger width or height would prevent the widget from
         # shrinking when needed.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
         widget.bind('<<Modified>>', self.__edit_modified)
         self.raw_set('real_widget', widget)
+        super().__init__(parent, **kwargs)
 
     def select_all(self):
         """Select all text in the widget."""

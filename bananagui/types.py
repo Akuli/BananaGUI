@@ -245,6 +245,10 @@ class Signal(Property):
 class BananaObject:
     """A base class for using BananaGUI properties and signals."""
 
+    def __init__(self, **kwargs):
+        for name, value in kwargs.items():
+            self[name] = value
+
     def __get_prop(self, propertyname):
         """Return a BananaGUI property."""
         result = self

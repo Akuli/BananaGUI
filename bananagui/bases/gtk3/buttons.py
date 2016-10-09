@@ -7,11 +7,11 @@ class BaseButton:
 
 class Button:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         button = Gtk.Button()
         button.connect('clicked', self.__click)
         self.real_widget.raw_set(button)
+        super().__init__(parent, **kwargs)
 
     def __click(self, button):
         self.on_click.emit()
@@ -22,5 +22,5 @@ class Button:
 
 class ImageButton:
 
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         raise NotImplementedError  # TODO

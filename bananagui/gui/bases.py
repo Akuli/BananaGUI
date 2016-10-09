@@ -100,9 +100,9 @@ class Child(_base.Child, Widget):
         'grayed_out', type=bool, default=False,
         doc="True if the widget is grayed out, False otherwise.")
 
-    def __init__(self, parent: Parent):
-        super().__init__()
+    def __init__(self, parent: Parent, **kwargs):
         self.parent.raw_set(parent)
+        super().__init__(**kwargs)
 
 
 @bananadoc

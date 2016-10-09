@@ -5,12 +5,11 @@ from . import mainloop
 
 class BaseWindow:
 
-    def __init__(self):
-        super().__init__()
-        print('basewindow init')
+    def __init__(self, **kwargs):
         self['real_widget'].title(self['title'])
         self['real_widget'].bind('<Configure>', self.__configure)
         self['real_widget'].protocol('WM_DELETE_WINDOW', self.destroy)
+        super().__init__(**kwargs)
 
     def __configure(self, event):
         self.size.raw_set((event.width, event.height))
@@ -40,20 +39,18 @@ class BaseWindow:
 
 class Window:
 
-    def __init__(self):
-        # This relies on tkinter's default root, which is created in the
-        # mainloop.py file.
+    def __init__(self, **kwargs):
         widget = tk.Toplevel(mainloop.root)
         self.real_widget.raw_set(widget)
-        super().__init__()
+        super().__init__(**kwargs)
 
 
 class Dialog:
 
-    def __init__(self, parentwindow):
+    def __init__(self, parentwindow, **kwargs):
         widget = tk.Toplevel(parentwindow['real_widget'])
         self.real_widget.raw_set(widget)
-        super().__init__(parentwindow)
+        super().__init__(parentwindow, **kwargs)
 
 
 def messagedialog(icon, parentwindow, text, title, buttons, defaultbutton):

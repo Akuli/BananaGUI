@@ -45,9 +45,9 @@ _tkinter_fills = {
 
 class Box:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         self.real_widget.raw_set(tk.Frame(parent['real_widget']))
+        super().__init__(parent, **kwargs)
 
     def append(self, child):
         child['real_widget'].pack(

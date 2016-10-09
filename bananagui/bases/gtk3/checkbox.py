@@ -3,11 +3,11 @@ from gi.repository import Gtk
 
 class Checkbox:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         widget = Gtk.CheckButton()
         widget.connect('notify::active', self.__on_check)
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
     def __on_check(self, real_widget, gparam):
         self.checked.raw_set(real_widget.get_active())

@@ -7,12 +7,11 @@ class TextBase:
 
 class Entry:
 
-    def __init__(self, parent):
-        super().__init__(parent)
-
+    def __init__(self, parent, **kwargs):
         widget = Gtk.Entry()
         widget.connect('changed', self.__changed)
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
     def __changed(self, entry):
         self.text.raw_set(entry.get_text())
@@ -30,12 +29,12 @@ class Entry:
 class PlainTextView:
     # TODO: tabchar
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         widget = Gtk.TextView()
         self.__buf = widget.get_buffer()
         self.__buf.connect('changed', self.__changed)
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
     def __changed(self, buf):
         self.text.raw_set(buf.get_text())

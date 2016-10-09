@@ -119,9 +119,9 @@ class Dialog(_base.Dialog, BaseWindow):
     parentwindow = Property('parentwindow', type=Window, settable=False,
                             doc="The parent window set on initialization.")
 
-    def __init__(self, parentwindow):
-        super().__init__()
+    def __init__(self, parentwindow, **kwargs):
         self.parentwindow.raw_set(parentwindow)
+        super().__init__(**kwargs)
 
 
 def messagedialog(icon, parentwindow: Window, text: str, *,

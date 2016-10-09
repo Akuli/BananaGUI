@@ -26,9 +26,9 @@ import tkinter as tk
 
 class BaseLabel:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         self.real_widget.raw_set(tk.Label(parent['real_widget']))
+        super().__init__(parent)
 
 
 class Label:
@@ -39,9 +39,9 @@ class Label:
 
 class ImageLabel:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         self.__photoimage = None
+        super().__init__(parent, **kwargs)
 
     def _bananagui_set_path(self, path):
         if path is None:

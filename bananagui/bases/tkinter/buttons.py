@@ -26,10 +26,10 @@ import tkinter as tk
 
 class BaseButton:
 
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, parent, **kwargs):
         widget = tk.Button(parent['real_widget'], command=self.on_click.emit)
         self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
 
 
 class Button:
@@ -40,11 +40,10 @@ class Button:
 
 class ImageButton:
 
-    def __init__(self, parent):
-        super().__init__(parent)
-
+    def __init__(self, parent, **kwargs):
         # This is needed to avoid garbage collection.
         self.__image = None
+        super().__init__(parent, **kwargs)
 
     def _bananagui_set_imagepath(self, path):
         if path is None:
