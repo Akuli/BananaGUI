@@ -22,28 +22,31 @@ class Canvas:
     def _bananagui_set_background(self, background):
         self['real_widget'].config(bg=background.hex)
 
-    def draw_line(self, pos1, pos2, thickness, color):
+    def draw_line(self, start, end, thickness, color):
         self['real_widget'].create_line(
-            *itertools.chain(pos1, pos2),
+            # *start, *end doesn't work on Pythons older than 3.5.
+            *itertools.chain(start, end),
             fill=color.hex, width=thickness)
 
-    def draw_polygon(self, *positions, fillcolor, linecolor, linethickness):
-        if fillcolor is None:
-            kwargs = {}
-        else:
-            kwargs = {'fill': fillcolor.hex}
+    def draw_polygon(self, *corners, fillcolor, linecolor, linethickness):
+        kwargs = {}
+        if fillcolor is not None:
+            kwargs['fill'] = fillcolor.hex
+        if linecolor is not None:
+            kwargs['outline'] = linecolor.hex
         self['real_widget'].create_polygon(
-            *itertools.chain.from_iterable(positions),
-            outline=linecolor.hex, width=linethickness, **kwargs)
+            *itertools.chain.from_iterable(corners),
+            width=linethickness, **kwargs)
 
-    def draw_oval(self, centerpos, xradius, yradius, fillcolor,
+    def draw_oval(self, center, xradius, yradius, fillcolor,
                   linecolor, linethickness):
-        centerx, centery = centerpos
-        if fillcolor is None:
-            kwargs = {}
-        else:
-            kwargs = {'fill': fillcolor.hex}
+        centerx, centery = center
+        kwargs = {}
+        if fillcolor is not None:
+            kwargs['fill'] = fillcolor.hex
+        if linecolor is not None:
+            kwargs['outline'] = linecolor.hex
         self['real_widget'].create_oval(
             centerx - xradius, centery - yradius,
             centerx + xradius, centery + yradius,
-            outline=linecolor.hex, width=linethickness, **kwargs)
+            width=linethickness, **kwargs)

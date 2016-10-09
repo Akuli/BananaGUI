@@ -6,6 +6,9 @@ class Widget:
     def _bananagui_set_tooltip(self, tooltip):
         self['real_widget'].set_tooltip_text(tooltip)
 
+    def _bananagui_set_background(self, background):
+        
+
 
 class Parent:
     pass

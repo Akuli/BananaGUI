@@ -21,7 +21,7 @@
 
 """Base classes for various widgets."""
 
-from bananagui import _base, Property, BananaObject, bananadoc
+from bananagui import _base, bananadoc, Color, Property, BananaObject
 from bananagui.utils import baseclass
 
 
@@ -38,6 +38,12 @@ class Widget(_base.Widget, BananaObject):
         doc="""Text in the widget's tooltip.
 
         This is None if the widget doesn't have a tooltip.
+        """)
+    background = Property(
+        'background', type=Color, allow_none=True, default=None,
+        doc="""The widget's background.
+
+        The system-specific default is used if this is None.
         """)
 
 

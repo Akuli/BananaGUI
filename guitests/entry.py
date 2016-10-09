@@ -21,8 +21,6 @@
 
 """BananaGUI entry test."""
 
-import sys
-
 from bananagui import gui
 
 

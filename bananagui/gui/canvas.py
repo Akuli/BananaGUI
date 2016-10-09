@@ -13,7 +13,7 @@ class Canvas(_base.Canvas, Child):
     """
 
     minimum_size = Property(
-        'size', pair=True, type=int, minimum=0, default=(300, 200),
+        'minimum_size', pair=True, type=int, minimum=0, default=(300, 200),
         doc="""Two-tuple of the minimum width and height of the canvas.
 
         The canvas is smaller than this only if the window is resized
@@ -35,29 +35,32 @@ class Canvas(_base.Canvas, Child):
         and clearing the canvas fills it with this color.
         """)
 
-    def draw_line(self, pos1: tuple, pos2: tuple, *, thickness: int = 1,
+    def draw_line(self, start: tuple, end: tuple, *, thickness: int = 1,
                   color: Color = BLACK):
         """Draw a line from start to end on the canvas.
 
-        This method does nothing if color is None.
+        It doesn't matter which position is start and which position is
+        end. This method does nothing if color is None.
         """
         assert thickness > 0, "non-positive thickness %r" % (thickness,)
         if color is not None:
-            super().draw_line(pos1, pos2, thickness, color)
+            super().draw_line(start, end, thickness, color)
 
-    def draw_polygon(self, *positions, fillcolor: Color = None,
+    def draw_polygon(self, *corners, fillcolor: Color = None,
                      linecolor: Color = BLACK, linethickness: int = 1):
         """Draw a polygon.
 
         linecolor and fillcolor can be None.
         """
-        assert len(positions) > 2, "use draw_line"
+        assert len(corners) > 2, "use draw_line"
         assert linethickness > 0, \
             "non-positive linethickness %r" % (linethickness,)
-        super().draw_polygon(*positions, fillcolor=fillcolor,
-                             linecolor=linecolor, linethickness=linethickness)
+        if fillcolor is not None or linecolor is not None:
+            super().draw_polygon(
+                *corners, fillcolor=fillcolor,
+                linecolor=linecolor, linethickness=linethickness)
 
-    def draw_oval(self, centerpos: tuple, xradius: int, yradius: int, *,
+    def draw_oval(self, center: tuple, xradius: int, yradius: int, *,
                   fillcolor: Color = None, linecolor: Color = BLACK,
                   linethickness: int = 1):
         """Draw an oval on the canvas.
@@ -68,7 +71,7 @@ class Canvas(_base.Canvas, Child):
         assert yradius > 0, "non-positive yradius %r" % (yradius,)
         assert linethickness > 0, \
             "non-positive line thickness %r" % (linethickness,)
-        super().draw_oval(centerpos, xradius, yradius, fillcolor,
+        super().draw_oval(center, xradius, yradius, fillcolor,
                           linecolor, linethickness)
 
     def draw_circle(self, center: tuple, radius: int, **kwargs):
