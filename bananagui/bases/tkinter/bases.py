@@ -89,7 +89,15 @@ class _ToolTip(ToolTipBase):
 
 
 class Widget:
-    pass
+
+    def __init__(self):
+        super().__init__()
+        self.__tooltip = None
+
+    def _bananagui_set_tooltip(self, tooltip):
+        if self.__tooltip is None and tooltip is not None:
+            self.__tooltip = _ToolTip(self['real_widget'])
+        self.__tooltip.text = tooltip
 
 
 class Parent:
@@ -108,7 +116,6 @@ class Child:
 
     def __init__(self):
         super().__init__()
-        self.__tooltip = None
         self._bananagui_tkinter_packed = False  # See also layouts.py.
 
     def _bananagui_set_expand(self, expand):
@@ -130,11 +137,6 @@ class Child:
                 # It's something else.
                 pack_kwargs['expand'] = (expand == (True, True))
             self['real_widget'].pack(**pack_kwargs)
-
-    def _bananagui_set_tooltip(self, tooltip):
-        if self.__tooltip is None and tooltip is not None:
-            self.__tooltip = _ToolTip(self['real_widget'])
-        self.__tooltip.text = tooltip
 
     def _bananagui_set_grayed_out(self, grayed_out):
         self['real_widget']['state'] = 'disable' if grayed_out else 'normal'

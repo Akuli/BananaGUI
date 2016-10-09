@@ -21,6 +21,7 @@
 
 """BananaGUI events and signals."""
 
+import collections
 import contextlib
 import functools
 import types
@@ -176,6 +177,31 @@ class Property:
             return self
         # This is invoked from an instance.
         return _PropertyWrapper(self, instance)
+
+    @classmethod
+    def filepath(cls, name, **kwargs):
+        """Create a property suitable for storing a path to a file."""
+        def check_filepath(filepath):
+            if filepath is not None:
+                assert os.path.isfile(filepath), \
+                    "%r is not a path to a file" % (filepath,)
+
+        # We can't use collections.ChainMap because it's new in
+        # Python 3.3.
+        real_kwargs = {'type': str, 'allow_none': True, 'default': None,
+                       'checker': check_filepath}
+        real_kwargs.update(kwargs)
+        return cls(**real_kwargs)
+
+    @classmethod
+    def imagepath(cls, name, **kwargs):
+        """Like filepath, but append a notice about filetypes to doc."""
+        kwargs['doc'] = kwargs['doc'].rstrip() + """
+
+        Supported filetypes depend on the GUI toolkit. I recommend using
+        `.png` and `.jpg` files because most GUI toolkits support them.
+        """
+        return cls.filepath(name, **kwargs)
 
 
 class Event(structures.NamespaceBase):

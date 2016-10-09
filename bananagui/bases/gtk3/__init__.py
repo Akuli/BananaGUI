@@ -3,9 +3,16 @@
 # flake8: noqa
 
 import gi
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gdk', '3.0')
 gi.require_version('GLib', '2.0')
+
+try:
+    gi.require_version('AppIndicator3', '0.1')
+    has_appindicator = True
+except ValueError:
+    has_appindicator = False
 
 from .bases import Widget, Parent, Child, Dummy
 from .buttons import BaseButton, Button, ImageButton

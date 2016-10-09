@@ -47,15 +47,6 @@ class Label(_base.Label, BaseLabel):
 @bananadoc
 class ImageLabel(_base.ImageLabel, BaseLabel):
     """A label that contains an image."""
-    imagepath = Property(
-        'imagepath', type=str, allow_none=True, default=None,
-        doc="""Path to an image file.
-
-        Supported filetypes depend on the GUI toolkit. I recommend using
-        `.png` and `.jpg` files because most GUI toolkits support them.
-        """)
-
-    def _bananagui_set_imagepath(self, path):
-        assert path is None or os.path.isfile(path), \
-            "%r is not a path to a file" % (path,)
-        super()._bananagui_set_imagepath(path)
+    imagepath = Property.imagepath(
+        'imagepath',
+        doc="Path to an image that will be displayed.")

@@ -12,6 +12,16 @@ except ImportError:
     from collections import Mapping
 
 
+class ListLikeBase:
+    """A base class that implements list-like methods.
+
+    Only append() and remove() methods will be called with super(). This
+    class implements everything else.
+
+    """
+    # TODO: better explanation in docstring.
+
+
 @Mapping.register
 class FrozenDict:
     """An immutable-ish dictionary-like object.

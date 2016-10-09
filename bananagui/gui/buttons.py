@@ -24,13 +24,9 @@ class Button(_base.Button, BaseButton):
 @bananadoc
 class ImageButton(_base.ImageButton, BaseButton):
     # TODO: The imagepath property is just like in labels.py.
-    imagepath = Property(
-        'imagepath', type=str, allow_none=True, default=None,
-        doc="""Path to an image file.
-
-        Supported filetypes depend on the GUI toolkit. I recommend using
-        `.png` and `.jpg` files because most GUI toolkits support them.
-        """)
+    imagepath = Property.imagepath(
+        'imagepath',
+        doc="Path to the image that will be displayed in the button.")
 
     def _bananagui_set_imagepath(self, path):
         assert path is None or os.path.isfile(path), \

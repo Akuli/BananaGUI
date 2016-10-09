@@ -34,6 +34,12 @@ class Widget(_base.Widget, BananaObject):
     real_widget = Property(
         'real_widget', settable=False,
         doc="The real GUI toolkit's widget that BananaGUI uses.")
+    tooltip = Property(
+        'tooltip', type=str, allow_none=True, default=None,
+        doc="""Text in the widget's tooltip.
+
+        This is None if the widget doesn't have a tooltip.
+        """)
 
 
 @baseclass
@@ -50,11 +56,6 @@ class Child(_base.Child, Widget):
     Children take a parent argument on initialization. The parent
     property can be used to retrieve it, but the parent cannot be
     changed afterwards.
-
-    Properties:
-
-        expand          RW
-            Two-tuple of horizontal and vertical expanding.
     """
 
     parent = Property('parent', type=Parent, settable=False,
@@ -98,12 +99,6 @@ class Child(_base.Child, Widget):
     grayed_out = Property(
         'grayed_out', type=bool, default=False,
         doc="True if the widget is grayed out, False otherwise.")
-    tooltip = Property(
-        'tooltip', type=str, allow_none=True, default=None,
-        doc="""Text in the widget's tooltip.
-
-        This is None if the widget doesn't have a tooltip.
-        """)
 
     def __init__(self, parent: Parent):
         super().__init__()
@@ -112,4 +107,8 @@ class Child(_base.Child, Widget):
 
 @bananadoc
 class Dummy(_base.Dummy, Child):
-    """An empty widget."""
+    """An empty widget.
+
+    This is useful for creating layouts with empty space that must be
+    filled with something.
+    """
