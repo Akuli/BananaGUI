@@ -25,12 +25,9 @@ from bananagui import gui
 
 
 def main():
-    with gui.Window() as window:
-        label = gui.Label(window)
-        label['text'] = "Hello World!"
-        label['expand'] = (True, True)
+    with gui.Window(title="Hello World!") as window:
+        label = gui.Label(window, text="Hello World!")
         window['child'] = label
-        window['title'] = "Hello World"
         window.destroyed.changed.connect(gui.quit)
         gui.main()
 

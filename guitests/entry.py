@@ -39,7 +39,8 @@ def select_all(event, entry):
 
 
 def main():
-    with gui.Window() as window:
+    with gui.Window(title="Entry test", size=(200, 50),
+                    resizable=False) as window:
         vbox = gui.VBox(window)
         window['child'] = vbox
 
@@ -49,24 +50,18 @@ def main():
         hbox = gui.HBox(vbox)
         vbox.append(hbox)
 
-        printbutton = gui.Button(hbox)
-        printbutton['text'] = "Print it"
+        printbutton = gui.Button(hbox, text="Print it")
         printbutton.on_click.connect(on_click, entry)
         hbox.append(printbutton)
 
-        selectallbutton = gui.Button(hbox)
-        selectallbutton['text'] = "Select all"
+        selectallbutton = gui.Button(hbox, text="Select all")
         selectallbutton.on_click.connect(select_all, entry)
         hbox.append(selectallbutton)
 
-        checkbox = gui.Checkbox(hbox)
-        checkbox['text'] = "Read only"
+        checkbox = gui.Checkbox(hbox, text="Read only")
         checkbox.checked.changed.connect(on_check, entry)
         hbox.append(checkbox)
 
-        window['title'] = "Entry test"
-        window['size'] = (200, 50)
-        window['resizable'] = False
         window.destroyed.changed.connect(gui.quit)
         gui.main()
 

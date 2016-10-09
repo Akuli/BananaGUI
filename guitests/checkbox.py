@@ -28,12 +28,11 @@ from bananagui import gui
 
 class CheckboxWindow(gui.Window):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        checkbox = gui.Checkbox(self)
-        checkbox['text'] = "Check me!"
-        checkbox['checked.changed'].append(self.on_check)
+        checkbox = gui.Checkbox(self, text="Click me!")
+        checkbox.checked.changed.connect(self.on_check)
         self['child'] = checkbox
 
     def on_check(self, event):
@@ -46,12 +45,10 @@ class CheckboxWindow(gui.Window):
 
 
 def main():
-    with CheckboxWindow() as window:
-        window['title'] = "Checkbox test"
-        window['size'] = (200, 50)
-        window['resizable'] = False
-        window['destroyed.changed'].append(gui.MainLoop.quit)
-        sys.exit(gui.MainLoop.run())
+    with CheckboxWindow(title="Checkbox test", size=(200, 50),
+                        resizable=False) as window:
+        window.destroyed.changed.connect(gui.quit)
+        gui.main()
 
 
 if __name__ == '__main__':

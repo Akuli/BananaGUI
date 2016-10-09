@@ -34,14 +34,12 @@ class TextViewWindow(gui.Window):
         box = gui.VBox(self)
         self['child'] = box
 
-        self.textview = gui.PlainTextView(box)
-        self.textview['text'] = "Enter something..."
-        self.textview['text.changed'].append(self.text_changed)
-        box.add_start(self.textview, expand=True)
+        self.textview = gui.PlainTextView(box, text="Enter something...")
+        self.textview.text.changed.connect(self.text_changed)
+        box.append(self.textview)
 
-        button = gui.Button(box)
-        button['text'] = "Click me"
-        button['on_click'].append(self.on_click)
+        button = gui.Button(box, text="Click me", expand=(False, False))
+        button.on_click.connect(self.on_click)
         box.add_start(button)
 
     def text_changed(self, event):
@@ -53,11 +51,10 @@ class TextViewWindow(gui.Window):
 
 
 def main():
-    with TextViewWindow() as window:
-        window['title'] = "Textview test"
-        window['minimum_size'] = (300, 200)
-        window['destroyed.changed'].append(gui.MainLoop.stop)
-        sys.exit(gui.MainLoop.run())
+    with TextViewWindow(title="Textview test",
+                        minimum_size=(300, 200)) as window:
+        window.destroyed.changed.connect(gui.quit)
+        gui.main()
 
 
 if __name__ == '__main__':

@@ -4,9 +4,8 @@ from bananagui import color, gui
 
 
 def main():
-    with gui.Window() as window:
-        canvas = gui.Canvas(window)
-        canvas['size'] = (400, 400)
+    with gui.Window(title="Canvas test") as window:
+        canvas = gui.Canvas(window, size=(400, 400))
         window['child'] = canvas
 
         canvas.draw_line((100, 100), (200, 100))
@@ -18,10 +17,7 @@ def main():
         canvas.draw_circle((300, 300), 50, fillcolor=color.ORANGE,
                            linecolor=color.RED, linethickness=10)
 
-        canvas['expand'] = (True, True)
-
-        window['title'] = "Canvas test"
-        window['destroyed.changed'].append(gui.quit)
+        window.destroyed.changed.connect(gui.quit)
         sys.exit(gui.main())
 
 
