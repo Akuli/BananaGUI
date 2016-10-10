@@ -32,8 +32,7 @@ from .bases import Child
 class Checkbox(_base.Checkbox, Child):
     """A widget that can be checked.
 
-    Note that the Checkbox class has nothing to do with BoxBase, HBox
-    and VBox.
+    The Checkbox widget has nothing to do with the Box widget.
     """
 
     text = Property('text', type=str, default='',

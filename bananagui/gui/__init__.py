@@ -14,7 +14,7 @@ from .bases import Widget, Parent, Child, Dummy
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .checkbox import Checkbox
-from .containers import Bin, Box, HBox, VBox
+from .containers import Bin, Box
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
 from .spinner import Spinner

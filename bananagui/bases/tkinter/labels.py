@@ -28,7 +28,7 @@ class BaseLabel:
 
     def __init__(self, parent, **kwargs):
         self.real_widget.raw_set(tk.Label(parent['real_widget']))
-        super().__init__(parent)
+        super().__init__(parent, **kwargs)
 
 
 class Label:

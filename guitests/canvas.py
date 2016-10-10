@@ -6,7 +6,7 @@ from bananagui import gui
 
 def main():
     with gui.Window(title="Canvas test") as window:
-        canvas = gui.Canvas(window, size=(400, 400))
+        canvas = gui.Canvas(window, minimum_size=(400, 400))
         window['child'] = canvas
 
         canvas.draw_line((100, 100), (200, 100))

@@ -3,7 +3,7 @@ from .bases import Child
 
 
 try:
-    _SpinnerBase = _base._SpinnerBase
+    _SpinnerBase = _base.Spinner
 except AttributeError:
     # The base doesn't provide a spinner. We need to create one using
     # other widgets.

@@ -25,7 +25,7 @@
 
 from bananagui import _base, Property, bananadoc
 from bananagui.utils import baseclass, common_beginning, ListLikeBase
-from .bases import Parent, Child
+from .bases import _Oriented, Parent, Child
 
 
 # This is not a Child because Window and Dialog are based on this.
@@ -49,7 +49,7 @@ class Bin(_base.Bin, Parent):
 
 
 class _BoxBase:
-    """A base class for Box."""
+    """A base class for implementing Box's list-like behavior."""
 
     children = Property(
         'children', type=tuple, default=(),
@@ -73,9 +73,8 @@ class _BoxBase:
             super().append(child)
 
 
-@baseclass
 @bananadoc
-class Box(ListLikeBase, _BoxBase, _base.Box, Parent, Child):
+class Box(_Oriented, ListLikeBase, _BoxBase, _base.Box, Parent, Child):
     """A widget that contains other widgets in a row.
 
     Boxes can be indexed and sliced like lists to modify their children,
@@ -84,13 +83,3 @@ class Box(ListLikeBase, _BoxBase, _base.Box, Parent, Child):
     BananaGUI object. You can also set the value of the children
     property directly, it's a tuple of children.
     """
-
-
-@bananadoc
-class HBox(_base.HBox, Box):
-    """A horizontal box."""
-
-
-@bananadoc
-class VBox(_base.VBox, Box):
-    """A vertical box."""

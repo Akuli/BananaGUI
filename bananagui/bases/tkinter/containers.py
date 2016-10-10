@@ -21,6 +21,8 @@
 
 import tkinter as tk
 
+from bananagui import HORIZONTAL, VERTICAL
+
 
 class Bin:
 
@@ -41,6 +43,13 @@ _tkinter_fills = {
     (False, True): 'y',
     (False, False): 'none',
 }
+_appendsides = {
+    # Appending to a box adds a child to the beginning of the box, and
+    # then the next child towards the center from the first child and
+    # so on.
+    HORIZONTAL: 'left',
+    VERTICAL: 'top',
+}
 
 
 class Box:
@@ -51,7 +60,7 @@ class Box:
 
     def append(self, child):
         child['real_widget'].pack(
-            side=self._bananagui_tkinter_appendside,
+            side=_appendsides[self['orientation']],
             fill=_tkinter_fills[child['expand']],
         )
         child._bananagui_tkinter_packed = True
@@ -63,17 +72,3 @@ class Box:
     def remove(self, child):
         child['real_widget'].pack_forget()
         child._bananagui_tkinter_packed = False
-
-
-class HBox:
-    _bananagui_tkinter_orientation = 'h'
-    # Appending to a box adds a child to the beginning of the box, and
-    # then the next child towards the center from the first child and
-    # so on.
-    _bananagui_tkinter_appendside = 'left'
-
-
-class VBox:
-
-    _bananagui_tkinter_orientation = 'v'
-    _bananagui_tkinter_appendside = 'top'

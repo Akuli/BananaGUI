@@ -21,7 +21,9 @@
 
 """Base classes for various widgets."""
 
-from bananagui import _base, bananadoc, Color, Property, BananaObject
+from bananagui import (
+    _base, bananadoc, Color, Property, BananaObject,
+    HORIZONTAL, VERTICAL)
 from bananagui.utils import baseclass
 
 
@@ -108,6 +110,47 @@ class Child(_base.Child, Widget):
     def __init__(self, parent: Parent, **kwargs):
         self.parent.raw_set(parent)
         super().__init__(**kwargs)
+
+
+@baseclass
+@bananadoc
+class _Oriented:
+    """Implement an orientation property and handy class methods.
+
+    There are many ways to create instances of _Oriented widgets. For
+    example, all of these are valid ways to create a horizontal widget:
+
+        SomeWidget.horizontal(...)
+        SomeWidget(..., orientation='h')
+        SomeWidget(..., orientation=bananagui.HORIZONTAL)
+    """
+
+    orientation = Property(
+        'orientation', settable=False,
+        doc="""This is bananagui.HORIZONTAL or bananagui.VERTICAL.
+
+        This is set with the last positional argument on initialization
+        and cannot be changed afterwards.
+        """)
+
+    def __init__(self, *args, **kwargs):
+        *args, orientation = args
+        if orientation not in {HORIZONTAL, VERTICAL}:
+            raise ValueError("unknown orientation %r" % (orientation,))
+        self.orientation.raw_set(orientation)
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def horizontal(cls, *args, **kwargs):
+        """Create a new horizontal instance."""
+        args += (HORIZONTAL,)
+        return cls(*args, **kwargs)
+
+    @classmethod
+    def vertical(cls, *args, **kwargs):
+        """Create a new vertical instance"""
+        args += (VERTICAL,)
+        return cls(*args, **kwargs)
 
 
 @bananadoc

@@ -4,8 +4,6 @@ from gi.repository import Gtk
 class Widget:
 
     def __init__(self, **kwargs):
-        widget = self['real_widget']
-
         # I have no idea why GTK+ makes changing the background color in
         # a non-deprecated (not-removed) way such a pain.
         self.__css = {}
@@ -13,7 +11,6 @@ class Widget:
         context = self['real_widget'].get_style_context()
         context.add_provider(self.__provider,
                              Gtk.STYLE_PROVIDER_PRIORITY_USER)
-
         super().__init__(**kwargs)
 
     def __update_css(self):

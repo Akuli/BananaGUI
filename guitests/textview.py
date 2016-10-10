@@ -31,22 +31,32 @@ class TextviewWindow(gui.Window):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        box = gui.VBox(self)
-        self['child'] = box
+        bigbox = gui.Box.vertical(self)
+        self['child'] = bigbox
 
-        self.textview = gui.PlainTextView(box, text="Enter something...")
+        self.textview = gui.PlainTextView(bigbox, text="Enter something...")
         self.textview['text.changed'].append(self.text_changed)
-        box.append(self.textview)
+        bigbox.append(self.textview)
 
-        button = gui.Button(box, text="Click me", expand=(False, False),
-                            on_click=[self.on_click])
-        box.append(button)
+        buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
+        bigbox.append(buttonbox)
+
+        insertbutton = gui.Button(buttonbox, text="Insert text",
+                                  on_click=[self.insert_text])
+        buttonbox.append(insertbutton)
+
+        clearbutton = gui.Button(buttonbox, text="Clear",
+                                 on_click=[self.clear])
+        buttonbox.append(clearbutton)
 
     def text_changed(self, event):
         print(event.new_value)
 
-    def on_click(self, event):
+    def insert_text(self, event):
         self.textview.append_text(" Click!")
+
+    def clear(self, event):
+        self.textview.clear()
 
 
 def main():

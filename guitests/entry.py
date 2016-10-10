@@ -29,30 +29,31 @@ class EntryWindow(gui.Window):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        vbox = gui.VBox(self)
-        self['child'] = vbox
+        bigbox = gui.Box.vertical(self)
+        self['child'] = bigbox
 
         # This is attached to self because we need it in other methods.
-        self.entry = gui.Entry(vbox, expand=(True, False))
-        vbox.append(self.entry)
+        self.entry = gui.Entry(bigbox, text="Enter something...",
+                               expand=(True, False))
+        bigbox.append(self.entry)
 
-        dummy = gui.Dummy(vbox)
-        vbox.append(dummy)
+        dummy = gui.Dummy(bigbox)
+        bigbox.append(dummy)
 
-        hbox = gui.HBox(vbox, expand=(True, False))
-        vbox.append(hbox)
+        buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
+        bigbox.append(buttonbox)
 
-        printbutton = gui.Button(hbox, text="Print it!",
+        printbutton = gui.Button(buttonbox, text="Print it!",
                                  on_click=[self.print_it])
-        hbox.append(printbutton)
+        buttonbox.append(printbutton)
 
-        selectallbutton = gui.Button(hbox, text="Select all",
+        selectallbutton = gui.Button(buttonbox, text="Select all",
                                      on_click=[self.select_all])
-        hbox.append(selectallbutton)
+        buttonbox.append(selectallbutton)
 
-        checkbox = gui.Checkbox(hbox, text="Read only")
+        checkbox = gui.Checkbox(buttonbox, text="Read only")
         checkbox['checked.changed'].append(self.read_only_toggled)
-        hbox.append(checkbox)
+        buttonbox.append(checkbox)
 
     def print_it(self, event):
         print(self.entry['text'])
@@ -65,7 +66,7 @@ class EntryWindow(gui.Window):
 
 
 def main():
-    with EntryWindow(title="Entry test", size=(200, 50)) as window:
+    with EntryWindow(title="Entry test", size=(250, 100)) as window:
         window['destroyed.changed'].append(gui.quit)
         gui.main()
 

@@ -38,6 +38,9 @@ import warnings
 #       |                              |
 #       |                              |
 #       `------------------------------'
+#
+#       I have managed to create nice tooltips with tkinter, now I just
+#       need to move my code here.
 _has_tooltips = True
 try:
     from idlelib.ToolTip import ToolTipBase
@@ -49,7 +52,8 @@ except ImportError:
         ToolTipBase = object
         _has_tooltips = False
 
-from .containers import HBox, VBox  # noqa
+from bananagui import HORIZONTAL, VERTICAL
+from .containers import Box
 
 
 class _ToolTip(ToolTipBase):
@@ -110,6 +114,10 @@ _tkinter_fills = {
     (False, True): 'y',
     (False, False): 'none',
 }
+_expand_indexes = {
+    HORIZONTAL: 0,
+    VERTICAL: 1,
+}
 
 
 class Child:
@@ -124,17 +132,11 @@ class Child:
             # sure that the pack options are changed when the expand is
             # changed.
             pack_kwargs = {'fill': _tkinter_fills[expand]}
-            box_orientation = getattr(self['parent'],
-                                      '_bananagui_tkinter_orientation',
-                                      None)
-            if box_orientation == 'h':
-                # It's a HBox.
-                pack_kwargs['expand'] = expand[0]
-            elif box_orientation == 'v':
-                # It's a VBox.
-                pack_kwargs['expand'] = expand[1]
+            if isinstance(self['parent'], Box):
+                index = _expand_indexes[self['parent']['orientation']]
+                pack_kwargs['expand'] = expand[index]
             else:
-                # It's something else.
+                # It's not a box. We need a default value.
                 pack_kwargs['expand'] = (expand == (True, True))
             self['real_widget'].pack(**pack_kwargs)
 

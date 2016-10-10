@@ -74,9 +74,11 @@ class PlainTextView(_base.PlainTextView, TextBase):
     def clear(self):
         """Remove everything from the textview."""
         super().clear()
-        self.text.raw_set('')
+        # The GUI toolkit's callback updates the text property
+        # automatically.
 
     def append_text(self, text: str):
         """Add text to the end of what is already in the text widget."""
         super().append_text(text)
-        self.text.raw_set(self['text'] + text)
+        # The GUI toolkit's callback updates the text property
+        # automatically.

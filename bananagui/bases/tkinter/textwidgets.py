@@ -65,7 +65,7 @@ class PlainTextView:
         # shrinking when needed.
         widget = tk.Text(parent['real_widget'], width=1, height=1)
         widget.bind('<<Modified>>', self.__edit_modified)
-        self.raw_set('real_widget', widget)
+        self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
     def select_all(self):
@@ -76,7 +76,7 @@ class PlainTextView:
 
     def __edit_modified(self, event):
         """Update the widget's text property."""
-        self.raw_set('text', event.widget.get(0.0, 'end-1c'))
+        self.text.raw_set(event.widget.get(0.0, 'end-1c'))
 
         # This function will be called twice if the event is not unbound
         # first.

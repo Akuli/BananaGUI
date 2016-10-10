@@ -8,13 +8,13 @@ class SpinnerWindow(gui.Window):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        mainbox = gui.VBox(self)
+        mainbox = gui.Box.vertical(self)
         self['child'] = mainbox
 
         self.spinner = gui.Spinner(mainbox)
         mainbox.append(self.spinner)
 
-        buttonbox = gui.HBox(mainbox, expand=(True, False))
+        buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
         mainbox.append(buttonbox)
 
         startbutton = gui.Button(buttonbox, text="Start",

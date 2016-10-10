@@ -39,6 +39,11 @@ from bananagui.structures import Color, Font, FrozenDict
 from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
 
 
+# These constants can be used with these variables or with their values
+# directly.
+HORIZONTAL = 'h'
+VERTICAL = 'v'
+
 # TODO: Add a BROWN.
 BLACK = Color(0, 0, 0)
 GRAY = Color(127, 127, 127)
