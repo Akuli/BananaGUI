@@ -11,6 +11,11 @@ except AttributeError:
 
 
 class Spinner(_SpinnerBase, Child):
+    """A spinner widget.
+
+    The spinner doesn't spin by default. You can set the spinning
+    property to True to make it spin.
+    """
 
     spinning = Property(
         'spinning', type=bool, default=False,

@@ -61,9 +61,10 @@ class Spinner:
                      y * diameter // 5 + height // 2)
             end = (x * diameter // 2 + width // 2,
                    y * diameter // 2 + height // 2)
-            self.__widget.draw_line(
-                start, end, thickness=diameter//10,
-                color=Color(brightness, brightness, brightness))
+            thickness = max(diameter // 10, 1)
+            color = Color(brightness, brightness, brightness)
+            self.__widget.draw_line(start, end, thickness=thickness,
+                                    color=color)
 
         # Keep spinning.
         return RUN_AGAIN

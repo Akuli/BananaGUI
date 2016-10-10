@@ -33,8 +33,7 @@ class SpinnerWindow(gui.Window):
 
 
 def main():
-    with SpinnerWindow(title="Spinner window",
-                       minimum_size=(200, 150)) as window:
+    with SpinnerWindow(title="Spinner window") as window:
         window['destroyed.changed'].append(gui.quit)
         gui.main()
 
