@@ -1,6 +1,4 @@
-import bananagui
 import collections
-import contextlib
 import math
 
 # We can only import modules from bananagui.gui because this file can be
