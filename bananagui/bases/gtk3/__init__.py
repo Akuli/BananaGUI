@@ -21,6 +21,7 @@ from .checkbox import Checkbox
 from .containers import Bin, Box
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
+from .separator import Separator
 from .spinner import Spinner
 from .textwidgets import TextBase, Entry, PlainTextView
 from .trayicon import TrayIcon
