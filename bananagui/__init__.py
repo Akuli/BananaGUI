@@ -44,6 +44,10 @@ from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
 HORIZONTAL = 'h'
 VERTICAL = 'v'
 
+# This is not 1 because returning True or False from a callback must not
+# be allowed.
+RUN_AGAIN = 2
+
 # TODO: Add a BROWN.
 BLACK = Color(0, 0, 0)
 GRAY = Color(127, 127, 127)

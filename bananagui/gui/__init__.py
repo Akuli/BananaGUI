@@ -31,7 +31,7 @@ from .windows import (
 # Some things in this module aren't actually GUI widgets but other
 # things that GUI toolkits like to provide.
 from .clipboard import set_clipboard_text, get_clipboard_text
-from .timeouts import RUN_AGAIN, add_timeout
+from .timeouts import add_timeout
 
 # Initialize the GUI.
 init()
