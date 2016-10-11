@@ -32,15 +32,12 @@ from bananagui.utils import baseclass
 class Widget(_base.Widget, BananaObject):
     """A widget baseclass."""
 
+    # The tooltip property is not implemented here. Parent widgets don't
+    # need tooltips because they should be always filled with Dummy
+    # widgets.
     real_widget = Property(
         'real_widget', settable=False,
         doc="The real GUI toolkit's widget that BananaGUI uses.")
-    tooltip = Property(
-        'tooltip', type=str, allow_none=True, default=None,
-        doc="""Text in the widget's tooltip.
-
-        This is None if the widget doesn't have a tooltip.
-        """)
     background = Property(
         'background', type=Color, allow_none=True, default=None,
         doc="""The widget's background.
@@ -67,6 +64,12 @@ class Child(_base.Child, Widget):
 
     parent = Property('parent', type=Parent, settable=False,
                       doc="The parent set on initialization.")
+    tooltip = Property(
+        'tooltip', type=str, allow_none=True, default=None,
+        doc="""Text in the widget's tooltip.
+
+        This is None if the widget doesn't have a tooltip.
+        """)
     expand = Property(
         'expand', pair=True, type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.

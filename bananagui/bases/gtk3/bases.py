@@ -20,9 +20,6 @@ class Widget:
         css = '* { %s }' % ' '.join(words)
         self.__provider.load_from_data(css.encode('utf-8'))
 
-    def _bananagui_set_tooltip(self, tooltip):
-        self['real_widget'].set_tooltip_text(tooltip)
-
     def _bananagui_set_background(self, color):
         if color is None:
             try:
@@ -47,6 +44,9 @@ class Child:
 
     def _bananagui_set_grayed_out(self, grayed_out):
         self['real_widget'].set_sensitive(not grayed_out)
+
+    def _bananagui_set_tooltip(self, tooltip):
+        self['real_widget'].set_tooltip_text(tooltip)
 
 
 class Dummy:

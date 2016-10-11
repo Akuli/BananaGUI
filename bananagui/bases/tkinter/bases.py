@@ -22,86 +22,81 @@
 import tkinter as tk
 import warnings
 
-# TODO: Implement better tooltips and stop relying on idlelib.
-#       idlelib's tooltips fail when there are two widgets inside each
-#       other. This window would display two tooltips if I would move
-#       the mouse first on the window but outside the button, wait for a
-#       tooltip and then move the mouse on the button:
-#
-#       ,------------------------------.
-#       |                  | _ |[o]| X |
-#       |------------------------------|
-#       |         ,----------.         |
-#       |         |  Button  |         |
-#       |         `----------'         |
-#       |                              |
-#       |                              |
-#       |                              |
-#       `------------------------------'
-#
-#       I have managed to create nice tooltips with tkinter, now I just
-#       need to move my code here.
-_has_tooltips = True
-try:
-    from idlelib.ToolTip import ToolTipBase
-except ImportError:
-    try:
-        # Maybe idlelib's modules will be renamed later?
-        from idlelib.tooltip import ToolTipBase
-    except ImportError:
-        ToolTipBase = object
-        _has_tooltips = False
-
 from bananagui import HORIZONTAL, VERTICAL
 from .containers import Box
 
 
-class _ToolTip(ToolTipBase):
-    """Tooltips for tkinter using idlelib.
+class _TooltipBase:
+    """Tooltips for tkinter.
 
-    http://stackoverflow.com/a/30021542
+    This has nothing to do with idlelib.ToolTip. I didn't copy-paste
+    this from idlelib and I didn't read idlelib's tooltip.py when I
+    wrote this.
     """
 
-    def __init__(self, widget):
-        """Initialize the tooltip.
+    # This should never contain more than one window at a time, but we
+    # allow multiple windows to make sure nothing breaks if we have
+    # multiple tipwindows at the same time for some reason.
+    __tipwindows = set()
 
-        By default, this doesn't do anything. Set the text attribute
-        to a string to display a tooltip.
-        """
-        if _has_tooltips:
-            super().__init__(widget)
-        else:
-            warnings.warn("idlelib is required to display tkinter tooltips")
-        self.text = None
+    def __init__(self, *args, **kwargs):
+        self.__got_mouse = False
+        self['real_widget'].bind('<Enter>', self.__enter)
+        self['real_widget'].bind('<Leave>', self.__leave)
+        self['real_widget'].bind('<Motion>', self.__motion)
+        super().__init__(*args, **kwargs)
 
-    def showcontents(self):
-        """Show the tooltip."""
-        if self.text is not None and _has_tooltips:
-            # With my dark GTK+ theme, the original showcontents
-            # creates light text on a light background. This
-            # always creates black text on a white background.
-            label = tk.Label(
-                self.tipwindow,
-                text=self.text,
-                # justify='left',
-                foreground='black',
-                background='white',
-                # relief='solid',
-                # borderwidth=1,
-            )
+    def __destroy_tipwindows(self, event=None):
+        while self.__tipwindows:
+            tipwindow = self.__tipwindows.pop()
+            tipwindow.destroy()
+
+    def __enter(self, event):
+        if event.widget is not self['real_widget']:
+            # For some reason, toplevels get also notified of their
+            # childrens' events.
+            return
+        self.__destroy_tipwindows()
+        self.__got_mouse = True
+        event.widget.after(1000, self.__show)
+
+    def __leave(self, event):
+        if event.widget is not self['real_widget']:
+            return
+        self.__destroy_tipwindows()
+        self.__got_mouse = False
+
+    def __motion(self, event):
+        self.__mousex = event.x_root
+        self.__mousey = event.y_root
+
+    def __show(self):
+        if not self.__got_mouse:
+            return
+        self.__destroy_tipwindows()
+        if self['tooltip'] is not None:
+            tipwindow = tk.Toplevel()
+            tipwindow.geometry('+%d+%d' % (self.__mousex+10, self.__mousey-10))
+            tipwindow.bind('<Motion>', self.__destroy_tipwindows)
+            tipwindow.overrideredirect(True)
+            self.__tipwindows.add(tipwindow)
+
+            # If you modify this, make sure to always define either no
+            # colors at all or both foreground and background. Otherwise
+            # the label will have light text on a light background or
+            # dark text on a dark background on some systems.
+            label = tk.Label(tipwindow, text=self['tooltip'],
+                             fg='black', bg='white')
             label.pack()
+
+    def _bananagui_set_tooltip(self, tooltip):
+        # This needs to be defined, but it doesn't need to do anything
+        # because the new tooltip is avaliable as self['tooltip'].
+        pass
 
 
 class Widget:
-
-    def __init__(self, **kwargs):
-        self.__tooltip = None
-        super().__init__(**kwargs)
-
-    def _bananagui_set_tooltip(self, tooltip):
-        if self.__tooltip is None and tooltip is not None:
-            self.__tooltip = _ToolTip(self['real_widget'])
-        self.__tooltip.text = tooltip
+    pass
 
 
 class Parent:
@@ -120,7 +115,7 @@ _expand_indexes = {
 }
 
 
-class Child:
+class Child(_TooltipBase):
 
     def __init__(self, **kwargs):
         self._bananagui_tkinter_packed = False  # See also layouts.py.
