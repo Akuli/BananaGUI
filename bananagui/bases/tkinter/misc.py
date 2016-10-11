@@ -21,7 +21,7 @@
 
 import tkinter as tk
 
-from bananagui import Color
+from bananagui import Color, HORIZONTAL, VERTICAL
 
 
 class Checkbox:
@@ -56,3 +56,22 @@ class Checkbox:
 
     def _bananagui_set_checked(self, checked):
         self.__var.set(1 if checked else 0)
+
+
+class Dummy:
+
+    def __init__(self, parent, **kwargs):
+        self.real_widget.raw_set(tk.Frame(parent['real_widget']))
+        super().__init__(parent, **kwargs)
+
+
+class Separator:
+
+    def __init__(self, parent, **kwargs):
+        widget = tk.Frame(parent['real_widget'], border=1, relief='sunken')
+        if self['orientation'] == HORIZONTAL:
+            widget['height'] = 3
+        if self['orientation'] == VERTICAL:
+            widget['width'] = 3
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)

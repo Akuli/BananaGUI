@@ -137,10 +137,3 @@ class Child(_TooltipBase):
 
     def _bananagui_set_grayed_out(self, grayed_out):
         self['real_widget']['state'] = 'disable' if grayed_out else 'normal'
-
-
-class Dummy:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(tk.Frame(parent['real_widget']))
-        super().__init__(parent, **kwargs)

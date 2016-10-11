@@ -47,10 +47,3 @@ class Child:
 
     def _bananagui_set_tooltip(self, tooltip):
         self['real_widget'].set_tooltip_text(tooltip)
-
-
-class Dummy:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(Gtk.Label())
-        super().__init__(parent, **kwargs)

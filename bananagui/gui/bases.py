@@ -154,12 +154,3 @@ class _Oriented:
         """Create a new vertical instance"""
         args += (VERTICAL,)
         return cls(*args, **kwargs)
-
-
-@bananadoc
-class Dummy(_base.Dummy, Child):
-    """An empty widget.
-
-    This is useful for creating layouts with empty space that must be
-    filled with something.
-    """

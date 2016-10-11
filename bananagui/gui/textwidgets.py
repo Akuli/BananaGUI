@@ -53,6 +53,7 @@ class Entry(_base.Entry, TextBase):
         doc="True if the entry's content is hidden with asterisks or balls.")
 
 
+# TODO: text wrapping.
 @bananadoc
 class PlainTextView(_base.PlainTextView, TextBase):
     """A multiline text widget."""

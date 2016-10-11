@@ -14,15 +14,13 @@ try:
 except ValueError:
     has_appindicator = False
 
-from .bases import Widget, Parent, Child, Dummy
+from .bases import Widget, Parent, Child
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
-from .checkbox import Checkbox
 from .containers import Bin, Box
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
-from .separator import Separator
-from .spinner import Spinner
+from .misc import Checkbox, Dummy, Separator, Spinner
 from .textwidgets import TextBase, Entry, PlainTextView
 from .trayicon import TrayIcon
 from .windows import BaseWindow, Window, Dialog, messagedialog

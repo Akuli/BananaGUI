@@ -19,11 +19,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""A checkbox widget."""
+"""Checkbox, Separator and Spinner widgets."""
 
-from bananagui import _base, Property, bananadoc
-from .bases import Child
+from bananagui import _base, bananadoc, Property, HORIZONTAL, VERTICAL
+from .bases import _Oriented, Child
 
+try:
+    _SpinnerBase = _base.Spinner
+except AttributeError:
+    # The base doesn't provide a spinner. We need to create one using
+    # other widgets.
+    from bananagui.bases.defaults import Spinner as _SpinnerBase
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
@@ -40,3 +46,35 @@ class Checkbox(_base.Checkbox, Child):
     checked = Property(
         'checked', type=bool, default=False,
         doc="True if the box is currently checked, False if not.")
+
+
+@bananadoc
+class Dummy(_base.Dummy, Child):
+    """An empty widget.
+
+    This is useful for creating layouts with empty space that must be
+    filled with something.
+    """
+
+
+class Separator(_Oriented, _base.Separator, Child):
+
+    def __init__(self, parent, orientation, **kwargs):
+        # Make the separator expand by default.
+        if orientation == HORIZONTAL:
+            kwargs.setdefault('expand', (True, False))
+        if orientation == VERTICAL:
+            kwargs.setdefault('expand', (False, True))
+        super().__init__(parent, orientation, **kwargs)
+
+
+class Spinner(_SpinnerBase, Child):
+    """A spinner widget.
+
+    The spinner doesn't spin by default. You can set the spinning
+    property to True to make it spin.
+    """
+
+    spinning = Property(
+        'spinning', type=bool, default=False,
+        doc="True if the widget is currently spinning, False if not.")
