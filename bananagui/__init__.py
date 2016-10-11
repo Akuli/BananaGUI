@@ -71,7 +71,7 @@ def load(*args):
     they will be treated as relative to bananagui.bases. For example,
     '.tkinter' is equivalent to 'bananagui.bases.tkinter'.
 
-    If multiple wrappers are given, attempt to load each one until
+    If multiple base modules are given, attempt to load each one until
     loading one of them succeeds. You can import bananagui.gui after
     calling this.
     """
