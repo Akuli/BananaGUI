@@ -25,9 +25,9 @@ This file sets up a BananaGUI base. If you use the -m option to run
 tests, this file will always be ran also.
 """
 
+import os
+
 import bananagui
 
 
-# Change this to load a different base.
-bananagui.load('.tkinter')
-#bananagui.load('.gtk3')
+bananagui.load(os.environ.get('base', '.tkinter'))
