@@ -40,14 +40,3 @@ class Window:
     def __init__(self, **kwargs):
         self.real_widget.raw_set(Gtk.Window())
         super().__init__(**kwargs)
-
-
-class Dialog:
-
-    def __init__(self, parentwindow, **kwargs):
-        self.real_widget.raw_set(Gtk.Dialog(parentwindow['real_widget']))
-        super().__init__(**kwargs)
-
-
-def messagedialog(icon, parentwindow, text, title, buttons, defaultbutton):
-    raise NotImplementedError  # TODO

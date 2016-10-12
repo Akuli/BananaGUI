@@ -19,12 +19,12 @@ from .mainloop import init, main, quit
 from .misc import Checkbox, Dummy, Separator, Spinner
 from .textwidgets import TextBase, Entry, PlainTextView
 from .trayicon import TrayIcon
+from .window import BaseWindow, Window
 
 # Bases don't need to provide infodialog, questiondialog, warningdialog
-# or errordialog. See windows.py for more info.
-from .windows import (
-    BaseWindow, Window, Dialog, messagedialog,
-    infodialog, questiondialog, warningdialog, errordialog)
+# or errordialog. See also dialogs.py.
+from .dialogs import (
+    Dialog, infodialog, questiondialog, warningdialog, errordialog)
 
 # Some things in this module aren't actually GUI widgets but other
 # things that GUI toolkits like to provide.

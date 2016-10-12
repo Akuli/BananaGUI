@@ -24,77 +24,13 @@
 from functools import partial
 from gettext import gettext as _
 
-from bananagui import _base, Property, bananadoc
-from bananagui.utils import baseclass
-from .containers import Bin
+from bananagui import _base, bananadoc, Color, Font, Property, BLACK
+from .window import BaseWindow, Window
 
-
-@baseclass
-@bananadoc
-class BaseWindow(_base.BaseWindow, Bin):
-    """A window baseclass.
-
-    BananaGUI windows have a destroy() method, and it should be called
-    when you don't need the window anymore. The windows can also be used
-    as context managers, and the destroying will be done automatically:
-
-        with Window() as my_window:
-            ...
-    """
-    # There is no maximum_size because X doesn't support it. Tkinter
-    # implements it on X, but it does that by moving the window with a
-    # maximum size to the upper left corner when it's maximized.
-
-    resizable = Property('resizable', type=bool, default=True,
-                         doc="True if the window can be resized.")
-    size = Property('size', pair=True, type=int, minimum=1, default=(200, 200),
-                    doc="Two-tuple of the window's current width and height.")
-    minimum_size = Property(
-        'minimum_size', default=None, pair=True, type=int, minimum=1,
-        allow_none=True,
-        doc="""Two-tuple of minimum width and height or None.
-
-        The window cannot be resized to be smaller than this.
-        """)
-    showing = Property('showing', type=bool, default=True,
-                       doc="True if the window is visible.")
-    destroyed = Property(
-        'destroyed', type=bool, default=False, settable=False,
-        doc="True if the window has been destroyed.")
-
-    def __enter__(self):
-        """Return the window."""
-        return self
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        """Call self.destroy()."""
-        self.destroy()
-
-    def wait(self):
-        """Wait until the window is destroyed."""
-        super().wait()
-
-    def destroy(self):
-        """Destroy the window and set self['destroyed'] to True.
-
-        This can be called multiple times and it will do nothing after
-        the first call.
-        """
-        if not self['destroyed']:
-            super().destroy()
-            self.destroyed.raw_set(True)
-
-
-@bananadoc
-class Window(_base.Window, BaseWindow):
-    """A window that can have child windows.
-
-    The windows don't have a parent window. You can create multiple
-    windows like this.
-    """
-
-    title = Property('title', type=str, default="BananaGUI Window",
-                     doc="The title of the window.")
+try:
+    _fontdialog = _base.fontdialog
+except AttributeError:
+    from bananagui.bases.defaults import fontdialog as _fontdialog
 
 
 @bananadoc
@@ -117,7 +53,7 @@ class Dialog(_base.Dialog, BaseWindow):
         super().__init__(**kwargs)
 
 
-def messagedialog(icon, parentwindow: Window, text: str, *,
+def messagedialog(icon, parentwindow: Window, *, text: str,
                   title: str = None, buttons: list = None,
                   defaultbutton: str = None):
     """Display a message dialog.
@@ -161,3 +97,25 @@ infodialog = partial(messagedialog, 'info')
 questiondialog = partial(messagedialog, 'question')
 warningdialog = partial(messagedialog, 'warning')
 errordialog = partial(messagedialog, 'error')
+
+
+def colordialog(parentwindow: Window, *, default: Color = BLACK,
+                title: str = None):
+    """Ask a color from the user.
+
+    This returns the new color, or None if the user canceled the dialog.
+    """
+    if title is None:
+        title = parentwindow['title']
+    return _base.colordialog(parentwindow, default, title)
+
+
+def fontdialog(parentwindow: Window, *, default: Font,
+               title: str = None):
+    """Ask a font from the user.
+
+    This returns the new font, or None if the user canceled the dialog.
+    """
+    if title is None:
+        title = parentwindow['title']
+    return _fontdialog(parentwindow, default, title)

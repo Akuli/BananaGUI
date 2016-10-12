@@ -14,16 +14,20 @@ try:
 except ValueError:
     has_appindicator = False
 
+from gi.repository import Gtk
+_GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
+
 from .bases import Widget, Parent, Child
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .containers import Bin, Box
+from .dialogs import Dialog, messagedialog
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
 from .misc import Checkbox, Dummy, Separator, Spinner
 from .textwidgets import TextBase, Entry, PlainTextView
 from .trayicon import TrayIcon
-from .windows import BaseWindow, Window, Dialog, messagedialog
+from .window import BaseWindow, Window
 
 from .clipboard import set_clipboard_text, get_clipboard_text
 from .timeouts import add_timeout
