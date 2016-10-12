@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import colorchooser
 
-from bananagui import Color
+from .mainloop import _convert_color
 
 
 class Dialog:
@@ -22,4 +22,4 @@ def colordialog(parentwindow, color, title):
         parent=parentwindow['real_widget'])
     if result == (None, None):
         return None
-    return Color.from_hex(result[1])
+    return _convert_color(result[1])

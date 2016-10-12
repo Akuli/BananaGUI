@@ -21,7 +21,8 @@
 
 import tkinter as tk
 
-from bananagui import Color, HORIZONTAL, VERTICAL
+from bananagui import HORIZONTAL, VERTICAL
+from .mainloop import _convert_color
 
 
 class Checkbox:
@@ -34,16 +35,16 @@ class Checkbox:
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        box_bg = Color.from_hex(widget.cget('selectcolor'))
-        checkmark = Color.from_hex(widget.cget('fg'))
+        box_bg = _convert_color(widget['selectcolor'])
+        checkmark = _convert_color(widget['fg'])
         if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
-            widget.config(selectcolor='#ffffff')
+            widget['selectcolor'] = '#ffffff'
         if box_bg.brightness >= 0.5 and checkmark.brightness >= 0.5:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
-            widget.config(selectcolor='#000000')
+            widget['selectcolor'] = '#000000'
 
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
