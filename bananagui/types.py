@@ -134,12 +134,10 @@ class Property:
         this:
           - Make sure the property is settable.
           - Get the setter. It is the widget's attribute
-            _bananagui_set_<name of this property>.
-          - Run the checker. It should raise an exception if the value
-            is not correct.
+            _bananagui_set_<name of the property>.
+          - Call raw_set.
           - Call the setter with the widget and the converted value
             as arguments.
-          - Call self.raw_set.
         """
         if not self.settable:
             raise ValueError("the value of the BananaGUI %r %r cannot be set"
@@ -149,8 +147,10 @@ class Property:
         except AttributeError as e:
             raise NotImplementedError("no setter was defined for %r"
                                       % self.name) from e
-        setter(value)
+        # raw_set is called first because it will more likely raise an
+        # exception than the setter will.
         self.raw_set(widget, value)
+        setter(value)
 
     def get(self, widget):
         """Get the value of a BananaGUI property.
