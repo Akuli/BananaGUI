@@ -12,10 +12,9 @@ class DialogTestWindow(gui.Window):
 
         colorbutton = gui.Button(box, text="Choose a color...")
         colorbutton['on_click'].append(self.choose_color)
-        print(type(box).append)
         box.append(colorbutton)
 
-    def choose_color(self):
+    def choose_color(self, event):
         result = gui.colordialog(self, default=bananagui.RED,
                                  title="Choose a color")
         print(result)
