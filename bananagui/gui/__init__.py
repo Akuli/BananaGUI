@@ -16,7 +16,7 @@ from .canvas import Canvas
 from .containers import Bin, Box
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
-from .misc import Checkbox, Dummy, Separator, Spinner
+from .misc import Checkbox, Dummy, Separator, Spinner, get_font_families
 from .textwidgets import TextBase, Entry, PlainTextView
 from .trayicon import TrayIcon
 from .window import BaseWindow, Window

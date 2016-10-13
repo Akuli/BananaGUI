@@ -78,3 +78,14 @@ class Spinner(_SpinnerBase, Child):
     spinning = Property(
         'spinning', type=bool, default=False,
         doc="True if the widget is currently spinning, False if not.")
+
+
+def get_font_families() -> list:
+    """Return a list of all avaliable font families.
+
+    The list never contains duplicates, but there's no guarantees about
+    its order.
+    """
+    # This is converted to a set first to make sure that we don't get
+    # any duplicates. The base function can return any iterable.
+    return list(set(_base.get_font_families()))

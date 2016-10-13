@@ -20,7 +20,6 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tkinter as tk
-import warnings
 
 from bananagui import HORIZONTAL, VERTICAL
 from .containers import Box

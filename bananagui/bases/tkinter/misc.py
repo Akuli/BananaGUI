@@ -20,6 +20,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tkinter as tk
+from tkinter import font
 
 from bananagui import HORIZONTAL, VERTICAL
 from .mainloop import _convert_color
@@ -76,3 +77,7 @@ class Separator:
             widget['width'] = 3
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
+
+
+def get_font_families():
+    return font.families()

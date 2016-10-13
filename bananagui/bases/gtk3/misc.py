@@ -63,3 +63,10 @@ class Spinner:
         else:
             self.__spinner.hide()
             self.__spinner.stop()
+
+
+def get_font_families():
+    # Based on http://zetcode.com/gui/pygtk/pango/
+    widget = Gtk.Label()
+    context = widget.create_pango_context()
+    return (family.get_name() for family in context.list_families())
