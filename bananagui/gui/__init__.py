@@ -24,7 +24,8 @@ from .window import BaseWindow, Window
 # Bases don't need to provide infodialog, questiondialog, warningdialog
 # or errordialog. See also dialogs.py.
 from .dialogs import (
-    Dialog, infodialog, questiondialog, warningdialog, errordialog)
+    Dialog, infodialog, questiondialog, warningdialog, errordialog,
+    colordialog, fontdialog)
 
 # Some things in this module aren't actually GUI widgets but other
 # things that GUI toolkits like to provide.
