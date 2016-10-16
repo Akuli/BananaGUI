@@ -35,25 +35,25 @@ class EntryWindow(gui.Window):
         # This is attached to self because we need it in other methods.
         self.entry = gui.Entry(bigbox, text="Enter something...",
                                expand=(True, False))
-        bigbox.append(self.entry)
+        bigbox['children'].append(self.entry)
 
         dummy = gui.Dummy(bigbox)
-        bigbox.append(dummy)
+        bigbox['children'].append(dummy)
 
         buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
-        bigbox.append(buttonbox)
+        bigbox['children'].append(buttonbox)
 
         printbutton = gui.Button(buttonbox, text="Print it!",
                                  on_click=[self.print_it])
-        buttonbox.append(printbutton)
+        buttonbox['children'].append(printbutton)
 
         selectallbutton = gui.Button(buttonbox, text="Select all",
                                      on_click=[self.select_all])
-        buttonbox.append(selectallbutton)
+        buttonbox['children'].append(selectallbutton)
 
         checkbox = gui.Checkbox(buttonbox, text="Read only")
         checkbox['checked.changed'].append(self.read_only_toggled)
-        buttonbox.append(checkbox)
+        buttonbox['children'].append(checkbox)
 
     def print_it(self, event):
         print(self.entry['text'])

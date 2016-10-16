@@ -12,18 +12,18 @@ class SpinnerWindow(gui.Window):
         self['child'] = mainbox
 
         self.spinner = gui.Spinner(mainbox)
-        mainbox.append(self.spinner)
+        mainbox['children'].append(self.spinner)
 
         buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
-        mainbox.append(buttonbox)
+        mainbox['children'].append(buttonbox)
 
         startbutton = gui.Button(buttonbox, text="Start",
                                  on_click=[self.start])
-        buttonbox.append(startbutton)
+        buttonbox['children'].append(startbutton)
 
         stopbutton = gui.Button(buttonbox, text="Stop",
                                 on_click=[self.stop])
-        buttonbox.append(stopbutton)
+        buttonbox['children'].append(stopbutton)
 
     def start(self, widget):
         self.spinner['spinning'] = True

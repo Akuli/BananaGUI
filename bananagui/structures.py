@@ -44,14 +44,22 @@ class _CallbackBase:
         @functools.wraps(function)
         def exposer(self, *args, **kwargs):
             # We can't use self._data.copy() because lists don't have a
-            # copy method in Python 3.2.
+            # copy method on Python 3.2.
             old_data = cls._basetype(self._data)
-
             result = function(self._data, *args, **kwargs)
-            if self._data != old_data:
+            new_data = cls._basetype(self._data)
+
+            if old_data != new_data:
                 # It has been mutated.
-                for callback in self._callbacks:
-                    callback(self)
+                try:
+                    for callback in self._callbacks:
+                        callback(old_data, new_data)
+                except Exception as e:
+                    # A callback doesn't like the new data. Let's
+                    # restore it back to what it was before and reraise
+                    # the exception.
+                    self._data = old_data
+                    raise e
 
             return result
 
@@ -68,23 +76,22 @@ class _CallbackBase:
 class CallbackList(_CallbackBase):
     """A list that runs callbacks when its content changes.
 
-    >>> def print_cl(arg):
-    ...     assert arg is cl
-    ...     print("now cl is", cl)
+    >>> def callback(old, new):
+    ...     print("before cl contained", old, "and now it contains", new)
     ...
     >>> cl = CallbackList([1])
     >>> cl
     CallbackList([1])
-    >>> cl.copy()      # return a regular list
+    >>> cl[:]       # slicing and methods return regular lists
     [1]
-    >>> cl._callbacks.append(print_cl)
+    >>> cl._callbacks.append(callback)
     >>> cl.extend([2, 3, 4])
-    now cl is CallbackList([1, 2, 3, 4])
+    before cl contained [1] and now it contains [1, 2, 3, 4]
     >>> cl[2:]      # again, a regular list
     [3, 4]
-    >>> cl.clear()
-    now cl is CallbackList([])
-    >>> cl.clear()     # it was already empty, no need to run callbacks
+    >>> del cl[:]
+    before cl contained [1, 2, 3, 4] and now it contains []
+    >>> del cl[:]     # it was already empty, no need to run callbacks
     >>> cl
     CallbackList([])
     """
@@ -94,7 +101,7 @@ class CallbackList(_CallbackBase):
 
 
 # The __eq__, __ne__, __gt__, __ge__, __lt__ and __le__ will make two
-# CallbackLists compare each others' _data. For example, this is what
+# CallbackLists compare each other's _data. For example, this is what
 # __eq__ will do:
 #
 #                        a == b
@@ -127,32 +134,38 @@ if sys.version_info >= (3, 3):
 class CallbackDict(_CallbackBase):
     """A dictionary that runs callbacks when its content changes.
 
-    >>> def print_d(arg):
-    ...     assert arg is d
-    ...     print("now d is", d)
+    >>> def callback(old, new):
+    ...     print("before d contained", old, "and now it contains", new)
     ...
     >>> d = CallbackDict(a=1)
     >>> d
     CallbackDict({'a': 1})
     >>> d.copy()    # return a regular dictionary
     {'a': 1}
-    >>> d._callbacks.append(print_d)
+    >>> d._callbacks.append(callback)
     >>> del d['a']
-    now d is CallbackDict({})
-    >>> d.update({'b': 4})
-    now d is CallbackDict({'b': 4})
-    >>> d['b'] = 4      # it was already 4, no need to run callbacks
+    before d contained {'a': 1} and now it contains {}
+    >>> d.update({'b': 2})
+    before d contained {} and now it contains {'b': 2}
+    >>> d['b'] = 2      # it was already 2, no need to run callbacks
     >>> d.clear()
-    now d is CallbackDict({})
+    before d contained {'b': 2} and now it contains {}
     """
 
     __slots__ = ()
     _basetype = dict
 
-    # We can't expose this like other methods because it's a classmethod.
+    # We can't expose this like other methods because it's a
+    # classmethod.
     @classmethod
-    @functools.wraps(dict.fromkeys)
     def fromkeys(cls, iterable, value=None):
+        """Create a new CallbackDict from an iterable of keys.
+
+        >>> CallbackDict.fromkeys(['lol'])
+        CallbackDict({'lol': None})
+        >>> CallbackDict.fromkeys(['lol'], 'wtf')
+        CallbackDict({'lol': 'wtf'})
+        """
         return cls(dict.fromkeys(iterable, value))
 
 
@@ -303,7 +316,7 @@ class Font:
             result.append(' '.join(attributes))
         return ', '.join(result)
 
-    def to_string(self):
+    def to_string(self) -> str:
         """Convert the font to a string.
 
         The strings can be parsed by Font.from_string, and they are
@@ -318,7 +331,7 @@ class Font:
         """
         return self._to_string({})
 
-    def to_translated_string(self):
+    def to_translated_string(self) -> str:
         """Like to_string, but translates the string also.
 
         The translating is done with gettext.gettext. Use this for
@@ -348,7 +361,7 @@ class Color(collections.namedtuple('Color', 'red green blue')):
             assert value in range(256), "invalid r/g/b value %r" % (value,)
 
     @property
-    def brightness(self):
+    def brightness(self) -> float:
         """Brightness of the color.
 
         >>> Color(0, 0, 0).brightness
@@ -391,7 +404,7 @@ class Color(collections.namedtuple('Color', 'red green blue')):
         return cls(*map(int16, match.groups()))
 
     @property
-    def hex(self):
+    def hex(self) -> str:
         """Convert self to a hexadecimal color.
 
         >>> Color(1, 2, 3).hex
@@ -409,7 +422,7 @@ class Color(collections.namedtuple('Color', 'red green blue')):
 
         >>> Color.from_rgbstring('rgb(255,100%,0)')
         Color(red=255, green=255, blue=0)
-        >>> Color.from_rgbstring('rG B ( 255 , 100% ,0) ')
+        >>> Color.from_rgbstring('rG B ( 255 , 100 % ,0) ')
         Color(red=255, green=255, blue=0)
         """
         match = re.search(
@@ -429,7 +442,7 @@ class Color(collections.namedtuple('Color', 'red green blue')):
         return cls(*rgb)
 
     @property
-    def rgbstring(self):
+    def rgbstring(self) -> str:
         """Convert self to a CSS-compatible color string.
 
         >>> Color(255, 255, 0).rgbstring

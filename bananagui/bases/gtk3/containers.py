@@ -1,6 +1,6 @@
 from gi.repository import Gtk
 
-from bananagui import HORIZONTAL, VERTICAL
+import bananagui
 
 
 class Bin:
@@ -14,12 +14,12 @@ class Bin:
 
 
 _gtk_orientations = {
-    HORIZONTAL: Gtk.Orientation.HORIZONTAL,
-    VERTICAL: Gtk.Orientation.VERTICAL,
+    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
+    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
 }
 _expand_indexes = {
-    HORIZONTAL: 0,
-    VERTICAL: 1,
+    bananagui.HORIZONTAL: 0,
+    bananagui.VERTICAL: 1,
 }
 
 
@@ -31,7 +31,7 @@ class Box:
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
-    def append(self, child):
+    def _bananagui_box_append(self, child):
         # TODO: What if the widget is added and then its expandiness is
         # changed?
         expandindex = _expand_indexes[self['orientation']]
@@ -39,5 +39,5 @@ class Box:
         self['real_widget'].pack_start(child['real_widget'], expand, expand, 0)
         child['real_widget'].show()
 
-    def remove(self, child):
+    def _bananagui_box_remove(self, child):
         self['real_widget'].remove(child['real_widget'])

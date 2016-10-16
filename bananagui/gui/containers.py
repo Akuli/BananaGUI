@@ -23,19 +23,19 @@
 
 # TODO: Add a grid widget.
 
-from bananagui import _base, Property, bananadoc
-from bananagui.utils import baseclass, common_beginning, ListLikeBase
-from .bases import Oriented, Parent, Child
+import bananagui
+from bananagui import utils
+from . import bases
 
 
 # This is not a Child because Window and Dialog are based on this.
-@baseclass
-@bananadoc
-class Bin(_base.Bin, Parent):
+@utils.baseclass
+@bananagui.bananadoc
+class Bin(bananagui._base.Bin, bases.Parent):
     """A widget that contains one child widget or no children at all."""
 
-    child = Property(
-        'child', allow_none=True, default=None, type=Child,
+    child = bananagui.Property(
+        'child', allow_none=True, default=None, type=bases.Child,
         doc="""The child in the widget, None by default.
 
         Setting this to None removes the child.
@@ -48,38 +48,38 @@ class Bin(_base.Bin, Parent):
         super()._bananagui_set_child(child)
 
 
-class _BoxBase:
-    """A base class for implementing Box's list-like behavior."""
+@bananagui.bananadoc
+class Box(bases.Oriented, bananagui._base.Box, bases.Parent, bases.Child):
+    """A widget that contains other widgets.
 
-    children = Property(
-        'children', type=tuple, default=(),
-        doc="A tuple of children in this widget.")
-    _bananagui_contentproperty = 'children'
+    The children property behaves like a list and you can modify it to
+    add widgets to the box or remove widgets from the box.
+    """
+    # The base should define a _bananagui_box_append method that adds a
+    # child widget to the end of the box and a _bananagui_box_remove
+    # method that removes a child widget from the box.
 
-    def _bananagui_set_children(self, children):
-        assert len(children) == len(set(children)), \
+    children = bananagui.Property(
+        'children', getdefault=bananagui.CallbackList, settable=False,
+        doc="A mutable sequence of children in the box.")
+
+    def __init__(self, parent, **kwargs):
+        self['children']._callbacks.append(self.__children_changed)
+        super().__init__(parent, **kwargs)
+
+    def __children_changed(self, old, new):
+        assert len(new) == len(set(new)), \
             "cannot add the same child twice"
 
-        # TODO: Maybe self and children have something else in common
-        # than the beginning? Optimize this.
-        common = common_beginning(self, children)
-        for child in self[common:]:
-            # This assumes that super().remove and super().append
-            # come from _base.Box.
-            super().remove(child)
-        for child in children[common:]:
+        # TODO: Maybe old and new have something else in common than the
+        # beginning? Optimize this.
+        common = utils.common_beginning(old, new)
+
+        # These are called from super() so a subclass can have an
+        # _append or _remove method and it's not going to conflict.
+        for child in old[common:]:
+            super()._bananagui_box_remove(child)
+        for child in new[common:]:
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
-            super().append(child)
-
-
-@bananadoc
-class Box(Oriented, ListLikeBase, _BoxBase, _base.Box, Parent, Child):
-    """A widget that contains other widgets in a row.
-
-    Boxes can be indexed and sliced like lists to modify their children,
-    and slicing a box returns a list of children. Subscripting with a
-    string still sets or gets the value of a property like for any other
-    BananaGUI object. You can also set the value of the children
-    property directly, it's a tuple of children.
-    """
+            super()._bananagui_box_append(child)

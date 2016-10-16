@@ -10,20 +10,20 @@ class ClipboardTestWindow(gui.Window):
         self['child'] = mainbox
 
         self.entry = gui.Entry(mainbox, expand=(True, False))
-        mainbox.append(self.entry)
+        mainbox['children'].append(self.entry)
 
-        mainbox.append(gui.Dummy(mainbox))
+        mainbox['children'].append(gui.Dummy(mainbox))
 
         buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
-        mainbox.append(buttonbox)
+        mainbox['children'].append(buttonbox)
 
         copybutton = gui.Button(buttonbox, text="Copy everything")
         copybutton['on_click'].append(self.copy)
-        buttonbox.append(copybutton)
+        buttonbox['children'].append(copybutton)
 
         pastebutton = gui.Button(buttonbox, text="Paste to the end")
         pastebutton['on_click'].append(self.paste)
-        buttonbox.append(pastebutton)
+        buttonbox['children'].append(pastebutton)
 
     def copy(self, event):
         gui.set_clipboard_text(self.entry['text'])

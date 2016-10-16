@@ -376,7 +376,11 @@ def bananadoc(bananaclass):
 
     if something_found:
         # There are BananaGUI properties so we can change the docstring.
-        bananaclass.__doc__ = result.rstrip()
+        try:
+            bananaclass.__doc__ = result.rstrip()
+        except AttributeError:
+            # Python 3.2 doesn't allow assigning to a class docstring.
+            pass
 
     return bananaclass
 

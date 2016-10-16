@@ -36,22 +36,22 @@ class TextviewWindow(gui.Window):
 
         self.textview = gui.PlainTextView(bigbox, text="Enter something...")
         self.textview['text.changed'].append(self.text_changed)
-        bigbox.append(self.textview)
+        bigbox['children'].append(self.textview)
 
         buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
-        bigbox.append(buttonbox)
+        bigbox['children'].append(buttonbox)
 
         insertbutton = gui.Button(buttonbox, text="Append text",
                                   on_click=[self.append_text])
-        buttonbox.append(insertbutton)
+        buttonbox['children'].append(insertbutton)
 
         clearbutton = gui.Button(buttonbox, text="Clear",
                                  on_click=[self.clear])
-        buttonbox.append(clearbutton)
+        buttonbox['children'].append(clearbutton)
 
         selectallbutton = gui.Button(buttonbox, text="Select all",
                                      on_click=[self.select_all])
-        buttonbox.append(selectallbutton)
+        buttonbox['children'].append(selectallbutton)
 
     def text_changed(self, event):
         print(event.new_value)

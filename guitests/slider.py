@@ -14,15 +14,15 @@ class SliderWindow(gui.Window):
 
         self.hslider = gui.Slider.horizontal(box, **kwargs)
         self.hslider['value.changed'].append(self.value_changed)
-        box.append(self.hslider)
+        box['children'].append(self.hslider)
 
         self.vslider = gui.Slider.vertical(box, **kwargs)
         self.vslider['value.changed'].append(self.value_changed)
-        box.append(self.vslider)
+        box['children'].append(self.vslider)
 
         self.spinbox = gui.Spinbox(box, **kwargs)
         self.spinbox['value.changed'].append(self.value_changed)
-        box.append(self.spinbox)
+        box['children'].append(self.spinbox)
 
     def value_changed(self, event):
         # Python's sets are awesome.

@@ -11,7 +11,7 @@ def main():
                          tooltip="Top label tooltip!")
     bottomlabel = gui.Label(box, text="Bottom label!",
                             tooltip="Bottom label tooltip!")
-    box.extend([toplabel, bottomlabel])
+    box['children'].extend([toplabel, bottomlabel])
 
     window['on_destroy'].append(gui.quit)
     gui.main()

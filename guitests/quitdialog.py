@@ -12,8 +12,8 @@ def main():
         label = gui.Label(window, text="Close me!")
         window['child'] = label
 
-        # The first callback destroys the window when its [X] button is
-        # clicked.
+        # The first callback destroys the window when its close button
+        # is clicked.
         del window['on_destroy'][0]
         window['on_destroy'].append(on_destroy)
 

@@ -8,20 +8,20 @@ def main():
     window['child'] = bigbox
 
     toplabel = gui.Label(bigbox, text="Top")
-    bigbox.append(toplabel)
+    bigbox['children'].append(toplabel)
 
-    bigbox.append(gui.Separator.horizontal(bigbox))
+    bigbox['children'].append(gui.Separator.horizontal(bigbox))
 
     bottombox = gui.Box.horizontal(bigbox)
-    bigbox.append(bottombox)
+    bigbox['children'].append(bottombox)
 
     bottomleftlabel = gui.Label(bottombox, text="Bottom left")
-    bottombox.append(bottomleftlabel)
+    bottombox['children'].append(bottomleftlabel)
 
-    bottombox.append(gui.Separator.vertical(bottombox))
+    bottombox['children'].append(gui.Separator.vertical(bottombox))
 
     bottomrightlabel = gui.Label(bottombox, text="Bottom right")
-    bottombox.append(bottomrightlabel)
+    bottombox['children'].append(bottomrightlabel)
 
     window['on_destroy'].append(gui.quit)
     gui.main()
