@@ -23,6 +23,7 @@ import tkinter as tk
 from tkinter import font
 
 import bananagui
+from bananagui import utils
 from . import mainloop
 
 
@@ -98,7 +99,8 @@ class Spinbox:
 
         widget = tk.Spinbox(
             parent['real_widget'], textvariable=self.__var,
-            values=tuple(self._bananagui_ranged_valuerange))
+            # Tkinter doesn't know how to handle ranges.
+            values=tuple(self['valuerange']))
         widget.bind('<Control-A>', _select_all)
         widget.bind('<Control-a>', _select_all)
         self.real_widget.raw_set(widget)
@@ -107,7 +109,7 @@ class Spinbox:
     def __var_changed(self, tkname, empty_string, mode):
         try:
             value = int(self.__var.get())
-            if value not in self._bananagui_ranged_valuerange:
+            if value not in self['valuerange']:
                 return
         except ValueError:
             return
@@ -127,17 +129,23 @@ _tkinter_orients = {
 class Slider:
 
     def __init__(self, parent, **kwargs):
+        minimum = min(self['valuerange'])
+        maximum = max(self['valuerange'])
+        step = utils.rangestep(self['valuerange'])
+
         # I think tkinter's scales are upside down when the orientation
         # is vertical because the bigger number is at the bottom.
         # Unfortunately this can't be fixed by setting resolution to a
         # negative value :(
-        widget = tk.Scale(parent['real_widget'], from_=self['minimum'],
-                          to=self['maximum'], resolution=self['step'],
+        widget = tk.Scale(parent['real_widget'], from_=minimum,
+                          to=maximum, resolution=step,
                           orient=_tkinter_orients[self['orientation']])
+
         # There's no value changed thing, but all tkinter widgets have
-        # a ButtonRelease signal that's emitted when the left mouse key
-        # is lifted. It seems to me that sliders can't be controlled
-        # with the keyboard so this seems to work.
+        # a ButtonRelease signal that's emitted when the left mouse
+        # button is released. It seems to me that sliders can't be
+        # controlled without pressing the button in any way so this
+        # seems to work.
         widget.bind('<ButtonRelease>', self.__value_changed)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)

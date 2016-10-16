@@ -9,18 +9,17 @@ class SliderWindow(gui.Window):
         box = gui.Box.vertical(self)
         self['child'] = box
 
-        # All of these widgets take these keyword arguments.
-        kwargs = {'minimum': 0, 'maximum': 50, 'step': 5}
+        values = range(0, 51, 5)
 
-        self.hslider = gui.Slider.horizontal(box, **kwargs)
+        self.hslider = gui.Slider.horizontal(box, valuerange=values)
         self.hslider['value.changed'].append(self.value_changed)
         box['children'].append(self.hslider)
 
-        self.vslider = gui.Slider.vertical(box, **kwargs)
+        self.vslider = gui.Slider.vertical(box, valuerange=values)
         self.vslider['value.changed'].append(self.value_changed)
         box['children'].append(self.vslider)
 
-        self.spinbox = gui.Spinbox(box, **kwargs)
+        self.spinbox = gui.Spinbox(box, valuerange=values)
         self.spinbox['value.changed'].append(self.value_changed)
         box['children'].append(self.spinbox)
 
