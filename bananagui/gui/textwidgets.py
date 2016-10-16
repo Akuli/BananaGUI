@@ -35,12 +35,15 @@ class TextBase(_base.TextBase, Child):
     text = Property('text', type=str, default='',
                     doc="Text in the entry.")
     read_only = Property(
-        'read_only', type=bool, default=True,
+        'read_only', type=bool, default=False,
         doc="True if the content of the widget cannot be edited.")
 
     # This is overrided just to make sure it has a docstring.
     def select_all(self):
-        """Select all text in the widget."""
+        """Select all text in the widget.
+
+        This also gives the keyboard focus to the widget.
+        """
         super().select_all()
 
 
@@ -64,6 +67,8 @@ class PlainTextView(_base.PlainTextView, TextBase):
 
     def _bananagui_set_text(self, text):
         old_text = self['text']
+        if old_text == text:
+            return
 
         # The changed signal needs to be emitted once only.
         with self.text.changed.blocked():
@@ -75,11 +80,9 @@ class PlainTextView(_base.PlainTextView, TextBase):
     def clear(self):
         """Remove everything from the textview."""
         super().clear()
-        # The GUI toolkit's callback updates the text property
-        # automatically.
+        # The GUI toolkit's callback will update the text property.
 
     def append_text(self, text: str):
         """Add text to the end of what is already in the text widget."""
         super().append_text(text)
-        # The GUI toolkit's callback updates the text property
-        # automatically.
+        # The GUI toolkit's callback will update the text property.

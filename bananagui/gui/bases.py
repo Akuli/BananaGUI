@@ -71,7 +71,7 @@ class Child(_base.Child, Widget):
         This is None if the widget doesn't have a tooltip.
         """)
     expand = Property(
-        'expand', pair=True, type=bool, default=(True, True),
+        'expand', how_many=2, type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.
 
         For example, (True, True) will make the widget expand in
@@ -117,7 +117,7 @@ class Child(_base.Child, Widget):
 
 @baseclass
 @bananadoc
-class _Oriented:
+class Oriented:
     """Implement an orientation property and handy class methods.
 
     There are many ways to create instances of _Oriented widgets. For
@@ -136,21 +136,58 @@ class _Oriented:
         and cannot be changed afterwards.
         """)
 
-    def __init__(self, *args, **kwargs):
-        *args, orientation = args
-        if orientation not in {HORIZONTAL, VERTICAL}:
-            raise ValueError("unknown orientation %r" % (orientation,))
+    def __init__(self, *args, orientation, **kwargs):
+        assert orientation in {HORIZONTAL, VERTICAL}, \
+            "unknown orientation %r" % (orientation,)
         self.orientation.raw_set(orientation)
         super().__init__(*args, **kwargs)
 
     @classmethod
     def horizontal(cls, *args, **kwargs):
-        """Create a new horizontal instance."""
-        args += (HORIZONTAL,)
-        return cls(*args, **kwargs)
+        """Create and return a new horizontal instance."""
+        return cls(*args, orientation=HORIZONTAL, **kwargs)
 
     @classmethod
     def vertical(cls, *args, **kwargs):
-        """Create a new vertical instance"""
-        args += (VERTICAL,)
-        return cls(*args, **kwargs)
+        """Create and return a new vertical instance"""
+        return cls(*args, orientation=VERTICAL, **kwargs)
+
+
+@baseclass
+@bananadoc
+class Ranged:
+    """Implement minimum, maximum, step and value BananaGUI properties.
+
+    Unlike with Python's range, the minimum and maximum are inclusive.
+    """
+    minimum = Property(
+        'minimum', type=int, settable=False,
+        doc="The smallest possible value set on initialization.")
+    maximum = Property(
+        'maximum', type=int, settable=False,
+        doc="The largest possible value set on initialization.")
+    step = Property(
+        'step', type=int, settable=False,
+        doc="How much the value will be incremented/decremented at a time.")
+    value = Property('value', type=int,
+                     doc="The current value.")
+
+    def __init__(self, *args, minimum: int = 0, maximum: int = 100,
+                 step: int = 1, **kwargs):
+        """Set the minimum, maximum and step properties."""
+        assert minimum < maximum, "minimum must be smaller than maximum"
+        assert step > 0, "non-positive step %d" % step
+        assert maximum - minimum >= step, "too big step"
+        self.minimum.raw_set(minimum)
+        self.maximum.raw_set(maximum)
+        self.step.raw_set(step)
+        self.value.raw_set(minimum)
+
+        # This makes checking values easier.
+        self._bananagui_ranged_valuerange = range(minimum, maximum+1, step)
+        super().__init__(*args, **kwargs)
+
+    def _bananagui_set_value(self, value):
+        assert value in self._bananagui_ranged_valuerange, \
+            "value %s is out of range" % value
+        super()._bananagui_set_value(value)

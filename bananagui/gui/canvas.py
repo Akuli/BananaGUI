@@ -13,14 +13,14 @@ class Canvas(_base.Canvas, Child):
     """
 
     minimum_size = Property(
-        'minimum_size', pair=True, type=int, minimum=0, default=(300, 200),
+        'minimum_size', how_many=2, type=int, minimum=0, default=(300, 200),
         doc="""Two-tuple of the minimum width and height of the canvas.
 
         The canvas is smaller than this only if the window is resized
         to something smaller than this.
         """)
     size = Property(
-        'size', pair=True, type=int, minimum=0, default=(300, 200),
+        'size', how_many=2, type=int, minimum=0, default=(300, 200),
         settable=False,
         doc="""Two-tuple of the current width and height of the canvas.
 

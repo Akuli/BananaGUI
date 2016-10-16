@@ -36,7 +36,10 @@ def colordialog(parentwindow, default, title):
 
     response = dialog.run()
     if response == Gtk.ResponseType.OK:
-        result = Color.from_rgbstring(get_rgba().to_string())
+        # Gdk.RGBA uses 0 as minimum value and 1 as maximum value.
+        rgba = get_rgba()
+        rgb = [int(value * 255) for value in (rgba.red, rgba.green, rgba.blue)]
+        result = Color(*rgb)
     else:
         result = None
     dialog.destroy()

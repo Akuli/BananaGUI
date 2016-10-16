@@ -35,7 +35,7 @@ import importlib
 import bananagui.bases
 
 # Importing other things.
-from bananagui.structures import Color, Font, FrozenDict
+from bananagui.structures import CallbackList, CallbackDict, Color, Font
 from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
 
 
@@ -44,8 +44,8 @@ from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
 HORIZONTAL = 'h'
 VERTICAL = 'v'
 
-# This is not 1 because returning True or False from a callback must not
-# be allowed.
+# This is not 0 or 1 because returning True or False from a callback
+# must not be allowed.
 RUN_AGAIN = 2
 
 # TODO: Add a BROWN.

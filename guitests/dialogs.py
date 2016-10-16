@@ -22,7 +22,7 @@ class DialogTestWindow(gui.Window):
 
 def main():
     with DialogTestWindow(title="Dialog test") as window:
-        window['destroyed.changed'].append(gui.quit)
+        window['on_destroy'].append(gui.quit)
         gui.main()
 
 

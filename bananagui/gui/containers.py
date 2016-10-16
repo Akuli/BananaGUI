@@ -25,7 +25,7 @@
 
 from bananagui import _base, Property, bananadoc
 from bananagui.utils import baseclass, common_beginning, ListLikeBase
-from .bases import _Oriented, Parent, Child
+from .bases import Oriented, Parent, Child
 
 
 # This is not a Child because Window and Dialog are based on this.
@@ -74,7 +74,7 @@ class _BoxBase:
 
 
 @bananadoc
-class Box(_Oriented, ListLikeBase, _BoxBase, _base.Box, Parent, Child):
+class Box(Oriented, ListLikeBase, _BoxBase, _base.Box, Parent, Child):
     """A widget that contains other widgets in a row.
 
     Boxes can be indexed and sliced like lists to modify their children,

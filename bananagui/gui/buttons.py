@@ -22,7 +22,7 @@ class Button(_base.Button, BaseButton):
 
 @bananadoc
 class ImageButton(_base.ImageButton, BaseButton):
-    # TODO: The imagepath property is just like in labels.py.
+    """A button that displays an image."""
     imagepath = Property.imagepath(
         'imagepath',
-        doc="Path to the image that will be displayed in the button.")
+        doc="Path to the image that is displayed in the button.")

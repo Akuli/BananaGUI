@@ -20,15 +20,3 @@ class TrayIcon(_base.TrayIcon, Widget):
         """)
     # TODO: A menu property, but not an on_click property. This will be
     #       an indicator instead of a tray icon on some platforms.
-
-    def __init__(self, iconpath: str, **kwargs):
-        """Initialize the tray icon.
-
-        The icon path needs to be given on initialization because some
-        GUI toolkits need to know it before creating a tray icon. A tray
-        icon without an icon would also be quite useless.
-        """
-        self.iconpath.raw_set(iconpath)
-        # The base needs to call super().__init__ with no positional
-        # arguments.
-        super().__init__(iconpath, **kwargs)

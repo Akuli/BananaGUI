@@ -69,7 +69,7 @@ class TextviewWindow(gui.Window):
 def main():
     with TextviewWindow(title="Textview test",
                         minimum_size=(300, 200)) as window:
-        window['destroyed.changed'].append(gui.quit)
+        window['on_destroy'].append(gui.quit)
         gui.main()
 
 

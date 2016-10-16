@@ -23,7 +23,7 @@ def main():
     bottomrightlabel = gui.Label(bottombox, text="Bottom right")
     bottombox.append(bottomrightlabel)
 
-    window['destroyed.changed'].append(gui.quit)
+    window['on_destroy'].append(gui.quit)
     gui.main()
 
 

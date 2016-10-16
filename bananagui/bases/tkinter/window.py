@@ -6,13 +6,17 @@ from . import mainloop
 class BaseWindow:
 
     def __init__(self, **kwargs):
-        self['real_widget'].title(self['title'])
-        self['real_widget'].bind('<Configure>', self.__configure)
-        self['real_widget'].protocol('WM_DELETE_WINDOW', self.destroy)
+        widget = self['real_widget']
+        widget.title(self['title'])
+        widget.bind('<Configure>', self.__configure)
+        widget.protocol('WM_DELETE_WINDOW', self.__delete_window)
         super().__init__(**kwargs)
 
     def __configure(self, event):
         self.size.raw_set((event.width, event.height))
+
+    def __delete_window(self):
+        self.on_destroy.emit()
 
     def _bananagui_set_title(self, title):
         self['real_widget'].title(title)
@@ -28,6 +32,9 @@ class BaseWindow:
             # Default minimum size.
             size = (1, 1)
         self['real_widget'].minsize(*size)
+
+    def wait(self):
+        self['real_widget'].wait_window()
 
     def destroy(self):
         try:

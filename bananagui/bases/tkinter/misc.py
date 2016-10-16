@@ -19,6 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import decimal
+
 import tkinter as tk
 from tkinter import font
 
@@ -77,6 +79,76 @@ class Separator:
             widget['width'] = 3
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
+
+
+def _select_all(event):
+    try:
+        # Tkinter's spinboxes don't have a selection_range method for
+        # some reason, but entries have it.
+        event.widget.selection('range', 0, 'end')
+    except tk.TclError:
+        # Maybe selection_range doesn't work with spinboxes on old Tk
+        # versions?
+        pass
+
+
+class Spinbox:
+
+    def __init__(self, parent, **kwargs):
+        self.__var = tk.StringVar()
+        self.__var.trace('w', self.__var_changed)
+
+        widget = tk.Spinbox(
+            parent['real_widget'], textvariable=self.__var,
+            values=tuple(self._bananagui_ranged_valuerange))
+        widget.bind('<Control-A>', _select_all)
+        widget.bind('<Control-a>', _select_all)
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def __var_changed(self, tkname, empty_string, mode):
+        try:
+            value = int(self.__var.get())
+            if value not in self._bananagui_ranged_valuerange:
+                return
+        except ValueError:
+            return
+        self.value.raw_set(value)
+
+    def _bananagui_set_value(self, value):
+        # This tells tkinter to call self.__var_changed.
+        self.__var.set(str(value))
+
+
+_tkinter_orients = {
+    HORIZONTAL: 'horizontal',
+    VERTICAL: 'vertical',
+}
+
+
+class Slider:
+
+    def __init__(self, parent, **kwargs):
+        # I think tkinter's scales are upside down when the orientation
+        # is vertical because the bigger number is at the bottom.
+        # Unfortunately this can't be fixed by setting resolution to a
+        # negative value :(
+        widget = tk.Scale(parent['real_widget'], from_=self['minimum'],
+                          to=self['maximum'], resolution=self['step'],
+                          orient=_tkinter_orients[self['orientation']])
+        # There's no value changed thing, but all tkinter widgets have
+        # a ButtonRelease signal that's emitted when the left mouse key
+        # is lifted. It seems to me that sliders can't be controlled
+        # with the keyboard so this seems to work.
+        widget.bind('<ButtonRelease>', self.__value_changed)
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def __value_changed(self, event):
+        self.value.raw_set(event.widget.get())
+
+    def _bananagui_set_value(self, value):
+        self['real_widget'].set(value)
 
 
 def get_font_families():

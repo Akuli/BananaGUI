@@ -55,6 +55,7 @@ class Entry:
 
     def select_all(self):
         self['real_widget'].selection_range(0, 'end')
+        self['real_widget'].focus()
 
 
 class PlainTextView:
@@ -73,6 +74,7 @@ class PlainTextView:
         # The end-1c doesn't get what tkinter thinks of as the last
         # character, which is a newline.
         self['real_widget'].tag_add('sel', 0.0, 'end-1c')
+        self['real_widget'].focus()
 
     def __edit_modified(self, event):
         """Update the widget's text property."""
@@ -94,3 +96,14 @@ class PlainTextView:
 
     def append_text(self, text):
         self['real_widget'].insert('end', text)
+
+    # Unfortunately read_only and grayed_out need to be done the same
+    # way.
+    def __set_disable(self, disable):
+        self['real_widget']['state'] = 'disable' if disable else 'normal'
+
+    def _bananagui_set_read_only(self, read_only):
+        self.__set_disable(read_only or self['grayed_out'])
+
+    def _bananagui_set_grayed_out(self, grayed_out):
+        self.__set_disable(self['read_only'] or grayed_out)

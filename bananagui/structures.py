@@ -5,114 +5,164 @@ import functools
 from gettext import gettext as _
 import operator
 import re
+import sys
 
 try:
-    from collections.abc import Mapping
+    from collections import abc
     from types import SimpleNamespace as NamespaceBase  # noqa
 except ImportError:
     # In Python 3.3, the abstract base classes in collections were moved
     # to collections.abc and types.SimpleNamespace was addded.
-    from collections import Mapping
+    import _abcoll as abc  # collections.py imports * from this.
     from argparse import Namespace as NamespaceBase  # noqa
 
+from bananagui import utils
 
-@Mapping.register
-class FrozenDict:
-    """An immutable-ish dictionary-like object.
 
-    >>> d = FrozenDict(a=1, b=2, c=3)   # arguments like for dict()
-    >>> d == {'a': 1, 'b': 2, 'c': 3}   # comparing to dicts
-    True
-    >>> d == FrozenDict(a=1, b=2, c=3)  # comparing to FrozenDicts
-    True
-    >>> from collections.abc import Mapping
-    >>> isinstance(d, Mapping)  # they are mappings
-    True
-    >>> isinstance(d, dict)     # but not regular dicts
-    False
-    >>> {d: 123}         # can be used as dict keys  # doctest: +ELLIPSIS
-    {FrozenDict(...): 123}
+class _CallbackBase:
+    """A mutable object that calls callbacks when it's mutated.
+
+    The callbacks can be anything callable and they're stored in a
+    _callbacks attribute. They will be called with the CallbackList as
+    the only argument.
     """
 
-    # Try to make this immutable.
-    __slots__ = ('_data',)
+    __slots__ = ('_data', '_callbacks')
 
     def __init__(self, *args, **kwargs):
-        """Initialize the new FrozenDict.
+        self._data = type(self)._basetype(*args, **kwargs)
+        self._callbacks = []
 
-        All arguments are treated like for a regular dictionary.
-        """
-        self._data = dict(*args, **kwargs)
-
-    @functools.wraps(dict.__repr__)
     def __repr__(self):
-        return 'FrozenDict(%r)' % (self._data,)
+        return '%s(%r)' % (type(self).__name__, self._data)
 
-    @functools.wraps(dict.__contains__)
-    def __contains__(self, item):
-        return item in self._data
+    @classmethod
+    def _expose(cls, name):
+        """Add a function to cls that exposes a self._data method."""
+        function = getattr(cls._basetype, name)
 
-    @functools.wraps(dict.__getitem__)
-    def __getitem__(self, item):
-        return self._data[item]
+        @functools.wraps(function)
+        def exposer(self, *args, **kwargs):
+            # We can't use self._data.copy() because lists don't have a
+            # copy method in Python 3.2.
+            old_data = cls._basetype(self._data)
 
-    @functools.wraps(dict.__iter__)
-    def __iter__(self):
-        return iter(self._data)
+            result = function(self._data, *args, **kwargs)
+            if self._data != old_data:
+                # It has been mutated.
+                for callback in self._callbacks:
+                    callback(self)
 
-    @functools.wraps(dict.__len__)
-    def __len__(self):
-        return len(self._data)
+            return result
 
+        setattr(cls, name, exposer)
+
+    @classmethod
+    def _expose_all(cls, *names):
+        """Call self._expose with each name."""
+        for name in names:
+            cls._expose(name)
+
+
+@utils.register(abc.MutableSequence)
+class CallbackList(_CallbackBase):
+    """A list that runs callbacks when its content changes.
+
+    >>> def print_cl(arg):
+    ...     assert arg is cl
+    ...     print("now cl is", cl)
+    ...
+    >>> cl = CallbackList([1])
+    >>> cl
+    CallbackList([1])
+    >>> cl.copy()      # return a regular list
+    [1]
+    >>> cl._callbacks.append(print_cl)
+    >>> cl.extend([2, 3, 4])
+    now cl is CallbackList([1, 2, 3, 4])
+    >>> cl[2:]      # again, a regular list
+    [3, 4]
+    >>> cl.clear()
+    now cl is CallbackList([])
+    >>> cl.clear()     # it was already empty, no need to run callbacks
+    >>> cl
+    CallbackList([])
+    """
+
+    __slots__ = ()  # Prevent attaching other attributes.
+    _basetype = list
+
+
+# The __eq__, __ne__, __gt__, __ge__, __lt__ and __le__ will make two
+# CallbackLists compare each others' _data. For example, this is what
+# __eq__ will do:
+#
+#                        a == b
+#                           |
+#                           |
+#                      a.__eq__(b)
+#                           |
+#                           |
+#                      a._data == b
+#                    /              \
+#                   /                \
+#          a._data.__eq__(b)   b.__eq__(a._data)
+#                 |                    |
+#                 |          ,--------------------.
+#           NotImplemented   | b._data == a._data |
+#                            `--------------------'
+CallbackList._expose_all(
+    '__contains__', '__iter__',
+    '__setitem__', '__getitem__', '__delitem__',
+    '__eq__', '__ne__', '__gt__', '__ge__', '__lt__', '__le__',
+    '__add__', '__mul__', '__iadd__', '__imul__',
+    'append', 'count', 'extend', 'index', 'insert', 'pop',
+    'remove', 'reverse', 'sort',
+)
+if sys.version_info >= (3, 3):
+    CallbackList._expose_all('clear', 'copy')
+
+
+@utils.register(abc.MutableMapping)
+class CallbackDict(_CallbackBase):
+    """A dictionary that runs callbacks when its content changes.
+
+    >>> def print_d(arg):
+    ...     assert arg is d
+    ...     print("now d is", d)
+    ...
+    >>> d = CallbackDict(a=1)
+    >>> d
+    CallbackDict({'a': 1})
+    >>> d.copy()    # return a regular dictionary
+    {'a': 1}
+    >>> d._callbacks.append(print_d)
+    >>> del d['a']
+    now d is CallbackDict({})
+    >>> d.update({'b': 4})
+    now d is CallbackDict({'b': 4})
+    >>> d['b'] = 4      # it was already 4, no need to run callbacks
+    >>> d.clear()
+    now d is CallbackDict({})
+    """
+
+    __slots__ = ()
+    _basetype = dict
+
+    # We can't expose this like other methods because it's a classmethod.
     @classmethod
     @functools.wraps(dict.fromkeys)
     def fromkeys(cls, iterable, value=None):
         return cls(dict.fromkeys(iterable, value))
 
-    @functools.wraps(dict.get)
-    def get(self, key, default=None):
-        return self._data.get(key, default)
 
-    @functools.wraps(dict.items)
-    def items(self):
-        return self._data.items()
-
-    @functools.wraps(dict.keys)
-    def keys(self):
-        return self._data.keys()
-
-    @functools.wraps(dict.values)
-    def values(self):
-        return self._data.values()
-
-    # We can't wrap this because dict.__hash__ is None.
-    def __hash__(self):
-        """Return a hash of items in the dictionary."""
-        # Dictionaries don't rely entirely on hashes of their keys, so
-        # they can have FrozenDict({'a': 1}) and frozenset({('a', 1)})
-        # as two different keys.
-        return hash(frozenset(self.items()))
-
-    @functools.wraps(dict.__eq__)
-    def __eq__(self, other):
-        # This will make two FrozenDicts compare their _data.
-        #
-        #                  self.__eq__(other)
-        #                           |
-        #                           |
-        #                  self._data == other
-        #                /                     \
-        #               /                       \
-        #    self._data.__eq__(other)   other.__eq__(self._data)
-        #              |                          |
-        #              |            ,---------------------------.
-        #       NotImplemented      | other._data == self._data |
-        #                           `---------------------------'
-        return self._data == other
-
-    @functools.wraps(dict.__ne__)
-    def __ne__(self, other):
-        return self._data != other
+CallbackDict._expose_all(
+    '__contains__', '__iter__',
+    '__setitem__', '__getitem__', '__delitem__',
+    '__eq__', '__ne__',
+    'clear', 'copy', 'get', 'items', 'keys', 'pop', 'popitem',
+    'setdefault', 'update', 'values',
+)
 
 
 class Font:
@@ -147,19 +197,18 @@ class Font:
         """Create a new font.
 
         If family or size is None their default values will be used. If
-        the family is 'monospace' (case-insensitive), a monospace font
-        will be used even if a font with the name monospace is not
-        available.
+        the family is 'Monospace', a monospace font will be used even if
+        a font with the name 'monospace' is not available.
 
         >>> Font(' mONoSpACe   ')
-        <BananaGUI font, family='monospace' size=None>
+        <BananaGUI font, family='Monospace' size=None>
         >>> Font('Sans')
         <BananaGUI font, family='Sans' size=None>
         """
         if family is not None:
             assert family, "family cannot be empty"
             if family.lower().strip() == 'monospace':
-                family = 'monospace'
+                family = 'Monospace'
         if size is not None:
             assert size > 0, "non-positive size %r" % (size,)
         self._family = family
@@ -219,24 +268,20 @@ class Font:
         >>> Font.from_string('default family, default size')
         <BananaGUI font, family=None size=None>
         """
-        try:
-            if string.count(',') == 2:
-                family, size, attributes = map(str.strip, string.split(','))
-            elif string.count(',') == 1:
-                family, size = map(str.strip, string.split(','))
-                attributes = ''
-            else:
-                raise ValueError("the string should contain one or two commas")
+        if string.count(',') == 2:
+            family, size, attributes = map(str.strip, string.split(','))
+        elif string.count(',') == 1:
+            family, size = map(str.strip, string.split(','))
+            attributes = ''
+        else:
+            raise ValueError("the string should contain one or two commas")
 
-            kwargs = dict.fromkeys(attributes.lower().split(), True)
-            if family.lower() != 'default family':
-                kwargs['family'] = family
-            if size.lower() != 'default size':
-                kwargs['size'] = int(size)
-            return cls(**kwargs)
-
-        except (AttributeError, IndexError, TypeError, ValueError) as e:
-            raise ValueError("invalid font string %r" % (string,)) from e
+        kwargs = dict.fromkeys(attributes.lower().split(), True)
+        if family.lower() != 'default family':
+            kwargs['family'] = family
+        if size.lower() != 'default size':
+            kwargs['size'] = int(size)
+        return cls(**kwargs)
 
     def _to_string(self, translations):
         def translate(string):
@@ -288,18 +333,18 @@ class Font:
         })
 
 
-class Color(collections.namedtuple('Color', 'r g b')):
+class Color(collections.namedtuple('Color', 'red green blue')):
     """An immutable color.
 
     The colors are based on a namedtuple, so they behave a lot like
     (r, g, b) tuples. Actually they are (r, g, b) tuples.
     """
 
-    def __init__(self, r, g, b):
-        """Check the r, g and b values."""
+    def __init__(self, red, green, blue):
+        """Check the red, green and blue values."""
         # Most of the initialization is done by the namedtuple's
         # __new__. See Color._source.
-        for value in (r, g, b):
+        for value in (red, green, blue):
             assert value in range(256), "invalid r/g/b value %r" % (value,)
 
     @property
@@ -323,11 +368,11 @@ class Color(collections.namedtuple('Color', 'r g b')):
         '#ff0' is treated as '#ffff00'.
 
         >>> Color.from_hex('#ffff00')
-        Color(r=255, g=255, b=0)
+        Color(red=255, green=255, blue=0)
         >>> Color.from_hex('#FfFF00')
-        Color(r=255, g=255, b=0)
+        Color(red=255, green=255, blue=0)
         >>> Color.from_hex('#ff0')
-        Color(r=255, g=255, b=0)
+        Color(red=255, green=255, blue=0)
         """
         if len(hexstring) == 4:
             # It's a 4-character hexadecimal color, like '#fff'.
@@ -363,9 +408,9 @@ class Color(collections.namedtuple('Color', 'r g b')):
         This supports percents.
 
         >>> Color.from_rgbstring('rgb(255,100%,0)')
-        Color(r=255, g=255, b=0)
+        Color(red=255, green=255, blue=0)
         >>> Color.from_rgbstring('rG B ( 255 , 100% ,0) ')
-        Color(r=255, g=255, b=0)
+        Color(red=255, green=255, blue=0)
         """
         match = re.search(
             r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$',

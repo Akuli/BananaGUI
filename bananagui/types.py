@@ -133,10 +133,11 @@ class Property:
         This is a higher-level alternative to raw_set, and it works like
         this:
           - Make sure the property is settable.
+          - Abort the setting process if the current value is equal to
+            the new value.
           - Get the setter. It is the widget's attribute
             _bananagui_set_<name of the property>.
-          - Call the setter with the widget and the converted value
-            as arguments.
+          - Call the setter with the converted value as the only argument.
           - Call raw_set.
         """
         if not self.settable:
@@ -147,6 +148,8 @@ class Property:
         except AttributeError as e:
             raise NotImplementedError("no setter was defined for %r"
                                       % self.name) from e
+        if self.get(widget) == value:
+            return
         setter(value)
         self.raw_set(widget, value)
 
@@ -166,7 +169,6 @@ class Property:
             value = self._values[widget] = self.getdefault()
         return value
 
-    # cls=None allows calling directly with prop.__get__(instance).
     def __get__(self, instance, cls=None):
         """Make the BananaGUI property behave like functions in classes."""
         if instance is None:
@@ -209,7 +211,7 @@ class Signal(Property):
     """A property that contains callbacks and can be emitted."""
 
     def __init__(self, name, *, doc):
-        """Initialize a signal."""
+        """Initialize the signal."""
         super().__init__(name, getdefault=list, type=list,
                          add_changed=False, doc=doc)
         self._blocked = weakref.WeakSet()
@@ -259,13 +261,16 @@ class BananaObject:
             raise TypeError("%r is not a BananaGUI property" % propertyname)
         return result
 
-    @utils.copy_doc(Property.set)
     def __setitem__(self, name: str, value):
         self.__get_prop(name).set(value)
 
-    @utils.copy_doc(Property.get)
     def __getitem__(self, name: str):
         return self.__get_prop(name).get()
+
+    # The set and get docstrings don't talk about things like set and
+    # get because the same docstrings are reused here.
+    __setitem__.__doc__ = Property.set.__doc__
+    __getitem__.__doc__ = Property.get.__doc__
 
 
 def _bool2string(value):

@@ -13,7 +13,7 @@ def main():
                             tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
 
-    window['destroyed.changed'].append(gui.quit)
+    window['on_destroy'].append(gui.quit)
     gui.main()
 
 

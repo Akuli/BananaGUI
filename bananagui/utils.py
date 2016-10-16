@@ -16,19 +16,6 @@ except ImportError:
 _NOTHING = object()
 
 
-def copy_doc(source):
-    """Copy __doc__ to another object.
-
-    Unlike functools.wraps, this only copies __doc__ so this also works
-    with classes. Use this as a decorator.
-    """
-    def inner(destination):
-        destination.__doc__ = source.__doc__
-        return destination
-
-    return inner
-
-
 def baseclass(base):
     """Modify a class to prevent creating instances and return it.
 
@@ -68,19 +55,17 @@ def common_beginning(*iterables):
     return result
 
 
-def check(value, *, pair=False, allow_none=False, type=None,
+def check(value, *, how_many=1, allow_none=False, type=None,
           length=None, minimum=None, maximum=None):
     """Do assertions about the value."""
-    if pair:
+    if how_many != 1:
         # Everything is different.
         assert isinstance(value, tuple), "%r is not a tuple" % (value,)
-        assert len(value) == 2, "length of %r is not 2" % (value,)
-        kwargs = locals().copy()
-        del kwargs['value']
-        del kwargs['pair']
-        first, second = value
-        check(first, **kwargs)
-        check(second, **kwargs)
+        assert len(value) == how_many, \
+            "length of %r is not %d" % (value, how_many)
+        for element in value:
+            check(element, allow_none=allow_none, type=type,
+                  length=length, minimum=minimum, maximum=maximum)
         return
 
     if not allow_none:
@@ -99,7 +84,20 @@ def check(value, *, pair=False, allow_none=False, type=None,
         assert value <= maximum, "%r is larger than %r" % (value, maximum)
 
 
-@MutableSequence.register
+def register(abstract_baseclass):
+    """Return a decorator that calls abstract_baseclass.register.
+
+    @abstract_baseclass.register also works since Python 3.3, but this
+    works on 3.2 also.
+    """
+    def inner(subclass):
+        abstract_baseclass.register(subclass)
+        return subclass
+
+    return inner
+
+
+@register(MutableSequence)
 class ListLikeBase:
     """A base class that implements list-like methods.
 
@@ -110,13 +108,13 @@ class ListLikeBase:
     # TODO: example in docstring.
 
     def __repr__(self):
-        return '<%s, %s: %r>' % (
+        return '<%s, %s=%r>' % (
             super().__repr__().lstrip('<').rstrip('>'),
             self._bananagui_contentproperty,
             self[:],
         )
 
-    def __set(self, content: tuple):
+    def __set(self, content):
         self[self._bananagui_contentproperty] = content
 
     def __get(self):

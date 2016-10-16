@@ -24,6 +24,7 @@ class Entry:
 
     def select_all(self):
         self['real_widget'].select_region(0, -1)
+        self['real_widget'].grab_focus()
 
 
 class PlainTextView:
@@ -46,6 +47,7 @@ class PlainTextView:
     def select_all(self):
         self.__buf.select_range(self.__buf.get_start_iter(),
                                 self.__buf.get_end_iter())
+        self['real_widget'].grab_focus()
 
     def clear(self):
         self.__buf.delete(self.__buf.get_start_iter(),

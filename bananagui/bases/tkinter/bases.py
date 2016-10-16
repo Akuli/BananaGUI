@@ -28,9 +28,11 @@ from .containers import Box
 class _TooltipBase:
     """Tooltips for tkinter.
 
-    This has nothing to do with idlelib.ToolTip. I didn't copy-paste
-    this from idlelib and I didn't read idlelib's tooltip.py when I
-    wrote this.
+    License notice: This class has nothing to do with idlelib.ToolTip. I
+    didn't copy-paste this from idlelib and I didn't read idlelib's
+    tooltip.py when I wrote this. I wrote my own tooltip manager mainly
+    because I didn't have the time to find out how I'm allowed to use
+    idlelib's code.
     """
 
     # This should never contain more than one window at a time, but we

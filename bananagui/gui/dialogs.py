@@ -25,6 +25,7 @@ from functools import partial
 from gettext import gettext as _
 
 from bananagui import _base, bananadoc, Color, Font, Property, BLACK
+from . import window
 from .window import BaseWindow, Window
 
 try:
@@ -48,14 +49,14 @@ class Dialog(_base.Dialog, BaseWindow):
     parentwindow = Property('parentwindow', type=Window, settable=False,
                             doc="The parent window set on initialization.")
 
-    def __init__(self, parentwindow, **kwargs):
+    def __init__(self, parentwindow: window.Window, **kwargs):
         self.parentwindow.raw_set(parentwindow)
         super().__init__(**kwargs)
 
 
-def messagedialog(icon, parentwindow: Window, *, text: str,
+def messagedialog(icon, parentwindow: window.Window, *, text: str,
                   title: str = None, buttons: list = None,
-                  defaultbutton: str = None):
+                  defaultbutton: str = None) -> str:
     """Display a message dialog.
 
     icon should be 'info', 'question', 'warning' or 'error'.
@@ -75,7 +76,7 @@ def messagedialog(icon, parentwindow: Window, *, text: str,
     The text of the clicked button is returned, or None if the user
     closed the dialog.
     """
-    assert icon in ('info', 'question', 'warning', 'error')
+    assert icon in {'info', 'question', 'warning', 'error'}
 
     if title is None:
         title = parentwindow['title']
@@ -100,7 +101,7 @@ errordialog = partial(messagedialog, 'error')
 
 
 def colordialog(parentwindow: Window, *, default: Color = BLACK,
-                title: str = None):
+                title: str = None) -> Color:
     """Ask a color from the user.
 
     This returns the new color, or None if the user canceled the dialog.
@@ -110,8 +111,8 @@ def colordialog(parentwindow: Window, *, default: Color = BLACK,
     return _base.colordialog(parentwindow, default, title)
 
 
-def fontdialog(parentwindow: Window, *, default: Font,
-               title: str = None):
+def fontdialog(parentwindow: Window, *, default: Font = Font(),
+               title: str = None) -> Font:
     """Ask a font from the user.
 
     This returns the new font, or None if the user canceled the dialog.

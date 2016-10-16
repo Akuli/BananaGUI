@@ -4,9 +4,10 @@ from gi.repository import Gtk
 class BaseWindow:
 
     def __init__(self, **kwargs):
-        self['real_widget'].set_title(self['title'])
-        self['real_widget'].connect('delete-event', self.__delete_event)
-        self['real_widget'].show()
+        window = self['real_widget']
+        window.set_title(self['title'])
+        window.connect('delete-event', self.__delete_event)
+        window.show()
         super().__init__(**kwargs)
 
     def _bananagui_set_title(self, title):
@@ -26,10 +27,11 @@ class BaseWindow:
         self['real_widget'].set_size_request(*size)
 
     def __delete_event(self, widget, event):
-        # TODO: on_destroy signal.
-        # TODO: allow the user to customize the destroying event.
-        self.destroy()
+        self.on_destroy.emit()
         return True  # Block GTK's delete-event handling.
+
+    def wait(self):
+        raise NotImplementedError  # TODO
 
     def destroy(self):
         self['real_widget'].destroy()

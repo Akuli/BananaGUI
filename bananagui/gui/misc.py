@@ -22,7 +22,7 @@
 """Checkbox, Separator and Spinner widgets."""
 
 from bananagui import _base, bananadoc, Property, HORIZONTAL, VERTICAL
-from .bases import _Oriented, Child
+from .bases import Oriented, Ranged, Child
 
 try:
     _SpinnerBase = _base.Spinner
@@ -57,19 +57,22 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-class Separator(_Oriented, _base.Separator, Child):
+@bananadoc
+class Separator(Oriented, _base.Separator, Child):
+    """A horizontal or vertical line."""
 
-    def __init__(self, parent, orientation, **kwargs):
+    def __init__(self, parent, **kwargs):
         # Make the separator expand by default.
+        orientation = kwargs.get('orientation')
         if orientation == HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
         if orientation == VERTICAL:
             kwargs.setdefault('expand', (False, True))
-        super().__init__(parent, orientation, **kwargs)
+        super().__init__(parent, **kwargs)
 
 
 class Spinner(_SpinnerBase, Child):
-    """A spinner widget.
+    """A waiting spinner.
 
     The spinner doesn't spin by default. You can set the spinning
     property to True to make it spin.
@@ -80,12 +83,16 @@ class Spinner(_SpinnerBase, Child):
         doc="True if the widget is currently spinning, False if not.")
 
 
-def get_font_families() -> list:
-    """Return a list of all avaliable font families.
+class Spinbox(Ranged, _base.Spinbox, Child):
+    """A box for selecting a number with arrow buttons up and down."""
 
-    The list never contains duplicates, but there's no guarantees about
-    its order.
-    """
+
+class Slider(Oriented, Ranged, _base.Slider, Child):
+    """A slider for selecting a number."""
+
+
+def get_font_families() -> list:
+    """Return a list of all avaliable font families."""
     # This is converted to a set first to make sure that we don't get
-    # any duplicates. The base function can return any iterable.
-    return list(set(_base.get_font_families()))
+    # any duplicates. The base function can return anything iterable.
+    return sorted(set(_base.get_font_families()))

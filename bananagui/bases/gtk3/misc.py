@@ -65,6 +65,18 @@ class Spinner:
             self.__spinner.stop()
 
 
+class Spinbox:
+
+    def __init__(self, parent, **kwargs):
+        raise NotImplementedError  # TODO
+
+
+class Slider:
+
+    def __init__(self, parent, **kwargs):
+        raise NotImplementedError  # TODO
+
+
 def get_font_families():
     # Based on http://zetcode.com/gui/pygtk/pango/
     widget = Gtk.Label()
