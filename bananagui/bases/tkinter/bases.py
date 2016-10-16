@@ -21,8 +21,8 @@
 
 import tkinter as tk
 
-from bananagui import HORIZONTAL, VERTICAL
-from .containers import Box
+import bananagui
+from . import containers
 
 
 class _TooltipBase:
@@ -111,8 +111,8 @@ _tkinter_fills = {
     (False, False): 'none',
 }
 _expand_indexes = {
-    HORIZONTAL: 0,
-    VERTICAL: 1,
+    bananagui.HORIZONTAL: 0,
+    bananagui.VERTICAL: 1,
 }
 
 
@@ -128,7 +128,7 @@ class Child(_TooltipBase):
             # sure that the pack options are changed when the expand is
             # changed.
             pack_kwargs = {'fill': _tkinter_fills[expand]}
-            if isinstance(self['parent'], Box):
+            if isinstance(self['parent'], containers.Box):
                 index = _expand_indexes[self['parent']['orientation']]
                 pack_kwargs['expand'] = expand[index]
             else:

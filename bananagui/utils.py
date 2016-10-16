@@ -4,12 +4,15 @@ It's not recommended to rely on this submodule. It's meant only for
 being used internally by BananaGUI and it can be changed in the future.
 """
 
+import re
+
+# Other BananaGUI modules are free to use collections.abc from here.
 try:
-    from collections.abc import MutableSequence
+    from collections import abc    # noqa
 except ImportError:
-    # The abstract base classes in collections were moved to
-    # collections.abc in Python 3.3.
-    from collections import MutableSequence
+    # The abstract base classes in collections were moved from _abcoll
+    # to collections.abc in Python 3.3.
+    import _abcoll as abc   # noqa
 
 
 # Allow None as a non-default value.
@@ -97,7 +100,27 @@ def register(abstract_baseclass):
     return inner
 
 
-@register(MutableSequence)
+def rangestep(range_object: range):
+    """Return a range object's step.
+
+    Unlike range_object.step, this also works on Python 3.2.
+    """
+    try:
+        return range_object.step
+    except AttributeError:
+        if len(range_object) >= 2:
+            # The range has enough items for calculating the step.
+            return range_object[1] - range_object[0]
+        # This hacky code only runs on Python 3.2.
+        if repr(range_object).count(',') == 1:
+            # The repr doesn't show the step, so it's the default.
+            return 1
+        # The repr shows the step so we can get it from that.
+        match = re.search(r'(-?\d+)\)$', repr(range_object))
+        return int(match.group(1))
+
+
+@register(abc.MutableSequence)
 class ListLikeBase:
     """A base class that implements list-like methods.
 

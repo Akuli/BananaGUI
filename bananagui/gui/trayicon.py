@@ -1,18 +1,19 @@
-from bananagui import _base, Property
-from .bases import Widget
+import bananagui
+from bananagui import _base
+from . import bases
 
 
-class TrayIcon(_base.TrayIcon, Widget):
+class TrayIcon(_base.TrayIcon, bases.Widget):
     """An application indicator that will be displayed in the system tray."""
 
     # TODO: the trayicon's size shouldn't be hard-coded.
-    iconpath = Property.imagepath(
+    iconpath = bananagui.Property.imagepath(
         'iconpath', settable=False,
         doc="""A path to the icon that will be displayed in the system tray.
 
         The icon should be 22 pixels wide and 22 pixels high.
         """)
-    tooltip = Property(
+    tooltip = bananagui.Property(
         'tooltip', type=str, allow_none=True, default=None,
         doc="""The trayicon's tooltip.
 

@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from bananagui import Color
+import bananagui
 
 
 root = None
@@ -22,7 +22,7 @@ def quit():
     root = None
 
 
-def _convert_color(colorstring):
+def convert_color(colorstring):
     """Convert a tkinter color string to a BananaGUI color.
 
     Unlike bananagui.Color.from_hex, this also handles color names like
@@ -31,4 +31,4 @@ def _convert_color(colorstring):
     # I have no idea why the biggest value is 65535. To scale it down to
     # 255 we need to divide it by 65535/255=257.
     rgb = [value // 257 for value in root.winfo_rgb(colorstring)]
-    return Color(*rgb)
+    return bananagui.Color(*rgb)

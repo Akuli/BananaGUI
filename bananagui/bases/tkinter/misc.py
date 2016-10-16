@@ -19,13 +19,11 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import decimal
-
 import tkinter as tk
 from tkinter import font
 
-from bananagui import HORIZONTAL, VERTICAL
-from .mainloop import _convert_color
+import bananagui
+from . import mainloop
 
 
 class Checkbox:
@@ -38,8 +36,8 @@ class Checkbox:
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        box_bg = _convert_color(widget['selectcolor'])
-        checkmark = _convert_color(widget['fg'])
+        box_bg = mainloop.convert_color(widget['selectcolor'])
+        checkmark = mainloop.convert_color(widget['fg'])
         if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
@@ -73,9 +71,9 @@ class Separator:
 
     def __init__(self, parent, **kwargs):
         widget = tk.Frame(parent['real_widget'], border=1, relief='sunken')
-        if self['orientation'] == HORIZONTAL:
+        if self['orientation'] == bananagui.HORIZONTAL:
             widget['height'] = 3
-        if self['orientation'] == VERTICAL:
+        if self['orientation'] == bananagui.VERTICAL:
             widget['width'] = 3
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
@@ -121,8 +119,8 @@ class Spinbox:
 
 
 _tkinter_orients = {
-    HORIZONTAL: 'horizontal',
-    VERTICAL: 'vertical',
+    bananagui.HORIZONTAL: 'horizontal',
+    bananagui.VERTICAL: 'vertical',
 }
 
 

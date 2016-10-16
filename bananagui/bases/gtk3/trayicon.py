@@ -3,10 +3,10 @@ import warnings
 
 from gi.repository import Gtk
 
-from . import has_appindicator
-if has_appindicator:
-    # Everything in this module starts with "Indicator" so we can use a
-    # from import.
+from . import HAS_APPINDICATOR
+if HAS_APPINDICATOR:
+    # Everything in this module starts with "Indicator" so I think it's
+    # fine to use a from import.
     from gi.repository.AppIndicator3 import (
         Indicator, IndicatorCategory, IndicatorStatus)
 
@@ -14,7 +14,7 @@ if has_appindicator:
 class TrayIcon:
 
     def __init__(self, **kwargs):
-        if has_appindicator:
+        if HAS_APPINDICATOR:
             # This is a bit bad. There's no good way to get the name of
             # the application, and we also don't know the icon yet so
             # we need to set that to a dummy value.
@@ -33,7 +33,7 @@ class TrayIcon:
         super().__init__(**kwargs)
 
     def _bananagui_set_iconpath(self, path):
-        if has_appindicator:
+        if HAS_APPINDICATOR:
             # This needs to be absolute path or AppIndicator3 thinks
             # it's an icon name.
             self['real_widget'].set_icon(os.path.abspath(path))
@@ -41,7 +41,7 @@ class TrayIcon:
             self['real_widget'].set_from_file(path)
 
     def _bananagui_set_tooltip(self, tooltip):
-        if has_appindicator:
+        if HAS_APPINDICATOR:
             warnings.warn("AppIndicator3 doesn't support tooltips")
         else:
             self['real_widget'].set_tooltip_text(tooltip)

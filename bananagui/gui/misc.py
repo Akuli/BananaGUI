@@ -21,8 +21,9 @@
 
 """Checkbox, Separator and Spinner widgets."""
 
-from bananagui import _base, bananadoc, Property, HORIZONTAL, VERTICAL
-from .bases import Oriented, Ranged, Child
+import bananagui
+from bananagui import _base
+from . import bases
 
 try:
     _SpinnerBase = _base.Spinner
@@ -34,22 +35,23 @@ except AttributeError:
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
 
-@bananadoc
-class Checkbox(_base.Checkbox, Child):
+@bananagui.bananadoc
+class Checkbox(_base.Checkbox, bases.Child):
     """A widget that can be checked.
 
     The Checkbox widget has nothing to do with the Box widget.
     """
 
-    text = Property('text', type=str, default='',
-                    doc="The text next to the box that can be checked.")
-    checked = Property(
+    text = bananagui.Property(
+        'text', type=str, default='',
+        doc="The text next to the box that can be checked.")
+    checked = bananagui.Property(
         'checked', type=bool, default=False,
         doc="True if the box is currently checked, False if not.")
 
 
-@bananadoc
-class Dummy(_base.Dummy, Child):
+@bananagui.bananadoc
+class Dummy(_base.Dummy, bases.Child):
     """An empty widget.
 
     This is useful for creating layouts with empty space that must be
@@ -57,37 +59,37 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-@bananadoc
-class Separator(Oriented, _base.Separator, Child):
+@bananagui.bananadoc
+class Separator(bases.Oriented, _base.Separator, bases.Child):
     """A horizontal or vertical line."""
 
     def __init__(self, parent, **kwargs):
         # Make the separator expand by default.
         orientation = kwargs.get('orientation')
-        if orientation == HORIZONTAL:
+        if orientation == bananagui.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
-        if orientation == VERTICAL:
+        if orientation == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
         super().__init__(parent, **kwargs)
 
 
-class Spinner(_SpinnerBase, Child):
+class Spinner(_SpinnerBase, bases.Child):
     """A waiting spinner.
 
     The spinner doesn't spin by default. You can set the spinning
     property to True to make it spin.
     """
 
-    spinning = Property(
+    spinning = bananagui.Property(
         'spinning', type=bool, default=False,
         doc="True if the widget is currently spinning, False if not.")
 
 
-class Spinbox(Ranged, _base.Spinbox, Child):
+class Spinbox(bases.Ranged, _base.Spinbox, bases.Child):
     """A box for selecting a number with arrow buttons up and down."""
 
 
-class Slider(Oriented, Ranged, _base.Slider, Child):
+class Slider(bases.Oriented, bases.Ranged, _base.Slider, bases.Child):
     """A slider for selecting a number."""
 
 

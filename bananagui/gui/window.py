@@ -22,7 +22,7 @@
 """Base classes for GUI toolkit wrappers."""
 
 import bananagui
-from bananagui import utils
+from bananagui import _base, utils
 from . import containers
 
 
@@ -33,7 +33,7 @@ def _destroy_callback(event):
 
 @utils.baseclass
 @bananagui.bananadoc
-class BaseWindow(bananagui._base.BaseWindow, containers.Bin):
+class BaseWindow(_base.BaseWindow, containers.Bin):
     """A window baseclass.
 
     BananaGUI windows have a destroy() method, and it should be called
@@ -79,7 +79,7 @@ class BaseWindow(bananagui._base.BaseWindow, containers.Bin):
         super().__init__(**kwargs)
 
     @property
-    def destroyed(self):
+    def destroyed(self) -> None:
         """True if the window has been destroyed.
 
         This is not a BananaGUI property because there's no need to
@@ -96,11 +96,11 @@ class BaseWindow(bananagui._base.BaseWindow, containers.Bin):
         """Destroy the window."""
         self.destroy()
 
-    def wait(self):
+    def wait(self) -> None:
         """Wait until the window is destroyed."""
         super().wait()
 
-    def destroy(self):
+    def destroy(self) -> None:
         """Destroy the window and set self.destroyed to True.
 
         This method can be called multiple times and it will do nothing
@@ -113,7 +113,7 @@ class BaseWindow(bananagui._base.BaseWindow, containers.Bin):
 
 
 @bananagui.bananadoc
-class Window(bananagui._base.Window, BaseWindow):
+class Window(_base.Window, BaseWindow):
     """A window that can have child windows.
 
     The windows don't have a parent window. You can create multiple

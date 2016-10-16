@@ -1,9 +1,10 @@
 from gi.repository import GLib
-from bananagui import RUN_AGAIN
+
+import bananagui
 
 
 def add_timeout(milliseconds, callback):
     def real_callback():
-        return callback() == RUN_AGAIN
+        return callback() == bananagui.RUN_AGAIN
 
     GLib.timeout_add(milliseconds, real_callback)

@@ -3,8 +3,8 @@
 from bananagui import _base
 
 
-initialized = False
-running = False
+_initialized = False
+_running = False
 
 
 def init():
@@ -14,10 +14,10 @@ def init():
     first time.
     """
     # TODO: Take arguments here?
-    global initialized
-    if not initialized:
+    global _initialized
+    if not _initialized:
         _base.init()
-        initialized = True
+        _initialized = True
 
 
 def main():
@@ -25,16 +25,16 @@ def main():
 
     Raise an exception on failure.
     """
-    global initialized
-    global running
-    assert initialized, "init() wasn't called before calling main()"
-    assert not running, "two mainloops cannot be running at the same time"
-    running = True
+    global _initialized
+    global _running
+    assert _initialized, "init() wasn't called before calling main()"
+    assert not _running, "two mainloops cannot be running at the same time"
+    _running = True
     try:
         _base.main()
     finally:
-        running = False
-        initialized = False
+        _running = False
+        _initialized = False
 
 
 def quit(*args):
@@ -43,5 +43,5 @@ def quit(*args):
     All positional arguments are ignored. Quitting when the main loop is
     not running does nothing.
     """
-    if running:
+    if _running:
         _base.quit()

@@ -10,26 +10,24 @@ gi.require_version('GLib', '2.0')
 
 try:
     gi.require_version('AppIndicator3', '0.1')
-    has_appindicator = True
+    HAS_APPINDICATOR = True
 except ValueError:
-    has_appindicator = False
+    HAS_APPINDICATOR = False
 
 from gi.repository import Gtk
-_GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
+GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
 
 from .bases import Widget, Parent, Child
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
+from .clipboard import set_clipboard_text, get_clipboard_text
 from .containers import Bin, Box
 from .dialogs import Dialog, messagedialog, colordialog, fontdialog
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
-from .misc import (
-    Checkbox, Dummy, Separator, Spinner, Spinbox, Slider,
-    get_font_families)
+from .misc import (Checkbox, Dummy, Separator, Spinner, Spinbox, Slider,
+                   get_font_families)
 from .textwidgets import TextBase, Entry, PlainTextView
+from .timeouts import add_timeout
 from .trayicon import TrayIcon
 from .window import BaseWindow, Window
-
-from .clipboard import set_clipboard_text, get_clipboard_text
-from .timeouts import add_timeout

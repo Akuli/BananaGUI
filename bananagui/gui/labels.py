@@ -21,29 +21,28 @@
 
 """BananaGUI labels."""
 
-from bananagui import _base, Property, bananadoc
-from bananagui.utils import baseclass
-from .bases import Child
+import bananagui
+from bananagui import _base, utils
+from . import bases
 
 
-@baseclass
-@bananadoc
-class BaseLabel(_base.BaseLabel, Child):
+@utils.baseclass
+@bananagui.bananadoc
+class BaseLabel(_base.BaseLabel, bases.Child):
     """A label base class."""
 
 
-@bananadoc
+@bananagui.bananadoc
 class Label(_base.Label, BaseLabel):
     """A label with text in it."""
 
     # TODO: Add fonts and colors?
-    text = Property('text', type=str, default='',
-                    doc="Text in the label.")
+    text = bananagui.Property('text', type=str, default='',
+                              doc="Text in the label.")
 
 
-@bananadoc
+@bananagui.bananadoc
 class ImageLabel(_base.ImageLabel, BaseLabel):
     """A label that contains an image."""
-    imagepath = Property.imagepath(
-        'imagepath',
-        doc="Path to an image that will be displayed.")
+    imagepath = bananagui.Property.imagepath(
+        'imagepath', doc="Path to an image that will be displayed.")

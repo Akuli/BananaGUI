@@ -12,7 +12,7 @@ RUN_AGAIN = 2
 _base.add_timeout.RUN_AGAIN = RUN_AGAIN
 
 
-def add_timeout(milliseconds: int, callback):
+def add_timeout(milliseconds: int, callback) -> None:
     """Run callback() after waiting.
 
     If the function returns RUN_AGAIN it will be called again after

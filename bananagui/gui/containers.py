@@ -24,14 +24,14 @@
 # TODO: Add a grid widget.
 
 import bananagui
-from bananagui import utils
+from bananagui import _base, utils
 from . import bases
 
 
 # This is not a Child because Window and Dialog are based on this.
 @utils.baseclass
 @bananagui.bananadoc
-class Bin(bananagui._base.Bin, bases.Parent):
+class Bin(_base.Bin, bases.Parent):
     """A widget that contains one child widget or no children at all."""
 
     child = bananagui.Property(
@@ -49,7 +49,7 @@ class Bin(bananagui._base.Bin, bases.Parent):
 
 
 @bananagui.bananadoc
-class Box(bases.Oriented, bananagui._base.Box, bases.Parent, bases.Child):
+class Box(bases.Oriented, _base.Box, bases.Parent, bases.Child):
     """A widget that contains other widgets.
 
     The children property behaves like a list and you can modify it to

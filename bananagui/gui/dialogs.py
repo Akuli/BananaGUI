@@ -21,12 +21,12 @@
 
 """Base classes for GUI toolkit wrappers."""
 
-from functools import partial
+import functools
 from gettext import gettext as _
 
-from bananagui import _base, bananadoc, Color, Font, Property, BLACK
+import bananagui
+from bananagui import _base
 from . import window
-from .window import BaseWindow, Window
 
 try:
     _fontdialog = _base.fontdialog
@@ -34,8 +34,8 @@ except AttributeError:
     from bananagui.bases.defaults import fontdialog as _fontdialog
 
 
-@bananadoc
-class Dialog(_base.Dialog, BaseWindow):
+@bananagui.bananadoc
+class Dialog(_base.Dialog, window.BaseWindow):
     """A window that has a parent window.
 
     This class takes a parentwindow argument on initialization. The
@@ -44,10 +44,11 @@ class Dialog(_base.Dialog, BaseWindow):
     toolkit supports. It's None by default.
     """
 
-    title = Property('title', type=str, default="BananaGUI Dialog",
-                     doc="The title of the window.")
-    parentwindow = Property('parentwindow', type=Window, settable=False,
-                            doc="The parent window set on initialization.")
+    title = bananagui.Property('title', type=str, default="BananaGUI Dialog",
+                               doc="The title of the window.")
+    parentwindow = bananagui.Property(
+        'parentwindow', type=window.Window, settable=False,
+        doc="The parent window set on initialization.")
 
     def __init__(self, parentwindow: window.Window, **kwargs):
         self.parentwindow.raw_set(parentwindow)
@@ -89,19 +90,19 @@ def messagedialog(icon, parentwindow: window.Window, *, text: str,
         defaultbutton = buttons[0]
     assert defaultbutton in buttons
 
-    return _base.messagedialog(icon, parentwindow, text, title,
-                               buttons, defaultbutton)
+    return _base.messagedialog(
+        icon, parentwindow, text, title, buttons, defaultbutton)
 
 
 # The bases don't need to define these.
-infodialog = partial(messagedialog, 'info')
-questiondialog = partial(messagedialog, 'question')
-warningdialog = partial(messagedialog, 'warning')
-errordialog = partial(messagedialog, 'error')
+infodialog = functools.partial(messagedialog, 'info')
+questiondialog = functools.partial(messagedialog, 'question')
+warningdialog = functools.partial(messagedialog, 'warning')
+errordialog = functools.partial(messagedialog, 'error')
 
 
-def colordialog(parentwindow: Window, *, default: Color = BLACK,
-                title: str = None) -> Color:
+def colordialog(parentwindow: window.Window, *, title: str = None,
+                default: bananagui.Color = bananagui.BLACK) -> bananagui.Color:
     """Ask a color from the user.
 
     This returns the new color, or None if the user canceled the dialog.
@@ -111,8 +112,8 @@ def colordialog(parentwindow: Window, *, default: Color = BLACK,
     return _base.colordialog(parentwindow, default, title)
 
 
-def fontdialog(parentwindow: Window, *, default: Font = Font(),
-               title: str = None) -> Font:
+def fontdialog(parentwindow: window.Window, *, title: str = None,
+               default: bananagui.Font = bananagui.Font()) -> bananagui.Font:
     """Ask a font from the user.
 
     This returns the new font, or None if the user canceled the dialog.

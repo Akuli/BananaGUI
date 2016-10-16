@@ -1,6 +1,6 @@
 from gi.repository import Gtk
 
-from bananagui import HORIZONTAL, VERTICAL
+import bananagui
 
 
 class Checkbox:
@@ -29,8 +29,8 @@ class Dummy:
 
 
 _orientations = {
-    HORIZONTAL: Gtk.Orientation.HORIZONTAL,
-    VERTICAL: Gtk.Orientation.VERTICAL,
+    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
+    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
 }
 
 

@@ -21,39 +21,31 @@
 
 """Base classes for various widgets."""
 
-from bananagui import (
-    _base, bananadoc, Color, Property, BananaObject,
-    HORIZONTAL, VERTICAL)
-from bananagui.utils import baseclass
+import bananagui
+from bananagui import _base, utils
 
 
-@baseclass
-@bananadoc
-class Widget(_base.Widget, BananaObject):
+@utils.baseclass
+@bananagui.bananadoc
+class Widget(_base.Widget, bananagui.BananaObject):
     """A widget baseclass."""
 
     # The tooltip property is not implemented here. Parent widgets don't
     # need tooltips because they should be always filled with Dummy
     # widgets.
-    real_widget = Property(
+    real_widget = bananagui.Property(
         'real_widget', settable=False,
         doc="The real GUI toolkit's widget that BananaGUI uses.")
-    background = Property(
-        'background', type=Color, allow_none=True, default=None,
-        doc="""The widget's background.
-
-        The system-specific default is used if this is None.
-        """)
 
 
-@baseclass
-@bananadoc
+@utils.baseclass
+@bananagui.bananadoc
 class Parent(_base.Parent, Widget):
     """A widget that child widgets can use as their parent."""
 
 
-@baseclass
-@bananadoc
+@utils.baseclass
+@bananagui.bananadoc
 class Child(_base.Child, Widget):
     """A widget that can be added to a container.
 
@@ -62,15 +54,15 @@ class Child(_base.Child, Widget):
     changed afterwards.
     """
 
-    parent = Property('parent', type=Parent, settable=False,
-                      doc="The parent set on initialization.")
-    tooltip = Property(
+    parent = bananagui.Property('parent', type=Parent, settable=False,
+                                doc="The parent set on initialization.")
+    tooltip = bananagui.Property(
         'tooltip', type=str, allow_none=True, default=None,
         doc="""Text in the widget's tooltip.
 
         This is None if the widget doesn't have a tooltip.
         """)
-    expand = Property(
+    expand = bananagui.Property(
         'expand', how_many=2, type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.
 
@@ -106,7 +98,7 @@ class Child(_base.Child, Widget):
             `------------------------------------------------'
 
         """)
-    grayed_out = Property(
+    grayed_out = bananagui.Property(
         'grayed_out', type=bool, default=False,
         doc="True if the widget is grayed out, False otherwise.")
 
@@ -115,12 +107,12 @@ class Child(_base.Child, Widget):
         super().__init__(**kwargs)
 
 
-@baseclass
-@bananadoc
+@utils.baseclass
+@bananagui.bananadoc
 class Oriented:
     """Implement an orientation property and handy class methods.
 
-    There are many ways to create instances of _Oriented widgets. For
+    There are many ways to create instances of Oriented subclasses. For
     example, all of these are valid ways to create a horizontal widget:
 
         SomeWidget.horizontal(...)
@@ -128,7 +120,7 @@ class Oriented:
         SomeWidget(..., orientation=bananagui.HORIZONTAL)
     """
 
-    orientation = Property(
+    orientation = bananagui.Property(
         'orientation', settable=False,
         doc="""This is bananagui.HORIZONTAL or bananagui.VERTICAL.
 
@@ -137,7 +129,7 @@ class Oriented:
         """)
 
     def __init__(self, *args, orientation, **kwargs):
-        assert orientation in {HORIZONTAL, VERTICAL}, \
+        assert orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}, \
             "unknown orientation %r" % (orientation,)
         self.orientation.raw_set(orientation)
         super().__init__(*args, **kwargs)
@@ -145,49 +137,50 @@ class Oriented:
     @classmethod
     def horizontal(cls, *args, **kwargs):
         """Create and return a new horizontal instance."""
-        return cls(*args, orientation=HORIZONTAL, **kwargs)
+        return cls(*args, orientation=bananagui.HORIZONTAL, **kwargs)
 
     @classmethod
     def vertical(cls, *args, **kwargs):
         """Create and return a new vertical instance"""
-        return cls(*args, orientation=VERTICAL, **kwargs)
+        return cls(*args, orientation=bananagui.VERTICAL, **kwargs)
 
 
-@baseclass
-@bananadoc
+def _check_valuerange(range_object):
+    """Check if a range is valid for Ranged."""
+    assert len(range_object) >= 2, \
+        "%r contains less than two values" % (range_object,)
+    assert utils.rangestep(range_object) > 0, \
+        "%r has a non-positive step" % (range_object,)
+
+
+@utils.baseclass
+@bananagui.bananadoc
 class Ranged:
-    """Implement minimum, maximum, step and value BananaGUI properties.
+    """Implement valuerange and value BananaGUI properties."""
+    valuerange = bananagui.Property(
+        'valuerange', type=range, settable=False,
+        doc="""A range of allowed values.
 
-    Unlike with Python's range, the minimum and maximum are inclusive.
-    """
-    minimum = Property(
-        'minimum', type=int, settable=False,
-        doc="The smallest possible value set on initialization.")
-    maximum = Property(
-        'maximum', type=int, settable=False,
-        doc="The largest possible value set on initialization.")
-    step = Property(
-        'step', type=int, settable=False,
-        doc="How much the value will be incremented/decremented at a time.")
-    value = Property('value', type=int,
-                     doc="The current value.")
+        This must be a Python range object.
+        """)
+    value = bananagui.Property(
+        'value', type=int,
+        doc="""The current value.
 
-    def __init__(self, *args, minimum: int = 0, maximum: int = 100,
-                 step: int = 1, **kwargs):
-        """Set the minimum, maximum and step properties."""
-        assert minimum < maximum, "minimum must be smaller than maximum"
-        assert step > 0, "non-positive step %d" % step
-        assert maximum - minimum >= step, "too big step"
-        self.minimum.raw_set(minimum)
-        self.maximum.raw_set(maximum)
-        self.step.raw_set(step)
-        self.value.raw_set(minimum)
+        This must be in the valuerange.
+        """)
 
-        # This makes checking values easier.
-        self._bananagui_ranged_valuerange = range(minimum, maximum+1, step)
+    def __init__(self, *args, valuerange: range = range(11), **kwargs):
+        """Set the value and range properties."""
+        # The range is set before calling _check_valuerange because
+        # setting it checks the type and we get better error messages.
+        self.valuerange.raw_set(valuerange)
+        _check_valuerange(valuerange)
+        self.value.raw_set(min(valuerange))
         super().__init__(*args, **kwargs)
 
     def _bananagui_set_value(self, value):
-        assert value in self._bananagui_ranged_valuerange, \
-            "value %s is out of range" % value
+        """Check if the value is in the range."""
+        assert value in self['valuerange'], \
+            "%r is not in %r" % (value, self['valuerange'])
         super()._bananagui_set_value(value)
