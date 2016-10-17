@@ -1,6 +1,7 @@
 from gi.repository import Gtk
 
 import bananagui
+from bananagui import utils
 
 
 class Checkbox:
@@ -68,13 +69,37 @@ class Spinner:
 class Spinbox:
 
     def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
+        minimum = min(self['valuerange'])
+        maximum = max(self['valuerange'])
+        step = utils.rangestep(self['valuerange'])
+        widget = Gtk.SpinButton.new_with_range(minimum, maximum, step)
+        widget.connect('notify::value', self.__value_changed)
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def __value_changed(self, widget, gparam):
+        self.value.raw_set(int(widget.get_value()))
+
+    def _bananagui_set_value(self, value):
+        self['real_widget'].set_value(value)
 
 
 class Slider:
 
     def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
+        range_args = (min(self['valuerange']), max(self['valuerange']),
+                      utils.rangestep(self['valuerange']))
+        widget = Gtk.Scale.new_with_range(
+            _orientations[self['orientation']], *range_args)
+        widget.connect('notify::value', self.__value_changed)
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def __value_changed(self, widget, gparam):
+        self.value.raw_set(int(widget.get_value()))
+
+    def _bananagui_set_value(self, value):
+        self['real_widget'].set_value(value)
 
 
 def get_font_families():
