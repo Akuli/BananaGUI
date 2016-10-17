@@ -24,6 +24,7 @@ class SliderWindow(gui.Window):
         box['children'].append(self.spinbox)
 
     def value_changed(self, event):
+        print("hi")
         # Python's sets are awesome.
         all_widgets = {self.hslider, self.vslider, self.spinbox}
         other_widgets = all_widgets - {event.widget}
