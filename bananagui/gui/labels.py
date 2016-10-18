@@ -34,8 +34,12 @@ class BaseLabel(_base.BaseLabel, bases.Child):
 
 @bananagui.bananadoc
 class Label(_base.Label, BaseLabel):
-    """A label with text in it."""
+    """A label with text in it.
 
+    Currently the text is always centered.
+    """
+    # TODO: add an alignment thing? Currently the text in the labels is
+    # always centered.
     # TODO: Add fonts and colors?
     text = bananagui.Property('text', type=str, default='',
                               doc="Text in the label.")

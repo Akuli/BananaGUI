@@ -9,7 +9,7 @@ class Dialog:
     def __init__(self, parentwindow, **kwargs):
         widget = tk.Toplevel(parentwindow['real_widget'])
         self.real_widget.raw_set(widget)
-        super().__init__(parentwindow, **kwargs)
+        super().__init__(**kwargs)
 
 
 def messagedialog(icon, parentwindow, message, title, buttons, defaultbutton):

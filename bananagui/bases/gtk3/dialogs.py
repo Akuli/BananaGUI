@@ -7,8 +7,30 @@ from . import GTK_VERSION
 class Dialog:
 
     def __init__(self, parentwindow, **kwargs):
-        self.real_widget.raw_set(Gtk.Dialog(parentwindow['real_widget']))
+        widget = Gtk.Dialog(parentwindow['real_widget'])
+
+        # Gtk's dialogs have an action area for buttons that we don't
+        # need. Let's set its border width to zero to make it invisible.
+        if not widget.get_action_area.is_deprecated():
+            widget.get_action_area().set_border_width(0)
+
+        self.real_widget.raw_set(widget)
         super().__init__(**kwargs)
+
+    # The content area needs to contain the child.
+    def _bananagui_set_child(self, child):
+        content = self['real_widget'].get_content_area()
+        if self['child'] is not None:
+            content.remove(self['child']['real_widget'])
+        if child is not None:
+            # The content area is a vertical box.
+            content.pack_start(child['real_widget'], True, True, 0)
+            child['real_widget'].show()
+
+    def wait(self):
+        # Currently I have no idea how this can be done with a regular
+        # window, but it's easier with dialogs.
+        self['real_widget'].run()
 
 
 def messagedialog(icon, parentwindow, message, title, buttons, defaultbutton):
@@ -27,7 +49,8 @@ def colordialog(parentwindow, default, title):
         get_rgba = dialog.get_rgba
     else:
         # This is deprecated, but the documentation doesn't say when it
-        # became deprecated.
+        # became deprecated and things like
+        # Gtk.ColorSelectionDialog.new.is_deprecated() return False.
         # https://developer.gnome.org/gtk3/stable/GtkColorSelectionDialog.html
         dialog = Gtk.ColorSelectionDialog(**kwargs)
         selection = dialog.get_color_selection()

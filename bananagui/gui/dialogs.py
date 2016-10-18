@@ -52,12 +52,12 @@ class Dialog(_base.Dialog, window.BaseWindow):
 
     def __init__(self, parentwindow: window.Window, **kwargs):
         self.parentwindow.raw_set(parentwindow)
-        super().__init__(**kwargs)
+        super().__init__(parentwindow, **kwargs)
 
 
 def messagedialog(icon, parentwindow: window.Window, *, message: str,
                   title: str = None, buttons: list = None,
-                  defaultbutton: str = None) -> str:
+                  default: str = None) -> str:
     """Display a message dialog.
 
     icon should be 'info', 'question', 'warning' or 'error'.
@@ -66,9 +66,8 @@ def messagedialog(icon, parentwindow: window.Window, *, message: str,
     be added to the dialog. It defaults to "OK" translated with
     gettext.gettext in a list.
 
-    The button with defaultbutton as its text will have keyboard focus
-    by default. If defaultbutton is not set, the first button will be
-    used.
+    The button with `default` as its text will have keyboard focus by
+    default, unless defaultbutton is None.
 
     The text argument is the text that will be shown in the dialog. If
     title is not given, the dialog's title will be the same as
@@ -86,9 +85,7 @@ def messagedialog(icon, parentwindow: window.Window, *, message: str,
         buttons = [_("OK")]
     assert buttons, "at least one button is required"
 
-    if defaultbutton is None:
-        defaultbutton = buttons[0]
-    assert defaultbutton in buttons
+    assert defaultbutton is None or defaultbutton in buttons
 
     return _base.messagedialog(
         icon, parentwindow, message, title, buttons, defaultbutton)

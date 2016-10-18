@@ -26,6 +26,12 @@ class BaseWindow:
             size = (-1, -1)
         self['real_widget'].set_size_request(*size)
 
+    def _bananagui_set_showing(self, showing):
+        if showing:
+            self['real_widget'].show()
+        else:
+            self['real_widget'].hide()
+
     def __delete_event(self, widget, event):
         self.on_destroy.emit()
         return True  # Block GTK's delete-event handling.

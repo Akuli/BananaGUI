@@ -33,6 +33,12 @@ class BaseWindow:
             size = (1, 1)
         self['real_widget'].minsize(*size)
 
+    def _bananagui_set_showing(self, showing):
+        if showing:
+            self['real_widget'].deiconify()
+        else:
+            self['real_widget'].withdraw()
+
     def wait(self):
         self['real_widget'].wait_window()
 
