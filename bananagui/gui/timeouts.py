@@ -3,15 +3,6 @@
 from bananagui import _base
 
 
-# Don't allow returning True to run again.
-RUN_AGAIN = 2
-
-# This is the only way to make sure that the base gets access to this
-# constant I can think of. Another alternative would be to use a class,
-# but I think it would be overkill for this.
-_base.add_timeout.RUN_AGAIN = RUN_AGAIN
-
-
 def add_timeout(milliseconds: int, callback) -> None:
     """Run callback() after waiting.
 

@@ -3,9 +3,8 @@ import math
 
 # We can only import modules from bananagui.gui because this file can be
 # loaded by bananagui.gui.__init__.
-from bananagui import Color
-from bananagui.gui.canvas import Canvas
-from bananagui.gui.timeouts import add_timeout, RUN_AGAIN
+import bananagui
+from bananagui.gui import canvas, timeouts
 
 
 _LINES = 15
@@ -15,7 +14,7 @@ _DELAY = 60
 class Spinner:
 
     def __init__(self, parent, **kwargs):
-        self.__widget = Canvas(parent, minimum_size=(25, 25))
+        self.__widget = canvas.Canvas(parent, minimum_size=(25, 25))
         self.real_widget.raw_set(self.__widget['real_widget'])
         self.__positions = collections.deque()
         for i in range(_LINES):
@@ -60,19 +59,15 @@ class Spinner:
             end = (x * diameter // 2 + width // 2,
                    y * diameter // 2 + height // 2)
             thickness = max(diameter // 10, 1)
-            color = Color(brightness, brightness, brightness)
+            color = bananagui.Color(brightness, brightness, brightness)
             self.__widget.draw_line(start, end, thickness=thickness,
                                     color=color)
 
         # Keep spinning.
-        return RUN_AGAIN
+        return bananagui.RUN_AGAIN
 
     def _bananagui_set_spinning(self, spinning):
-        if spinning == self['spinning']:
-            # We are already spinning or not spinning as the user wants
-            # to, no need to do anything.
-            return
         if spinning:
             # Start spinning.
-            add_timeout(_DELAY, self.__draw)
+            timeouts.add_timeout(_DELAY, self.__draw)
         # We don't need an else because __draw knows when to stop.
