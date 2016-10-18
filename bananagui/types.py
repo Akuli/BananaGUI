@@ -117,12 +117,16 @@ class Property:
         This is called raw_set because it sets the value directly to the
         dictionary of set values. This also checks the value and emits
         the changed signal.
+
+        This does nothing if the value is equal to the current value.
         """
+        old_value = self.get(widget)
+        if value == old_value:
+            return
         if self._checker is not None:
             self._checker(value)
         if self._check_kwargs:
             utils.check(value, **self._check_kwargs)
-        old_value = self.get(widget)
         self._values[widget] = value
         if hasattr(self, 'changed'):
             self.changed.emit(widget, old_value=old_value, new_value=value)
@@ -150,6 +154,7 @@ class Property:
                                       % self.name) from e
         if self.get(widget) == value:
             return
+        # The setter may raise an exception to prevent calling raw_set.
         setter(value)
         self.raw_set(widget, value)
 
