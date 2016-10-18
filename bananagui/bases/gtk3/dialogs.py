@@ -11,7 +11,7 @@ class Dialog:
         super().__init__(**kwargs)
 
 
-def messagedialog(icon, parentwindow, text, title, buttons, defaultbutton):
+def messagedialog(icon, parentwindow, message, title, buttons, defaultbutton):
     raise NotImplementedError  # TODO
 
 

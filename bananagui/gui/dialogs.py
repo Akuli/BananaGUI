@@ -55,7 +55,7 @@ class Dialog(_base.Dialog, window.BaseWindow):
         super().__init__(**kwargs)
 
 
-def messagedialog(icon, parentwindow: window.Window, *, text: str,
+def messagedialog(icon, parentwindow: window.Window, *, message: str,
                   title: str = None, buttons: list = None,
                   defaultbutton: str = None) -> str:
     """Display a message dialog.
@@ -91,7 +91,7 @@ def messagedialog(icon, parentwindow: window.Window, *, text: str,
     assert defaultbutton in buttons
 
     return _base.messagedialog(
-        icon, parentwindow, text, title, buttons, defaultbutton)
+        icon, parentwindow, message, title, buttons, defaultbutton)
 
 
 # The bases don't need to define these.
