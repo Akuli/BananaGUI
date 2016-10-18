@@ -21,8 +21,6 @@
 
 """BananaGUI checkbox test."""
 
-import sys
-
 from bananagui import gui
 
 

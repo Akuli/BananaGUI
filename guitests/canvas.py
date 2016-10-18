@@ -1,5 +1,3 @@
-import sys
-
 import bananagui
 from bananagui import gui
 

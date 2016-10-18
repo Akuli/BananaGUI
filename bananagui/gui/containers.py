@@ -25,6 +25,7 @@
 
 import bananagui
 from bananagui import _base, utils
+from bananagui.structures import CallbackList  # Not imported in __init__.
 from . import bases
 
 
@@ -60,7 +61,7 @@ class Box(bases.Oriented, _base.Box, bases.Parent, bases.Child):
     # method that removes a child widget from the box.
 
     children = bananagui.Property(
-        'children', getdefault=bananagui.CallbackList, settable=False,
+        'children', getdefault=CallbackList, settable=False,
         doc="A mutable sequence of children in the box.")
 
     def __init__(self, parent, **kwargs):

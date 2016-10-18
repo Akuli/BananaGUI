@@ -132,20 +132,13 @@ class Slider:
         minimum = min(self['valuerange'])
         maximum = max(self['valuerange'])
         step = utils.rangestep(self['valuerange'])
-
-        # I think tkinter's scales are upside down when the orientation
-        # is vertical because the bigger number is at the bottom.
-        # Unfortunately this can't be fixed by setting resolution to a
-        # negative value :(
         widget = tk.Scale(parent['real_widget'], from_=minimum,
                           to=maximum, resolution=step,
                           orient=_tkinter_orients[self['orientation']])
 
-        # There's no value changed thing, but all tkinter widgets have
-        # a ButtonRelease signal that's emitted when the left mouse
-        # button is released. It seems to me that sliders can't be
-        # controlled without pressing the button in any way so this
-        # seems to work.
+        # There seems to be no way to change a Scale's value with the
+        # keyboard so this seems to work.
+        # http://stackoverflow.com/a/16970862
         widget.bind('<ButtonRelease>', self.__value_changed)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)

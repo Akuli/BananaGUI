@@ -1,8 +1,6 @@
-import importlib
 import os
 import subprocess
 import sys
-import traceback
 
 try:
     import faulthandler
@@ -10,8 +8,6 @@ try:
 except ImportError:
     # I think faulthandler is new in... maybe 3.4? I don't know.
     pass
-
-from bananagui import gui
 
 
 here = os.path.dirname(os.path.abspath(__file__))

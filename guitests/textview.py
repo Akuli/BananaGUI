@@ -21,8 +21,6 @@
 
 """BananaGUI PlainTextView test."""
 
-import sys
-
 from bananagui import gui
 
 

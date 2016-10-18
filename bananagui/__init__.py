@@ -34,8 +34,9 @@ import importlib
 # parent modules as needed with relative imports.
 import bananagui.bases
 
-# Importing other things.
-from bananagui.structures import CallbackList, CallbackDict, Color, Font
+# Importing other things. CallbackList and CallbackDict aren't imported
+# here because they're meant to be used internally by BananaGUI.
+from bananagui.structures import Color, Font
 from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
 
 
