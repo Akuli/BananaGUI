@@ -118,11 +118,6 @@ def infodialog(*args):
 
 
 @_messagedialog
-def questiondialog(*args):
-    """Display a dialog with the question icon."""
-
-
-@_messagedialog
 def warningdialog(*args):
     """Display a dialog with a warning icon."""
     return _warningdialog(*args)
@@ -132,6 +127,12 @@ def warningdialog(*args):
 def errordialog(*args):
     """Display a dialog with an error icon."""
     return _errordialog(*args)
+
+
+@_messagedialog
+def questiondialog(*args):
+    """Display a dialog with the question icon."""
+    return _questiondialog(*args)
 
 
 def colordialog(parentwindow: window.Window, *, title: str = None,

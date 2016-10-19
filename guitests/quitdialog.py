@@ -2,8 +2,10 @@ from bananagui import gui
 
 
 def on_destroy(event):
-    # TODO: replace this with a dialog when it's working.
-    if input("Do you really want to quit? (y or n) ") == 'y':
+    answer = gui.questiondialog(
+        event.widget, "Do you really want to quit?",
+        buttons=["Yes", "No"])
+    if answer == "Yes":
         gui.quit()
 
 

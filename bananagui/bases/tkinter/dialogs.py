@@ -12,10 +12,6 @@ class Dialog:
         super().__init__(**kwargs)
 
 
-def messagedialog(icon, parentwindow, message, title, buttons, defaultbutton):
-    raise NotImplementedError  # TODO
-
-
 def colordialog(parentwindow, color, title):
     result = colorchooser.askcolor(
         color.hex, title=title,
