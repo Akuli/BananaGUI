@@ -1,7 +1,4 @@
-color chooser and font chooser
-  - functions, not classes
-Spinbox
-Slider
+progressbar and a pulsing progressbar
 DropdownMenu
 autocompletion for entries?
   - awesome compared to a dropdown menu if there's a lot of things
