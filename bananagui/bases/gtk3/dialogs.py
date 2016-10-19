@@ -37,18 +37,22 @@ class Dialog:
 
 def _messagedialog(icon, parentwindow, message, title,
                    buttons, defaultbutton):
-    # This is not the best way to do this because some id's have special
-    # meanings, but this seems to work.
+    # The start=100 avoids confusing this with Gtk's ResponseTypes.
     texts_and_ids = []
-    for the_id, text in enumerate(buttons):
+    for the_id, text in enumerate(buttons, start=100):
         texts_and_ids.extend([text, the_id])
 
     dialog = Gtk.MessageDialog(
         parentwindow['real_widget'], Gtk.DialogFlags.MODAL, icon,
-        tuple(ids_and_texts), message)
+        tuple(texts_and_ids), message, title=title)
     response = dialog.run()
     dialog.destroy()
-    return buttons[int(response)]
+
+    try:
+        return buttons[response - 100]
+    except IndexError:
+        # The window was probably closed.
+        return None
 
 
 infodialog = functools.partial(_messagedialog, Gtk.MessageType.INFO)

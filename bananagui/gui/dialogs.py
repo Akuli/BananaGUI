@@ -21,16 +21,17 @@
 
 """Base classes for GUI toolkit wrappers."""
 
+import functools
 from gettext import gettext as _
 
 import bananagui
-from bananagui import _base
+from bananagui import _base, utils
 from bananagui.bases import defaults
 from . import window
 
 
 # TODO: move this to utils?
-def _findattr(attribute, *objects):
+def _find_attribute(attribute, *objects):
     for obj in objects:
         try:
             return getattr(obj, attribute)
@@ -40,11 +41,11 @@ def _findattr(attribute, *objects):
                          % attribute)
 
 
-_infodialog = _findattr('infodialog', _base, defaults)
-_warningdialog = _findattr('warningdialog', _base, defaults)
-_errordialog = _findattr('errordialog', _base, defaults)
-_questiondialog = _findattr('questiondialog', _base, defaults)
-_fontdialog = _findattr('fontdialog', _base, defaults)
+_infodialog = _find_attribute('infodialog', _base, defaults)
+_warningdialog = _find_attribute('warningdialog', _base, defaults)
+_errordialog = _find_attribute('errordialog', _base, defaults)
+_questiondialog = _find_attribute('questiondialog', _base, defaults)
+_fontdialog = _find_attribute('fontdialog', _base, defaults)
 
 
 @bananagui.bananadoc
@@ -68,13 +69,16 @@ class Dialog(_base.Dialog, window.BaseWindow):
         super().__init__(parentwindow, **kwargs)
 
 
-def _dialogfunc(function, name, icondoc):
-    # We don't use functools.wraps here because we need to control which
-    # attributes we set.
-    def result(parentwindow: window.Window, *, message: str,
-               title: str = None, buttons: list = None,
-               defaultbutton: str = None) -> str:
-        """Display a dialog.
+def _messagedialog(function):
+    """Return a new message dialog function."""
+    # We need to modify the original function first because
+    # functools.wraps overrides everything the wrapped function has.
+    function.__annotations__ = {
+        'parentwindow': window.Window, 'message': str, 'title': str,
+        'buttons': utils.abc.Sequence, 'defaultbutton': str, 'return': str}
+    if function.__doc__ is not None:
+        # Not running with Python's optimizations.
+        function.__doc__ += """
 
         The buttons argument should be a sequence of button texts that
         will be added to the dialog. It defaults to "OK" translated with
@@ -87,9 +91,14 @@ def _dialogfunc(function, name, icondoc):
         If title is not given, the dialog's title will be the same as
         parentwindow's title.
 
-        The dialog will have %s icon if possible. The text of the
-        clicked button is returned, or None if the dialog is closed.
+        The dialog doesn't have an icon on some GUI toolkits. The text
+        of the clicked button is returned, or None if the dialog is
+        closed.
         """
+
+    @functools.wraps(function)
+    def result(parentwindow, message, *, title=None, buttons=None,
+               defaultbutton=None) -> str:
         # TODO: add something to Widget to handle defaultbutton?
         if title is None:
             title = parentwindow['title']
@@ -99,17 +108,30 @@ def _dialogfunc(function, name, icondoc):
         assert defaultbutton is None or defaultbutton in buttons
         return function(parentwindow, message, title, buttons, defaultbutton)
 
-    if result.__doc__ is not None:
-        # Not running with Python's optimizations.
-        result.__doc__ %= icondoc  # New-style formatting can't do this!
-    result.__name__ = result.__qualname__ = name
     return result
 
 
-infodialog = _dialogfunc(_infodialog, 'infodialog', 'an information')
-questiondialog = _dialogfunc(_questiondialog, 'questiondialog', 'a question')
-warningdialog = _dialogfunc(_warningdialog, 'warningdialog', 'a warning')
-errordialog = _dialogfunc(_errordialog, 'errordialog', 'an error')
+@_messagedialog
+def infodialog(*args):
+    """Display a dialog with an information icon."""
+    return _infodialog(*args)
+
+
+@_messagedialog
+def questiondialog(*args):
+    """Display a dialog with the question icon."""
+
+
+@_messagedialog
+def warningdialog(*args):
+    """Display a dialog with a warning icon."""
+    return _warningdialog(*args)
+
+
+@_messagedialog
+def errordialog(*args):
+    """Display a dialog with an error icon."""
+    return _errordialog(*args)
 
 
 def colordialog(parentwindow: window.Window, *, title: str = None,
