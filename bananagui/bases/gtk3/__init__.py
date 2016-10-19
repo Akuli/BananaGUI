@@ -22,7 +22,8 @@ from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .clipboard import set_clipboard_text, get_clipboard_text
 from .containers import Bin, Box
-from .dialogs import Dialog, messagedialog, colordialog, fontdialog
+from .dialogs import (Dialog, infodialog, warningdialog, errordialog,
+                      colordialog, fontdialog)
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
 from .misc import (Checkbox, Dummy, Separator, Spinner, Spinbox, Slider,

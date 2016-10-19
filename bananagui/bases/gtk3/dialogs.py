@@ -1,3 +1,5 @@
+import functools
+
 from gi.repository import Gdk, Gtk
 
 import bananagui
@@ -33,8 +35,26 @@ class Dialog:
         self['real_widget'].run()
 
 
-def messagedialog(icon, parentwindow, message, title, buttons, defaultbutton):
-    raise NotImplementedError  # TODO
+def _messagedialog(icon, parentwindow, message, title,
+                   buttons, defaultbutton):
+    # This is not the best way to do this because some id's have special
+    # meanings, but this seems to work.
+    texts_and_ids = []
+    for the_id, text in enumerate(buttons):
+        texts_and_ids.extend([text, the_id])
+
+    dialog = Gtk.MessageDialog(
+        parentwindow['real_widget'], Gtk.DialogFlags.MODAL, icon,
+        tuple(ids_and_texts), message)
+    response = dialog.run()
+    dialog.destroy()
+    return buttons[int(response)]
+
+
+infodialog = functools.partial(_messagedialog, Gtk.MessageType.INFO)
+warningdialog = functools.partial(_messagedialog, Gtk.MessageType.WARNING)
+errordialog = functools.partial(_messagedialog, Gtk.MessageType.ERROR)
+questiondialog = functools.partial(_messagedialog, Gtk.MessageType.QUESTION)
 
 
 def colordialog(parentwindow, default, title):

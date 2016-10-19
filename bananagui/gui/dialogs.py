@@ -68,7 +68,7 @@ class Dialog(_base.Dialog, window.BaseWindow):
         super().__init__(parentwindow, **kwargs)
 
 
-def _create_dialogfunction(function, icondoc):
+def _dialogfunc(function, name, icondoc):
     # We don't use functools.wraps here because we need to control which
     # attributes we set.
     def result(parentwindow: window.Window, *, message: str,
@@ -102,19 +102,14 @@ def _create_dialogfunction(function, icondoc):
     if result.__doc__ is not None:
         # Not running with Python's optimizations.
         result.__doc__ %= icondoc  # New-style formatting can't do this!
-    result.__name__ = function.__name__
-    try:
-        result.__qualname__ = function.__qualname__
-    except AttributeError:
-        # Python 3.2.
-        pass
+    result.__name__ = result.__qualname__ = name
     return result
 
 
-infodialog = _create_dialogfunction(_infodialog, 'an information')
-questiondialog = _create_dialogfunction(_questiondialog, 'a question')
-warningdialog = _create_dialogfunction(_warningdialog, 'a warning')
-errordialog = _create_dialogfunction(_errordialog, 'an error')
+infodialog = _dialogfunc(_infodialog, 'infodialog', 'an information')
+questiondialog = _dialogfunc(_questiondialog, 'questiondialog', 'a question')
+warningdialog = _dialogfunc(_warningdialog, 'warningdialog', 'a warning')
+errordialog = _dialogfunc(_errordialog, 'errordialog', 'an error')
 
 
 def colordialog(parentwindow: window.Window, *, title: str = None,
