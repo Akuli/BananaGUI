@@ -7,7 +7,7 @@ from . import GTK_VERSION
 class Dialog:
 
     def __init__(self, parentwindow, **kwargs):
-        widget = Gtk.Dialog(parentwindow['real_widget'])
+        widget = Gtk.Dialog(transient_for=parentwindow['real_widget'])
 
         # Gtk's dialogs have an action area for buttons that we don't
         # need. Let's set its border width to zero to make it invisible.

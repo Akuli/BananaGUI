@@ -20,7 +20,7 @@ def _on_click(dialog, event):
 
 
 def messagebox(parentwindow, message, title, buttons, defaultbutton):
-    dialog = gui.Dialog(parentwindow, title=title, minimum_size=(350, 200))
+    dialog = gui.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
     mainbox = gui.Box.vertical(dialog)
     dialog['child'] = mainbox
