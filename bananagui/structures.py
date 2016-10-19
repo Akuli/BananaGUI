@@ -382,11 +382,12 @@ class Color(collections.namedtuple('Color', 'red green blue')):
 
         >>> Color.from_hex('#ffff00')
         Color(red=255, green=255, blue=0)
-        >>> Color.from_hex('#FfFF00')
+        >>> Color.from_hex(' #FfFF00   ')
         Color(red=255, green=255, blue=0)
         >>> Color.from_hex('#ff0')
         Color(red=255, green=255, blue=0)
         """
+        hexstring = hexstring.strip()
         if len(hexstring) == 4:
             # It's a 4-character hexadecimal color, like '#fff'.
             real_hexstring = hexstring[0]
