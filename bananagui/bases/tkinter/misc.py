@@ -150,7 +150,7 @@ class Slider:
         self['real_widget'].set(value)
 
 
-class ProgressBar:
+class Progressbar:
 
     def __init__(self, parent, **kwargs):
         widget = ttk.Progressbar(
@@ -160,7 +160,6 @@ class ProgressBar:
         super().__init__(parent, **kwargs)
 
     def _bananagui_set_progress(self, progress):
-        print("lol setting progress")
         self['real_widget'].stop()  # Reset it.
         step = progress * 100
         if step >= 99.99:

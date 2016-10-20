@@ -11,7 +11,7 @@ from .dialogs import Dialog, colordialog
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
 from .misc import (Checkbox, Dummy, Separator, Spinbox, Slider,
-                   ProgressBar, get_font_families)
+                   Progressbar, get_font_families)
 from .textwidgets import TextBase, Entry, PlainTextView
 from .timeouts import add_timeout
 from .trayicon import TrayIcon

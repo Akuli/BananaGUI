@@ -93,7 +93,7 @@ class Slider(bases.Oriented, bases.Ranged, _base.Slider, bases.Child):
     """A slider for selecting a number."""
 
 
-class ProgressBar(bases.Oriented, _base.ProgressBar, bases.Child):
+class Progressbar(bases.Oriented, _base.Progressbar, bases.Child):
     """A progress bar widget."""
 
     progress = bananagui.Property(
