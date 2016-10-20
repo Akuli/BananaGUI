@@ -1,4 +1,7 @@
-progressbar and a pulsing progressbar
+progressbar for gtk and a pulsing progressbar
+rename orientation to orient?
+file and directory choosing dialogs
+a qt base
 DropdownMenu
 autocompletion for entries?
   - awesome compared to a dropdown menu if there's a lot of things
