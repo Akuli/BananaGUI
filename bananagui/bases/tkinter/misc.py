@@ -20,7 +20,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tkinter as tk
-from tkinter import font
+from tkinter import font, ttk
 
 import bananagui
 from bananagui import utils
@@ -148,6 +148,26 @@ class Slider:
 
     def _bananagui_set_value(self, value):
         self['real_widget'].set(value)
+
+
+class ProgressBar:
+
+    def __init__(self, parent, **kwargs):
+        widget = ttk.Progressbar(
+            parent['real_widget'],
+            orient=_tkinter_orients[self['orientation']])
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def _bananagui_set_progress(self, progress):
+        print("lol setting progress")
+        self['real_widget'].stop()  # Reset it.
+        step = progress * 100
+        if step >= 99.99:
+            # The widget would go back to zero if we stepped it this
+            # much.
+            step = 99.99
+        self['real_widget'].step(step)
 
 
 def get_font_families():

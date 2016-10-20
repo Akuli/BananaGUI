@@ -93,6 +93,14 @@ class Slider(bases.Oriented, bases.Ranged, _base.Slider, bases.Child):
     """A slider for selecting a number."""
 
 
+class ProgressBar(bases.Oriented, _base.ProgressBar, bases.Child):
+    """A progress bar widget."""
+
+    progress = bananagui.Property(
+        'progress', type=(float, int), minimum=0, maximum=1, default=0,
+        doc="The progressbar's position.")
+
+
 def get_font_families() -> list:
     """Return a list of all avaliable font families."""
     # This is converted to a set first to make sure that we don't get
