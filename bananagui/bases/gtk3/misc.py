@@ -123,6 +123,16 @@ class Slider:
         self['real_widget'].set_value(value)
 
 
+class Progressbar:
+
+    def __init__(self, parent, **kwargs):
+        self.real_widget.raw_set(Gtk.ProgressBar())
+        super().__init__(parent, **kwargs)
+
+    def _bananagui_set_progress(self, progress):
+        self['real_widget'].set_fraction(progress)
+
+
 def get_font_families():
     # Based on http://zetcode.com/gui/pygtk/pango/
     widget = Gtk.Label()
