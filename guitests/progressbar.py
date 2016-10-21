@@ -19,7 +19,7 @@ def main():
 
         box['children'].append(gui.Dummy(box))
 
-        spinbox = gui.Spinbox(box, expand=(True, False))
+        spinbox = gui.Spinbox(box, valuerange=range(101), expand=(True, False))
         spinbox['value.changed'].append(functools.partial(set_progress, progressbar))
         box['children'].append(spinbox)
 
