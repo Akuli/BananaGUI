@@ -4,9 +4,15 @@
 
 import gi
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('GLib', '2.0')
+import bananagui
+
+try:
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('Gdk', '3.0')
+    gi.require_version('GLib', '2.0')
+except ValueError as e:
+    # BananaGUI expects an ImportError.
+    raise ImportError from e
 
 try:
     gi.require_version('AppIndicator3', '0.1')
@@ -15,20 +21,24 @@ except ValueError:
     HAS_APPINDICATOR = False
 
 from gi.repository import Gtk
-GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
 
-from .bases import Widget, Parent, Child
+GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
+orientations = {
+    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
+    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
+}
+
+from .basewidgets import Widget, Parent, Child
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
-from .clipboard import set_clipboard_text, get_clipboard_text
 from .containers import Bin, Box
-from .dialogs import (Dialog, infodialog, warningdialog, errordialog,
-                      colordialog, fontdialog)
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit
-from .misc import (Checkbox, Dummy, Separator, Spinner, Spinbox, Slider,
-                   Progressbar, get_font_families)
+from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
+                   get_clipboard_text, get_font_families)
+from .progress import Progressbar, BouncingProgressbar, Spinner
+from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, PlainTextView
-from .timeouts import add_timeout
 from .trayicon import TrayIcon
-from .window import BaseWindow, Window
+from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
+                     errordialog, questiondialog, colordialog, fontdialog)

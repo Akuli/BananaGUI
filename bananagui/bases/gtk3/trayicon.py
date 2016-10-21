@@ -4,6 +4,7 @@ import warnings
 from gi.repository import Gtk
 
 from . import HAS_APPINDICATOR
+
 if HAS_APPINDICATOR:
     # Everything in this module starts with "Indicator" so I think it's
     # fine to use a from import.
@@ -42,6 +43,7 @@ class TrayIcon:
 
     def _bananagui_set_tooltip(self, tooltip):
         if HAS_APPINDICATOR:
-            warnings.warn("AppIndicator3 doesn't support tooltips")
+            warnings.warn("AppIndicator3 doesn't support tooltips",
+                          RuntimeWarning)
         else:
             self['real_widget'].set_tooltip_text(tooltip)

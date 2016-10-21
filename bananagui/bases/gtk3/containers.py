@@ -1,6 +1,7 @@
 from gi.repository import Gtk
 
 import bananagui
+from . import orientations
 
 
 class Bin:
@@ -13,10 +14,6 @@ class Bin:
             child['real_widget'].show()
 
 
-_gtk_orientations = {
-    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
-    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
-}
 _expand_indexes = {
     bananagui.HORIZONTAL: 0,
     bananagui.VERTICAL: 1,
@@ -26,7 +23,7 @@ _expand_indexes = {
 class Box:
 
     def __init__(self, parent, **kwargs):
-        gtk_orientation = _gtk_orientations[self['orientation']]
+        gtk_orientation = orientations[self['orientation']]
         widget = Gtk.Box(orientation=gtk_orientation)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)

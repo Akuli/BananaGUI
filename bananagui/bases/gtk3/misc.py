@@ -1,7 +1,6 @@
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
-import bananagui
-from bananagui import utils
+from . import orientations
 
 
 class Checkbox:
@@ -29,108 +28,38 @@ class Dummy:
         super().__init__(parent, **kwargs)
 
 
-_orientations = {
-    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
-    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
-}
-
-
 class Separator:
 
     def __init__(self, parent, **kwargs):
-        gtk_orientation = _orientations[self['orientation']]
+        gtk_orientation = orientations[self['orientation']]
         widget = Gtk.Separator(orientation=gtk_orientation)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
 
-class Spinner:
-
-    def __init__(self, parent, **kwargs):
-        # We need to hide the spinner when it's not spinning. Rest of
-        # BananaGUI calls real_widget.show() when the widget is added
-        # somewhere, so we need to create a container for it and add the
-        # real spinner inside it.
-        self.__spinner = Gtk.Spinner()
-        container = Gtk.Box()
-        container.pack_start(self.__spinner, True, True, 0)
-        self.real_widget.raw_set(container)
-        super().__init__(parent, **kwargs)
-
-    def _bananagui_set_spinning(self, spinning):
-        if spinning:
-            self.__spinner.show()
-            self.__spinner.start()
-        else:
-            self.__spinner.hide()
-            self.__spinner.stop()
+_clipboard = None
 
 
-class Spinbox:
-
-    def __init__(self, parent, **kwargs):
-        minimum = min(self['valuerange'])
-        maximum = max(self['valuerange'])
-        step = utils.rangestep(self['valuerange'])
-        widget = Gtk.SpinButton.new_with_range(minimum, maximum, step)
-        widget.connect('notify::value', self.__value_changed)
-        self.real_widget.raw_set(widget)
-        super().__init__(parent, **kwargs)
-
-    def __value_changed(self, widget, gparam):
-        self.value.raw_set(int(widget.get_value()))
-
-    def _bananagui_set_value(self, value):
-        self['real_widget'].set_value(value)
+def _init_clipboard():
+    global _clipboard
+    if _clipboard is None:
+        _clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
 
-class Slider:
-
-    def __init__(self, parent, **kwargs):
-        range_args = (min(self['valuerange']), max(self['valuerange']),
-                      utils.rangestep(self['valuerange']))
-        widget = Gtk.Scale.new_with_range(
-            _orientations[self['orientation']], *range_args)
-        widget.connect('value-changed', self.__value_changed)
-        self.real_widget.raw_set(widget)
-        super().__init__(parent, **kwargs)
-
-    def __value_changed(self, widget):
-        # TODO: something's wrong, the guitest prints hi a lot because
-        # the value is set constantly when the scale is moved.
-        value = int(widget.get_value())
-        if value in self['valuerange']:
-            self.value.raw_set(value)
-        else:
-            # TODO: is there a better way to allow only values in the
-            # range?
-            difference = value - self['value']
-            if abs(difference) < utils.rangestep(self['valuerange'])/2:
-                # Keeping the value where it is now is probably closest
-                # to what the user wants.
-                widget.set_value(self['value'])
-            else:
-                # Time to move the widget.
-                if difference > 0:
-                    # Let's move the scale up.
-                    self['value'] += utils.rangestep(self['valuerange'])
-                else:
-                    # Let's move it down.
-                    self['value'] -= utils.rangestep(self['valuerange'])
-            widget.set_value(self['value'])
-
-    def _bananagui_set_value(self, value):
-        self['real_widget'].set_value(value)
+def set_clipboard_text(text):
+    _init_clipboard()
+    _clipboard.set_text(text, -1)
+    _clipboard.store()
 
 
-class Progressbar:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(Gtk.ProgressBar())
-        super().__init__(parent, **kwargs)
-
-    def _bananagui_set_progress(self, progress):
-        self['real_widget'].set_fraction(progress)
+def get_clipboard_text():
+    _init_clipboard()
+    # clipboard.wait_for_text() doesn't block if there's no text on the
+    # clipboard, it returns None.
+    result = _clipboard.wait_for_text()
+    if result is None:
+        return ''
+    return result
 
 
 def get_font_families():
