@@ -2,11 +2,11 @@
 
 import bananagui
 from bananagui import _base
-from . import bases
+from .basewidgets import Child
 
 
 @bananagui.bananadoc
-class Canvas(_base.Canvas, bases.Child):
+class Canvas(_base.Canvas, Child):
     """A canvas widget that you can draw things on.
 
     When drawing on the canvas, the coordinates can be less than zero or

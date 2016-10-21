@@ -22,6 +22,7 @@
 import tkinter as tk
 
 import bananagui
+from . import tkinter_fills
 
 
 class Bin:
@@ -36,13 +37,6 @@ class Bin:
             child._bananagui_set_expand(child['expand'])  # See bases.py.
 
 
-_tkinter_fills = {
-    # child['expand']: fill
-    (True, True): 'both',
-    (True, False): 'x',
-    (False, True): 'y',
-    (False, False): 'none',
-}
 _appendsides = {
     # Appending to a box adds a child to the beginning of the box, and
     # then the next child towards the center from the first child and
@@ -61,7 +55,7 @@ class Box:
     def _bananagui_box_append(self, child):
         child['real_widget'].pack(
             side=_appendsides[self['orientation']],
-            fill=_tkinter_fills[child['expand']],
+            fill=tkinter_fills[child['expand']],
         )
         child._bananagui_tkinter_packed = True
 

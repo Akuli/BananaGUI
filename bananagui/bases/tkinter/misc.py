@@ -20,10 +20,9 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tkinter as tk
-from tkinter import font, ttk
+from tkinter import font
 
 import bananagui
-from bananagui import utils
 from . import mainloop
 
 
@@ -80,93 +79,17 @@ class Separator:
         super().__init__(parent, **kwargs)
 
 
-def _select_all(event):
+def set_clipboard_text(text):
+    mainloop.root.clipboard_clear()
+    mainloop.root.clipboard_append(text)
+
+
+def get_clipboard_text():
     try:
-        # Tkinter's spinboxes don't have a selection_range method for
-        # some reason, but entries have it.
-        event.widget.selection('range', 0, 'end')
+        return mainloop.root.clipboard_get()
     except tk.TclError:
-        # Maybe selection_range doesn't work with spinboxes on old Tk
-        # versions?
-        pass
-
-
-class Spinbox:
-
-    def __init__(self, parent, **kwargs):
-        self.__var = tk.StringVar()
-        self.__var.trace('w', self.__var_changed)
-
-        widget = tk.Spinbox(
-            parent['real_widget'], textvariable=self.__var,
-            # Tkinter doesn't know how to handle ranges.
-            values=tuple(self['valuerange']))
-        widget.bind('<Control-A>', _select_all)
-        widget.bind('<Control-a>', _select_all)
-        self.real_widget.raw_set(widget)
-        super().__init__(parent, **kwargs)
-
-    def __var_changed(self, tkname, empty_string, mode):
-        try:
-            value = int(self.__var.get())
-            if value not in self['valuerange']:
-                return
-        except ValueError:
-            return
-        self.value.raw_set(value)
-
-    def _bananagui_set_value(self, value):
-        # This tells tkinter to call self.__var_changed.
-        self.__var.set(str(value))
-
-
-_tkinter_orients = {
-    bananagui.HORIZONTAL: 'horizontal',
-    bananagui.VERTICAL: 'vertical',
-}
-
-
-class Slider:
-
-    def __init__(self, parent, **kwargs):
-        minimum = min(self['valuerange'])
-        maximum = max(self['valuerange'])
-        step = utils.rangestep(self['valuerange'])
-        widget = tk.Scale(parent['real_widget'], from_=minimum,
-                          to=maximum, resolution=step,
-                          orient=_tkinter_orients[self['orientation']])
-
-        # There seems to be no way to change a Scale's value with the
-        # keyboard so this seems to work.
-        # http://stackoverflow.com/a/16970862
-        widget.bind('<ButtonRelease>', self.__value_changed)
-        self.real_widget.raw_set(widget)
-        super().__init__(parent, **kwargs)
-
-    def __value_changed(self, event):
-        self.value.raw_set(event.widget.get())
-
-    def _bananagui_set_value(self, value):
-        self['real_widget'].set(value)
-
-
-class Progressbar:
-
-    def __init__(self, parent, **kwargs):
-        widget = ttk.Progressbar(
-            parent['real_widget'],
-            orient=_tkinter_orients[self['orientation']])
-        self.real_widget.raw_set(widget)
-        super().__init__(parent, **kwargs)
-
-    def _bananagui_set_progress(self, progress):
-        self['real_widget'].stop()  # Reset it.
-        step = progress * 100
-        if step >= 99.99:
-            # The widget would go back to zero if we stepped it this
-            # much.
-            step = 99.99
-        self['real_widget'].step(step)
+        # There's nothing on the clipboard.
+        return ''
 
 
 def get_font_families():

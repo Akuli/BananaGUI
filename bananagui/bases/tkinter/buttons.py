@@ -27,9 +27,13 @@ import tkinter as tk
 class BaseButton:
 
     def __init__(self, parent, **kwargs):
-        widget = tk.Button(parent['real_widget'], command=self.on_click.emit)
+        widget = tk.Button(parent['real_widget'], command=self.__click)
+        widget.bind('<Return>', self.__click)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
+
+    def __click(self, event=None):
+        self.on_click.emit()
 
 
 class Button:

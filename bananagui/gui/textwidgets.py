@@ -23,12 +23,12 @@
 
 import bananagui
 from bananagui import _base, utils
-from . import bases
+from .basewidgets import Child
 
 
 @utils.baseclass
 @bananagui.bananadoc
-class TextBase(_base.TextBase, bases.Child):
+class TextBase(_base.TextBase, Child):
     """A base class for text editing widgets."""
 
     # TODO: Add fonts and colors.

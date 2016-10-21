@@ -19,34 +19,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
-
-import bananagui
-from bananagui import _base, utils
-from .basewidgets import Child
+from bananagui import _base
+from .basewidgets import Child, Oriented, Ranged
 
 
-@utils.baseclass
-@bananagui.bananadoc
-class BaseLabel(_base.BaseLabel, Child):
-    """A label base class."""
+class Spinbox(Ranged, _base.Spinbox, Child):
+    """A box for selecting a number with arrow buttons up and down."""
 
 
-@bananagui.bananadoc
-class Label(_base.Label, BaseLabel):
-    """A label with text in it.
-
-    Currently the text is always centered.
-    """
-    # TODO: add an alignment thing? Currently the text in the labels is
-    # always centered.
-    # TODO: Add fonts and colors?
-    text = bananagui.Property('text', type=str, default='',
-                              doc="Text in the label.")
-
-
-@bananagui.bananadoc
-class ImageLabel(_base.ImageLabel, BaseLabel):
-    """A label that contains an image."""
-    imagepath = bananagui.Property.imagepath(
-        'imagepath', doc="Path to an image that will be displayed.")
+class Slider(Oriented, Ranged, _base.Slider, Child):
+    """A slider for selecting a number."""

@@ -19,34 +19,39 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
-
 import bananagui
 from bananagui import _base, utils
-from .basewidgets import Child
+from bananagui.bases import defaults
+from .basewidgets import Child, Oriented
 
 
-@utils.baseclass
-@bananagui.bananadoc
-class BaseLabel(_base.BaseLabel, Child):
-    """A label base class."""
+class Progressbar(Oriented, _base.Progressbar, Child):
+    """A progress bar widget."""
+
+    progress = bananagui.Property(
+        'progress', type=(float, int), minimum=0, maximum=1, default=0,
+        doc="The progressbar's position.")
 
 
-@bananagui.bananadoc
-class Label(_base.Label, BaseLabel):
-    """A label with text in it.
+class BouncingProgressbar(Oriented, _base.BouncingProgressbar, Child):
+    """A Progressbar-like widget that bounces back and forth.
 
-    Currently the text is always centered.
+    This doesn't bounce by default. Set the bouncing property to True to
+    make it bounce.
     """
-    # TODO: add an alignment thing? Currently the text in the labels is
-    # always centered.
-    # TODO: Add fonts and colors?
-    text = bananagui.Property('text', type=str, default='',
-                              doc="Text in the label.")
+
+    bouncing = bananagui.Property(
+        'bouncing', type=bool, default=False,
+        doc="True if the progress bar is bouncing, False if not.")
 
 
-@bananagui.bananadoc
-class ImageLabel(_base.ImageLabel, BaseLabel):
-    """A label that contains an image."""
-    imagepath = bananagui.Property.imagepath(
-        'imagepath', doc="Path to an image that will be displayed.")
+class Spinner(utils.find_attribute('Spinner', _base, defaults), Child):
+    """A waiting spinner.
+
+    The spinner doesn't spin by default. You can set the spinning
+    property to True to make it spin.
+    """
+
+    spinning = bananagui.Property(
+        'spinning', type=bool, default=False,
+        doc="True if the widget is currently spinning, False if not.")

@@ -19,24 +19,15 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Checkbox, Separator and Spinner widgets."""
-
 import bananagui
 from bananagui import _base
-from . import bases
-
-try:
-    _SpinnerBase = _base.Spinner
-except AttributeError:
-    # The base doesn't provide a spinner. We need to create one using
-    # other widgets.
-    from bananagui.bases.defaults import Spinner as _SpinnerBase
+from .basewidgets import Oriented, Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
 
 @bananagui.bananadoc
-class Checkbox(_base.Checkbox, bases.Child):
+class Checkbox(_base.Checkbox, Child):
     """A widget that can be checked.
 
     The Checkbox widget has nothing to do with the Box widget.
@@ -51,7 +42,7 @@ class Checkbox(_base.Checkbox, bases.Child):
 
 
 @bananagui.bananadoc
-class Dummy(_base.Dummy, bases.Child):
+class Dummy(_base.Dummy, Child):
     """An empty widget.
 
     This is useful for creating layouts with empty space that must be
@@ -60,11 +51,11 @@ class Dummy(_base.Dummy, bases.Child):
 
 
 @bananagui.bananadoc
-class Separator(bases.Oriented, _base.Separator, bases.Child):
+class Separator(Oriented, _base.Separator, Child):
     """A horizontal or vertical line."""
 
     def __init__(self, parent, **kwargs):
-        # Make the separator expand by default.
+        # Make the separator expand correctly by default.
         orientation = kwargs.get('orientation')
         if orientation == bananagui.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
@@ -73,32 +64,14 @@ class Separator(bases.Oriented, _base.Separator, bases.Child):
         super().__init__(parent, **kwargs)
 
 
-class Spinner(_SpinnerBase, bases.Child):
-    """A waiting spinner.
-
-    The spinner doesn't spin by default. You can set the spinning
-    property to True to make it spin.
-    """
-
-    spinning = bananagui.Property(
-        'spinning', type=bool, default=False,
-        doc="True if the widget is currently spinning, False if not.")
+def set_clipboard_text(text: str) -> None:
+    """Set text to the clipboard."""
+    _base.set_clipboard_text(text)
 
 
-class Spinbox(bases.Ranged, _base.Spinbox, bases.Child):
-    """A box for selecting a number with arrow buttons up and down."""
-
-
-class Slider(bases.Oriented, bases.Ranged, _base.Slider, bases.Child):
-    """A slider for selecting a number."""
-
-
-class Progressbar(bases.Oriented, _base.Progressbar, bases.Child):
-    """A progress bar widget."""
-
-    progress = bananagui.Property(
-        'progress', type=(float, int), minimum=0, maximum=1, default=0,
-        doc="The progressbar's position.")
+def get_clipboard_text() -> str:
+    """Return the text that is currently on the clipboard."""
+    return _base.get_clipboard_text()
 
 
 def get_font_families() -> list:

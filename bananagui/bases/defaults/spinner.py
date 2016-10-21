@@ -4,7 +4,7 @@ import math
 # We can only import modules from bananagui.gui because this file can be
 # loaded by bananagui.gui.__init__.
 import bananagui
-from bananagui.gui import canvas, timeouts
+from bananagui.gui import canvas, mainloop
 
 
 _LINES = 15
@@ -69,5 +69,5 @@ class Spinner:
     def _bananagui_set_spinning(self, spinning):
         if spinning:
             # Start spinning.
-            timeouts.add_timeout(_DELAY, self.__draw)
+            mainloop.add_timeout(_DELAY, self.__draw)
         # We don't need an else because __draw knows when to stop.

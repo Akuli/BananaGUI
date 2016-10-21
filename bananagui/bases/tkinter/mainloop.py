@@ -22,6 +22,16 @@ def quit():
     root = None
 
 
+def add_timeout(milliseconds, callback):
+    after = root.after
+
+    def real_callback():
+        if callback() == bananagui.RUN_AGAIN:
+            after(milliseconds, real_callback)
+
+    after(milliseconds, real_callback)
+
+
 def convert_color(colorstring):
     """Convert a tkinter color string to a BananaGUI color.
 

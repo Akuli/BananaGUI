@@ -19,34 +19,31 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
+from tkinter import ttk
 
-import bananagui
-from bananagui import _base, utils
-from .basewidgets import Child
+from . import tkinter_orients
 
 
-@utils.baseclass
-@bananagui.bananadoc
-class BaseLabel(_base.BaseLabel, Child):
-    """A label base class."""
+class Progressbar:
+
+    def __init__(self, parent, **kwargs):
+        widget = ttk.Progressbar(
+            parent['real_widget'],
+            orient=tkinter_orients[self['orientation']])
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def _bananagui_set_progress(self, progress):
+        self['real_widget'].stop()  # Reset it.
+        step = progress * 100
+        if step >= 99.99:
+            # The widget would go back to zero if we stepped it this
+            # much.
+            step = 99.99
+        self['real_widget'].step(step)
 
 
-@bananagui.bananadoc
-class Label(_base.Label, BaseLabel):
-    """A label with text in it.
+class BouncingProgressbar:
 
-    Currently the text is always centered.
-    """
-    # TODO: add an alignment thing? Currently the text in the labels is
-    # always centered.
-    # TODO: Add fonts and colors?
-    text = bananagui.Property('text', type=str, default='',
-                              doc="Text in the label.")
-
-
-@bananagui.bananadoc
-class ImageLabel(_base.ImageLabel, BaseLabel):
-    """A label that contains an image."""
-    imagepath = bananagui.Property.imagepath(
-        'imagepath', doc="Path to an image that will be displayed.")
+    def __init__(self, parent, **kwargs):
+        raise NotImplementedError  # TODO

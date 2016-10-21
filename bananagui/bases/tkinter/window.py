@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import colorchooser
 
 from . import mainloop
 
@@ -9,14 +10,11 @@ class BaseWindow:
         widget = self['real_widget']
         widget.title(self['title'])
         widget.bind('<Configure>', self.__configure)
-        widget.protocol('WM_DELETE_WINDOW', self.__delete_window)
+        widget.protocol('WM_DELETE_WINDOW', self.on_destroy.emit)
         super().__init__(**kwargs)
 
     def __configure(self, event):
         self.size.raw_set((event.width, event.height))
-
-    def __delete_window(self):
-        self.on_destroy.emit()
 
     def _bananagui_set_title(self, title):
         self['real_widget'].title(title)
@@ -56,3 +54,20 @@ class Window:
         widget = tk.Toplevel(mainloop.root)
         self.real_widget.raw_set(widget)
         super().__init__(**kwargs)
+
+
+class Dialog:
+
+    def __init__(self, parentwindow, **kwargs):
+        widget = tk.Toplevel(parentwindow['real_widget'])
+        self.real_widget.raw_set(widget)
+        super().__init__(**kwargs)
+
+
+def colordialog(parentwindow, color, title):
+    result = colorchooser.askcolor(
+        color.hex, title=title,
+        parent=parentwindow['real_widget'])
+    if result == (None, None):
+        return None
+    return mainloop.convert_color(result[1])

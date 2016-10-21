@@ -1,11 +1,11 @@
 import bananagui
 from bananagui import _base, utils
-from . import bases
+from .basewidgets import Child
 
 
 @utils.baseclass
 @bananagui.bananadoc
-class BaseButton(_base.BaseButton, bases.Child):
+class BaseButton(_base.BaseButton, Child):
     """Base for other buttons."""
 
     on_click = bananagui.Signal(

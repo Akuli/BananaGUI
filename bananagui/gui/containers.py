@@ -26,17 +26,17 @@
 import bananagui
 from bananagui import _base, utils
 from bananagui.structures import CallbackList  # Not imported in __init__.
-from . import bases
+from .basewidgets import Parent, Child, Oriented
 
 
-# This is not a Child because Window and Dialog are based on this.
+# This is not a Child because Window is based on this.
 @utils.baseclass
 @bananagui.bananadoc
-class Bin(_base.Bin, bases.Parent):
+class Bin(_base.Bin, Parent):
     """A widget that contains one child widget or no children at all."""
 
     child = bananagui.Property(
-        'child', allow_none=True, default=None, type=bases.Child,
+        'child', allow_none=True, default=None, type=Child,
         doc="""The child in the widget, None by default.
 
         Setting this to None removes the child.
@@ -50,7 +50,7 @@ class Bin(_base.Bin, bases.Parent):
 
 
 @bananagui.bananadoc
-class Box(bases.Oriented, _base.Box, bases.Parent, bases.Child):
+class Box(Oriented, _base.Box, Parent, Child):
     """A widget that contains other widgets.
 
     The children property behaves like a list and you can modify it to

@@ -1,5 +1,8 @@
 """Main loop."""
 
+import warnings
+
+import bananagui
 from bananagui import _base
 
 
@@ -45,3 +48,29 @@ def quit(*args):
     """
     if _running:
         _base.quit()
+
+
+def add_timeout(milliseconds: int, callback, *args, **kwargs) -> None:
+    """Run callback(*args, **kwargs) after waiting.
+
+    If the function returns RUN_AGAIN it will be called again after
+    waiting again. Depending on the GUI toolkit, the timing may start
+    when bananagui.main() is started or before it.
+
+    The waiting time is not guaranteed to be exact, but it's good enough
+    for most purposes. Use something like time.time() if you need to
+    measure time in the callback function.
+    """
+    assert milliseconds > 0, "non-positive timeout %r" % (milliseconds,)
+    assert callable(callback), "non-callable callback"
+
+    def real_callback():
+        result = callback(*args, **kwargs)
+        if result not in {None, bananagui.RUN_AGAIN}:
+            warnings.warn("BananaGUI callback returned %r, expected "
+                          "None or bananagui.RUN_AGAIN" % (result,),
+                          RuntimeWarning)
+            result = None
+        return result
+
+    _base.add_timeout(milliseconds, real_callback)

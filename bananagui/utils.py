@@ -87,6 +87,17 @@ def check(value, *, how_many=1, allow_none=False, type=None,
         assert value <= maximum, "%r is larger than %r" % (value, maximum)
 
 
+def find_attribute(attribute, *objects):
+    """Get an attribute from any of objects."""
+    for obj in objects:
+        try:
+            return getattr(obj, attribute)
+        except AttributeError:
+            pass
+    raise AttributeError("none of the objects have an attribute %r"
+                         % attribute)
+
+
 def register(abstract_baseclass):
     """Return a decorator that calls abstract_baseclass.register.
 
