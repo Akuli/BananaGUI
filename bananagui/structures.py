@@ -28,6 +28,7 @@ class _CallbackBase:
     """
 
     __slots__ = ('_data', '_callbacks')
+    __hash__ = None
 
     def __init__(self, *args, **kwargs):
         self._data = type(self)._basetype(*args, **kwargs)
