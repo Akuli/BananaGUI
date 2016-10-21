@@ -36,13 +36,15 @@ class Slider:
                           orient=tkinter_orients[self['orientation']])
 
         # There seems to be no way to change a Scale's value with the
-        # keyboard so this seems to work.
-        # http://stackoverflow.com/a/16970862
-        widget.bind('<ButtonRelease>', self.__value_changed)
+        # keyboard so this seems to work. There's a stackoverflow answer
+        # that recommends binding <Button1-Release>, but it doesn't
+        # change the value immediately when the scale is moved.
+        widget.bind('<Button1-Motion>', self.__motion)
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
-    def __value_changed(self, event):
+    def __motion(self, event):
+        # This doesn't do anything if the value hasn't changed.
         self.value.raw_set(event.widget.get())
 
     def _bananagui_set_value(self, value):
