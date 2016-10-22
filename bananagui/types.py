@@ -255,16 +255,16 @@ class BananaObject:
 
     def __get_prop(self, propertyname):
         """Return a BananaGUI property."""
-        result = self
+        result = type(self)
         try:
             for attribute in propertyname.split('.'):
                 result = getattr(result, attribute)
         except AttributeError as e:
             raise ValueError("no such BananaGUI property: %r"
                              % propertyname) from e
-        if not isinstance(result, _PropertyWrapper):
+        if not isinstance(result, Property):
             raise TypeError("%r is not a BananaGUI property" % propertyname)
-        return result
+        return _PropertyWrapper(result, self)
 
     def __setitem__(self, name: str, value):
         self.__get_prop(name).set(value)
