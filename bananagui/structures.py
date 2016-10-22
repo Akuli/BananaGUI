@@ -5,8 +5,8 @@ import functools
 from gettext import gettext as _
 import operator
 import re
-import sys
 import traceback
+import warnings
 
 try:
     from types import SimpleNamespace as NamespaceBase  # noqa

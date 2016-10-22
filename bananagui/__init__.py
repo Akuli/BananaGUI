@@ -37,7 +37,8 @@ import bananagui.bases
 # Importing other things. CallbackList and CallbackDict aren't imported
 # here because they're meant to be used internally by BananaGUI.
 from bananagui.structures import Color, Font
-from bananagui.types import Property, Event, Signal, BananaObject, bananadoc
+from bananagui.types import (BananaProperty, Event, BananaSignal,
+                             BananaObject, document_props)
 
 
 # These constants can be used with these variables or with their values

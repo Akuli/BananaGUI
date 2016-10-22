@@ -11,7 +11,7 @@ def once():
 def over_and_over():
     number = next(counter)
     print("I have ran %d times before." % number)
-    if number >= 5: 
+    if number >= 5:
         print("It's time to stop now.")
         gui.quit()
         return None

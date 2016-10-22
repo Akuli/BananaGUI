@@ -27,12 +27,12 @@ from .basewidgets import Child
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class BaseLabel(_base.BaseLabel, Child):
     """A label base class."""
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Label(_base.Label, BaseLabel):
     """A label with text in it.
 
@@ -41,12 +41,13 @@ class Label(_base.Label, BaseLabel):
     # TODO: add an alignment thing? Currently the text in the labels is
     # always centered.
     # TODO: Add fonts and colors?
-    text = bananagui.Property('text', type=str, default='',
-                              doc="Text in the label.")
+    text = bananagui.BananaProperty(
+        'text', type=str, default='',
+        doc="Text in the label.")
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class ImageLabel(_base.ImageLabel, BaseLabel):
     """A label that contains an image."""
-    imagepath = bananagui.Property.imagepath(
+    imagepath = bananagui.BananaProperty.imagepath(
         'imagepath', doc="Path to an image that will be displayed.")

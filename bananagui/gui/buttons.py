@@ -4,25 +4,26 @@ from .basewidgets import Child
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class BaseButton(_base.BaseButton, Child):
     """Base for other buttons."""
 
-    on_click = bananagui.Signal(
+    on_click = bananagui.BananaSignal(
         'on_click', doc="This is emitted when the button is clicked.")
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Button(_base.Button, BaseButton):
     """A button that displays text in it."""
 
-    text = bananagui.Property('text', type=str, default='',
-                              doc="The text in the button.")
+    text = bananagui.BananaProperty(
+        'text', type=str, default='',
+        doc="The text in the button.")
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class ImageButton(_base.ImageButton, BaseButton):
     """A button that displays an image."""
-    imagepath = bananagui.Property.imagepath(
+    imagepath = bananagui.BananaProperty.imagepath(
         'imagepath',
         doc="Path to the image that is displayed in the button.")

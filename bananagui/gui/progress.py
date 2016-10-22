@@ -28,7 +28,7 @@ from .basewidgets import Child, Oriented
 class Progressbar(Oriented, _base.Progressbar, Child):
     """A progress bar widget."""
 
-    progress = bananagui.Property(
+    progress = bananagui.BananaProperty(
         'progress', type=(float, int), minimum=0, maximum=1, default=0,
         doc="The progressbar's position.")
 
@@ -40,7 +40,7 @@ class BouncingProgressbar(Oriented, _base.BouncingProgressbar, Child):
     make it bounce.
     """
 
-    bouncing = bananagui.Property(
+    bouncing = bananagui.BananaProperty(
         'bouncing', type=bool, default=False,
         doc="True if the progress bar is bouncing, False if not.")
 
@@ -52,6 +52,6 @@ class Spinner(utils.find_attribute('Spinner', _base, defaults), Child):
     property to True to make it spin.
     """
 
-    spinning = bananagui.Property(
+    spinning = bananagui.BananaProperty(
         'spinning', type=bool, default=False,
         doc="True if the widget is currently spinning, False if not.")

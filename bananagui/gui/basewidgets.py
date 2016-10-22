@@ -26,26 +26,26 @@ from bananagui import _base, utils
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Widget(_base.Widget, bananagui.BananaObject):
     """A widget baseclass."""
 
     # The tooltip property is not implemented here. Parent widgets don't
     # need tooltips because they should be always filled with Dummy
     # widgets.
-    real_widget = bananagui.Property(
+    real_widget = bananagui.BananaProperty(
         'real_widget', settable=False,
         doc="The real GUI toolkit's widget that BananaGUI uses.")
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Parent(_base.Parent, Widget):
     """A widget that child widgets can use as their parent."""
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Child(_base.Child, Widget):
     """A widget that can be added to a container.
 
@@ -54,15 +54,16 @@ class Child(_base.Child, Widget):
     changed afterwards.
     """
 
-    parent = bananagui.Property('parent', type=Parent, settable=False,
-                                doc="The parent set on initialization.")
-    tooltip = bananagui.Property(
+    parent = bananagui.BananaProperty(
+        'parent', type=Parent, settable=False,
+        doc="The parent set on initialization.")
+    tooltip = bananagui.BananaProperty(
         'tooltip', type=str, allow_none=True, default=None,
         doc="""Text in the widget's tooltip.
 
         This is None if the widget doesn't have a tooltip.
         """)
-    expand = bananagui.Property(
+    expand = bananagui.BananaProperty(
         'expand', how_many=2, type=bool, default=(True, True),
         doc="""Two-tuple of horizontal and vertical expanding.
 
@@ -98,7 +99,7 @@ class Child(_base.Child, Widget):
             `------------------------------------------------'
 
         """)
-    grayed_out = bananagui.Property(
+    grayed_out = bananagui.BananaProperty(
         'grayed_out', type=bool, default=False,
         doc="True if the widget is grayed out, False otherwise.")
 
@@ -108,7 +109,7 @@ class Child(_base.Child, Widget):
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Oriented:
     """Implement an orientation property and handy class methods.
 
@@ -120,7 +121,7 @@ class Oriented:
         SomeWidget(..., orientation=bananagui.HORIZONTAL)
     """
 
-    orientation = bananagui.Property(
+    orientation = bananagui.BananaProperty(
         'orientation', settable=False,
         doc="""This is bananagui.HORIZONTAL or bananagui.VERTICAL.
 
@@ -154,16 +155,16 @@ def _check_valuerange(range_object):
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Ranged:
     """Implement valuerange and value BananaGUI properties."""
-    valuerange = bananagui.Property(
+    valuerange = bananagui.BananaProperty(
         'valuerange', type=range, settable=False,
         doc="""A range of allowed values.
 
         This must be a Python range object.
         """)
-    value = bananagui.Property(
+    value = bananagui.BananaProperty(
         'value', type=int,
         doc="""The current value.
 

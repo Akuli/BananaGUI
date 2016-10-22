@@ -5,7 +5,7 @@ from bananagui import _base
 from .basewidgets import Child
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Canvas(_base.Canvas, Child):
     """A canvas widget that you can draw things on.
 
@@ -13,14 +13,14 @@ class Canvas(_base.Canvas, Child):
     greater than the width of the canvas.
     """
 
-    minimum_size = bananagui.Property(
+    minimum_size = bananagui.BananaProperty(
         'minimum_size', how_many=2, type=int, minimum=0, default=(300, 200),
         doc="""Two-tuple of the minimum width and height of the canvas.
 
         The canvas is smaller than this only if the window is resized
         to something smaller than this.
         """)
-    size = bananagui.Property(
+    size = bananagui.BananaProperty(
         'size', how_many=2, type=int, minimum=0, default=(300, 200),
         settable=False,
         doc="""Two-tuple of the current width and height of the canvas.
@@ -28,7 +28,7 @@ class Canvas(_base.Canvas, Child):
         This is updated when the canvas gets resized. The value is
         undefined when the canvas isn't in a visible container.
         """)
-    background = bananagui.Property(
+    background = bananagui.BananaProperty(
         'background', type=bananagui.Color, default=bananagui.WHITE,
         doc="""The background color of the canvas.
 

@@ -31,7 +31,7 @@ from .containers import Bin
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class BaseWindow(_base.BaseWindow, Bin):
     """A window baseclass.
 
@@ -51,23 +51,23 @@ class BaseWindow(_base.BaseWindow, Bin):
         """Destroy event.widget."""
         event.widget.destroy()
 
-    resizable = bananagui.Property(
+    resizable = bananagui.BananaProperty(
         'resizable', type=bool, default=True,
         doc="True if the window can be resized.")
-    size = bananagui.Property(
+    size = bananagui.BananaProperty(
         'size', how_many=2, type=int, minimum=1, default=(200, 200),
         doc="Two-tuple of the window's current width and height.")
-    minimum_size = bananagui.Property(
+    minimum_size = bananagui.BananaProperty(
         'minimum_size', default=None, how_many=2, type=int, minimum=1,
         allow_none=True,
         doc="""Two-tuple of minimum width and height or None.
 
         The window cannot be resized to be smaller than this.
         """)
-    showing = bananagui.Property(
+    showing = bananagui.BananaProperty(
         'showing', type=bool, default=True,
         doc="True if the window is visible.")
-    on_destroy = bananagui.Signal(
+    on_destroy = bananagui.BananaSignal(
         'on_destroy',
         doc="""This is emitted when the user tries to close the window.
 
@@ -117,7 +117,7 @@ class BaseWindow(_base.BaseWindow, Bin):
             self.__destroyed = True
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Window(_base.Window, BaseWindow):
     """A window that can have child windows.
 
@@ -125,12 +125,12 @@ class Window(_base.Window, BaseWindow):
     windows like this.
     """
 
-    title = bananagui.Property(
+    title = bananagui.BananaProperty(
         'title', type=str, default="BananaGUI Window",
         doc="The title of the window.")
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Dialog(_base.Dialog, BaseWindow):
     """A window that has a parent window.
 
@@ -140,10 +140,10 @@ class Dialog(_base.Dialog, BaseWindow):
     toolkit supports. It's None by default.
     """
 
-    title = bananagui.Property(
+    title = bananagui.BananaProperty(
         'title', type=str, default="BananaGUI Dialog",
         doc="The title of the window.")
-    parentwindow = bananagui.Property(
+    parentwindow = bananagui.BananaProperty(
         'parentwindow', type=Window, settable=False,
         doc="The parent window set on initialization.")
 

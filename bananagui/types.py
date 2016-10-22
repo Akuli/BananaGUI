@@ -30,7 +30,7 @@ import weakref
 from bananagui import utils, structures
 
 
-class _PropertyWrapper:
+class _BananaPropertyWrapper:
     """Like types.MethodType but for BananaGUI properties."""
 
     def __init__(self, prop, instance):
@@ -58,9 +58,9 @@ class _PropertyWrapper:
             # methods only instead of all callables because there's also
             # callable instance attributes like getdefault.
             result = functools.partial(value, self.__instance)
-        elif isinstance(value, Property):
+        elif isinstance(value, BananaProperty):
             # It's a nested BananaGUI property, create another wrapper.
-            result = _PropertyWrapper(value, self.__instance)
+            result = _BananaPropertyWrapper(value, self.__instance)
         else:
             # It's something else.
             result = value
@@ -68,7 +68,7 @@ class _PropertyWrapper:
         return result
 
 
-class Property:
+class BananaProperty:
     """A basic property.
 
     The properties are not like Python properties with descriptor magic.
@@ -103,13 +103,12 @@ class Property:
 
         self._values = weakref.WeakKeyDictionary()
         if add_changed:
-            self.changed = Signal(
+            self.changed = BananaSignal(
                 name + '.changed',
                 doc="This signal is emitted when %s changes." % name)
 
     def __repr__(self):
-        """Clearly tell the user that this is not a Python @property."""
-        return '<BananaGUI %s %r>' % (type(self).__name__, self.name)
+        return '<%s %r>' % (type(self).__name__, self.name)
 
     def raw_set(self, widget, value):
         """Set the value of the BananaGUI property.
@@ -180,7 +179,7 @@ class Property:
             # This is invoked from a class.
             return self
         # This is invoked from an instance.
-        return _PropertyWrapper(self, instance)
+        return _BananaPropertyWrapper(self, instance)
 
     @classmethod
     def filepath(cls, name, **kwargs):
@@ -212,7 +211,7 @@ class Event(structures.NamespaceBase):
     """An attribute container."""
 
 
-class Signal(Property):
+class BananaSignal(BananaProperty):
     """A property that contains callbacks and can be emitted."""
 
     def __init__(self, name, *, doc):
@@ -262,9 +261,9 @@ class BananaObject:
         except AttributeError as e:
             raise ValueError("no such BananaGUI property: %r"
                              % propertyname) from e
-        if not isinstance(result, Property):
+        if not isinstance(result, BananaProperty):
             raise TypeError("%r is not a BananaGUI property" % propertyname)
-        return _PropertyWrapper(result, self)
+        return _BananaPropertyWrapper(result, self)
 
     def __setitem__(self, name: str, value):
         self.__get_prop(name).set(value)
@@ -274,23 +273,23 @@ class BananaObject:
 
     # The set and get docstrings don't talk about things like set and
     # get because the same docstrings are reused here.
-    __setitem__.__doc__ = Property.set.__doc__
-    __getitem__.__doc__ = Property.get.__doc__
+    __setitem__.__doc__ = BananaProperty.set.__doc__
+    __getitem__.__doc__ = BananaProperty.get.__doc__
 
 
 def _bool2string(value):
     return 'yes' if value else 'no'
 
 
-def bananadoc(bananaclass):
+def document_props(bananaclass):
     '''Add documentation to a BananaObject subclass from its properties.
 
     Use this as a decorator, like this:
 
-    >>> @bananadoc
+    >>> @document_props
     ... class Thing(BananaObject):
     ...     """Thing doc."""
-    ...     a = Property('a', doc="Here's the a doc.")
+    ...     a = BananaProperty('a', doc="Here's the a doc.")
     ...
     >>> print(Thing.__doc__)
     Thing doc.
@@ -304,13 +303,13 @@ def bananadoc(bananaclass):
             Default value:        None
             Has a changed signal: yes
             Settable:             yes
-    >>> @bananadoc
+    >>> @document_props
     ... class Thingy(Thing):
     ...     """Thingy doc.
     ...
     ...     This thingy doc is multiple lines long.
     ...     """
-    ...     b = Property(
+    ...     b = BananaProperty(
     ...         'b', default="hello", settable=False,
     ...         doc="""Here's the b doc.
     ...
@@ -360,7 +359,7 @@ def bananadoc(bananaclass):
             continue
 
         prop = getattr(bananaclass, name)
-        if not isinstance(prop, Property):
+        if not isinstance(prop, BananaProperty):
             # Can't add it to documentation.
             continue
 

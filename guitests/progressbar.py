@@ -19,8 +19,9 @@ def main():
 
         box['children'].append(gui.Dummy(box))
 
+        spin_callback = functools.partial(set_progress, progressbar)
         spinbox = gui.Spinbox(box, valuerange=range(101), expand=(True, False))
-        spinbox['value.changed'].append(functools.partial(set_progress, progressbar))
+        spinbox['value.changed'].append(spin_callback)
         box['children'].append(spinbox)
 
         window['on_destroy'].append(gui.quit)

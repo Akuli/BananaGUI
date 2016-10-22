@@ -27,14 +27,15 @@ from .basewidgets import Child
 
 
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class TextBase(_base.TextBase, Child):
     """A base class for text editing widgets."""
 
     # TODO: Add fonts and colors.
-    text = bananagui.Property('text', type=str, default='',
-                              doc="Text in the entry.")
-    read_only = bananagui.Property(
+    text = bananagui.BananaProperty(
+        'text', type=str, default='',
+        doc="Text in the entry.")
+    read_only = bananagui.BananaProperty(
         'read_only', type=bool, default=False,
         doc="True if the content of the widget cannot be edited.")
 
@@ -47,21 +48,21 @@ class TextBase(_base.TextBase, Child):
         super().select_all()
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Entry(_base.Entry, TextBase):
     """A one-line text widget."""
 
-    hidden = bananagui.Property(
+    hidden = bananagui.BananaProperty(
         'hidden', type=bool, default=False,
         doc="True if the entry's content is hidden with asterisks or balls.")
 
 
 # TODO: text wrapping.
-@bananagui.bananadoc
+@bananagui.document_props
 class PlainTextView(_base.PlainTextView, TextBase):
     """A multiline text widget."""
 
-    tab_inserts = bananagui.Property(
+    tab_inserts = bananagui.BananaProperty(
         'tab_inserts', type=str, default='\t',
         doc="The character(s) that will be inserted when tab is pressed.")
 

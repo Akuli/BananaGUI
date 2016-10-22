@@ -26,22 +26,22 @@ from .basewidgets import Oriented, Child
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Checkbox(_base.Checkbox, Child):
     """A widget that can be checked.
 
     The Checkbox widget has nothing to do with the Box widget.
     """
 
-    text = bananagui.Property(
+    text = bananagui.BananaProperty(
         'text', type=str, default='',
         doc="The text next to the box that can be checked.")
-    checked = bananagui.Property(
+    checked = bananagui.BananaProperty(
         'checked', type=bool, default=False,
         doc="True if the box is currently checked, False if not.")
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Dummy(_base.Dummy, Child):
     """An empty widget.
 
@@ -50,7 +50,7 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Separator(Oriented, _base.Separator, Child):
     """A horizontal or vertical line."""
 

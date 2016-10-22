@@ -31,11 +31,11 @@ from .basewidgets import Parent, Child, Oriented
 
 # This is not a Child because Window is based on this.
 @utils.baseclass
-@bananagui.bananadoc
+@bananagui.document_props
 class Bin(_base.Bin, Parent):
     """A widget that contains one child widget or no children at all."""
 
-    child = bananagui.Property(
+    child = bananagui.BananaProperty(
         'child', allow_none=True, default=None, type=Child,
         doc="""The child in the widget, None by default.
 
@@ -49,7 +49,7 @@ class Bin(_base.Bin, Parent):
         super()._bananagui_set_child(child)
 
 
-@bananagui.bananadoc
+@bananagui.document_props
 class Box(Oriented, _base.Box, Parent, Child):
     """A widget that contains other widgets.
 
@@ -60,7 +60,7 @@ class Box(Oriented, _base.Box, Parent, Child):
     # child widget to the end of the box and a _bananagui_box_remove
     # method that removes a child widget from the box.
 
-    children = bananagui.Property(
+    children = bananagui.BananaProperty(
         'children', getdefault=CallbackList, settable=False,
         doc="A mutable sequence of children in the box.")
 
