@@ -33,7 +33,7 @@ from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .containers import Bin, Box
 from .labels import BaseLabel, Label, ImageLabel
-from .mainloop import init, main, quit
+from .mainloop import init, main, quit, add_timeout
 from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
                    get_clipboard_text, get_font_families)
 from .progress import Progressbar, BouncingProgressbar, Spinner
