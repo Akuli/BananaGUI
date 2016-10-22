@@ -6,14 +6,12 @@ from gettext import gettext as _
 import operator
 import re
 import sys
+import traceback
 
 try:
-    from collections import abc
     from types import SimpleNamespace as NamespaceBase  # noqa
 except ImportError:
-    # In Python 3.3, the abstract base classes in collections were moved
-    # to collections.abc and types.SimpleNamespace was addded.
-    import _abcoll as abc  # collections.py imports * from this.
+    # types.SimpleNamespace is new in Python 3.3.
     from argparse import Namespace as NamespaceBase  # noqa
 
 from bananagui import utils
@@ -67,13 +65,22 @@ class _CallbackBase:
         setattr(cls, name, exposer)
 
     @classmethod
-    def _expose_all(cls, *names):
-        """Call self._expose with each name."""
+    def _expose_all(cls, names):
+        """Call cls._expose with each name.
+
+        Warn when exposing a name fails.
+        """
         for name in names:
-            cls._expose(name)
+            try:
+                cls._expose(name)
+            except Exception:
+                warnings.warn(
+                    "problem creating %s.%s\n%s"
+                    % (cls.__name__, name, traceback.format_exc()),
+                    RuntimeWarning)
 
 
-@utils.register(abc.MutableSequence)
+@utils.register(utils.abc.MutableSequence)
 class CallbackList(_CallbackBase):
     """A list that runs callbacks when its content changes.
 
@@ -119,19 +126,10 @@ class CallbackList(_CallbackBase):
 #                 |          ,--------------------.
 #           NotImplemented   | b._data == a._data |
 #                            `--------------------'
-CallbackList._expose_all(
-    '__contains__', '__iter__',
-    '__setitem__', '__getitem__', '__delitem__',
-    '__eq__', '__ne__', '__gt__', '__ge__', '__lt__', '__le__',
-    '__add__', '__mul__', '__iadd__', '__imul__',
-    'append', 'count', 'extend', 'index', 'insert', 'pop',
-    'remove', 'reverse', 'sort',
-)
-if sys.version_info >= (3, 3):
-    CallbackList._expose_all('clear', 'copy')
+CallbackList._expose_all(set(dir(list)) - set(dir(object)))
 
 
-@utils.register(abc.MutableMapping)
+@utils.register(utils.abc.MutableMapping)
 class CallbackDict(_CallbackBase):
     """A dictionary that runs callbacks when its content changes.
 
@@ -162,21 +160,15 @@ class CallbackDict(_CallbackBase):
     def fromkeys(cls, iterable, value=None):
         """Create a new CallbackDict from an iterable of keys.
 
-        >>> CallbackDict.fromkeys(['lol'])
-        CallbackDict({'lol': None})
-        >>> CallbackDict.fromkeys(['lol'], 'wtf')
-        CallbackDict({'lol': 'wtf'})
+        >>> CallbackDict.fromkeys(['hello'])
+        CallbackDict({'hello': None})
+        >>> CallbackDict.fromkeys(['hello'], 'there')
+        CallbackDict({'hello': 'there'})
         """
         return cls(dict.fromkeys(iterable, value))
 
 
-CallbackDict._expose_all(
-    '__contains__', '__iter__',
-    '__setitem__', '__getitem__', '__delitem__',
-    '__eq__', '__ne__',
-    'clear', 'copy', 'get', 'items', 'keys', 'pop', 'popitem',
-    'setdefault', 'update', 'values',
-)
+CallbackDict._expose_all(set(dir(dict)) - set(dir(object)) - {'fromkeys'})
 
 
 class Font:
@@ -192,22 +184,9 @@ class Font:
     to choose the fonts they want to use with a font dialog.
     """
 
-    # Try to make the fonts immutable.
-    __slots__ = ('_family', '_size', '_bold', '_italic', '_underline')
-    family = property(operator.attrgetter('_family'),
-                      doc="The font's family as a string or None.")
-    size = property(operator.attrgetter('_size'),
-                    doc="The font's size as an integer or None.")
-    bold = property(operator.attrgetter('_bold'),
-                    doc="True if the font is in bold.")
-    italic = property(operator.attrgetter('_italic'),
-                      doc="True if the font is italic.")
-    underline = property(operator.attrgetter('_underline'),
-                         doc="True if the font is underlined.")
-
     def __init__(self, family: str = None, size: int = None, *,
                  bold: bool = False, italic: bool = False,
-                 underline: bool = False):
+                 underline: bool = False, overline: bool = False):
         """Create a new font.
 
         If family or size is None their default values will be used. If
@@ -230,20 +209,23 @@ class Font:
         self._bold = bold
         self._italic = italic
         self._underline = underline
+        self._overline = overline
 
     def __repr__(self):
         words = ['family=%r' % self.family, 'size=%r' % self.size]
-        for attribute in ('bold', 'italic', 'underline'):
+        for attribute in self._slotnames[2:]:
             value = getattr(self, attribute)
             if value:
                 words.append('%s=%r' % (attribute, value))
         return '<BananaGUI font, %s>' % ' '.join(words)
 
     def __eq__(self, other):
-        """Implement self == other using to_string().
+        """Implement self == other.
 
         >>> Font('Sans', 16, bold=True) == Font('Sans', 16, bold=True)
         True
+        >>> Font('Sans', 16, bold=True) != Font('Sans', 16, bold=True)
+        False
         >>> Font('Sans', 16, bold=True) == Font('Sans', 16)
         False
         >>> Font() == "Hello"
@@ -251,21 +233,18 @@ class Font:
         """
         if not isinstance(other, Font):
             return NotImplemented
-        return self.to_string() == other.to_string()
+        for attribute in self._slotnames:
+            if getattr(self, attribute) != getattr(other, attribute):
+                return False
+        return True
 
-    def __ne__(self, other):
-        """Implement self != other using to_string().
+    # __ne__ will work automagically.
 
-        >>> Font('Sans', 16, bold=True) != Font('Sans', 16, bold=True)
-        False
-        >>> Font('Sans', 16, bold=True) != Font('Sans', 16)
-        True
-        >>> Font() != "Hello"
-        True
-        """
-        if not isinstance(other, Font):
-            return NotImplemented
-        return self.to_string() != other.to_string()
+    # Defining an __eq__ sets __hash__ to None, but I don't see any
+    # reason why fonts wouldn't be hashable.
+    def __hash__(self):
+        values = (getattr(self, attribute) for attribute in self._slotnames)
+        return hash(tuple(values))
 
     @classmethod
     def from_string(cls, string: str):
@@ -282,13 +261,9 @@ class Font:
         >>> Font.from_string('default family, default size')
         <BananaGUI font, family=None size=None>
         """
-        if string.count(',') == 2:
-            family, size, attributes = map(str.strip, string.split(','))
-        elif string.count(',') == 1:
-            family, size = map(str.strip, string.split(','))
-            attributes = ''
-        else:
-            raise ValueError("the string should contain one or two commas")
+        if string.count(',') == 1:
+            string += ','
+        family, size, attributes = map(str.strip, string.split(','))
 
         kwargs = dict.fromkeys(attributes.lower().split(), True)
         if family.lower() != 'default family':
@@ -310,30 +285,35 @@ class Font:
             result.append(translate("default size"))
         else:
             result.append(str(self.size))
-        attributes = [translate(attribute)
-                      for attribute in ('bold', 'italic', 'underline')
-                      if getattr(self, attribute)]
+
+        attributes = []
+        for attribute in self._slotnames[2:]:
+            if getattr(self, attribute):
+                attributes.append(attribute)
         if attributes:
             result.append(' '.join(attributes))
+
         return ', '.join(result)
 
-    def to_string(self) -> str:
+    @property
+    def string(self) -> str:
         """Convert the font to a string.
 
         The strings can be parsed by Font.from_string, and they are
         readable enough for displaying them to the users of the program.
 
-        >>> Font().to_string()
+        >>> Font().string
         'default family, default size'
-        >>> Font(bold=True, underline=True).to_string()
+        >>> Font(bold=True, underline=True).string
         'default family, default size, bold underline'
-        >>> Font('Sans', 123, italic=True).to_string()
+        >>> Font('Sans', 123, italic=True).string
         'Sans, 123, italic'
         """
         return self._to_string({})
 
-    def to_translated_string(self) -> str:
-        """Like to_string, but translates the string also.
+    @property
+    def translated_string(self) -> str:
+        """Like string, but translates the string also.
 
         The translating is done with gettext.gettext. Use this for
         displaying fonts to the user. There is no from_translated_string.
@@ -344,7 +324,24 @@ class Font:
             "bold": _("bold"),
             "italic": _("italic"),
             "underline": _("underline"),
+            "overline": _("overline"),
         })
+
+    # Try to make the fonts immutable without inheriting from tuple.
+    __slots__ = ('_family', '_size', '_bold', '_italic',
+                 '_underline', '_overline')
+    _slotnames = ('family', 'size', 'bold', 'italic',
+                  'underline', 'overline')
+
+    @classmethod
+    def _setup(cls):
+        for slot, alias in zip(cls.__slots__, cls._slotnames):
+            prop = property(operator.attrgetter(slot),
+                            doc="The %s value set on initialization." % alias)
+            setattr(cls, alias, prop)
+
+
+Font._setup()
 
 
 class Color(collections.namedtuple('Color', 'red green blue')):
