@@ -27,9 +27,7 @@ from . import tkinter_orients
 class Progressbar:
 
     def __init__(self, parent, **kwargs):
-        widget = ttk.Progressbar(
-            parent['real_widget'],
-            orient=tkinter_orients[self['orientation']])
+        widget = ttk.Progressbar(parent['real_widget'], orient='horizontal')
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 

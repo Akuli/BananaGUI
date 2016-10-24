@@ -34,8 +34,7 @@ def main():
         box = gui.Box.vertical(window)
         window['child'] = box
 
-        progressbar = gui.Progressbar(
-            box, orientation=bananagui.HORIZONTAL, expand=(True, False))
+        progressbar = gui.Progressbar(box, expand=(True, False))
         box['children'].append(progressbar)
 
         box['children'].append(gui.Dummy(box))

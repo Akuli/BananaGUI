@@ -25,7 +25,7 @@ from bananagui.bases import defaults
 from .basewidgets import Child, Oriented
 
 
-class Progressbar(Oriented, _base.Progressbar, Child):
+class Progressbar(_base.Progressbar, Child):
     """A progress bar widget."""
 
     progress = bananagui.BananaProperty(
@@ -33,7 +33,7 @@ class Progressbar(Oriented, _base.Progressbar, Child):
         doc="The progressbar's position.")
 
 
-class BouncingProgressbar(Oriented, _base.BouncingProgressbar, Child):
+class BouncingProgressbar(_base.BouncingProgressbar, Child):
     """A Progressbar-like widget that bounces back and forth.
 
     This doesn't bounce by default. Set the bouncing property to True to
