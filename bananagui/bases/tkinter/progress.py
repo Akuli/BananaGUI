@@ -44,4 +44,12 @@ class Progressbar:
 class BouncingProgressbar:
 
     def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
+        widget = ttk.Progressbar(parent['real_widget'], mode='indeterminate')
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def _bananagui_set_bouncing(self, bouncing):
+        if bouncing:
+            self['real_widget'].start(20)  # Move every 20 milliseconds.
+        else:
+            self['real_widget'].stop()
