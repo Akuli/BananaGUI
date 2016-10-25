@@ -21,8 +21,6 @@
 
 from tkinter import ttk
 
-from . import tkinter_orients
-
 
 class Progressbar:
 

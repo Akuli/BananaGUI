@@ -21,12 +21,11 @@
 
 import functools
 
-import bananagui
 from bananagui import gui
 
 
 def set_progress(progressbar, event):
-    progressbar['progress'] = event.widget ['value'] / 100
+    progressbar['progress'] = event.widget['value'] / 100
 
 
 def toggle_bouncing(progressbar, event):

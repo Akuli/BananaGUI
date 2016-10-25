@@ -22,7 +22,7 @@
 import bananagui
 from bananagui import _base, utils
 from bananagui.bases import defaults
-from .basewidgets import Child, Oriented
+from .basewidgets import Child
 
 
 class Progressbar(_base.Progressbar, Child):
