@@ -27,7 +27,7 @@ from . import tkinter_orients
 class Progressbar:
 
     def __init__(self, parent, **kwargs):
-        widget = ttk.Progressbar(parent['real_widget'], orient='horizontal')
+        widget = ttk.Progressbar(parent['real_widget'])
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
@@ -44,12 +44,16 @@ class Progressbar:
 class BouncingProgressbar:
 
     def __init__(self, parent, **kwargs):
-        widget = ttk.Progressbar(parent['real_widget'], mode='indeterminate')
+        widget = ttk.Progressbar(parent['real_widget'])
         self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
     def _bananagui_set_bouncing(self, bouncing):
+        # Unfortunately there's no better way to hide the moving
+        # part of the bar when we don't want it to bounce.
         if bouncing:
+            self['real_widget']['mode'] = 'indeterminate'
             self['real_widget'].start(20)  # Move every 20 milliseconds.
         else:
+            self['real_widget']['mode'] = 'determinate'
             self['real_widget'].stop()

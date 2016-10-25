@@ -36,44 +36,34 @@ class Progressbar:
 class BouncingProgressbar:
 
     def __init__(self, parent, **kwargs):
-        # We need to hide the spinner when it's not spinning. Rest of
-        # BananaGUI calls real_widget.show() when the widget is added
-        # somewhere, so we need to create a container for it and add the
-        # real spinner inside it.
-        self.__bar = Gtk.ProgressBar()
-        container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        container.pack_start(self.__bar, True, True, 0)
-        self.real_widget.raw_set(container)
+        widget = Gtk.ProgressBar(orientation=Gtk.Orientation.HORIZONTAL)
+        self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
     def __on_timeout(self):
         if not self['bouncing']:
             return False
-        self.__bar.pulse()
+        self['real_widget'].pulse()
         return True  # Run this again.
 
     def _bananagui_set_bouncing(self, bouncing):
         if bouncing:
-            self.__bar.show()
             GLib.timeout_add(100, self.__on_timeout)
         else:
-            self.__bar.hide()
+            # The __on_timeout method knows when to stop, but we need to
+            # move the progressbar back to the beginning now.
+            self['real_widget'].set_fraction(0)
 
 
 class Spinner:
 
     def __init__(self, parent, **kwargs):
-        # See the BouncingProgressbar comment.
-        self.__spinner = Gtk.Spinner()
-        container = Gtk.Box()
-        container.pack_start(self.__spinner, True, True, 0)
-        self.real_widget.raw_set(container)
+        widget = Gtk.Spinner()
+        self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
     def _bananagui_set_spinning(self, spinning):
         if spinning:
-            self.__spinner.show()
-            self.__spinner.start()
+            self['real_widget'].start()
         else:
-            self.__spinner.hide()
-            self.__spinner.stop()
+            self['real_widget'].stop()
