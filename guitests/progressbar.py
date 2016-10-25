@@ -26,23 +26,40 @@ from bananagui import gui
 
 
 def set_progress(progressbar, event):
-    progressbar['progress'] = event.widget['value'] / 100
+    progressbar['progress'] = event.widget ['value'] / 100
+
+
+def toggle_bouncing(progressbar, event):
+    if event.widget['checked']:
+        progressbar['bouncing'] = True
+    else:
+        progressbar['bouncing'] = False
 
 
 def main():
-    with gui.Window(title="Scrollbar test") as window:
+    with gui.Window(title="Progress bar test") as window:
         box = gui.Box.vertical(window)
         window['child'] = box
 
+        # A regular progress bar.
         progressbar = gui.Progressbar(box, expand=(True, False))
         box['children'].append(progressbar)
-
-        box['children'].append(gui.Dummy(box))
 
         spin_callback = functools.partial(set_progress, progressbar)
         spinbox = gui.Spinbox(box, valuerange=range(101), expand=(True, False))
         spinbox['value.changed'].append(spin_callback)
         box['children'].append(spinbox)
+
+        box['children'].append(gui.Dummy(box))
+
+        # A bouncing progress bar.
+        bouncingbar = gui.BouncingProgressbar(box, expand=(True, False))
+        box['children'].append(bouncingbar)
+
+        check_callback = functools.partial(toggle_bouncing, bouncingbar)
+        checkbox = gui.Checkbox(box, text="Bouncing", expand=(True, False))
+        checkbox['checked.changed'].append(check_callback)
+        box['children'].append(checkbox)
 
         window['on_destroy'].append(gui.quit)
         gui.main()
