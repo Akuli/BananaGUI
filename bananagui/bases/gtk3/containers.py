@@ -28,8 +28,11 @@ from . import orientations
 class Bin:
 
     def _bananagui_set_child(self, child):
-        if self['child'] is not None:
-            self['real_widget'].remove(self['child']['real_widget'])
+        # The widget in self['real_widget'] can be something else than
+        # self['child']['real_widget'].
+        old_child = self['real_widget'].get_child()
+        if old_child is not None:
+            self['real_widget'].remove(old_child)
         if child is not None:
             self['real_widget'].add(child['real_widget'])
             child['real_widget'].show()
@@ -59,3 +62,24 @@ class Box:
 
     def _bananagui_box_remove(self, child):
         self['real_widget'].remove(child['real_widget'])
+
+
+class ScrollArea:
+
+    def __init__(self, parent, **kwargs):
+        widget = Gtk.ScrolledWindow()
+        self.real_widget.raw_set(widget)
+        super().__init__(parent, **kwargs)
+
+    def _bananagui_set_child(self, child):
+        if child is None or isinstance(child['real_widget'], Gtk.Scrollable):
+            # We can add it normally.
+            super()._bananagui_set_child(child)
+            self['real_widget'].add(child['real_widget'])
+            child['real_widget'].show()
+        else:
+            # We need to add it with a ViewPort.
+            super()._bananagui_set_child(None)  # Remove the old child if any.
+            self['real_widget'].add_with_viewport(child['real_widget'])
+            child['real_widget'].show()
+            self['real_widget'].get_child().show()  # Show the viewport.

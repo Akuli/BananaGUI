@@ -97,7 +97,6 @@ class Child(_base.Child, Widget):
             |expanding |expanding |       Dummy widget       |
             |  widget  |  widget  |                          |
             `------------------------------------------------'
-
         """)
     grayed_out = bananagui.BananaProperty(
         'grayed_out', type=bool, default=False,

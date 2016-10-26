@@ -84,3 +84,12 @@ class Box(Oriented, _base.Box, Parent, Child):
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
             super()._bananagui_box_append(child)
+
+
+@bananagui.document_props
+class ScrollArea(_base.ScrollArea, Bin, Child):
+    """A container that adds scrollbars around its child.
+
+    The ScrollArea displays a horizontal and a vertical progress bar
+    automatically when needed.
+    """
