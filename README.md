@@ -14,9 +14,8 @@ bananagui.load('.gtk3', '.tkinter')
 from bananagui import gui
 
 with gui.Window(title="Hello World") as window:
-    label = gui.Label(window, text="Hello World!")
-    window['child'] = label
-    window['on_destroy'].append(gui.quit)
+    window['child'] = gui.Label(window, text="Hello World!")
+    window['on_close'].append(gui.quit)
     gui.main()
 ```
 
@@ -52,8 +51,8 @@ def main():
         button['on_click'].append(click_callback)
         box['children'].append(button)
 
-        del window['on_destroy'][0]  # The default callback.
-        window['on_destroy'].append(quit_callback)
+        del window['on_close'][0]  # The default callback.
+        window['on_close'].append(quit_callback)
         gui.main()
 
 

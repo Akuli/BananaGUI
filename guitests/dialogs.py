@@ -78,7 +78,7 @@ class DialogTestWindow(gui.Window):
 
 def main():
     with DialogTestWindow(title="Dialog test") as window:
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

@@ -55,7 +55,7 @@ class ClipboardTestWindow(gui.Window):
 
 def main():
     with ClipboardTestWindow(title="Clipboard test") as window:
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

@@ -28,7 +28,7 @@ def main():
     with gui.Window(title="Hello World!") as window:
         label = gui.Label(window, text="Hello World!")
         window['child'] = label
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

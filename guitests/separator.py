@@ -44,7 +44,7 @@ def main():
     bottomrightlabel = gui.Label(bottombox, text="Bottom right")
     bottombox['children'].append(bottomrightlabel)
 
-    window['on_destroy'].append(gui.quit)
+    window['on_close'].append(gui.quit)
     gui.main()
 
 

@@ -37,7 +37,7 @@ def main():
         canvas.draw_circle((300, 300), 50, fillcolor=bananagui.ORANGE,
                            linecolor=bananagui.RED, linethickness=10)
 
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

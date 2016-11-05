@@ -31,7 +31,7 @@ class BaseWindow:
         widget = self['real_widget']
         widget.title(self['title'])
         widget.bind('<Configure>', self.__configure)
-        widget.protocol('WM_DELETE_WINDOW', self.on_destroy.emit)
+        widget.protocol('WM_DELETE_WINDOW', self.on_close.emit)
         super().__init__(**kwargs)
 
     def __configure(self, event):
@@ -61,11 +61,11 @@ class BaseWindow:
     def wait(self):
         self['real_widget'].wait_window()
 
-    def destroy(self):
+    def close(self):
         try:
             self['real_widget'].destroy()
         except tk.TclError:
-            # The widget has already been destroyed.
+            # The widget has already been closed.
             pass
 
 

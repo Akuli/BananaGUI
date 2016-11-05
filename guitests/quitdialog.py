@@ -22,7 +22,7 @@
 from bananagui import gui
 
 
-def on_destroy(event):
+def on_close(event):
     answer = gui.questiondialog(
         event.widget, "Do you really want to quit?",
         buttons=["Yes", "No"])
@@ -35,10 +35,10 @@ def main():
         label = gui.Label(window, text="Close me!")
         window['child'] = label
 
-        # The first callback destroys the window when its close button
+        # The first callback closes the window when its close button
         # is clicked.
-        del window['on_destroy'][0]
-        window['on_destroy'].append(on_destroy)
+        del window['on_close'][0]
+        window['on_close'].append(on_close)
 
         gui.main()
 

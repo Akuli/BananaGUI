@@ -54,7 +54,7 @@ class SliderWindow(gui.Window):
 
 def main():
     with SliderWindow(title="Hello World!") as window:
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

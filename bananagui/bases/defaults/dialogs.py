@@ -29,7 +29,7 @@ import bananagui
 
 def _on_click(dialog, event):
     dialog.response = event.widget['text']
-    dialog.destroy()
+    dialog.close()
 
 
 def _messagedialog(parentwindow, message, title, buttons, defaultbutton):

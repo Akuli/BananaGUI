@@ -38,7 +38,7 @@ def main():
         checkbox = gui.Checkbox(window, text="Check me!")
         checkbox['checked.changed'].append(on_check)
         window['child'] = checkbox
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

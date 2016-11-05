@@ -59,13 +59,13 @@ class BaseWindow:
             self['real_widget'].hide()
 
     def __delete_event(self, widget, event):
-        self.on_destroy.emit()
+        self.on_close.emit()
         return True  # Block GTK's delete-event handling.
 
     def wait(self):
         raise NotImplementedError  # TODO
 
-    def destroy(self):
+    def close(self):
         self['real_widget'].destroy()
 
 

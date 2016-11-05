@@ -14,7 +14,7 @@ def main():
         scroller['child'] = gui.Label(scroller, text=the_text)
         window['child'] = scroller
 
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

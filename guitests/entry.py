@@ -67,7 +67,7 @@ class EntryWindow(gui.Window):
 
 def main():
     with EntryWindow(title="Entry test", size=(250, 100)) as window:
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

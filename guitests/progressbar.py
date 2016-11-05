@@ -60,7 +60,7 @@ def main():
         checkbox['checked.changed'].append(check_callback)
         box['children'].append(checkbox)
 
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

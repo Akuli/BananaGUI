@@ -55,7 +55,7 @@ class SpinnerWindow(gui.Window):
 
 def main():
     with SpinnerWindow(title="Spinner window") as window:
-        window['on_destroy'].append(gui.quit)
+        window['on_close'].append(gui.quit)
         gui.main()
 
 

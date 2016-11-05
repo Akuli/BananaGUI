@@ -35,9 +35,9 @@ from .containers import Bin
 class BaseWindow(_base.BaseWindow, Bin):
     """A window baseclass.
 
-    BananaGUI windows have a destroy() method, and it should be called
+    BananaGUI windows have a close() method, and it should be called
     when you don't need the window anymore. The windows can also be used
-    as context managers, and the destroying will be done automatically:
+    as context managers, and the closing will be done automatically:
 
         with Window() as my_window:
             ...
@@ -45,11 +45,6 @@ class BaseWindow(_base.BaseWindow, Bin):
     # There is no maximum_size because X doesn't support it. Tkinter
     # implements it on X, but it does that by moving the window with a
     # maximum size to the upper left corner when it's maximized.
-
-    @staticmethod
-    def destroy_callback(event) -> None:
-        """Destroy event.widget."""
-        event.widget.destroy()
 
     resizable = bananagui.BananaProperty(
         'resizable', type=bool, default=True,
@@ -67,54 +62,59 @@ class BaseWindow(_base.BaseWindow, Bin):
     showing = bananagui.BananaProperty(
         'showing', type=bool, default=True,
         doc="True if the window is visible.")
-    on_destroy = bananagui.BananaSignal(
-        'on_destroy',
+    on_close = bananagui.BananaSignal(
+        'on_close',
         doc="""This is emitted when the user tries to close the window.
 
         Unlike most other signals, this contains a callback by default.
-        It's BaseWindow.destroy_callback and it destroys the window
+        It's BaseWindow.close_callback and it closes the window
         when it's closed. You can remove it to customize this and call
-        the_window.destroy() from custom callbacks.
+        the_window.close() from custom callbacks.
         """)
+
+    @staticmethod
+    def close_callback(event) -> None:
+        """Close event.widget."""
+        event.widget.close()
 
     def __init__(self, **kwargs):
         # TODO: this doesn't work with the class __doc__.
-        self['on_destroy'].append(self.destroy_callback)
-        self.__destroyed = False
+        self['on_close'].append(self.close_callback)
+        self.__closed = False
         super().__init__(**kwargs)
 
     @property
-    def destroyed(self) -> None:
-        """True if the window has been destroyed.
+    def closed(self) -> bool:
+        """True if the window has been closed.
 
         This is not a BananaGUI property because there's no need to
-        attach callbacks to this and you can use the on_destroy signal
+        attach callbacks to this and you can use the on_close signal
         instead.
         """
-        return self.__destroyed
+        return self.__closed
 
     def __enter__(self):
         """Return the window."""
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        """Destroy the window."""
-        self.destroy()
+        """Close the window."""
+        self.close()
 
     def wait(self) -> None:
-        """Wait until the window is destroyed."""
+        """Wait until the window is closed."""
         super().wait()
 
-    def destroy(self) -> None:
-        """Destroy the window and set self.destroyed to True.
+    def close(self) -> None:
+        """Close the window and set self.closed to True.
 
         This method can be called multiple times and it will do nothing
         after the first call. It's not recommended to override this, use
-        the on_destroy signal instead.
+        the on_close signal instead.
         """
-        if not self.destroyed:
-            super().destroy()
-            self.__destroyed = True
+        if not self.closed:
+            super().close()
+            self.__closed = True
 
 
 @bananagui.document_props
