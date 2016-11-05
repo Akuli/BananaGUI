@@ -61,12 +61,21 @@ class Box(Oriented, _base.Box, Parent, Child):
     # method that removes a child widget from the box.
 
     children = bananagui.BananaProperty(
-        'children', getdefault=CallbackList, settable=False,
-        doc="A mutable sequence of children in the box.")
+        'children', getdefault=CallbackList,
+        doc="""A mutable sequence of children in the box.
+
+        Setting this sets the sequence's content, the actual value never
+        changes.
+        """)
 
     def __init__(self, parent, **kwargs):
         self['children']._callbacks.append(self.__children_changed)
         super().__init__(parent, **kwargs)
+
+    def _bananagui_set_children(self, children):
+        """Set the content of the child list and return it."""
+        self['children'][:] = children
+        return self['children']
 
     def __children_changed(self, old, new):
         assert len(new) == len(set(new)), \
@@ -78,6 +87,8 @@ class Box(Oriented, _base.Box, Parent, Child):
         for child in old[common:]:
             self._bananagui_box_remove(child)
         for child in new[common:]:
+            assert isinstance(child, Child), \
+                "expected a BananaGUI child widget, got %r" % (child,)
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
             self._bananagui_box_append(child)
