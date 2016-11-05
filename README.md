@@ -64,8 +64,6 @@ You can also write your GUI using the .ini format and then load it with
 `bananagui.iniloader`:
 
 ```py
-import pprint
-
 import bananagui
 bananagui.load('.gtk3', '.tkinter')
 from bananagui import gui, iniloader
@@ -88,9 +86,9 @@ text = "Hello World!"
 
 def main():
     widgets = iniloader.load_ini(INI)
-    pprint.pprint(widgets)
-    widgets['window']['on_close'].append(gui.quit)
-    gui.main()
+    with widgets['window'] as window:
+        window['on_close'].append(gui.quit)
+        gui.main()
 
 
 if __name__ == '__main__':
