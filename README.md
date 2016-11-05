@@ -60,6 +60,43 @@ if __name__ == '__main__':
     main()
 ```
 
+You can also write your GUI using the .ini format and then load it with
+`bananagui.iniloader`:
+
+```py
+import pprint
+
+import bananagui
+bananagui.load('.gtk3', '.tkinter')
+from bananagui import gui, iniloader
+
+
+# Usually this would be in another file.
+
+INI = """\
+[window]
+class = gui.Window
+title = "Hello World 3"
+child = label
+
+[label]
+class = gui.Label
+parent = window
+text = "Hello World!"
+"""
+
+
+def main():
+    widgets = iniloader.load_ini(INI)
+    pprint.pprint(widgets)
+    widgets['window']['on_close'].append(gui.quit)
+    gui.main()
+
+
+if __name__ == '__main__':
+    main()
+```
+
 I don't have good documentation anywhere yet, but calling `help()` on
 things should be useful in many places. You can also read the source if
 you're wondering something.
