@@ -68,7 +68,7 @@ class Box:
         child._bananagui_tkinter_packed = False
 
 
-class ScrollArea:
+class Scroller:
 
     def __init__(self, parent, **kwargs):
         # TODO: implement this.

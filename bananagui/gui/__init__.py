@@ -33,7 +33,7 @@ if bananagui._base is None:
 from .basewidgets import Widget, Parent, Child, Oriented, Ranged
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
-from .containers import Bin, Box, ScrollArea
+from .containers import Bin, Box, Scroller
 from .labels import BaseLabel, Label, ImageLabel
 from .mainloop import init, main, quit, add_timeout
 from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,

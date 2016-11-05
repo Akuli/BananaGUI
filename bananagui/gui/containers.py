@@ -75,21 +75,19 @@ class Box(Oriented, _base.Box, Parent, Child):
         # TODO: Maybe old and new have something else in common than the
         # beginning? Optimize this.
         common = utils.common_beginning(old, new)
-
-        # These are called from super() so a subclass can have an
-        # _append or _remove method and it's not going to conflict.
         for child in old[common:]:
-            super()._bananagui_box_remove(child)
+            self._bananagui_box_remove(child)
         for child in new[common:]:
             assert child['parent'] is self, \
                 "cannot add a child with the wrong parent"
-            super()._bananagui_box_append(child)
+            self._bananagui_box_append(child)
 
 
+# TODO: allow scrolling in one direction only.
 @bananagui.document_props
-class ScrollArea(_base.ScrollArea, Bin, Child):
+class Scroller(_base.Scroller, Bin, Child):
     """A container that adds scrollbars around its child.
 
-    The ScrollArea displays a horizontal and a vertical progress bar
+    The scroller displays a horizontal and a vertical scrollbar
     automatically when needed.
     """

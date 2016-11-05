@@ -10,9 +10,9 @@ def main():
         # actually useful.
         the_text = '\n'.join(map(template.format, range(20)))
 
-        scrollarea = gui.ScrollArea(window)
-        scrollarea['child'] = gui.Label(scrollarea, text=the_text)
-        window['child'] = scrollarea
+        scroller = gui.Scroller(window)
+        scroller['child'] = gui.Label(scroller, text=the_text)
+        window['child'] = scroller
 
         window['on_destroy'].append(gui.quit)
         gui.main()

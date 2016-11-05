@@ -64,7 +64,7 @@ class Box:
         self['real_widget'].remove(child['real_widget'])
 
 
-class ScrollArea:
+class Scroller:
 
     def __init__(self, parent, **kwargs):
         widget = Gtk.ScrolledWindow()
