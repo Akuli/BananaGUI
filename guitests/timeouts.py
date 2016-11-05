@@ -32,8 +32,8 @@ def once():
 def over_and_over():
     number = next(counter)
     print("I have ran %d times before." % number)
-    if number >= 5:
-        print("It's time to stop now.")
+    if number >= 3:
+        print("Goodbye!")
         gui.quit()
         return None
     return bananagui.RUN_AGAIN
