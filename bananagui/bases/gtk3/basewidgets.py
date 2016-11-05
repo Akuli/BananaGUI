@@ -23,6 +23,7 @@ from gi.repository import Gtk
 
 
 class Widget:
+    # TODO: implement background colors elsewhere also?
 
     def __init__(self, **kwargs):
         # I have no idea why GTK+ makes changing the background color in

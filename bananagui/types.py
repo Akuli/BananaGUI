@@ -140,8 +140,9 @@ class BananaProperty:
             the new value.
           - Get the setter. It is the widget's attribute
             _bananagui_set_<name of the property>.
-          - Call the setter with the converted value as the only argument.
-          - Call raw_set.
+          - Call the setter with the value as the only argument.
+          - Call raw_set with the setter's return value, or the original
+            value if the setter returned None.
         """
         if not self.settable:
             raise ValueError("the value of the BananaGUI %r %r cannot be set"
@@ -154,7 +155,9 @@ class BananaProperty:
         if self.get(widget) == value:
             return
         # The setter may raise an exception to prevent calling raw_set.
-        setter(value)
+        new_value = setter(value)
+        if new_value is not None:
+            value = new_value
         self.raw_set(widget, value)
 
     def get(self, widget):

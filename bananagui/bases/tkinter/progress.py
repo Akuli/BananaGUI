@@ -32,7 +32,7 @@ class Progressbar:
     def _bananagui_set_progress(self, progress):
         self['real_widget'].stop()  # Reset it.
         step = progress * 100
-        if step >= 99.99:
+        if step > 99.99:
             # The widget would go back to zero if we stepped it this
             # much.
             step = 99.99

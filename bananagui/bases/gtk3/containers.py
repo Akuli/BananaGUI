@@ -29,7 +29,7 @@ class Bin:
 
     def _bananagui_set_child(self, child):
         # The widget in self['real_widget'] can be something else than
-        # self['child']['real_widget'].
+        # self['child']['real_widget']. See Scroller.
         old_child = self['real_widget'].get_child()
         if old_child is not None:
             self['real_widget'].remove(old_child)
@@ -72,11 +72,9 @@ class Scroller:
         super().__init__(parent, **kwargs)
 
     def _bananagui_set_child(self, child):
-        if child is None or isinstance(child['real_widget'], Gtk.Scrollable):
-            # We can add it normally.
+        if child is None or isinstance(child, Gtk.Scrollable):
+            # We can add or remove it normally.
             super()._bananagui_set_child(child)
-            self['real_widget'].add(child['real_widget'])
-            child['real_widget'].show()
         else:
             # We need to add it with a ViewPort.
             super()._bananagui_set_child(None)  # Remove the old child if any.

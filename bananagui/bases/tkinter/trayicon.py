@@ -28,5 +28,5 @@ class TrayIcon:
         warnings.warn("Tkinter doesn't support tray icons", RuntimeWarning)
         super().__init__(**kwargs)
 
-    def _bananagui_set_tooltip(self):
+    def _bananagui_set_tooltip(self, tooltip):
         pass
