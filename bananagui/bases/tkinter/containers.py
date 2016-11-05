@@ -66,3 +66,10 @@ class Box:
     def _bananagui_box_remove(self, child):
         child['real_widget'].pack_forget()
         child._bananagui_tkinter_packed = False
+
+
+class ScrollArea:
+
+    def __init__(self, parent, **kwargs):
+        # TODO: implement this.
+        raise NotImplementedError
