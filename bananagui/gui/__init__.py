@@ -44,7 +44,3 @@ from .textwidgets import TextBase, Entry, PlainTextView  # 2DO:rename2TextView?
 from .trayicon import TrayIcon
 from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
                      errordialog, questiondialog, colordialog, fontdialog)
-
-# Initialize the GUI so people don't need to call gui.init() after
-# importing it.
-init()

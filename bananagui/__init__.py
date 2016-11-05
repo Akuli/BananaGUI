@@ -97,3 +97,6 @@ def load(*args):
             except ImportError:
                 pass
         raise ImportError("cannot load any of the requested base modules")
+
+    from bananagui import gui
+    gui.init()
