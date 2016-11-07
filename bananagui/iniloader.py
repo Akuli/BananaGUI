@@ -19,11 +19,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import argparse
 import ast
 import collections
 import configparser
 import gettext
 import io
+import sys
 
 import bananagui
 
@@ -112,9 +114,8 @@ def load_ini(source) -> dict:
     """Load a GUI from source.
 
     The source can be a string or a file object. It will be parsed with
-    configparser.ConfigParser. It may be closed if it's a file object.
-    Closing an already closed file does nothing so you can just use a
-    with statement normally.
+    configparser.ConfigParser and it will be closed if it's a file
+    object.
     """
     if not hasattr(bananagui, 'gui'):
         raise RuntimeError("bananagui.load() wasn't called before "
@@ -124,13 +125,66 @@ def load_ini(source) -> dict:
     if isinstance(source, str):
         loader.parser.read_string(source)
     elif isinstance(source, io.TextIOBase):
-        loader.parser.read_file(source)
+        with source:
+            loader.parser.read_file(source)
     elif isinstance(source, io.IOBase):
         # ConfigParser expects strings, but the file object gives us
         # bytes.
-        loader.parser.read_file(io.TextIOWrapper(source))
+        with io.TextIOWrapper(source) as file:
+            loader.parser.read_file(file)
     else:
         raise TypeError("cannot read from a source of type %s"
                         % type(source).__name__)
     loader.load()
     return loader.loaded
+
+
+def preview():
+    """Simple way to preview BananaGUI ini files."""
+    parser = argparse.ArgumentParser(prog='bananagui-preview')
+    parser.add_argument(
+        'inifile', default='<stdin>',
+        help=("path to the ini file that will be loaded, "
+              "defaults to stdin"))
+    parser.add_argument(
+        '-b', '--bases', default='.tkinter',
+        help=("comma-separated argument list for bananagui.load(), "
+              "defaults to '.tkinter'"))
+    args = parser.parse_args()
+
+    load_args = []
+    for base in args.bases.split(','):
+        base = base.strip()
+        if base:
+            load_args.append(base)
+
+    bananagui.load(*load_args)
+    gui = bananagui.gui
+
+    if args.inifile == '<stdin>':
+        widgets = load_ini(sys.stdin)
+    else:
+        # load_ini() will close the file.
+        widgets = load_ini(open(args.inifile))
+
+    windows = {window for window in widgets.values()
+               if isinstance(window, gui.Window)}
+    if not windows:
+        # It's important not to say "windows is required" to avoid
+        # confusion with Windows the operating system.
+        print("no gui.Window objects were found in", args.inifile,
+              file=sys.stderr)
+        sys.exit(1)
+
+    def on_close(event):
+        windows.remove(event.widget)
+        if not windows:
+            gui.quit()
+
+    for window in windows:
+        window['on_close'].append(on_close)
+    gui.main()
+
+
+if __name__ == '__main__':
+    preview()
