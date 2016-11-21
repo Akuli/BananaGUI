@@ -19,6 +19,54 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""A way to write GUI's using the .ini file format.
+
+This is nice compared to writing the GUI in plain Python when writing
+it in Python would be repetitive.
+
+Each section in the .ini data has the name of the widget as a title.
+The section's value of `class` will be then called with other
+name=value pairs as keyword arguments. To avoid circular references,
+properties named `child` and `children` will be set up later.
+
+The values can be (limited) Python expressions. They can use widgets
+created in other sections as variables, and they also have these
+special variables:
+
+    bananagui   the bananagui module
+    gui         the bananagui.gui module
+    _           gettext.gettext for translating
+
+Example ini file:
+
+    [window]
+    class = gui.Window
+    title = _("Hello World")
+    child = label
+
+    [label]
+    class = gui.Label
+    parent = window
+    text = _("Hello World!")
+
+Now you can preview the file without loading it in Python manually.
+
+    $ yourpython -m bananagui.iniloader hello-world-gui.ini
+
+Or you can read the ini file with Python:
+
+    import bananagui
+    bananagui.load('whatever you want')
+    from bananagui import iniloader, gui
+
+    # load_ini() will close the file.
+    widgets = iniloader.load_ini(open('hello-world-gui.ini', 'r'))
+
+    # Now widgets is a dictionary.
+    widgets['window']['on_close'].append(gui.quit)
+    gui.main()
+"""
+
 import argparse
 import ast
 import collections
@@ -116,6 +164,10 @@ def load_ini(source) -> dict:
     The source can be a string or a file object. It will be parsed with
     configparser.ConfigParser and it will be closed if it's a file
     object.
+
+    SECURITY NOTE: Don't use this function with untrusted input. It's
+    possible to call any object in bananagui from the ini data,
+    including everything in modules that BananaGUI has imported.
     """
     if not hasattr(bananagui, 'gui'):
         raise RuntimeError("bananagui.load() wasn't called before "
@@ -139,17 +191,15 @@ def load_ini(source) -> dict:
     return loader.loaded
 
 
-def preview():
+def _preview():
     """Simple way to preview BananaGUI ini files."""
-    parser = argparse.ArgumentParser(prog='bananagui-preview')
-    parser.add_argument(
-        'inifile', default='<stdin>',
-        help=("path to the ini file that will be loaded, "
-              "defaults to stdin"))
-    parser.add_argument(
-        '-b', '--bases', default='.tkinter',
-        help=("comma-separated argument list for bananagui.load(), "
-              "defaults to '.tkinter'"))
+    # When running with -m, sys.argv[0] is '__main__' and argparse uses
+    # it as the default prog. That's obviously not what we want.
+    parser = argparse.ArgumentParser(prog='yourpython -m bananagui.iniloader')
+    parser.add_argument('inifile', type=argparse.FileType('r'),
+                        default=sys.stdin, nargs=argparse.OPTIONAL,
+                        help=("path to the ini file that will be loaded, "
+                              "defaults to stdin"))
     args = parser.parse_args()
 
     load_args = []
@@ -160,20 +210,19 @@ def preview():
 
     bananagui.load(*load_args)
     gui = bananagui.gui
-
-    if args.inifile == '<stdin>':
-        widgets = load_ini(sys.stdin)
-    else:
-        # load_ini() will close the file.
-        widgets = load_ini(open(args.inifile))
+    # load_ini() will close the file.
+    widgets = load_ini(args.inifile)
 
     windows = {window for window in widgets.values()
                if isinstance(window, gui.Window)}
     if not windows:
-        # It's important not to say "windows is required" to avoid
-        # confusion with Windows the operating system.
-        print("no gui.Window objects were found in", args.inifile,
-              file=sys.stderr)
+        # We can be sure that args.inifile has a name attribute because
+        # it's always either sys.stdin or an io.TextIOWrapper returned
+        # by argparse.FileType. It's also important not to say "windows
+        # is required" to avoid confusion with Windows the operating
+        # system.
+        print("bananagui.iniloader: no gui.Window objects were "
+              "found in %s" % args.inifile.name, file=sys.stderr)
         sys.exit(1)
 
     def on_close(event):
@@ -183,8 +232,10 @@ def preview():
 
     for window in windows:
         window['on_close'].append(on_close)
+
+    print("Previewing %s..." % args.inifile.name)
     gui.main()
 
 
 if __name__ == '__main__':
-    preview()
+    _preview()
