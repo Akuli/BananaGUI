@@ -92,8 +92,14 @@ def get_clipboard_text():
     return _base.get_clipboard_text()
 
 
+font_family_cache = []
+
+
 def get_font_families():
     """Return a list of all avaliable font families as strings."""
-    # This is converted to a set first to make sure that we don't get
-    # any duplicates. The base function can return anything iterable.
-    return sorted(set(_base.get_font_families()))
+    if not font_family_cache:
+        # This is converted to a set to make sure that we don't get any
+        # duplicates. The base function can return anything iterable.
+        font_family_cache.extend(set(_base.get_font_families()))
+        font_family_cache.sort()  # Undefined order wouldn't be nice.
+    return font_family_cache
