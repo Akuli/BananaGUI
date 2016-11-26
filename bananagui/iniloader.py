@@ -49,7 +49,7 @@ Example ini file:
     parent = window
     text = _("Hello World!")
 
-Now you can preview the file without loading it in Python manually.
+You can preview the file without loading it in Python manually.
 
     $ yourpython -m bananagui.iniloader hello-world-gui.ini
 
@@ -59,12 +59,18 @@ Or you can read the ini file with Python:
     bananagui.load('whatever you want')
     from bananagui import iniloader, gui
 
-    # load_ini() will close the file.
-    widgets = iniloader.load_ini(open('hello-world-gui.ini', 'r'))
+    with open('hello-world-gui', 'r') as f:
+        widgets = iniloader.load_ini(f)
 
     # Now widgets is a dictionary.
-    widgets['window']['on_close'].append(gui.quit)
+    widgets['window'].on_close.append(gui.quit)
     gui.main()
+
+SECURITY NOTE: Don't use this module with untrusted input. It's
+possible to call any object in bananagui from the ini data, including
+everything in modules that BananaGUI has imported. This module is meant
+to be used when writing the GUI in plain Python would be tedious, not
+to allow loading GUI's from random places.
 """
 
 import argparse
@@ -138,7 +144,8 @@ class _Loader:
         for propertyname, valuesource in self.parser[name].items():
             if propertyname in {'child', 'children'}:
                 # The value can't be set with kwargs because we would
-                # end up with circular references.
+                # end up with circular references or the name has a
+                # special meaning.
                 self.apply_later[name][propertyname] = valuesource
             elif propertyname not in {'class'}:
                 # The name doesn't have a special meaning.
@@ -155,19 +162,25 @@ class _Loader:
         for name, properties in self.apply_later.items():
             widget = self.loaded[name]
             for propertyname, source in properties.items():
-                widget[propertyname] = self.parse_source(source)
+                value = self.parse_source(source)
+                if propertyname == 'children':
+                    if isinstance(widget, bananagui.gui.Box):
+                        widget[:] = self.parse_source(source)
+                    # TODO: Handle other children values here later.
+                    else:
+                        # Maybe it's a user-defined children attribute?
+                        widget.children = value
+                else:
+                    setattr(widget, propertyname, value)
 
 
 def load_ini(source) -> dict:
-    """Load a GUI from source.
+    """Load a GUI from ini data.
 
     The source can be a string or a file object. It will be parsed with
-    configparser.ConfigParser and it will be closed if it's a file
-    object.
+    configparser.ConfigParser.
 
-    SECURITY NOTE: Don't use this function with untrusted input. It's
-    possible to call any object in bananagui from the ini data,
-    including everything in modules that BananaGUI has imported.
+    See the SECURITY NOTE in the module documentation.
     """
     if not hasattr(bananagui, 'gui'):
         raise RuntimeError("bananagui.load() wasn't called before "
@@ -177,15 +190,13 @@ def load_ini(source) -> dict:
     if isinstance(source, str):
         loader.parser.read_string(source)
     elif isinstance(source, io.TextIOBase):
-        with source:
-            loader.parser.read_file(source)
+        loader.parser.read_file(source)
     elif isinstance(source, io.IOBase):
         # ConfigParser expects strings, but the file object gives us
         # bytes.
-        with io.TextIOWrapper(source) as file:
-            loader.parser.read_file(file)
+        loader.parser.read_file(io.TextIOWrapper(source))
     else:
-        raise TypeError("cannot read from a source of type %s"
+        raise TypeError("cannot read from a source of type %r"
                         % type(source).__name__)
     loader.load()
     return loader.loaded
@@ -195,23 +206,24 @@ def _preview():
     """Simple way to preview BananaGUI ini files."""
     # When running with -m, sys.argv[0] is '__main__' and argparse uses
     # it as the default prog. That's obviously not what we want.
-    parser = argparse.ArgumentParser(prog='yourpython -m bananagui.iniloader')
-    parser.add_argument('inifile', type=argparse.FileType('r'),
-                        default=sys.stdin, nargs=argparse.OPTIONAL,
-                        help=("path to the ini file that will be loaded, "
-                              "defaults to stdin"))
+    parser = argparse.ArgumentParser(prog='bananagui-iniloader')
+    parser.add_argument(
+        'inifile', type=argparse.FileType('r'),
+        default=sys.stdin, nargs=argparse.OPTIONAL,
+        help="path to the ini file that will be loaded, defaults to stdin")
+    parser.add_argument(
+        '-b', '--bases', default='.tkinter',
+        help="comma-separated list of arguments for bananagui.load()")
     args = parser.parse_args()
 
-    load_args = []
-    for base in args.bases.split(','):
-        base = base.strip()
-        if base:
-            load_args.append(base)
-
+    load_args = map(str.strip, args.bases.split(','))
     bananagui.load(*load_args)
-    gui = bananagui.gui
+    from bananagui import gui
+    gui.init()
+
     # load_ini() will close the file.
-    widgets = load_ini(args.inifile)
+    with args.inifile as f:
+        widgets = load_ini(f)
 
     windows = {window for window in widgets.values()
                if isinstance(window, gui.Window)}
@@ -225,13 +237,13 @@ def _preview():
               "found in %s" % args.inifile.name, file=sys.stderr)
         sys.exit(1)
 
-    def on_close(event):
-        windows.remove(event.widget)
+    def on_close(window):
+        windows.remove(window)
         if not windows:
             gui.quit()
 
     for window in windows:
-        window['on_close'].append(on_close)
+        window.on_close.append(on_close)
 
     print("Previewing %s..." % args.inifile.name)
     gui.main()
