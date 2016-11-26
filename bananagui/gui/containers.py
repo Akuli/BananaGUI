@@ -23,79 +23,99 @@
 
 # TODO: Add a grid widget.
 
-import bananagui
+try:
+    from collections import abc as abcoll
+except ImportError:
+    # Python 3.2, there's no separate collections.abc.
+    import collections as abcoll
+
 from bananagui import _base, utils
-from bananagui.structures import CallbackList  # Not imported in __init__.
 from .basewidgets import Parent, Child, Oriented
 
 
 # This is not a Child because Window is based on this.
-@utils.baseclass
-@bananagui.document_props
+@utils.add_property('child')
 class Bin(_base.Bin, Parent):
-    """A widget that contains one child widget or no children at all."""
+    """A widget that may contain one child widget.
 
-    child = bananagui.BananaProperty(
-        'child', allow_none=True, default=None, type=Child,
-        doc="""The child in the widget, None by default.
-
-        Setting this to None removes the child.
-        """)
-
-    def _bananagui_set_child(self, child):
-        if child is not None:
-            assert child['parent'] is self, \
-                "cannot add a child with the wrong parent"
-        super()._bananagui_set_child(child)
-
-
-@bananagui.document_props
-class Box(Oriented, _base.Box, Parent, Child):
-    """A widget that contains other widgets.
-
-    The children property behaves like a list and you can modify it to
-    add widgets to the box or remove widgets from the box.
+    Attributes:
+      child     The child in the widget.
+                This can be None and this is None by default.
     """
-    # The base should define a _bananagui_box_append method that adds a
-    # child widget to the end of the box and a _bananagui_box_remove
-    # method that removes a child widget from the box.
 
-    children = bananagui.BananaProperty(
-        'children', getdefault=CallbackList,
-        doc="""A mutable sequence of children in the box.
+    def __init__(self, *args, **kwargs):
+        self._child = None
+        super().__init__(*args, **kwargs)
 
-        Setting this sets the sequence's content, the actual value never
-        changes.
-        """)
+    def _check_child(self, child):
+        if child is not None:
+            assert isinstance(child, Child)
+            assert child.parent is self
 
-    def __init__(self, parent, **kwargs):
-        self['children']._callbacks.append(self.__children_changed)
-        super().__init__(parent, **kwargs)
 
-    def _bananagui_set_children(self, children):
-        """Set the content of the child list and return it."""
-        self['children'][:] = children
-        return self['children']
+class Box(abcoll.MutableSequence, Oriented, _base.Box, Parent, Child):
+    """A widget that contains other widgets next to or above each other.
 
-    def __children_changed(self, old, new):
-        assert len(new) == len(set(new)), \
-            "cannot add the same child twice"
+    To access the children just treat the Box object like a list:
+
+        box.append(child)   # add a child
+        box.remove(child)   # remove a child
+        box[0]              # get the first child
+        box[:3]             # get a list of first three children
+        del box[:3]         # remove first three children
+        box[:]              # get a list of children
+        if box: ...         # check if there's children in the box
+    """
+    # The base should define an _append method that adds a child widget
+    # to the end of the box and a _remove method that removes a child.
+
+    def __init__(self, *args, **kwargs):
+        self._children = []
+        super().__init__(*args, **kwargs)
+
+    def _set_children(self, new):
+        assert len(new) == len(set(new)), "cannot add same child twice"
+        old = self[:]
 
         # TODO: Maybe old and new have something else in common than the
         # beginning? Optimize this.
         common = utils.common_beginning(old, new)
         for child in old[common:]:
-            self._bananagui_box_remove(child)
+            self._remove(child)
         for child in new[common:]:
-            assert isinstance(child, Child), \
-                "expected a BananaGUI child widget, got %r" % (child,)
-            assert child['parent'] is self, \
-                "cannot add a child with the wrong parent"
-            self._bananagui_box_append(child)
+            assert isinstance(child, Child)
+            assert child.parent is self
+            self._append(child)
+
+        self._children = new
+
+    def __setitem__(self, item, value):
+        children = self[:]
+        children[item] = value
+        self._set_children(children)
+
+    def __getitem__(self, item):
+        return self._children[item]
+
+    def __delitem__(self, item):
+        children = self[:]
+        del children[item]
+        self._set_children(children)
+
+    def __len__(self):
+        return len(self._children)
+
+    # MutableMapping doesn't do this because it doesn't require that
+    # subclasses support slicing. We also can't use functools.wraps()
+    # to get the doc because then abc will think that our insert is
+    # an abstract method that needs to be overrided.
+    def insert(self, index, value):
+        self[index:index] = [value]
+
+    insert.__doc__ = abcoll.MutableSequence.insert.__doc__
 
 
 # TODO: allow scrolling in one direction only.
-@bananagui.document_props
 class Scroller(_base.Scroller, Bin, Child):
     """A container that adds scrollbars around its child.
 

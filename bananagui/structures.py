@@ -31,9 +31,11 @@ import warnings
 
 try:
     from types import SimpleNamespace as NamespaceBase  # noqa
+    from collections import abcoll
 except ImportError:
-    # types.SimpleNamespace is new in Python 3.3.
+    # types.SimpleNamespace and collections.abc are new in Python 3.3.
     from argparse import Namespace as NamespaceBase  # noqa
+    abcoll = collections
 
 from bananagui import utils
 
@@ -101,7 +103,7 @@ class _CallbackBase:
                     RuntimeWarning)
 
 
-@utils.register(utils.abc.MutableSequence)
+@utils.register(abcoll.MutableSequence)
 class CallbackList(_CallbackBase):
     """A list that runs callbacks when its content changes.
 
@@ -150,7 +152,7 @@ class CallbackList(_CallbackBase):
 CallbackList._expose_all(set(dir(list)) - set(dir(object)))
 
 
-@utils.register(utils.abc.MutableMapping)
+@utils.register(abcoll.MutableMapping)
 class CallbackDict(_CallbackBase):
     """A dictionary that runs callbacks when its content changes.
 

@@ -29,18 +29,15 @@ class BaseLabel:
 class Label:
 
     def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(Gtk.Label(justify=Gtk.Justification.CENTER))
+        self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_text(self, text):
-        self['real_widget'].set_text(text)
+    def _set_text(self, text):
+        self.real_widget.set_text(text)
 
 
+# TODO: implement this with Gtk.Image.
 class ImageLabel:
 
     def __init__(self, parent, **kwargs):
         raise NotImplementedError  # TODO
-        super().__init__(parent, **kwargs)
-
-    def _bananagui_set_path(self, path):
-        ...

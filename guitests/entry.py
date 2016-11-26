@@ -21,53 +21,75 @@
 
 """BananaGUI entry test."""
 
+import bananagui
 from bananagui import gui
 
 
-class EntryWindow(gui.Window):
+class EntryBox(gui.Box):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        bigbox = gui.Box.vertical(self)
-        self['child'] = bigbox
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
 
         # This is attached to self because we need it in other methods.
-        self.entry = gui.Entry(bigbox, text="Enter something...",
-                               expand=(True, False))
-        bigbox['children'].append(self.entry)
+        self.entry = gui.Entry(self, expand=(True, False))
+        self.entry.on_text_changed.append(self.text_changed)
+        self.append(self.entry)
 
-        dummy = gui.Dummy(bigbox)
-        bigbox['children'].append(dummy)
+        self.append(gui.Dummy(self))
 
-        buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
-        bigbox['children'].append(buttonbox)
+        buttonbox = gui.Box.horizontal(self, expand=(True, False))
+        self.append(buttonbox)
 
-        printbutton = gui.Button(buttonbox, text="Print it!",
-                                 on_click=[self.print_it])
-        buttonbox['children'].append(printbutton)
+        resetbutton = gui.Button(buttonbox, text="Reset")
+        resetbutton.on_click.append(self.reset)
+        buttonbox.append(resetbutton)
 
-        selectallbutton = gui.Button(buttonbox, text="Select all",
-                                     on_click=[self.select_all])
-        buttonbox['children'].append(selectallbutton)
+        selectallbutton = gui.Button(buttonbox, text="Select all")
+        selectallbutton.on_click.append(self.select_all)
+        buttonbox.append(selectallbutton)
 
-        checkbox = gui.Checkbox(buttonbox, text="Read only")
-        checkbox['checked.changed'].append(self.read_only_toggled)
-        buttonbox['children'].append(checkbox)
+        focusbutton = gui.Button(buttonbox, text="Focus")
+        focusbutton.on_click.append(self.get_focus)
+        buttonbox.append(focusbutton)
 
-    def print_it(self, event):
-        print(self.entry['text'])
+        grayedcheckbox = gui.Checkbox(buttonbox, text="Grayed out")
+        grayedcheckbox.on_checked_changed.append(
+            self.grayed_out_toggled)
+        buttonbox.append(grayedcheckbox)
 
-    def select_all(self, event):
+        secretcheckbox = gui.Checkbox(buttonbox, text="Secret")
+        secretcheckbox.on_checked_changed.append(self.secret_toggled)
+        buttonbox.append(secretcheckbox)
+
+        self.reset()
+
+    def reset(self, resetbutton=None):
+        self.entry.text = "Enter something..."
+
+    def text_changed(self, entry):
+        print("text changed to %r" % entry.text)
+
+    def select_all(self, selectallbutton):
         self.entry.select_all()
 
-    def read_only_toggled(self, event):
-        self.entry['read_only'] = event.new_value
+    # This is get_focus instead of focus. If this was focus, it would
+    # be difficult to give focus to this widget when needed, except
+    # that it wouldn't really matter because BananaGUI boxes aren't
+    # focusable anyway.
+    def get_focus(self, focusbutton):
+        self.entry.focus()
+
+    def grayed_out_toggled(self, checkbox):
+        self.entry.grayed_out = checkbox.checked
+
+    def secret_toggled(self, checkbox):
+        self.entry.secret = checkbox.checked
 
 
 def main():
-    with EntryWindow(title="Entry test", size=(250, 100)) as window:
-        window['on_close'].append(gui.quit)
+    with gui.Window(title="Entry test", size=(350, 100)) as window:
+        window.child = EntryBox(window)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

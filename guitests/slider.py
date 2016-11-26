@@ -19,42 +19,44 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import functools
+
+import bananagui
 from bananagui import gui
 
 
-class SliderWindow(gui.Window):
+class SliderBox(gui.Box):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        box = gui.Box.vertical(self)
-        self['child'] = box
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
 
         values = range(0, 51, 5)
 
-        self.hslider = gui.Slider.horizontal(box, valuerange=values)
-        self.hslider['value.changed'].append(self.value_changed)
-        box['children'].append(self.hslider)
+        hslider = gui.Slider.horizontal(self, valuerange=values)
+        hslider.on_value_changed.append(self.value_changed)
+        self.append(hslider)
 
-        self.vslider = gui.Slider.vertical(box, valuerange=values)
-        self.vslider['value.changed'].append(self.value_changed)
-        box['children'].append(self.vslider)
+        vslider = gui.Slider.vertical(self, valuerange=values)
+        vslider.on_value_changed.append(self.value_changed)
+        self.append(vslider)
 
-        self.spinbox = gui.Spinbox(box, valuerange=values)
-        self.spinbox['value.changed'].append(self.value_changed)
-        box['children'].append(self.spinbox)
+        spinbox = gui.Spinbox(self, valuerange=values)
+        spinbox.on_value_changed.append(self.value_changed)
+        self.append(spinbox)
 
-    def value_changed(self, event):
-        # Python's sets are awesome.
-        all_widgets = {self.hslider, self.vslider, self.spinbox}
-        other_widgets = all_widgets - {event.widget}
-        for widget in other_widgets:
-            widget['value'] = event.new_value
+    def value_changed(self, called_widget):
+        widgets = list(self)
+        widgets.remove(called_widget)
+        for widget in widgets:
+            # This doesn't recurse too much because callbacks don't run
+            # if the old and new value are equal.
+            widget.value = called_widget.value
 
 
 def main():
-    with SliderWindow(title="Hello World!") as window:
-        window['on_close'].append(gui.quit)
+    with gui.Window(title="Slider test") as window:
+        window.child = SliderBox(window)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

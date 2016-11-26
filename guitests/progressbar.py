@@ -24,43 +24,41 @@ import functools
 from bananagui import gui
 
 
-def set_progress(progressbar, event):
-    progressbar['progress'] = event.widget['value'] / 100
+def set_progress(progressbar, spinbox):
+    progressbar.progress = spinbox.value / 100
 
 
-def toggle_bouncing(progressbar, event):
-    if event.widget['checked']:
-        progressbar['bouncing'] = True
-    else:
-        progressbar['bouncing'] = False
+def toggle_bouncing(progressbar, checkbox):
+    progressbar.bouncing = checkbox.checked
 
 
 def main():
     with gui.Window(title="Progress bar test") as window:
         box = gui.Box.vertical(window)
-        window['child'] = box
+        window.child = box
 
         # A regular progress bar.
         progressbar = gui.Progressbar(box, expand=(True, False))
-        box['children'].append(progressbar)
+        box.append(progressbar)
 
+        spinbox = gui.Spinbox(box, valuerange=range(101),
+                              expand=(True, False))
         spin_callback = functools.partial(set_progress, progressbar)
-        spinbox = gui.Spinbox(box, valuerange=range(101), expand=(True, False))
-        spinbox['value.changed'].append(spin_callback)
-        box['children'].append(spinbox)
+        spinbox.on_value_changed.append(spin_callback)
+        box.append(spinbox)
 
-        box['children'].append(gui.Dummy(box))
+        box.append(gui.Dummy(box))
 
         # A bouncing progress bar.
         bouncingbar = gui.BouncingProgressbar(box, expand=(True, False))
-        box['children'].append(bouncingbar)
+        box.append(bouncingbar)
 
-        check_callback = functools.partial(toggle_bouncing, bouncingbar)
         checkbox = gui.Checkbox(box, text="Bouncing", expand=(True, False))
-        checkbox['checked.changed'].append(check_callback)
-        box['children'].append(checkbox)
+        check_callback = functools.partial(toggle_bouncing, bouncingbar)
+        checkbox.on_checked_changed.append(check_callback)
+        box.append(checkbox)
 
-        window['on_close'].append(gui.quit)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

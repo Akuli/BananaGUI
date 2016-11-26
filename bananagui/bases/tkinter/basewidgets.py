@@ -36,65 +36,66 @@ class _Tooltip:
     idlelib's code.
     """
 
-    # This should never contain more than one window at a time, but we
-    # allow multiple windows to make sure nothing breaks if we have
-    # multiple tipwindows at the same time for some reason.
-    _tipwindows = set()
+    # This needs to be shared by all instances because there's only one
+    # mouse pointer.
+    tipwindow = None
 
-    def __init__(self, widget, content=None):
-        widget.bind('<Enter>', self._enter)
-        widget.bind('<Leave>', self._leave)
-        widget.bind('<Motion>', self._motion)
-        self._widget = widget
-        self._got_mouse = False
-        self.content = content
+    def __init__(self, widget):
+        widget.bind('<Enter>', self.enter)
+        widget.bind('<Leave>', self.leave)
+        widget.bind('<Motion>', self.motion)
+        self.widget = widget
+        self.got_mouse = False
+        self.content = None
 
-    def _destroy_tipwindows(self, event=None):
-        while self._tipwindows:
-            tipwindow = self._tipwindows.pop()
-            tipwindow.destroy()
+    @classmethod
+    def destroy_tipwindow(cls, event=None):
+        if cls.tipwindow is not None:
+            cls.tipwindow.destroy()
+            cls.tipwindow = None
 
-    def _enter(self, event):
-        if event.widget is not self._widget:
+    def enter(self, event):
+        if event.widget is not self.widget:
             # For some reason, toplevels get also notified of their
             # childrens' events.
             return
-        self._destroy_tipwindows()
-        self._got_mouse = True
-        event.widget.after(1000, self._show)
+        self.destroy_tipwindow()
+        self.got_mouse = True
+        event.widget.after(1000, self.show)
 
-    def _leave(self, event):
-        if event.widget is not self._widget:
+    def leave(self, event):
+        if event.widget is not self.widget:
             return
-        self._destroy_tipwindows()
-        self._got_mouse = False
+        self.destroy_tipwindow()
+        self.got_mouse = False
 
-    def _motion(self, event):
-        self._mousex = event.x_root
-        self._mousey = event.y_root
+    def motion(self, event):
+        self.mousex = event.x_root
+        self.mousey = event.y_root
 
-    def _show(self):
-        if not self._got_mouse:
+    def show(self):
+        if not self.got_mouse:
             return
-        self._destroy_tipwindows()
+        self.destroy_tipwindow()
         if self.content is not None:
-            tipwindow = tk.Toplevel()
-            tipwindow.geometry('+%d+%d' % (self._mousex+10, self._mousey-10))
-            tipwindow.bind('<Motion>', self._destroy_tipwindows)
+            tipwindow = type(self).tipwindow = tk.Toplevel()
+            tipwindow.geometry('+%d+%d' % (self.mousex+10, self.mousey-10))
+            tipwindow.bind('<Motion>', self.destroy_tipwindow)
             tipwindow.overrideredirect(True)
-            self._tipwindows.add(tipwindow)
 
             # If you modify this, make sure to always define either no
             # colors at all or both foreground and background. Otherwise
             # the label will have light text on a light background or
             # dark text on a dark background on some systems.
-            label = tk.Label(tipwindow, text=self.content,
+            label = tk.Label(tipwindow, text=self.content, border=3,
                              fg='black', bg='white')
             label.pack()
 
 
 class Widget:
-    pass
+
+    def _focus(self):
+        self.real_widget.focus()
 
 
 class Parent:
@@ -110,26 +111,26 @@ _expand_indexes = {
 class Child:
 
     def __init__(self, **kwargs):
-        self.__tooltip = _Tooltip(self['real_widget'])
-        self._bananagui_tkinter_packed = False  # See also containers.py.
+        self._tkinter_tooltip = _Tooltip(self.real_widget)
+        self._tkinter_packed = False  # See also containers.py.
         super().__init__(**kwargs)
 
-    def _bananagui_set_expand(self, expand):
-        if self._bananagui_tkinter_packed:
+    def _set_expand(self, expand):
+        if self._tkinter_packed:
             # Update the pack expanding. By having this here we can make
             # sure that the pack options are changed when the expand is
             # changed.
             pack_kwargs = {'fill': tkinter_fills[expand]}
-            if isinstance(self['parent'], Box):
-                index = _expand_indexes[self['parent']['orientation']]
+            if isinstance(self.parent, Box):
+                index = _expand_indexes[self.parent.orientation]
                 pack_kwargs['expand'] = expand[index]
             else:
                 # It's not a box. We need a default value.
                 pack_kwargs['expand'] = (expand == (True, True))
-            self['real_widget'].pack(**pack_kwargs)
+            self.real_widget.pack(**pack_kwargs)
 
-    def _bananagui_set_tooltip(self, tooltip):
-        self.__tooltip.content = tooltip
+    def _set_tooltip(self, tooltip):
+        self._tkinter_tooltip.content = tooltip
 
-    def _bananagui_set_grayed_out(self, grayed_out):
-        self['real_widget']['state'] = 'disable' if grayed_out else 'normal'
+    def _set_grayed_out(self, grayed_out):
+        self.real_widget['state'] = 'disable' if grayed_out else 'normal'

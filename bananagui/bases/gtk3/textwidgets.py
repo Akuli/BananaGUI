@@ -29,50 +29,52 @@ class TextBase:
 class Entry:
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.Entry()
-        widget.connect('changed', self.__changed)
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.Entry()
+        self.real_widget.connect('changed', self._do_changed)
         super().__init__(parent, **kwargs)
 
-    def __changed(self, entry):
-        self.text.raw_set(entry.get_text())
+    def _do_changed(self, entry):
+        self.text = entry.get_text()
 
-    def _bananagui_set_text(self, text):
-        self['real_widget'].set_text(text)
+    def _set_text(self, text):
+        self.real_widget.set_text(text)
 
-    def _bananagui_set_read_only(self, read_only):
-        self['real_widget'].set_editable(not read_only)
+    def _set_grayed_out(self, grayed_out):
+        self.real_widget.set_editable(not grayed_out)
+
+    def _set_secret(self, secret):
+        self.real_widget.set_visibility(not secret)
 
     def select_all(self):
-        self['real_widget'].select_region(0, -1)
-        self['real_widget'].grab_focus()
+        self.real_widget.select_region(0, -1)
 
 
-class PlainTextView:
+class TextEdit:
     # TODO: tabchar
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.TextView()
-        self.__buf = widget.get_buffer()
-        self.__buf.connect('changed', self.__changed)
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.TextView()
+        self._textbuf = self.real_widget.get_buffer()
+        self._changed_id = self._textbuf.connect('changed', self._do_changed)
+        self.__setting_text = False
         super().__init__(parent, **kwargs)
 
-    def __changed(self, buf):
-        self.text.raw_set(buf.get_text(buf.get_start_iter(),
-                                       buf.get_end_iter(), True))
-
-    def __bounds(self):
-        return self.__buf.get_start_iter(), self.__buf.get_end_iter()
+    def _do_changed(self, buf):
+        self.__setting_text = True
+        self.text = buf.get_text(buf.get_start_iter(),
+                                 buf.get_end_iter(), True)
+        self.__setting_text = False
 
     def select_all(self):
-        self.__buf.select_range(self.__buf.get_start_iter(),
-                                self.__buf.get_end_iter())
-        self['real_widget'].grab_focus()
+        self._textbuf.select_range(self._textbuf.get_start_iter(),
+                                   self._textbuf.get_end_iter())
 
-    def clear(self):
-        self.__buf.delete(self.__buf.get_start_iter(),
-                          self.__buf.get_end_iter())
-
-    def append_text(self, text):
-        self.__buf.insert(self.__buf.get_end_iter(), text)
+    def _set_text(self, text):
+        # We get infinite recursion for some reason if we remove the
+        # __setting_text thing.
+        if not self.__setting_text:
+            # We need to set the text twice but make it seem like one set.
+            with self._textbuf.handler_block(self._changed_id):
+                self._textbuf.delete(self._textbuf.get_start_iter(),
+                                     self._textbuf.get_end_iter())
+            self._textbuf.insert(self._textbuf.get_start_iter(), text)

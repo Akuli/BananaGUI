@@ -23,22 +23,20 @@ from gi.repository import Gtk
 
 
 class BaseButton:
-    pass
+
+    def __init__(self, parent, **kwargs):
+        self.real_widget = Gtk.Button()
+        self.real_widget.connect('clicked', self._do_click)
+        super().__init__(parent, **kwargs)
+
+    def _do_click(self, real_widget):
+        self.run_callbacks('on_click')
 
 
 class Button:
 
-    def __init__(self, parent, **kwargs):
-        button = Gtk.Button()
-        button.connect('clicked', self.__click)
-        self.real_widget.raw_set(button)
-        super().__init__(parent, **kwargs)
-
-    def __click(self, button):
-        self.on_click.emit()
-
-    def _bananagui_set_text(self, text):
-        self['real_widget'].set_label(text)
+    def _set_text(self, text):
+        self.real_widget.set_label(text)
 
 
 class ImageButton:

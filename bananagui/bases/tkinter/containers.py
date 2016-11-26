@@ -27,14 +27,14 @@ from . import tkinter_fills
 
 class Bin:
 
-    def _bananagui_set_child(self, child):
-        if self['child'] is not None:
-            self['child']['real_widget'].pack_forget()
-            self['child']._bananagui_tkinter_packed = False
+    def _set_child(self, child):
+        if self.child is not None:
+            self.child.real_widget.pack_forget()
+            self.child._tkinter_packed = False
         if child is not None:
-            child['real_widget'].pack()
-            child._bananagui_tkinter_packed = True
-            child._bananagui_set_expand(child['expand'])  # See bases.py.
+            child.real_widget.pack()
+            child._tkinter_packed = True
+            child._set_expand(child.expand)  # Update the packing.
 
 
 _appendsides = {
@@ -49,23 +49,20 @@ _appendsides = {
 class Box:
 
     def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(tk.Frame(parent['real_widget']))
+        self.real_widget = tk.Frame(parent.real_widget)
         super().__init__(parent, **kwargs)
 
-    def _bananagui_box_append(self, child):
-        child['real_widget'].pack(
-            side=_appendsides[self['orientation']],
-            fill=tkinter_fills[child['expand']],
+    def _append(self, child):
+        child.real_widget.pack(
+            side=_appendsides[self.orientation],
+            fill=tkinter_fills[child.expand],
         )
-        child._bananagui_tkinter_packed = True
+        child._tkinter_packed = True
+        child._set_expand(child.expand)  # Update the packing.
 
-        # Set the pack expanding, see ChildBase._bananagui_set_expand
-        # in bases.py.
-        child._bananagui_set_expand(child['expand'])
-
-    def _bananagui_box_remove(self, child):
-        child['real_widget'].pack_forget()
-        child._bananagui_tkinter_packed = False
+    def _remove(self, child):
+        child.real_widget.pack_forget()
+        child._tkinter_packed = False
 
 
 class Scroller:

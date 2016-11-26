@@ -27,32 +27,27 @@ import tkinter as tk
 class BaseButton:
 
     def __init__(self, parent, **kwargs):
-        widget = tk.Button(parent['real_widget'], command=self.__click)
-        widget.bind('<Return>', self.__click)
-        self.real_widget.raw_set(widget)
+        widget = tk.Button(parent.real_widget, command=self._do_click)
+        widget.bind('<Return>', self._do_click)
+        self.real_widget = widget
         super().__init__(parent, **kwargs)
 
-    def __click(self, event=None):
-        self.on_click.emit()
+    def _do_click(self, event=None):
+        self.run_callbacks('on_click')
 
 
 class Button:
 
-    def _bananagui_set_text(self, text):
-        self['real_widget'].config(text=text)
+    def _set_text(self, text):
+        self.real_widget['text'] = text
 
 
 class ImageButton:
 
-    def __init__(self, parent, **kwargs):
-        # This is needed to avoid garbage collection.
-        self.__image = None
-        super().__init__(parent, **kwargs)
-
-    def _bananagui_set_imagepath(self, path):
+    def _set_imagepath(self, path):
         if path is None:
-            self['real_widget']['image'] = ''
-            self.__image = None
+            self.real_widget['image'] = ''
         else:
+            # The __image reference is needed to avoid garbage collection.
             self.__image = tk.PhotoImage(file=path)
-            self['real_widget']['image'] = self.__image
+            self.real_widget['image'] = self.__image

@@ -11,10 +11,10 @@ def main():
         the_text = '\n'.join(map(template.format, range(20)))
 
         scroller = gui.Scroller(window)
-        scroller['child'] = gui.Label(scroller, text=the_text)
-        window['child'] = scroller
+        scroller.child = gui.Label(scroller, text=the_text)
+        window.child = scroller
 
-        window['on_close'].append(gui.quit)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

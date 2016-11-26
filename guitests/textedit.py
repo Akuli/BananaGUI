@@ -19,55 +19,56 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI PlainTextView test."""
+"""BananaGUI TextEdit test."""
 
 from bananagui import gui
 
 
-class TextviewWindow(gui.Window):
+class TextEditWindow(gui.Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         bigbox = gui.Box.vertical(self)
-        self['child'] = bigbox
+        self.child = bigbox
 
-        self.textview = gui.PlainTextView(bigbox, text="Enter something...")
-        self.textview['text.changed'].append(self.text_changed)
-        bigbox['children'].append(self.textview)
+        self.textedit = gui.TextEdit(bigbox, text="Enter something...")
+        self.textedit.on_text_changed.append(self.text_changed)
+        bigbox.append(self.textedit)
 
         buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
-        bigbox['children'].append(buttonbox)
+        bigbox.append(buttonbox)
 
-        insertbutton = gui.Button(buttonbox, text="Append text",
-                                  on_click=[self.append_text])
-        buttonbox['children'].append(insertbutton)
+        addbutton = gui.Button(buttonbox, text="Add text")
+        addbutton.on_click.append(self.add_text)
+        buttonbox.append(addbutton)
 
-        clearbutton = gui.Button(buttonbox, text="Clear",
-                                 on_click=[self.clear])
-        buttonbox['children'].append(clearbutton)
+        clearbutton = gui.Button(buttonbox, text="Clear")
+        clearbutton.on_click.append(self.clear)
+        buttonbox.append(clearbutton)
 
-        selectallbutton = gui.Button(buttonbox, text="Select all",
-                                     on_click=[self.select_all])
-        buttonbox['children'].append(selectallbutton)
+        selectallbutton = gui.Button(buttonbox, text="Select all")
+        selectallbutton.on_click.append(self.select_all)
+        buttonbox.append(selectallbutton)
 
-    def text_changed(self, event):
-        print(event.new_value)
+    def text_changed(self, textedit):
+        print("text changed to %r" % textedit.text)
 
-    def append_text(self, event):
-        self.textview.append_text(" Click!")
+    def add_text(self, addbutton):
+        self.textedit.text += " Click!"
 
-    def select_all(self, event):
-        self.textview.select_all()
+    def select_all(self, selectallbutton):
+        self.textedit.select_all()
+        self.textedit.focus()
 
-    def clear(self, event):
-        self.textview.clear()
+    def clear(self, clearbutton):
+        self.textedit.text = ''
 
 
 def main():
-    with TextviewWindow(title="Textview test",
+    with TextEditWindow(title="TextEdit test",
                         minimum_size=(300, 200)) as window:
-        window['on_close'].append(gui.quit)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

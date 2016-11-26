@@ -30,7 +30,7 @@ import bananagui
 if bananagui._base is None:
     raise ImportError("call bananagui.load() before importing bananagui.gui")
 
-from .basewidgets import Widget, Parent, Child, Oriented, Ranged
+from .basewidgets import Widget, Parent, Child, Oriented
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .containers import Bin, Box, Scroller
@@ -39,8 +39,8 @@ from .mainloop import init, main, quit, add_timeout
 from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
                    get_clipboard_text, get_font_families)
 from .progress import Progressbar, BouncingProgressbar, Spinner
-from .ranged import Slider, Spinbox
-from .textwidgets import TextBase, Entry, PlainTextView  # 2DO:rename2TextView?
-from .trayicon import TrayIcon
+from .ranged import Ranged, Slider, Spinbox
+from .textwidgets import TextBase, Entry, TextEdit
+#from .trayicon import TrayIcon
 from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
                      errordialog, questiondialog, colordialog, fontdialog)

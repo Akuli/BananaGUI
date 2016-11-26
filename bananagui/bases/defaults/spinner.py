@@ -35,9 +35,9 @@ _DELAY = 60
 class Spinner:
 
     def __init__(self, parent, **kwargs):
-        self.__widget = canvas.Canvas(parent, minimum_size=(25, 25))
-        self.real_widget.raw_set(self.__widget['real_widget'])
-        self.__positions = collections.deque()
+        self._widget = canvas.Canvas(parent, minimum_size=(25, 25))
+        self.real_widget = self._widget.real_widget
+        self._positions = collections.deque()
         for i in range(_LINES):
             #          /|
             #         / |
@@ -56,24 +56,24 @@ class Spinner:
             angle = 360 * i // _LINES
             y = math.sin(math.radians(angle))
             x = math.cos(math.radians(angle))
-            self.__positions.append((x, y))
+            self._positions.append((x, y))
         super().__init__(parent, **kwargs)
 
-    def __draw(self):
-        self.__widget.clear()
+    def _draw(self):
+        self._widget.clear()
 
-        if not self['spinning']:
+        if not self.spinning:
             # We're not spinning anymore.
             return None
 
-        width, height = self.__widget['size']
+        width, height = self._widget.current_size
         diameter = min(width, height)
 
         # Rotating by a positive number would make the spinner spin
         # counter-clockwise.
-        self.__positions.rotate(-1)
+        self._positions.rotate(-1)
 
-        for index, (x, y) in enumerate(self.__positions):
+        for index, (x, y) in enumerate(self._positions):
             brightness = index * 255 // _LINES
             start = (x * diameter // 5 + width // 2,
                      y * diameter // 5 + height // 2)
@@ -81,14 +81,14 @@ class Spinner:
                    y * diameter // 2 + height // 2)
             thickness = max(diameter // 10, 1)
             color = bananagui.Color(brightness, brightness, brightness)
-            self.__widget.draw_line(start, end, thickness=thickness,
-                                    color=color)
+            self._widget.draw_line(start, end, thickness=thickness,
+                                   color=color)
 
         # Keep spinning.
         return bananagui.RUN_AGAIN
 
-    def _bananagui_set_spinning(self, spinning):
+    def _set_spinning(self, spinning):
         if spinning:
             # Start spinning.
-            mainloop.add_timeout(_DELAY, self.__draw)
-        # We don't need an else because __draw knows when to stop.
+            mainloop.add_timeout(_DELAY, self._draw)
+        # We don't need an else because _draw knows when to stop.

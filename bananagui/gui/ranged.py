@@ -19,12 +19,38 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import _base
-from .basewidgets import Child, Oriented, Ranged
+from bananagui import _base, utils
+from .basewidgets import Child, Oriented
+
+
+@utils.add_property('value', add_changed=True)
+class Ranged:
+    """Implement valuerange and value BananaGUI properties.
+
+    Attributes:
+      valuerange        The value range set on initialization.
+      value             The widget's current value.
+                        This needs to be in valuerange and it's the
+                        smallest value of valuerange by default.
+      on_value_changed  List of callbacks that are ran when value changes.
+    """
+
+    def __init__(self, *args, valuerange=range(11), **kwargs):
+        assert isinstance(valuerange, range)
+        assert len(valuerange) >= 2
+        assert utils.rangestep(valuerange) > 0
+        self.valuerange = valuerange
+        self._value = min(valuerange)
+        super().__init__(*args, **kwargs)
+
+    def _check_value(self, value):
+        assert value in self.valuerange
 
 
 class Spinbox(Ranged, _base.Spinbox, Child):
     """A box for selecting a number with arrow buttons up and down."""
+
+    can_focus = True
 
 
 class Slider(Oriented, Ranged, _base.Slider, Child):

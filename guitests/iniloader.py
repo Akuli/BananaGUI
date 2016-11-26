@@ -4,7 +4,7 @@ import pprint
 from bananagui import gui, iniloader
 
 
-def click(event):
+def click(button):
     print("Click!")
 
 
@@ -14,8 +14,8 @@ def main():
         widgets = iniloader.load_ini(f)
     pprint.pprint(widgets)
     with widgets['window']:
-        widgets['button']['on_click'].append(click)
-        widgets['window']['on_close'].append(gui.quit)
+        widgets['button'].on_click.append(click)
+        widgets['window'].on_close.append(gui.quit)
         gui.main()
 
 

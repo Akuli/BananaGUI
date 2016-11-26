@@ -30,32 +30,32 @@ class SpinnerWindow(gui.Window):
         super().__init__(**kwargs)
 
         mainbox = gui.Box.vertical(self)
-        self['child'] = mainbox
+        self.child = mainbox
 
         self.spinner = gui.Spinner(mainbox)
-        mainbox['children'].append(self.spinner)
+        mainbox.append(self.spinner)
 
         buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
-        mainbox['children'].append(buttonbox)
+        mainbox.append(buttonbox)
 
-        startbutton = gui.Button(buttonbox, text="Start",
-                                 on_click=[self.start])
-        buttonbox['children'].append(startbutton)
+        startbutton = gui.Button(buttonbox, text="Start")
+        startbutton.on_click.append(self.start)
+        buttonbox.append(startbutton)
 
-        stopbutton = gui.Button(buttonbox, text="Stop",
-                                on_click=[self.stop])
-        buttonbox['children'].append(stopbutton)
+        stopbutton = gui.Button(buttonbox, text="Stop")
+        stopbutton.on_click.append(self.stop)
+        buttonbox.append(stopbutton)
 
-    def start(self, widget):
-        self.spinner['spinning'] = True
+    def start(self, startbutton):
+        self.spinner.spinning = True
 
-    def stop(self, widget):
-        self.spinner['spinning'] = False
+    def stop(self, stopbutton):
+        self.spinner.spinning = False
 
 
 def main():
     with SpinnerWindow(title="Spinner window") as window:
-        window['on_close'].append(gui.quit)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

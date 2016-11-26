@@ -19,39 +19,62 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
 from bananagui import _base, utils
 from bananagui.bases import defaults
 from .basewidgets import Child
 
 
+@utils.add_property('progress')
 class Progressbar(_base.Progressbar, Child):
-    """A progress bar widget."""
+    """A progress bar widget.
 
-    progress = bananagui.BananaProperty(
-        'progress', type=(float, int), minimum=0, maximum=1, default=0,
-        doc="The progressbar's position.")
+    Attributes:
+      progress      The progressbar's position.
+                    This is always between 0 and 1 (inclusive).
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._progress = 0
+        super().__init__(*args, **kwargs)
+
+    def _check_progress(self, progress):
+        # This also checks the type because we can't compare with a
+        # value of a wrong type.
+        assert 0 <= progress <= 1
 
 
+@utils.add_property('bouncing')
 class BouncingProgressbar(_base.BouncingProgressbar, Child):
     """A Progressbar-like widget that bounces back and forth.
 
-    This doesn't bounce by default. Set the bouncing property to True to
-    make it bounce.
+    This doesn't bounce by default. Set bouncing to True to make it
+    bounce.
+
+    Attributes:
+      bouncing      True if the widget bounces back and forth.
     """
 
-    bouncing = bananagui.BananaProperty(
-        'bouncing', type=bool, default=False,
-        doc="True if the progress bar is bouncing, False if not.")
+    def __init__(self, *args, **kwargs):
+        self._bouncing = False
+        super().__init__(*args, **kwargs)
+
+    def _check_bouncing(self, bouncing):
+        assert isinstance(bouncing, bool)
 
 
 class Spinner(utils.find_attribute('Spinner', _base, defaults), Child):
     """A waiting spinner.
 
-    The spinner doesn't spin by default. You can set the spinning
-    property to True to make it spin.
+    The spinner doesn't spin by default. You can set spinning to True
+    to make it spin.
+
+    Attributes:
+      spinning      True if the widget is currently spinning, False if not.
     """
 
-    spinning = bananagui.BananaProperty(
-        'spinning', type=bool, default=False,
-        doc="True if the widget is currently spinning, False if not.")
+    def __init__(self, *args, **kwargs):
+        self._spinning = False
+        super().__init__(*args, **kwargs)
+
+    def _check_spinning(self, spinning):
+        assert isinstance(spinning, bool)

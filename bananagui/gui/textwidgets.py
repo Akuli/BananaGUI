@@ -21,69 +21,67 @@
 
 """Widgets that contain text."""
 
-import bananagui
 from bananagui import _base, utils
 from .basewidgets import Child
 
 
-@utils.baseclass
-@bananagui.document_props
+@utils.add_property('text', add_changed=True)
 class TextBase(_base.TextBase, Child):
-    """A base class for text editing widgets."""
+    """A base class for text editing widgets.
 
+    Setting grayed_out to True means that the user can't edit the text.
+
+    Attributes:
+      text              The text in the widget.
+      on_text_changed   List of callbacks that run when the text changes.
+    """
     # TODO: Add fonts and colors.
-    text = bananagui.BananaProperty(
-        'text', type=str, default='',
-        doc="Text in the entry.")
-    read_only = bananagui.BananaProperty(
-        'read_only', type=bool, default=False,
-        doc="True if the content of the widget cannot be edited.")
 
-    # This is overrided just to make sure it has a docstring.
-    def select_all(self) -> None:
-        """Select all text in the widget.
+    can_focus = True
 
-        This also gives the keyboard focus to the widget.
-        """
-        super().select_all()
+    def __init__(self, *args, **kwargs):
+        self._text = ''
+        super().__init__(*args, **kwargs)
+
+    def _check_text(self, text):
+        assert isinstance(text, str)
+
+    def select_all(self):
+        """Select all text in the widget."""
+        self._select_all()
 
 
-@bananagui.document_props
+@utils.add_property('secret')
 class Entry(_base.Entry, TextBase):
-    """A one-line text widget."""
+    """A one-line text widget.
 
-    hidden = bananagui.BananaProperty(
-        'hidden', type=bool, default=False,
-        doc="True if the entry's content is hidden with asterisks or balls.")
+    Attributes:
+      secret    True if the text is hidden with stars or balls.
+                It's also impossible to copy-paste content from a
+                secret entry. This is useful for asking passwords.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._secret = False
+        super().__init__(*args, **kwargs)
+
+    def _check_secret(self, secret):
+        assert isinstance(secret, bool)
 
 
 # TODO: text wrapping.
-@bananagui.document_props
-class PlainTextView(_base.PlainTextView, TextBase):
-    """A multiline text widget."""
+# TODO: text alignment?
+@utils.add_property('tab')
+class TextEdit(_base.TextEdit, TextBase):
+    """A multiline text widget.
 
-    tab_inserts = bananagui.BananaProperty(
-        'tab_inserts', type=str, default='\t',
-        doc="The character(s) that will be inserted when tab is pressed.")
+    Attributes:
+      tab       The character that pressing tab inserts.
+    """
 
-    def _bananagui_set_text(self, text):
-        old_text = self['text']
-        if old_text == text:
-            return
+    def __init__(self, *args, **kwargs):
+        self._tab = '\t'
+        super().__init__(*args, **kwargs)
 
-        # The changed signal needs to be emitted once only.
-        with self.text.changed.blocked():
-            self.clear()
-            if text:
-                self.append_text(text)
-        self.text.changed.emit(old_value=old_text, new_value=text)
-
-    def clear(self) -> None:
-        """Remove everything from the textview."""
-        super().clear()
-        # The GUI toolkit's callback will update the text property.
-
-    def append_text(self, text: str) -> None:
-        """Add text to the end of what is already in the text widget."""
-        super().append_text(text)
-        # The GUI toolkit's callback will update the text property.
+    def _check_tab(self, tab):
+        assert isinstance(tab, str)

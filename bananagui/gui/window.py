@@ -19,9 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Base classes for GUI toolkit wrappers."""
+"""Window widgets."""
 
-import functools
 from gettext import gettext as _
 
 import bananagui
@@ -30,8 +29,11 @@ from bananagui.bases import defaults
 from .containers import Bin
 
 
-@utils.baseclass
-@bananagui.document_props
+@utils.add_property('title')
+@utils.add_property('resizable')
+@utils.add_property('size', add_changed=True)
+@utils.add_property('minimum_size')
+@utils.add_property('showing')
 class BaseWindow(_base.BaseWindow, Bin):
     """A window baseclass.
 
@@ -39,85 +41,108 @@ class BaseWindow(_base.BaseWindow, Bin):
     when you don't need the window anymore. The windows can also be used
     as context managers, and the closing will be done automatically:
 
-        with Window() as my_window:
+        with Window() as the_window:
             ...
+
+    There's no maximum_size attribute because X doesn't support maximum
+    sizes that well. Tkinter implements a maximum size on X, but it
+    does that by moving the window to the upper left corner when it's
+    maximized.
+
+    Attributes:
+      title             The text in the top bar.
+      resizable         True if the user can resize the window.
+      size              The current window size.
+                        Like most other sizes, this is a two-tuple of
+                        integers.
+      on_size_changed   List of callbacks that are ran when size changes.
+      minimum_size      Two-tuple of smallest allowed width and height.
+                        This is (None, None) by default, so the window
+                        can be however big it needs to be in both
+                        directions.
+      showing           True if the window hasn't been hidden.
+                        Hiding the window is done by setting this to
+                        False and it's easier than creating a new
+                        window when a window with the same content
+                        needs to be displayed multiple times.
+      on_close          List of callbacks that run when the user tries to
+                        close the window.
+                        This contains a callback that calls close() by
+                        default. You can remove it or replace it with
+                        something else. This doesn't run when close()
+                        is called.
+      closed            True if close() has been called.
     """
-    # There is no maximum_size because X doesn't support it. Tkinter
-    # implements it on X, but it does that by moving the window with a
-    # maximum size to the upper left corner when it's maximized.
+    # TODO: window icon?
 
-    resizable = bananagui.BananaProperty(
-        'resizable', type=bool, default=True,
-        doc="True if the window can be resized.")
-    size = bananagui.BananaProperty(
-        'size', how_many=2, type=int, minimum=1, default=(200, 200),
-        doc="Two-tuple of the window's current width and height.")
-    minimum_size = bananagui.BananaProperty(
-        'minimum_size', default=None, how_many=2, type=int, minimum=1,
-        allow_none=True,
-        doc="""Two-tuple of minimum width and height or None.
-
-        The window cannot be resized to be smaller than this.
-        """)
-    showing = bananagui.BananaProperty(
-        'showing', type=bool, default=True,
-        doc="True if the window is visible.")
-    on_close = bananagui.BananaSignal(
-        'on_close',
-        doc="""This is emitted when the user tries to close the window.
-
-        Unlike most other signals, this contains a callback by default.
-        It's BaseWindow.close_callback and it closes the window
-        when it's closed. You can remove it to customize this and call
-        the_window.close() from custom callbacks.
-        """)
-
-    @staticmethod
-    def close_callback(event) -> None:
-        """Close event.widget."""
-        event.widget.close()
+    can_focus = True
 
     def __init__(self, **kwargs):
-        # TODO: this doesn't work with the class __doc__.
-        self['on_close'].append(self.close_callback)
-        self.__closed = False
+        self._title = "BananaGUI Window"
+        self._resizable = True
+        self._size = (200, 200)
+        self._minimum_size = (None, None)
+        self._showing = True
+        self.on_close = [lambda w: w.close()]
+        self.closed = False
         super().__init__(**kwargs)
 
-    @property
-    def closed(self) -> bool:
-        """True if the window has been closed.
+    def _check_title(self, title):
+        assert not self.closed
+        assert isinstance(title, str)
 
-        This is not a BananaGUI property because there's no need to
-        attach callbacks to this and you can use the on_close signal
-        instead.
-        """
-        return self.__closed
+    def _check_resizable(self):
+        assert not self.closed
+        assert isinstance(resizable, bool)
 
-    def __enter__(self):
-        """Return the window."""
-        return self
+    def _check_minimum_size(self, size):
+        assert not self.closed
+        x, y = size
+        if x is not None:
+            assert isinstance(x, int)
+            assert x > 0
+        if y is not None:
+            assert isinstance(y, int)
+            assert y > 0
 
-    def __exit__(self, exception_type, exception_value, traceback):
-        """Close the window."""
-        self.close()
+    def _check_size(self, size):
+        assert not self.closed
+        min_x, min_y = self.minimum_size
+        if min_x is None:
+            min_x = 1
+        if min_y is None:
+            min_y = 1
+        x, y = size
+        assert isinstance(x, int) and isinstance(y, int)
+        assert x >= min_x and y >= min_y, (x, y, min_x, min_y)
 
-    def wait(self) -> None:
-        """Wait until the window is closed."""
-        super().wait()
+    def _check_showing(self, showing):
+        assert not self.closed
+        assert isinstance(showing, bool)
 
-    def close(self) -> None:
-        """Close the window and set self.closed to True.
+    def close(self):
+        """Close the window and set the closed attribute to True.
 
         This method can be called multiple times and it will do nothing
-        after the first call. It's not recommended to override this, use
-        the on_close signal instead.
+        after the first call. It's not recommended to override this, add
+        a callback to the on_close list instead.
         """
         if not self.closed:
-            super().close()
-            self.__closed = True
+            self._close()
+            self.closed = True
+
+    def wait(self):
+        """Wait until the window is closed."""
+        assert not self.closed
+        self._wait()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *error):
+        self.close()
 
 
-@bananagui.document_props
 class Window(_base.Window, BaseWindow):
     """A window that can have child windows.
 
@@ -125,75 +150,76 @@ class Window(_base.Window, BaseWindow):
     windows like this.
     """
 
-    title = bananagui.BananaProperty(
-        'title', type=str, default="BananaGUI Window",
-        doc="The title of the window.")
 
-
-@bananagui.document_props
 class Dialog(_base.Dialog, BaseWindow):
     """A window that has a parent window.
 
-    This class takes a parentwindow argument on initialization. The
-    parent window must be an instance of Window and it may be centered
-    over the parent window, it may be modal or whatever the real GUI
-    toolkit supports. It's None by default.
+    This class takes a positional parentwindow argument on initialization.
+    The parent window must be an instance of Window and this window may
+    be centered over the parent window, it may be modal or whatever the
+    real GUI toolkit supports.
+
+    Attributes:
+      parentwindow      The parent window set on initialization.
     """
 
-    title = bananagui.BananaProperty(
-        'title', type=str, default="BananaGUI Dialog",
-        doc="The title of the window.")
-    parentwindow = bananagui.BananaProperty(
-        'parentwindow', type=Window, settable=False,
-        doc="The parent window set on initialization.")
-
-    def __init__(self, parentwindow: Window, **kwargs):
-        self.parentwindow.raw_set(parentwindow)
-        super().__init__(parentwindow, **kwargs)
+    def __init__(self, parentwindow, **kwargs):
+        assert isinstance(parentwindow, Window)
+        self.parentwindow = parentwindow
+        super().__init__(**kwargs)
 
 
 def _messagedialog(function):
     """Return a new message dialog function."""
-    # We need to modify the original function first because
-    # functools.wraps overrides everything the wrapped function has.
-    function.__annotations__ = {
-        'parentwindow': Window, 'message': str, 'title': str,
-        'buttons': utils.abc.Sequence, 'defaultbutton': str,
-        'return': str,
-    }
-    if function.__doc__ is not None:
+    doc = function.__doc__
+    if doc is not None:
         # Not running with Python's optimizations.
-        function.__doc__ += """
+        doc += """
 
         The buttons argument should be a sequence of button texts that
         will be added to the dialog. It defaults to "OK" translated with
         gettext.gettext in a list.
 
-        The button with `default` as its text will have keyboard focus
-        by default, unless defaultbutton is None.
+        The button with defaultbutton as its text will have keyboard
+        focus by default. If defaultbutton is None and there's one 
+        button the defaultbutton defaults to it, otherwise there will
+        be no default button.
 
         The text argument is the text that will be shown in the dialog.
         If title is not given, the dialog's title will be the same as
         parentwindow's title.
 
-        The dialog doesn't have an icon on some GUI toolkits. The text
-        of the clicked button is returned, or None if the dialog is
-        closed.
+        The text of the clicked button is returned, or None if the
+        dialog is closed. Note that the dialog doesn't have an icon on
+        some GUI toolkits.
         """
 
-    # TODO: does this really work? Seems like we end up with *args
-    #       showing up in help().
-    @functools.wraps(function)
     def result(parentwindow, message, *, title=None, buttons=None,
-               defaultbutton=None) -> str:
-        # TODO: add something to Widget to handle defaultbutton?
+               defaultbutton=None):
+        assert isinstance(parentwindow, Window)
+
         if title is None:
-            title = parentwindow['title']
+            title = parentwindow.title
+
         if buttons is None:
             buttons = [_("OK")]
-            assert buttons, "at least one button is required"
-            assert defaultbutton is None or defaultbutton in buttons
+        assert buttons, "at least one button is required"
+
+        assert defaultbutton is None or defaultbutton in buttons
+        if defaultbutton is None and len(buttons) == 1:
+            defaultbutton = buttons[0]
+
         return function(parentwindow, message, title, buttons, defaultbutton)
+
+    # We can't use functools.wraps() because we want to avoid copying
+    # *args showing up in help().
+    result.__doc__ = doc
+    result.__name__ = function.__name__
+    try:
+        result.__qualname__ = function.__qualname__
+    except AttributeError:
+        # Python 3.2.
+        pass
 
     return result
 
@@ -225,27 +251,25 @@ def errordialog(*args):
 
 @_messagedialog
 def questiondialog(*args):
-    """Display a dialog with the question icon."""
+    """Display a dialog with a question icon."""
     return _questiondialog(*args)
 
 
-def colordialog(parentwindow: Window, *, title: str = None,
-                default: bananagui.Color = bananagui.BLACK) -> bananagui.Color:
+def colordialog(parentwindow, *, title=None, defaultcolor=bananagui.BLACK):
     """Ask a color from the user.
 
     This returns the new color, or None if the user canceled the dialog.
     """
     if title is None:
-        title = parentwindow['title']
-    return _base.colordialog(parentwindow, default, title)
+        title = parentwindow.title
+    return _base.colordialog(parentwindow, defaultcolor, title)
 
 
-def fontdialog(parentwindow: Window, *, title: str = None,
-               default: bananagui.Font = bananagui.Font()) -> bananagui.Font:
+def fontdialog(parentwindow, *, title=None, defaultfont=bananagui.Font()):
     """Ask a font from the user.
 
     This returns the new font, or None if the user canceled the dialog.
     """
     if title is None:
-        title = parentwindow['title']
-    return _fontdialog(parentwindow, default, title)
+        title = parentwindow.title
+    return _fontdialog(parentwindow, defaultfont, title)

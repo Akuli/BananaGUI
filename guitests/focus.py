@@ -19,27 +19,39 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Focusing GUI test."""
+
 from bananagui import gui
 
 
-def on_close(event):
-    answer = gui.questiondialog(
-        event.widget, "Do you really want to quit?",
-        buttons=["Yes", "No"])
-    if answer == "Yes":
-        gui.quit()
+def on_click(button):
+    box = button.parent
+    if button == box[1]:
+        box[2].focus()
+    if button == box[2]:
+        box[1].focus()
 
 
 def main():
-    with gui.Window(title="Quit dialog test") as window:
-        label = gui.Label(window, text="Close me!")
-        window['child'] = label
+    message = ("Press tab and then enter. The focus\n"
+               "should move to the other button.")
 
-        # The first callback closes the window when its close button
-        # is clicked.
-        del window['on_close'][0]
-        window['on_close'].append(on_close)
+    with gui.Window(title="Focus test", minimum_size=(250, 150)) as window:
+        box = gui.Box.vertical(window)
+        window.child = box
 
+        label = gui.Label(box, text=message)
+        box.append(label)
+
+        button1 = gui.Button(box, text="Focus the button below")
+        button1.on_click.append(on_click)
+        box.append(button1)
+    
+        button2 = gui.Button(box, text="Focus the button above")
+        button2.on_click.append(on_click)
+        box.append(button2)
+
+        window.on_close.append(gui.quit)
         gui.main()
 
 

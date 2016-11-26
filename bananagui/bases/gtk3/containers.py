@@ -27,15 +27,15 @@ from . import orientations
 
 class Bin:
 
-    def _bananagui_set_child(self, child):
-        # The widget in self['real_widget'] can be something else than
-        # self['child']['real_widget']. See Scroller.
-        old_child = self['real_widget'].get_child()
+    def _set_child(self, child):
+        # The widget in self.real_widget can be something else than
+        # self.child.real_widget. See Scroller.
+        old_child = self.real_widget.get_child()
         if old_child is not None:
-            self['real_widget'].remove(old_child)
+            self.real_widget.remove(old_child)
         if child is not None:
-            self['real_widget'].add(child['real_widget'])
-            child['real_widget'].show()
+            self.real_widget.add(child.real_widget)
+            child.real_widget.show()
 
 
 _expand_indexes = {
@@ -47,37 +47,34 @@ _expand_indexes = {
 class Box:
 
     def __init__(self, parent, **kwargs):
-        gtk_orientation = orientations[self['orientation']]
-        widget = Gtk.Box(orientation=gtk_orientation)
-        self.real_widget.raw_set(widget)
+        gtk_orientation = orientations[self.orientation]
+        self.real_widget = Gtk.Box(orientation=gtk_orientation)
         super().__init__(parent, **kwargs)
 
-    def _bananagui_box_append(self, child):
+    def _append(self, child):
         # TODO: What if the widget is added and then its expandiness is
         # changed?
-        expandindex = _expand_indexes[self['orientation']]
-        expand = child['expand'][expandindex]
-        self['real_widget'].pack_start(child['real_widget'], expand, expand, 0)
-        child['real_widget'].show()
+        expandindex = _expand_indexes[self.orientation]
+        expand = child.expand[expandindex]
+        self.real_widget.pack_start(child.real_widget, expand, expand, 0)
+        child.real_widget.show()
 
-    def _bananagui_box_remove(self, child):
-        self['real_widget'].remove(child['real_widget'])
+    def _remove(self, child):
+        self.real_widget.remove(child.real_widget)
 
 
 class Scroller:
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.ScrolledWindow()
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.ScrolledWindow()
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_child(self, child):
+    def _set_child(self, child):
         if child is None or isinstance(child, Gtk.Scrollable):
             # We can add or remove it normally.
-            super()._bananagui_set_child(child)
+            super()._set_child(child)
         else:
             # We need to add it with a ViewPort.
-            super()._bananagui_set_child(None)  # Remove the old child if any.
-            self['real_widget'].add_with_viewport(child['real_widget'])
-            child['real_widget'].show()
-            self['real_widget'].get_child().show()  # Show the viewport.
+            super()._set_child(None)     # Remove the old child if any.
+            self.real_widget.add_with_viewport(child.real_widget)
+            self.real_widget.get_child().show_all()  # Show viewport and child.

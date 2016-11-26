@@ -26,15 +26,15 @@ def main():
     window = gui.Window(title="Tooltip test")
 
     box = gui.Box.vertical(window)
-    window['child'] = box
+    window.child = box
 
     toplabel = gui.Label(box, text="Top label!",
                          tooltip="Top label tooltip!")
     bottomlabel = gui.Label(box, text="Bottom label!",
                             tooltip="Bottom label tooltip!")
-    box['children'].extend([toplabel, bottomlabel])
+    box.extend([toplabel, bottomlabel])
 
-    window['on_close'].append(gui.quit)
+    window.on_close.append(gui.quit)
     gui.main()
 
 

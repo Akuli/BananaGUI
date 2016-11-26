@@ -21,24 +21,25 @@
 
 """BananaGUI checkbox test."""
 
+import functools
+
 from bananagui import gui
 
 
-def on_check(event):
-    if event.new_value:
+def on_check(checkbox):
+    if checkbox.checked:
         print("You checked me!")
-        event.widget['text'] = "Uncheck me!"
     else:
         print("You unchecked me!")
-        event.widget['text'] = "Check me!"
 
 
 def main():
     with gui.Window(title="Checkbox test", size=(200, 50)) as window:
         checkbox = gui.Checkbox(window, text="Check me!")
-        checkbox['checked.changed'].append(on_check)
-        window['child'] = checkbox
-        window['on_close'].append(gui.quit)
+        checkbox.on_checked_changed.append(on_check)
+        window.child = checkbox
+
+        window.on_close.append(gui.quit)
         gui.main()
 
 

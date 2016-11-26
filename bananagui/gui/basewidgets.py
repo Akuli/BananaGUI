@@ -21,96 +21,146 @@
 
 """Base classes for various widgets."""
 
+import contextlib
+
 import bananagui
 from bananagui import _base, utils
 
 
-@utils.baseclass
-@bananagui.document_props
-class Widget(_base.Widget, bananagui.BananaObject):
-    """A widget baseclass."""
+class Widget(_base.Widget):
+    """A baseclass for all widgets.
 
-    # The tooltip property is not implemented here. Parent widgets don't
-    # need tooltips because they should be always filled with Dummy
-    # widgets.
-    real_widget = bananagui.BananaProperty(
-        'real_widget', settable=False,
-        doc="The real GUI toolkit's widget that BananaGUI uses.")
+    Initialization keyword arguments are set as attributes to the
+    instance.
 
-
-@utils.baseclass
-@bananagui.document_props
-class Parent(_base.Parent, Widget):
-    """A widget that child widgets can use as their parent."""
-
-
-@utils.baseclass
-@bananagui.document_props
-class Child(_base.Child, Widget):
-    """A widget that can be added to a container.
-
-    Children take a parent argument on initialization. The parent
-    property can be used to retrieve it, but the parent cannot be
-    changed afterwards.
+    Attributes:
+      real_widget   The GUI toolkit widget that BananaGUI uses.
+      can_focus     True if focus() can be called.
+                    Unlike most other attributes in BananaGUI, this
+                    is a class attribute.
     """
 
-    parent = bananagui.BananaProperty(
-        'parent', type=Parent, settable=False,
-        doc="The parent set on initialization.")
-    tooltip = bananagui.BananaProperty(
-        'tooltip', type=str, allow_none=True, default=None,
-        doc="""Text in the widget's tooltip.
+    can_focus = False
 
-        This is None if the widget doesn't have a tooltip.
-        """)
-    expand = bananagui.BananaProperty(
-        'expand', how_many=2, type=bool, default=(True, True),
-        doc="""Two-tuple of horizontal and vertical expanding.
+    def __init__(self, **kwargs):
+        self._blocked = set()
+        for name, value in kwargs.items():
+            # Don't allow setting non-existent attributes.
+            if not hasattr(self, name):
+                raise ValueError("invalid keyword argument %r" % name)
+            setattr(self, name, value)
 
-        For example, (True, True) will make the widget expand in
-        both directions.
+    @contextlib.contextmanager
+    def block(self, callback_attribute):
+        """Prevent callbacks from running temporarily.
 
-        **Note:** When multiple widgets are next to each other in a
-        container, at least one of them needs to expand in the
-        container's direction. Like this:
+        Blocking is instance-specific.
+        """
+        assert isinstance(callback_attribute, str)
+        assert callback_attribute not in self._blocked, \
+            "cannot block the same callback twice"
+        self._blocked.add(callback_attribute)
+        try:
+            yield
+        finally:
+            self._blocked.remove(callback_attribute)
 
-            ,------------------------------------------------.
-            |   non-   |                                     |
-            |expanding |           expanding widget          |
-            |  widget  |                                     |
-            `------------------------------------------------'
+    def run_callbacks(self, callback_attribute, *extra_args):
+        """Run each callback in self.CALLBACK_ATTRIBUTE.
 
-        Not like this:
+        This does nothing if the callback is blocked. The callbacks are
+        ran with the widget and extra_args as arguments.
+        """
+        if callback_attribute not in self._blocked:
+            for callback in getattr(self, callback_attribute):
+                callback(self, *extra_args)
 
-            ,------------------------------------------------.
-            |   non-   |   non-   |                          |
-            |expanding |expanding |       empty space        |
-            |  widget  |  widget  |                          |
-            `------------------------------------------------'
+    def focus(self):
+        """Give the keyboard focus to this widget.
 
-        This way the children will behave consistently with all GUI
-        toolkits. You can use a Dummy widget to fill the empty
-        space:
+        Focusing a window also brings it in front of other windows.
+        It's recommended to first create the widgets and then focus
+        one of them to make sure that the widget gets focused with
+        all GUI toolkits.
+        """
+        assert type(self).can_focus
+        self._focus()
 
-            ,------------------------------------------------.
-            |   non-   |   non-   |                          |
-            |expanding |expanding |       Dummy widget       |
-            |  widget  |  widget  |                          |
-            `------------------------------------------------'
-        """)
-    grayed_out = bananagui.BananaProperty(
-        'grayed_out', type=bool, default=False,
-        doc="True if the widget is grayed out, False otherwise.")
 
-    def __init__(self, parent: Parent, **kwargs):
-        self.parent.raw_set(parent)
+class Parent(_base.Parent, Widget):
+    """A base class for widgets that contain other widgets."""
+
+
+@utils.add_property('tooltip')
+@utils.add_property('grayed_out')
+@utils.add_property('expand')
+class Child(_base.Child, Widget):
+    """A base class for widgets that can be added to Parent widgets.
+
+    Children take a positional parent argument on initialization.
+    The parent cannot be changed afterwards.
+
+    The expand attribute determines the directions that the widget
+    expands in. It's (True, True) by default, so the widget expands
+    in both directions. When multiple widgets are next to each other
+    in a container, at least one of them should expand in the
+    container's direction, like this:
+
+        ,------------------------------------------------.
+        |   non-   |                                     |
+        |expanding |           expanding widget          |
+        |  widget  |                                     |
+        `------------------------------------------------'
+
+    Not like this:
+
+        ,------------------------------------------------.
+        |   non-   |   non-   |                          |
+        |expanding |expanding |       empty space        |
+        |  widget  |  widget  |                          |
+        `------------------------------------------------'
+
+    This way the children will behave consistently with all GUI
+    toolkits. You can use a Dummy widget to fill the empty space if
+    needed:
+
+        ,------------------------------------------------.
+        |   non-   |   non-   |                          |
+        |expanding |expanding |       Dummy widget       |
+        |  widget  |  widget  |                          |
+        `------------------------------------------------'
+
+    Attributes:
+      parent        The parent widget set on initialization.
+      tooltip       The widget's tooltip text, or None for no tooltip.
+                    None by default.
+      grayed_out    True if the widget looks grayed_out.
+                    This can be used to tell the user that the widget
+                    can't be used for some reason.
+      expand        Two-tuple of horizontal and vertical expanding.
+    """
+
+    def __init__(self, parent, **kwargs):
+        assert isinstance(parent, Parent)
+        self.parent = parent
+        self._tooltip = None
+        self._grayed_out = False
+        self._expand = (True, True)
         super().__init__(**kwargs)
 
+    def _check_tooltip(self, tooltip):
+        assert tooltip is None or isinstance(tooltip, str)
 
-@utils.baseclass
-@bananagui.document_props
+    def _check_grayed_out(self, grayed_out):
+        assert isinstance(grayed_out, bool)
+
+    def _check_expand(self, expand):
+        x, y = expand
+        assert isinstance(x, bool) and isinstance(y, bool)
+
+
 class Oriented:
-    """Implement an orientation property and handy class methods.
+    """Implement an orientation attribute and handy class methods.
 
     There are many ways to create instances of Oriented subclasses. For
     example, all of these are valid ways to create a horizontal widget:
@@ -118,20 +168,14 @@ class Oriented:
         SomeWidget.horizontal(...)
         SomeWidget(..., orientation='h')
         SomeWidget(..., orientation=bananagui.HORIZONTAL)
+
+    Attributes:
+      orientation       The orientation set on initialization.
     """
 
-    orientation = bananagui.BananaProperty(
-        'orientation', settable=False,
-        doc="""This is bananagui.HORIZONTAL or bananagui.VERTICAL.
-
-        This is set with the last positional argument on initialization
-        and cannot be changed afterwards.
-        """)
-
     def __init__(self, *args, orientation, **kwargs):
-        assert orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}, \
-            "unknown orientation %r" % (orientation,)
-        self.orientation.raw_set(orientation)
+        assert orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}
+        self.orientation = orientation
         super().__init__(*args, **kwargs)
 
     @classmethod
@@ -143,44 +187,3 @@ class Oriented:
     def vertical(cls, *args, **kwargs):
         """Create and return a new vertical instance"""
         return cls(*args, orientation=bananagui.VERTICAL, **kwargs)
-
-
-def _check_valuerange(range_object):
-    """Check if a range is valid for Ranged."""
-    assert len(range_object) >= 2, \
-        "%r contains less than two values" % (range_object,)
-    assert utils.rangestep(range_object) > 0, \
-        "%r has a non-positive step" % (range_object,)
-
-
-@utils.baseclass
-@bananagui.document_props
-class Ranged:
-    """Implement valuerange and value BananaGUI properties."""
-    valuerange = bananagui.BananaProperty(
-        'valuerange', type=range, settable=False,
-        doc="""A range of allowed values.
-
-        This must be a Python range object.
-        """)
-    value = bananagui.BananaProperty(
-        'value', type=int,
-        doc="""The current value.
-
-        This must be in the valuerange.
-        """)
-
-    def __init__(self, *args, valuerange: range = range(11), **kwargs):
-        """Set the value and range properties."""
-        # The range is set before calling _check_valuerange because
-        # setting it checks the type and we get better error messages.
-        self.valuerange.raw_set(valuerange)
-        _check_valuerange(valuerange)
-        self.value.raw_set(min(valuerange))
-        super().__init__(*args, **kwargs)
-
-    def _bananagui_set_value(self, value):
-        """Check if the value is in the range."""
-        assert value in self['valuerange'], \
-            "%r is not in %r" % (value, self['valuerange'])
-        super()._bananagui_set_value(value)

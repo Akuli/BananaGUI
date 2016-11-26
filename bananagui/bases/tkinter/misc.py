@@ -29,53 +29,53 @@ from . import mainloop
 class Checkbox:
 
     def __init__(self, parent, **kwargs):
-        self.__var = tk.IntVar()
-        self.__var.trace('w', self.__var_changed)
+        self._tkinter_var = tk.IntVar()
+        self._tkinter_var.trace('w', self._tkinter_var_changed)
 
-        widget = tk.Checkbutton(parent['real_widget'], variable=self.__var)
+        self.real_widget = tk.Checkbutton(
+            parent.real_widget, variable=self._tkinter_var)
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        box_bg = mainloop.convert_color(widget['selectcolor'])
-        checkmark = mainloop.convert_color(widget['fg'])
+        box_bg = mainloop.convert_color(self.real_widget['selectcolor'])
+        checkmark = mainloop.convert_color(self.real_widget['fg'])
         if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
-            widget['selectcolor'] = '#ffffff'
+            self.real_widget['selectcolor'] = '#ffffff'
         if box_bg.brightness >= 0.5 and checkmark.brightness >= 0.5:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
-            widget['selectcolor'] = '#000000'
+            self.real_widget['selectcolor'] = '#000000'
 
-        self.real_widget.raw_set(widget)
         super().__init__(parent, **kwargs)
 
-    def __var_changed(self, name, empty_string, mode):
-        self.checked.raw_set(bool(self.__var.get()))
+    def _tkinter_var_changed(self, name, empty_string, mode):
+        self.checked = bool(self._tkinter_var.get())
 
-    def _bananagui_set_text(self, text):
-        self['real_widget']['text'] = text
+    def _set_text(self, text):
+        self.real_widget['text'] = text
 
-    def _bananagui_set_checked(self, checked):
-        self.__var.set(1 if checked else 0)
+    def _set_checked(self, checked):
+        self._tkinter_var.set(1 if checked else 0)
 
 
 class Dummy:
 
     def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(tk.Frame(parent['real_widget']))
+        self.real_widget = tk.Frame(parent.real_widget)
         super().__init__(parent, **kwargs)
 
 
 class Separator:
 
     def __init__(self, parent, **kwargs):
-        widget = tk.Frame(parent['real_widget'], border=1, relief='sunken')
-        if self['orientation'] == bananagui.HORIZONTAL:
+        widget = tk.Frame(parent.real_widget, border=1, relief='sunken')
+        if self.orientation == bananagui.HORIZONTAL:
             widget['height'] = 3
-        if self['orientation'] == bananagui.VERTICAL:
+        if self.orientation == bananagui.VERTICAL:
             widget['width'] = 3
-        self.real_widget.raw_set(widget)
+        self.real_widget = widget
         super().__init__(parent, **kwargs)
 
 

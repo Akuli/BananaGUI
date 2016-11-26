@@ -46,6 +46,6 @@ from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
                    get_clipboard_text, get_font_families)
 from .progress import Progressbar, BouncingProgressbar
 from .ranged import Slider, Spinbox
-from .textwidgets import TextBase, Entry, PlainTextView
+from .textwidgets import TextBase, Entry, TextEdit
 from .trayicon import TrayIcon
 from .window import BaseWindow, Window, Dialog, colordialog

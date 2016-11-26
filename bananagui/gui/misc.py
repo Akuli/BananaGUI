@@ -20,28 +20,41 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import bananagui
-from bananagui import _base
+from bananagui import _base, utils
 from .basewidgets import Oriented, Child
+from . import mainloop
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 
 
-@bananagui.document_props
+@utils.add_property('text')
+@utils.add_property('checked', add_changed=True)
 class Checkbox(_base.Checkbox, Child):
     """A widget that can be checked.
 
     The Checkbox widget has nothing to do with the Box widget.
+
+    Attributes:
+      text                  The text next to the checkbox.
+      checked               True if the checkbox is checked currently.
+                            False by default.
+      on_checked_changed    List of callbacks that are called on (un)check.
     """
 
-    text = bananagui.BananaProperty(
-        'text', type=str, default='',
-        doc="The text next to the box that can be checked.")
-    checked = bananagui.BananaProperty(
-        'checked', type=bool, default=False,
-        doc="True if the box is currently checked, False if not.")
+    can_focus = True
+
+    def __init__(self, *args, **kwargs):
+        self._text = ''
+        self._checked = False
+        super().__init__(*args, **kwargs)
+
+    def _check_text(self, text):
+        assert isinstance(text, str)
+
+    def _check_checked(self, checked):
+        assert isinstance(checked, bool)
 
 
-@bananagui.document_props
 class Dummy(_base.Dummy, Child):
     """An empty widget.
 
@@ -50,32 +63,37 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-@bananagui.document_props
 class Separator(Oriented, _base.Separator, Child):
     """A horizontal or vertical line."""
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, orientation, **kwargs):
         # Make the separator expand correctly by default.
-        orientation = kwargs.get('orientation')
         if orientation == bananagui.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
         if orientation == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, orientation=orientation, **kwargs)
 
 
-def set_clipboard_text(text: str) -> None:
+def set_clipboard_text(text):
     """Set text to the clipboard."""
+    assert mainloop.initialized
+    assert isinstance(text, str)
     _base.set_clipboard_text(text)
 
 
-def get_clipboard_text() -> str:
-    """Return the text that is currently on the clipboard."""
+def get_clipboard_text():
+    """Return the text that is currently on the clipboard.
+
+    The returned value is an empty string if there is no text on the
+    clipboard.
+    """
+    assert mainloop.initialized
     return _base.get_clipboard_text()
 
 
-def get_font_families() -> list:
-    """Return a list of all avaliable font families."""
+def get_font_families():
+    """Return a list of all avaliable font families as strings."""
     # This is converted to a set first to make sure that we don't get
     # any duplicates. The base function can return anything iterable.
     return sorted(set(_base.get_font_families()))

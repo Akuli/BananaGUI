@@ -28,34 +28,34 @@ class ClipboardTestWindow(gui.Window):
         super().__init__(**kwargs)
 
         mainbox = gui.Box.vertical(self)
-        self['child'] = mainbox
+        self.child = mainbox
 
         self.entry = gui.Entry(mainbox, expand=(True, False))
-        mainbox['children'].append(self.entry)
+        mainbox.append(self.entry)
 
-        mainbox['children'].append(gui.Dummy(mainbox))
+        mainbox.append(gui.Dummy(mainbox))
 
         buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
-        mainbox['children'].append(buttonbox)
+        mainbox.append(buttonbox)
 
         copybutton = gui.Button(buttonbox, text="Copy everything")
-        copybutton['on_click'].append(self.copy)
-        buttonbox['children'].append(copybutton)
+        copybutton.on_click.append(self.copy)
+        buttonbox.append(copybutton)
 
         pastebutton = gui.Button(buttonbox, text="Paste to the end")
-        pastebutton['on_click'].append(self.paste)
-        buttonbox['children'].append(pastebutton)
+        pastebutton.on_click.append(self.paste)
+        buttonbox.append(pastebutton)
 
-    def copy(self, event):
-        gui.set_clipboard_text(self.entry['text'])
+    def copy(self, copybutton):
+        gui.set_clipboard_text(self.entry.text)
 
-    def paste(self, event):
-        self.entry['text'] += gui.get_clipboard_text()
+    def paste(self, pastebutton):
+        self.entry.text += gui.get_clipboard_text()
 
 
 def main():
     with ClipboardTestWindow(title="Clipboard test") as window:
-        window['on_close'].append(gui.quit)
+        window.on_close.append(gui.quit)
         gui.main()
 
 

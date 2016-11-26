@@ -19,32 +19,53 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
 from bananagui import _base, utils
 from .basewidgets import Child
 
 
-@utils.baseclass
-@bananagui.document_props
 class BaseButton(_base.BaseButton, Child):
-    """Base for other buttons."""
+    """Base class for other buttons.
 
-    on_click = bananagui.BananaSignal(
-        'on_click', doc="This is emitted when the button is clicked.")
+    Attributes:
+      on_click  List of callbacks that are ran when the button is clicked.
+    """
+
+    can_focus = True
+
+    def __init__(self, *args, **kwargs):
+        self.on_click = []
+        super().__init__(*args, **kwargs)
 
 
-@bananagui.document_props
+@utils.add_property('text')
 class Button(_base.Button, BaseButton):
-    """A button that displays text in it."""
+    """A button that displays text in it.
 
-    text = bananagui.BananaProperty(
-        'text', type=str, default='',
-        doc="The text in the button.")
+    Attributes:
+      text      The text in the button.
+                An empty string by default.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._text = ''
+        super().__init__(*args, **kwargs)
+
+    def _check_text(self, text):
+        assert isinstance(text, str)
 
 
-@bananagui.document_props
+@utils.add_property('imagepath')
 class ImageButton(_base.ImageButton, BaseButton):
-    """A button that displays an image."""
-    imagepath = bananagui.BananaProperty.imagepath(
-        'imagepath',
-        doc="Path to the image that is displayed in the button.")
+    """A button that displays an image.
+
+    Attributes:
+      imagepath     Path to the image displayed in the button or None.
+                    None by default.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._imagepath = None
+        super().__init__(*args, **kwargs)
+
+    def _check_imagepath(self, path):
+        assert path is None or isinstance(path, str)

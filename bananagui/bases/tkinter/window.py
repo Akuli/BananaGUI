@@ -28,67 +28,85 @@ from . import mainloop
 class BaseWindow:
 
     def __init__(self, **kwargs):
-        widget = self['real_widget']
-        widget.title(self['title'])
-        widget.bind('<Configure>', self.__configure)
-        widget.protocol('WM_DELETE_WINDOW', self.on_close.emit)
+        self.real_widget.title(self.title)
+        self.real_widget.bind('<Configure>', self._do_configure)
+        self.real_widget.protocol(
+            'WM_DELETE_WINDOW', self._do_deletewindow)
+        self.__setting_size = False
         super().__init__(**kwargs)
 
-    def __configure(self, event):
-        self.size.raw_set((event.width, event.height))
-
-    def _bananagui_set_title(self, title):
-        self['real_widget'].title(title)
-
-    def _bananagui_set_resizable(self, resizable):
-        self['real_widget'].resizable(resizable, resizable)
-
-    def _bananagui_set_size(self, size):
-        self['real_widget'].geometry('%dx%d' % size)
-
-    def _bananagui_set_minimum_size(self, size):
-        if size is None:
-            # Default minimum size.
-            size = (1, 1)
-        self['real_widget'].minsize(*size)
-
-    def _bananagui_set_showing(self, showing):
-        if showing:
-            self['real_widget'].deiconify()
-        else:
-            self['real_widget'].withdraw()
-
-    def wait(self):
-        self['real_widget'].wait_window()
-
-    def close(self):
+    def _do_configure(self, event):
+        # I have no idea why the window becomes ridiculously small
+        # without this __setting_size guard thingy.
+        self.__setting_size = True
         try:
-            self['real_widget'].destroy()
+            self.size = (event.width, event.height)
+        except AssertionError:
+            # The window is currently smaller than the minimum size but
+            # it will expand it in a moment.
+            pass
+        self.__setting_size = False
+
+    def _do_deletewindow(self):
+        self.run_callbacks('on_close')
+
+    def _set_title(self, title):
+        self.real_widget.title(title)
+
+    def _set_resizable(self, resizable):
+        self.real_widget.resizable(resizable, resizable)
+
+    def _set_size(self, size):
+        if not self.__setting_size:
+            self.real_widget.geometry('%dx%d' % size)
+
+    def _set_minimum_size(self, size):
+        width, height = size
+        if width is None:
+            width = 1
+        if height is None:
+            height = 1
+        self.real_widget.minsize(width, height)
+
+    def _set_showing(self, showing):
+        if showing:
+            self.real_widget.deiconify()
+        else:
+            self.real_widget.withdraw()
+
+    def _close(self):
+        try:
+            self.real_widget.destroy()
         except tk.TclError:
             # The widget has already been closed.
             pass
+
+    def _wait(self):
+        self.real_widget.wait_window()
+
+    def _focus(self):
+        self.real_widget.lift()
+        self.real_widget.attributes('-topmost', True)
 
 
 class Window:
 
     def __init__(self, **kwargs):
-        widget = tk.Toplevel(mainloop.root)
-        self.real_widget.raw_set(widget)
+        self.real_widget = tk.Toplevel(mainloop.root)
         super().__init__(**kwargs)
 
 
 class Dialog:
 
-    def __init__(self, parentwindow, **kwargs):
-        widget = tk.Toplevel(parentwindow['real_widget'])
-        self.real_widget.raw_set(widget)
+    def __init__(self, **kwargs):
+        self.real_widget = tk.Toplevel(self.parentwindow.real_widget)
         super().__init__(**kwargs)
 
 
 def colordialog(parentwindow, color, title):
     result = colorchooser.askcolor(
         color.hex, title=title,
-        parent=parentwindow['real_widget'])
+        parent=parentwindow.real_widget)
     if result == (None, None):
         return None
     return mainloop.convert_color(result[1])

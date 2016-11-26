@@ -27,34 +27,32 @@ from . import orientations
 class Checkbox:
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.CheckButton()
-        widget.connect('notify::active', self.__on_check)
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.CheckButton()
+        self.real_widget.connect('notify::active', self._do_check)
         super().__init__(parent, **kwargs)
 
-    def __on_check(self, real_widget, gparam):
-        self.checked.raw_set(real_widget.get_active())
+    def _do_check(self, real_widget, gparam):
+        self.checked = real_widget.get_active()
 
-    def _bananagui_set_text(self, text):
-        self['real_widget'].set_label(text)
+    def _set_text(self, text):
+        self.real_widget.set_label(text)
 
-    def _bananagui_set_checked(self, checked):
-        self['real_widget'].set_active(checked)
+    def _set_checked(self, checked):
+        self.real_widget.set_active(checked)
 
 
 class Dummy:
 
     def __init__(self, parent, **kwargs):
-        self.real_widget.raw_set(Gtk.Label())
+        self.real_widget = Gtk.Label()
         super().__init__(parent, **kwargs)
 
 
 class Separator:
 
     def __init__(self, parent, **kwargs):
-        gtk_orientation = orientations[self['orientation']]
-        widget = Gtk.Separator(orientation=gtk_orientation)
-        self.real_widget.raw_set(widget)
+        gtk_orientation = orientations[self.orientation]
+        self.real_widget = Gtk.Separator(orientation=gtk_orientation)
         super().__init__(parent, **kwargs)
 
 

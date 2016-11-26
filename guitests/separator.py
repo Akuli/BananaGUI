@@ -26,25 +26,25 @@ def main():
     window = gui.Window(title="Separator test")
 
     bigbox = gui.Box.vertical(window)
-    window['child'] = bigbox
+    window.child = bigbox
 
     toplabel = gui.Label(bigbox, text="Top")
-    bigbox['children'].append(toplabel)
+    bigbox.append(toplabel)
 
-    bigbox['children'].append(gui.Separator.horizontal(bigbox))
+    bigbox.append(gui.Separator.horizontal(bigbox))
 
     bottombox = gui.Box.horizontal(bigbox)
-    bigbox['children'].append(bottombox)
+    bigbox.append(bottombox)
 
     bottomleftlabel = gui.Label(bottombox, text="Bottom left")
-    bottombox['children'].append(bottomleftlabel)
+    bottombox.append(bottomleftlabel)
 
-    bottombox['children'].append(gui.Separator.vertical(bottombox))
+    bottombox.append(gui.Separator.vertical(bottombox))
 
     bottomrightlabel = gui.Label(bottombox, text="Bottom right")
-    bottombox['children'].append(bottomrightlabel)
+    bottombox.append(bottomrightlabel)
 
-    window['on_close'].append(gui.quit)
+    window.on_close.append(gui.quit)
     gui.main()
 
 

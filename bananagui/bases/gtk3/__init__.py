@@ -37,9 +37,9 @@ except ValueError as e:
 
 try:
     gi.require_version('AppIndicator3', '0.1')
-    HAS_APPINDICATOR = True
+    GOT_APPINDICATOR = True
 except ValueError:
-    HAS_APPINDICATOR = False
+    GOT_APPINDICATOR = False
 
 from gi.repository import Gtk
 
@@ -59,7 +59,7 @@ from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
                    get_clipboard_text, get_font_families)
 from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox
-from .textwidgets import TextBase, Entry, PlainTextView
+from .textwidgets import TextBase, Entry, TextEdit
 from .trayicon import TrayIcon
 from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
                      errordialog, questiondialog, colordialog, fontdialog)

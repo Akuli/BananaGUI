@@ -21,33 +21,45 @@
 
 """BananaGUI labels."""
 
-import bananagui
 from bananagui import _base, utils
 from .basewidgets import Child
 
 
-@utils.baseclass
-@bananagui.document_props
 class BaseLabel(_base.BaseLabel, Child):
     """A label base class."""
 
 
-@bananagui.document_props
+@utils.add_property('text')
 class Label(_base.Label, BaseLabel):
     """A label with text in it.
 
-    Currently the text is always centered.
+    The text is always centered. If you would like to have text that
+    aligns to left or right instead, let me know and I'll implement it.
+
+    Attributes:
+      text      The text in the label.
     """
-    # TODO: add an alignment thing? Currently the text in the labels is
-    # always centered.
     # TODO: Add fonts and colors?
-    text = bananagui.BananaProperty(
-        'text', type=str, default='',
-        doc="Text in the label.")
+
+    def __init__(self, *args, **kwargs):
+        self._text = ''
+        super().__init__(*args, **kwargs)
+
+    def _check_text(self, text):
+        assert isinstance(text, str)
 
 
-@bananagui.document_props
+@utils.add_property('imagepath')
 class ImageLabel(_base.ImageLabel, BaseLabel):
-    """A label that contains an image."""
-    imagepath = bananagui.BananaProperty.imagepath(
-        'imagepath', doc="Path to an image that will be displayed.")
+    """A label that contains an image.
+
+    Attributes:
+      imagepath     Path to the image displayed in the label or None.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._imagepath = None
+        super().__init__(*args, **kwargs)
+
+    def _check_imagepath(self, path):
+        assert path is None or isinstance(path, str)

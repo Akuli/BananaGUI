@@ -27,8 +27,8 @@ import functools
 import bananagui
 
 
-def _on_click(dialog, event):
-    dialog.response = event.widget['text']
+def _on_click(dialog, button):
+    dialog.response = button.text
     dialog.close()
 
 
@@ -38,18 +38,29 @@ def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
     dialog = gui.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
     mainbox = gui.Box.vertical(dialog)
-    dialog['child'] = mainbox
+    dialog.child = mainbox
 
     label = gui.Label(mainbox, text=message)
-    mainbox['children'].append(label)
+    mainbox.append(label)
 
     buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
+    mainbox.append(buttonbox)
+
+    focus_this = None
     for buttontext in buttons:
         button = gui.Button(buttonbox, text=buttontext)
-        button['on_click'].append(functools.partial(_on_click, dialog))
-        buttonbox['children'].extend([
+        callback = functools.partial(_on_click, dialog)
+        button.on_click.append(callback)
+
+        # Adding a dummy on both sides will give us more space between
+        # the buttons than between the buttons and the window border.
+        buttonbox.extend([
             gui.Dummy(buttonbox), button, gui.Dummy(buttonbox)])
-    mainbox['children'].append(buttonbox)
+        if buttontext == defaultbutton:
+            focus_this = button
+
+    if focus_this is not None:
+        focus_this.focus()
 
     dialog.response = None  # This is not special for BananaGUI in any way.
     dialog.wait()

@@ -29,16 +29,15 @@ GTK+ 3 and tkinter.
 # flake8: noqa
 
 import importlib
+import warnings
 
 # This is imported because importlib.import_module() doesn't import
 # parent modules as needed with relative imports.
 import bananagui.bases
 
-# Importing other things. CallbackList and CallbackDict aren't imported
-# here because they're meant to be used internally by BananaGUI.
+# Some things in this module isn't imported here because they're
+# meant to be used internally by BananaGUI.
 from bananagui.structures import Color, Font
-from bananagui.types import (BananaProperty, Event, BananaSignal,
-                             BananaObject, document_props)
 
 
 # These constants can be used with these variables or with their values
@@ -48,7 +47,7 @@ VERTICAL = 'v'
 
 # This is not 0 or 1 because returning True or False from a callback
 # must not be allowed.
-RUN_AGAIN = 2
+RUN_AGAIN = -1
 
 # TODO: Add a BROWN.
 BLACK = Color(0, 0, 0)
@@ -97,6 +96,3 @@ def load(*args):
             except ImportError:
                 pass
         raise ImportError("cannot load any of the requested base modules")
-
-    from bananagui import gui
-    gui.init()

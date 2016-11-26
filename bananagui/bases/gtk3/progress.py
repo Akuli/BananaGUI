@@ -25,45 +25,43 @@ from gi.repository import Gtk, GLib
 class Progressbar:
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.ProgressBar()
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.ProgressBar()
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_progress(self, progress):
-        self['real_widget'].set_fraction(progress)
+    def _set_progress(self, progress):
+        self.real_widget.set_fraction(progress)
 
 
 class BouncingProgressbar:
 
     def __init__(self, parent, **kwargs):
         widget = Gtk.ProgressBar(orientation=Gtk.Orientation.HORIZONTAL)
-        self.real_widget.raw_set(widget)
+        self.real_widget = widget
         super().__init__(parent, **kwargs)
 
-    def __on_timeout(self):
-        if not self['bouncing']:
+    def _on_timeout(self):
+        if not self.bouncing:
             return False
-        self['real_widget'].pulse()
+        self.real_widget.pulse()
         return True  # Run this again.
 
-    def _bananagui_set_bouncing(self, bouncing):
+    def _set_bouncing(self, bouncing):
         if bouncing:
-            GLib.timeout_add(100, self.__on_timeout)
+            GLib.timeout_add(100, self._on_timeout)
         else:
-            # The __on_timeout method knows when to stop, but we need to
+            # The _on_timeout method knows when to stop, but we need to
             # move the progressbar back to the beginning now.
-            self['real_widget'].set_fraction(0)
+            self.real_widget.set_fraction(0)
 
 
 class Spinner:
 
     def __init__(self, parent, **kwargs):
-        widget = Gtk.Spinner()
-        self.real_widget.raw_set(widget)
+        self.real_widget = Gtk.Spinner()
         super().__init__(parent, **kwargs)
 
-    def _bananagui_set_spinning(self, spinning):
+    def _set_spinning(self, spinning):
         if spinning:
-            self['real_widget'].start()
+            self.real_widget.start()
         else:
-            self['real_widget'].stop()
+            self.real_widget.stop()
