@@ -153,9 +153,8 @@ questiondialog = functools.partial(_messagedialog, Gtk.MessageType.QUESTION)
 
 def colordialog(parentwindow, default, title):
     # Gdk.RGBA uses 0 as minimum value and 1 as maximum value.
-    default_rgba = Gdk.RGBA(default.red/255,
-                            default.green/255,
-                            default.blue/255)
+    divided = [value / 255 for value in bananagui.color.hex2rgb(default)]
+    default_rgba = Gdk.RGBA(*divided)
     kwargs = {'transient_for': parentwindow.real_widget,
               'title': title}
     if GTK_VERSION > (3, 4):
