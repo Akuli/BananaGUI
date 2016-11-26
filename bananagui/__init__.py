@@ -37,7 +37,7 @@ import bananagui.bases
 
 # Some things in this module isn't imported here because they're
 # meant to be used internally by BananaGUI.
-from bananagui.structures import Color, Font
+from bananagui.structures import Font
 
 
 # These constants can be used with these variables or with their values
@@ -49,17 +49,17 @@ VERTICAL = 'v'
 # must not be allowed.
 RUN_AGAIN = -1
 
-# TODO: Add a BROWN.
-BLACK = Color(0, 0, 0)
-GRAY = Color(127, 127, 127)
-WHITE = Color(255, 255, 255)
-RED = Color(255, 0, 0)
-ORANGE = Color(255, 127, 0)
-YELLOW = Color(255, 255, 0)
-GREEN = Color(0, 255, 0)
-CYAN = Color(0, 255, 255)
-BLUE = Color(0, 0, 255)
-PINK = Color(255, 0, 255)
+BLACK = '#000000'
+BROWN = '#996600'
+GRAY = '#7f7f7f'
+WHITE = '#ffffff'
+RED = '#ff0000'
+ORANGE = '#ff7f00'
+YELLOW = '#ffff00'
+GREEN = '#00ff00'
+CYAN = '#00ffff'
+BLUE = '#0000ff'
+PINK = '#ff00ff'
 
 
 _base = None

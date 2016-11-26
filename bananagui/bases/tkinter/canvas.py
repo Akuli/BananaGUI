@@ -40,17 +40,15 @@ class Canvas:
         self.real_widget.config(width=width, height=height)
 
     def draw_line(self, start, end, thickness, color):
-        self.real_widget.create_line(
-            # *start, *end doesn't work on Pythons older than 3.5.
-            *itertools.chain(start, end),
-            fill=color.hex, width=thickness)
+        self.real_widget.create_line(*(start + end), fill=color,
+                                     width=thickness)
 
     def draw_polygon(self, *corners, fillcolor, linecolor, linethickness):
         kwargs = {'width': linethickness}
         if fillcolor is not None:
-            kwargs['fill'] = fillcolor.hex
+            kwargs['fill'] = fillcolor
         if linecolor is not None:
-            kwargs['outline'] = linecolor.hex
+            kwargs['outline'] = linecolor
         self.real_widget.create_polygon(
             *itertools.chain.from_iterable(corners), **kwargs)
 
@@ -59,9 +57,9 @@ class Canvas:
         centerx, centery = center
         kwargs = {}
         if fillcolor is not None:
-            kwargs['fill'] = fillcolor.hex
+            kwargs['fill'] = fillcolor
         if linecolor is not None:
-            kwargs['outline'] = linecolor.hex
+            kwargs['outline'] = linecolor
         self.real_widget.create_oval(
             centerx - xradius, centery - yradius,
             centerx + xradius, centery + yradius,

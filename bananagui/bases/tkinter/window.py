@@ -104,9 +104,7 @@ class Dialog:
 
 
 def colordialog(parentwindow, color, title):
-    result = colorchooser.askcolor(
-        color.hex, title=title,
+    rgb, hex = colorchooser.askcolor(
+        color, title=title,
         parent=parentwindow.real_widget)
-    if result == (None, None):
-        return None
-    return mainloop.convert_color(result[1])
+    return hex      # This may be None.

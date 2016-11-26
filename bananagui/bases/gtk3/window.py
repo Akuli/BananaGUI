@@ -23,7 +23,7 @@ import functools
 
 from gi.repository import Gdk, GLib, Gtk
 
-import bananagui
+import bananagui.color
 from . import GTK_VERSION
 
 
@@ -176,7 +176,7 @@ def colordialog(parentwindow, default, title):
     if response == Gtk.ResponseType.OK:
         rgba = get_rgba()
         rgb = [int(value * 255) for value in (rgba.red, rgba.green, rgba.blue)]
-        result = bananagui.Color(*rgb)
+        result = bananagui.color.rgb2hex(rgb)
     else:
         result = None
     dialog.destroy()

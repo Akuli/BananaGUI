@@ -23,6 +23,7 @@ import tkinter as tk
 from tkinter import font
 
 import bananagui
+from bananagui.color import brightness
 from . import mainloop
 
 
@@ -39,11 +40,11 @@ class Checkbox:
         # default with my dark GTK+ theme.
         box_bg = mainloop.convert_color(self.real_widget['selectcolor'])
         checkmark = mainloop.convert_color(self.real_widget['fg'])
-        if box_bg.brightness < 0.5 and checkmark.brightness < 0.5:
+        if brightness(box_bg) < 0.5 and brightness(checkmark) < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
             self.real_widget['selectcolor'] = '#ffffff'
-        if box_bg.brightness >= 0.5 and checkmark.brightness >= 0.5:
+        if brightness(box_bg) >= 0.5 and brightness(checkmark) >= 0.5:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
             self.real_widget['selectcolor'] = '#000000'
