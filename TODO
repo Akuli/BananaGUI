@@ -1,5 +1,4 @@
-progressbar for gtk and a pulsing progressbar
-rename orientation to orient?
+in gui/__init__.py, call _base.init() and add a reinitialize()
 file and directory choosing dialogs
 a qt base
 DropdownMenu
