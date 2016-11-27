@@ -64,7 +64,8 @@ def _connect(real_widget, signalname, callback):
         real_callback, 0, 0, 0)
 
 
-# These flags were generated with flags/flags.c.
+# These flags were generated with gtk2-constants/constants.c in the
+# BananaGUI source.
 GTK_WINDOW_TOPLEVEL = 0
 GTK_ORIENTATION_HORIZONTAL = 0
 GTK_ORIENTATION_VERTICAL = 1
