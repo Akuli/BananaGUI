@@ -19,19 +19,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
+@debug.debug_class
+class Progressbar:
+    ...
+    
+    
+@debug.debug_class
+class BouncingProgressbar:
+    ...
 
-import os
 
-import bananagui
-
-
-import faulthandler
-faulthandler.enable()
-
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+@debug.debug_class
+class Spinner:
+    ...

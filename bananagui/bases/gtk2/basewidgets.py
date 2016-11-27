@@ -19,19 +19,36 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
-
-import os
-
-import bananagui
+from .libs import GCallback, gobject, gtk
 
 
-import faulthandler
-faulthandler.enable()
+@debug.debug_class
+class Widget:
 
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+    def __init__(self):
+        # Things that tend to be garbage collected too early can be
+        # added here.
+        self._dont_garbage_collect = []
+
+    def _focus(self):
+        gtk.gtk_widget_grab_focus(self.real_widget)
+
+
+@debug.debug_class
+class Parent:
+    pass
+
+
+@debug.debug_class
+class Child:
+
+    def _set_expand(self, expand):
+        pass    # TODO
+
+    def _set_tooltip(self, tooltip):
+        gtk.gtk_widget_set_tooltip_text(
+            self.real_widget, tooltip.encode('utf-8'))
+
+    def _set_grayed_out(self, grayed_out):
+        gtk.gtk_widget_set_sensitive(self.real_widget, not grayed_out)

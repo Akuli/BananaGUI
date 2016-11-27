@@ -19,19 +19,27 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
+"""A GTK+ 2 BananaGUI base using ctypes."""
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
+import builtins
+import debug
+builtins.debug = debug
 
-import os
+print(debug)
 
-import bananagui
+import ctypes.util
 
-
-import faulthandler
-faulthandler.enable()
-
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+from .basewidgets import Widget, Parent, Child
+from .buttons import BaseButton, Button, ImageButton
+from .canvas import Canvas
+from .containers import Bin, Box, Scroller
+from .labels import BaseLabel, Label, ImageLabel
+from .mainloop import init, main, quit, add_timeout
+from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
+                   get_clipboard_text, get_font_families)
+from .progress import Progressbar, BouncingProgressbar, Spinner
+from .ranged import Slider, Spinbox
+from .textwidgets import TextBase, Entry, TextEdit
+#from .trayicon import TrayIcon
+from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
+                     errordialog, questiondialog, colordialog, fontdialog)

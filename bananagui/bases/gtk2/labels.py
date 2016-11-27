@@ -19,19 +19,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
-
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
-
-import os
-
-import bananagui
+from .libs import gtk, GTK_JUSTIFY_CENTER
 
 
-import faulthandler
-faulthandler.enable()
+@debug.debug_class
+class BaseLabel:
+    pass
+    
+    
+@debug.debug_class
+class Label:
 
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+    def __init__(self, parent, **kwargs):
+        self.real_widget = gtk.gtk_label_new(b"")
+        gtk.gtk_label_set_justify(self.real_widget, GTK_JUSTIFY_CENTER)
+        super().__init__(parent, **kwargs)
+
+    def _set_text(self, text):
+        gtk.gtk_label_set_text(self.real_widget, text.encode('utf-8'))
+
+
+@debug.debug_class
+class ImageLabel:
+
+    def __init__(self, parent, **kwargs):
+        raise NotImplementedError  # TODO: use GtkImage here

@@ -19,19 +19,33 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
+import ctypes
 
-import os
-
-import bananagui
+from .libs import _connect, gtk
 
 
-import faulthandler
-faulthandler.enable()
+@debug.debug_class
+class BaseButton:
 
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+    def __init__(self, parent, **kwargs):
+        self.real_widget = gtk.gtk_button_new()
+        _connect(self.real_widget, 'clicked', self._do_click)
+        super().__init__(parent, **kwargs)
+
+    def _do_click(self):
+        self.run_callbacks('on_click')
+
+
+@debug.debug_class
+class Button:
+
+    def _set_text(self, text):
+        gtk.gtk_button_set_label(self.real_widget, text.encode('utf-8'))
+
+
+@debug.debug_class
+class ImageButton:
+
+    def __init__(self, parent, **kwargs):
+        raise NotImplementedError  # TODO

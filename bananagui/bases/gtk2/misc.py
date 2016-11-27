@@ -19,19 +19,38 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
-
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
-
-import os
-
-import bananagui
+from .libs import _connect, gdk, gtk
 
 
-import faulthandler
-faulthandler.enable()
+@debug.debug_class
+class Checkbox:
 
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+    def __init__(self, parent, **kwargs):
+        self.real_widget = gtk.gtk_check_button_new()
+        _connect(self.real_widget, 'notify::active', self._do_check)
+        super().__init__(parent, **kwargs)
+
+    def _do_check(self):
+        self.checked = bool(gtk.gtk_toggle_button_get_active(self.real_widget))
+
+    def _set_text(self, text):
+        gtk.gtk_button_set_label(self.real_widget, text.encode('utf-8'))
+
+    def _set_checked(self, checked):
+        gtk.gtk_toggle_button_set_active(checked)
+
+
+@debug.debug_class
+class Dummy:
+
+    def __init__(self, parent, **kwargs):
+        self.real_widget = gtk.gtk_label_new(b"")
+        super().__init__(parent, **kwargs)
+
+
+@debug.debug_class
+class Separator:
+    ...
+
+
+set_clipboard_text = get_clipboard_text = get_font_families = ...

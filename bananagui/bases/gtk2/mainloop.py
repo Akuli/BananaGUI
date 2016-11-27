@@ -19,19 +19,32 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
-
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
-
-import os
-
 import bananagui
+from .libs import GCallback, gtk
 
 
-import faulthandler
-faulthandler.enable()
+def init():
+    print('initing')
+    gtk.gtk_init(0, 0)
 
-bananagui.load(os.environ.get('base', '.tkinter'))
-from bananagui import gui  # noqa
+
+def main():
+    input('about 2 run main ...')
+    gtk.gtk_main()
+
+
+def quit():
+    input('about 2 quit...')
+    gtk.gtk_main_quit()
+
+
+_dont_garbage_collect = []
+
+
+def add_timeout(milliseconds, callback):
+    @GCallback
+    def real_callback():
+        return callback() == bananagui.RUN_AGAIN
+
+    _dont_garbage_collect.append(real_callback)
+    glib.g_timeout_add(milliseconds, real_callback, 0)
