@@ -31,7 +31,6 @@ class BaseWindow:
 
     def __init__(self, **kwargs):
         self._waitloop = None
-        self.real_widget.set_title(self.title)
         self.real_widget.connect('configure-event', self._do_configure_event)
         self.real_widget.connect('delete-event', self._do_delete_event)
         self.real_widget.show()
