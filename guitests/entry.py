@@ -87,7 +87,7 @@ class EntryBox(gui.Box):
 
 
 def main():
-    with gui.Window(title="Entry test", size=(350, 100)) as window:
+    with gui.Window(title="Entry test", size=(400, 100)) as window:
         window.child = EntryBox(window)
         window.on_close.append(gui.quit)
         gui.main()
