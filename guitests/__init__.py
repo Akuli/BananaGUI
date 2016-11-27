@@ -32,4 +32,3 @@ import bananagui
 
 bananagui.load(os.environ.get('base', '.tkinter'))
 from bananagui import gui  # noqa
-gui.init()

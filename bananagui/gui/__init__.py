@@ -35,7 +35,7 @@ from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .containers import Bin, Box, Scroller
 from .labels import BaseLabel, Label, ImageLabel
-from .mainloop import init, main, quit, add_timeout
+from .mainloop import init as _init, main, quit, add_timeout
 from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
                    get_clipboard_text, get_font_families)
 from .progress import Progressbar, BouncingProgressbar, Spinner
@@ -44,3 +44,14 @@ from .textwidgets import TextBase, Entry, TextEdit
 #from .trayicon import TrayIcon
 from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
                      errordialog, questiondialog, colordialog, fontdialog)
+
+
+def reinitialize():
+    """Initialize bananagui.gui again after running main().
+
+    Call this if you want to run main() multiple times.
+    """
+    _init()
+
+
+_init()
