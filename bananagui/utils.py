@@ -68,9 +68,9 @@ def common_beginning(*iterables):
 def find_attribute(attribute, *objects):
     """Get an attribute from any of objects.
 
-    >>> class Thing: 
+    >>> class Thing:
     ...     pass
-    ... 
+    ...
     >>> a = Thing()
     >>> b = Thing()
     >>> a.stuff = 'a stuff'
@@ -151,11 +151,11 @@ def add_property(name, *, add_changed=False):
     >>> thing.test = 'new test'
     setting test to 'new test'
     >>> thing.test = 'new test'  # does nothing
-    >>> 
+    >>>
     >>> def user_callback(arg):
     ...     print("callback called with arg", arg,
     ...           "and arg.test is", repr(arg.test))
-    ... 
+    ...
     >>> thing.on_test_changed.append(user_callback)
     >>> thing.test = 'even newer test'
     setting test to 'even newer test'

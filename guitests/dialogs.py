@@ -51,7 +51,6 @@ class DialogTest(gui.Window):
         colorbutton.on_click.append(self.choose_color)
         box.append(colorbutton)
 
-
     def info(self, infobutton):
         result = gui.infodialog(self, "Information!")
         print(repr(result))

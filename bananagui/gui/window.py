@@ -91,7 +91,7 @@ class BaseWindow(_base.BaseWindow, Bin):
         assert not self.closed
         assert isinstance(title, str)
 
-    def _check_resizable(self):
+    def _check_resizable(self, resizable):
         assert not self.closed
         assert isinstance(resizable, bool)
 
@@ -181,7 +181,7 @@ def _messagedialog(function):
         gettext.gettext in a list.
 
         The button with defaultbutton as its text will have keyboard
-        focus by default. If defaultbutton is None and there's one 
+        focus by default. If defaultbutton is None and there's one
         button the defaultbutton defaults to it, otherwise there will
         be no default button.
 

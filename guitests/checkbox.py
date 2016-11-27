@@ -21,8 +21,6 @@
 
 """BananaGUI checkbox test."""
 
-import functools
-
 from bananagui import gui
 
 

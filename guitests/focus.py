@@ -26,6 +26,7 @@ from bananagui import gui
 
 def on_click(button):
     box = button.parent
+    # box[0] is the label, so box[1] and box[2] are the buttons.
     if button == box[1]:
         box[2].focus()
     if button == box[2]:
@@ -46,7 +47,7 @@ def main():
         button1 = gui.Button(box, text="Focus the button below")
         button1.on_click.append(on_click)
         box.append(button1)
-    
+
         button2 = gui.Button(box, text="Focus the button above")
         button2.on_click.append(on_click)
         box.append(button2)

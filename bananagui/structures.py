@@ -25,7 +25,6 @@ import collections
 import functools
 from gettext import gettext as _
 import operator
-import re
 import traceback
 import warnings
 

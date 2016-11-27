@@ -19,38 +19,36 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from gi.repository import Gtk
-
 
 class Widget:
     # TODO: implement background colors elsewhere also?
 
-#    def __init__(self, **kwargs):
-#        # I have no idea why GTK+ makes changing the background color in
-#        # a non-deprecated (not-removed) way such a pain.
-#        self.__css = {}
-#        self.__provider = Gtk.CssProvider()
-#        context = self['real_widget'].get_style_context()
-#        context.add_provider(self.__provider,
-#                             Gtk.STYLE_PROVIDER_PRIORITY_USER)
-#        super().__init__(**kwargs)
-#
-#    def __update_css(self):
-#        words = []
-#        for item in self.__css.items():
-#            words.append('%s: %s;' % item)
-#        css = '* { %s }' % ' '.join(words)
-#        self.__provider.load_from_data(css.encode('utf-8'))
-#
-#    def _bananagui_set_background(self, color):
-#        if color is None:
-#            try:
-#                del self.__css['background-color']
-#            except KeyError:
-#                pass
-#        else:
-#            self.__css['background-color'] = color.rgbstring
-#        self.__update_css()
+    # def __init__(self, **kwargs):
+    #    # I have no idea why GTK+ makes changing the background color in
+    #    # a non-deprecated (not-removed) way such a pain.
+    #    self.__css = {}
+    #    self.__provider = Gtk.CssProvider()
+    #    context = self['real_widget'].get_style_context()
+    #    context.add_provider(self.__provider,
+    #                         Gtk.STYLE_PROVIDER_PRIORITY_USER)
+    #    super().__init__(**kwargs)
+    #
+    # def __update_css(self):
+    #    words = []
+    #    for item in self.__css.items():
+    #        words.append('%s: %s;' % item)
+    #    css = '* { %s }' % ' '.join(words)
+    #    self.__provider.load_from_data(css.encode('utf-8'))
+    #
+    # def _bananagui_set_background(self, color):
+    #    if color is None:
+    #        try:
+    #            del self.__css['background-color']
+    #        except KeyError:
+    #            pass
+    #    else:
+    #        self.__css['background-color'] = color.rgbstring
+    #    self.__update_css()
 
     def _focus(self):
         self.real_widget.grab_focus()
