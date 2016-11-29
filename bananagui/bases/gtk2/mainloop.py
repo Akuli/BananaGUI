@@ -24,17 +24,14 @@ from .libs import GCallback, gtk
 
 
 def init():
-    print('initing')
     gtk.gtk_init(0, 0)
 
 
 def main():
-    input('about 2 run main ...')
     gtk.gtk_main()
 
 
 def quit():
-    input('about 2 quit...')
     gtk.gtk_main_quit()
 
 

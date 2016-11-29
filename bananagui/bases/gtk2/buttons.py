@@ -25,7 +25,6 @@ import ctypes
 from .libs import _connect, gtk
 
 
-@debug.debug_class
 class BaseButton:
 
     def __init__(self, parent, **kwargs):
@@ -37,14 +36,12 @@ class BaseButton:
         self.run_callbacks('on_click')
 
 
-@debug.debug_class
 class Button:
 
     def _set_text(self, text):
         gtk.gtk_button_set_label(self.real_widget, text.encode('utf-8'))
 
 
-@debug.debug_class
 class ImageButton:
 
     def __init__(self, parent, **kwargs):

@@ -26,18 +26,20 @@ from .libs import gtk
 from .textwidgets import TextEdit
 
 
-@debug.debug_class
 class Bin:
 
     def _set_child(self, child):
         # The old child isn't necessarily self.child.real_widget. See
         # Scroller.
+        print('_set_child', self, child)
         old_child = gtk.gtk_bin_get_child(self.real_widget)
         if old_child is not None:
+            print('_set_child: removing child', old_child)
             gtk.gtk_container_remove(self.real_widget, old_child)
         if child is not None:
+            print('_set_child: adding child', child)
             gtk.gtk_container_add(self.real_widget, child.real_widget)
-            gtk.gtk_widget_show(self.real_widget)
+            gtk.gtk_widget_show(child.real_widget)
 
 
 _expand_indexes = {
@@ -46,7 +48,6 @@ _expand_indexes = {
 }
 
 
-@debug.debug_class
 class Box:
 
     def __init__(self, parent, **kwargs):
@@ -61,7 +62,7 @@ class Box:
         # TODO: what if the widget is added and then its expandiness is
         # changed?
         expandindex = _expand_indexes[self.orientation]
-        expand = child.expand[expand]
+        expand = child.expand[expandindex]
         gtk.gtk_box_pack_start(self.real_widget, child.real_widget,
                                expand, expand, 0)
         gtk.gtk_widget_show(child.real_widget)
@@ -79,7 +80,6 @@ def _create_adjustment():
     return gtk.gtk_adjustment_new(*args)
 
 
-@debug.debug_class
 class Scroller:
 
     def __init__(self, parent, **kwargs):

@@ -19,13 +19,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import ctypes
 import functools
 
 import bananagui.color
 from .libs import _connect, GTK_WINDOW_TOPLEVEL, gdk, glib, gtk
 
 
-@debug.debug_class
 class BaseWindow:
 
     def __init__(self, **kwargs):
@@ -35,7 +35,12 @@ class BaseWindow:
         super().__init__(**kwargs)
 
     def _do_configure_event(self):
-        self.size = gtk.gtk_window_get_size(self.real_widget)
+        width = ctypes.c_int()
+        height = ctypes.c_int()
+        gtk.gtk_window_get_size(
+            self.real_widget, ctypes.byref(width), ctypes.byref(height))
+        print('_do_configure_event', width, height)
+        self.size = (width.value, height.value)
 
     def _do_delete_event(self):
         self.run_callbacks('on_close')
@@ -78,7 +83,6 @@ class BaseWindow:
         gtk.gtk_window_present(self.real_widget)
 
 
-@debug.debug_class
 class Window:
 
     def __init__(self, **kwargs):
@@ -86,7 +90,6 @@ class Window:
         super().__init__(**kwargs)
 
 
-@debug.debug_class
 class Dialog:
 
     def __init__(self, **kwargs):

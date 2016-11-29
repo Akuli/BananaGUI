@@ -36,19 +36,19 @@ gdk = _get_library('gdk-x11-2')
 glib = _get_library('glib-2')
 gobject = _get_library('gobject-2')
 
-gobject.g_signal_connect_data.restype = ctypes.c_ulong
-gtk.gtk_adjustment_new.argtypes = (ctypes.c_double,) * 6
+c_int_p = ctypes.POINTER(ctypes.c_int)
+gtk.g_signal_connect_data.restype = ctypes.c_ulong
+gtk.gtk_adjustment_new.argtypes = [ctypes.c_double] * 6
+gtk.gtk_entry_get_text.restype = ctypes.c_char_p
+GCallback = ctypes.CFUNCTYPE(ctypes.c_void_p)
 
 # These functions return widgets, but their restype is c_int by default
 # which isn't guaranteed to be large enough for pointers.
 for func in (
   gtk.gtk_button_new, gtk.gtk_bin_get_child, gtk.gtk_adjustment_new,
-  gtk.gtk_scrolled_window_new, gtk.gtk_hbox_new, gtk.gtk_vbox_new):
+  gtk.gtk_scrolled_window_new, gtk.gtk_hbox_new, gtk.gtk_vbox_new,
+  gtk.gtk_entry_new, gtk.gtk_text_view_new, gtk.gtk_text_view_get_buffer):
     func.restype = ctypes.c_void_p
-
-gobject.g_signal_connect_data.restype = ctypes.c_ulong
-
-GCallback = ctypes.CFUNCTYPE(ctypes.c_void_p)
 
 
 # This can save a lot of head-scratching...

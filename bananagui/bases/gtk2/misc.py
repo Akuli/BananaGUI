@@ -22,7 +22,6 @@
 from .libs import _connect, gdk, gtk
 
 
-@debug.debug_class
 class Checkbox:
 
     def __init__(self, parent, **kwargs):
@@ -30,17 +29,16 @@ class Checkbox:
         _connect(self.real_widget, 'notify::active', self._do_check)
         super().__init__(parent, **kwargs)
 
-    def _do_check(self):
+    def _do_check(self, *args):
         self.checked = bool(gtk.gtk_toggle_button_get_active(self.real_widget))
 
     def _set_text(self, text):
         gtk.gtk_button_set_label(self.real_widget, text.encode('utf-8'))
 
     def _set_checked(self, checked):
-        gtk.gtk_toggle_button_set_active(checked)
+        gtk.gtk_toggle_button_set_active(self.real_widget, checked)
 
 
-@debug.debug_class
 class Dummy:
 
     def __init__(self, parent, **kwargs):
@@ -48,7 +46,6 @@ class Dummy:
         super().__init__(parent, **kwargs)
 
 
-@debug.debug_class
 class Separator:
     ...
 

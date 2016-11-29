@@ -21,12 +21,6 @@
 
 """A GTK+ 2 BananaGUI base using ctypes."""
 
-import builtins
-import debug
-builtins.debug = debug
-
-print(debug)
-
 import ctypes.util
 
 from .basewidgets import Widget, Parent, Child

@@ -20,16 +20,13 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-@debug.debug_class
 class Progressbar:
     ...
     
     
-@debug.debug_class
 class BouncingProgressbar:
     ...
 
 
-@debug.debug_class
 class Spinner:
     ...

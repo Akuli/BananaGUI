@@ -19,11 +19,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-@debug.debug_class
 class Slider:
     ...
 
-@debug.debug_class
 class Spinbox:
     ...
 

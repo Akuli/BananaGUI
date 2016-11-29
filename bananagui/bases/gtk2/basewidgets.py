@@ -23,7 +23,6 @@
 from .libs import GCallback, gobject, gtk
 
 
-@debug.debug_class
 class Widget:
 
     def __init__(self):
@@ -35,12 +34,10 @@ class Widget:
         gtk.gtk_widget_grab_focus(self.real_widget)
 
 
-@debug.debug_class
 class Parent:
     pass
 
 
-@debug.debug_class
 class Child:
 
     def _set_expand(self, expand):

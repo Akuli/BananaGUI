@@ -24,8 +24,13 @@
 from bananagui import gui
 
 
+def resize(window):
+    print("window resized to", window.size)
+
+
 def main():
     with gui.Window(title="Hello World!") as window:
+        window.on_size_changed.append(resize)
         label = gui.Label(window, text="Hello World!")
         window.child = label
         window.on_close.append(gui.quit)

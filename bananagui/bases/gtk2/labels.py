@@ -22,12 +22,10 @@
 from .libs import gtk, GTK_JUSTIFY_CENTER
 
 
-@debug.debug_class
 class BaseLabel:
     pass
     
     
-@debug.debug_class
 class Label:
 
     def __init__(self, parent, **kwargs):
@@ -39,7 +37,6 @@ class Label:
         gtk.gtk_label_set_text(self.real_widget, text.encode('utf-8'))
 
 
-@debug.debug_class
 class ImageLabel:
 
     def __init__(self, parent, **kwargs):
