@@ -70,11 +70,9 @@ class TextEdit:
                                    self._textbuf.get_end_iter())
 
     def _set_text(self, text):
-        # We get infinite recursion for some reason if we remove the
-        # __setting_text thing.
+        # We get weird warnings if we remove this check.
         if not self.__setting_text:
-            # We need to set the text twice but make it seem like one set.
+            # set_text() first clears the buffer and then inserts to
+            # it, but we must not run the callback twice.
             with self._textbuf.handler_block(self._changed_id):
-                self._textbuf.delete(self._textbuf.get_start_iter(),
-                                     self._textbuf.get_end_iter())
-            self._textbuf.insert(self._textbuf.get_start_iter(), text)
+                self._textbuf.set_text(text)
