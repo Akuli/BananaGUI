@@ -32,7 +32,7 @@ def once():
 def over_and_over(counter):
     number = next(counter)
     print("I have ran %d times before." % number)
-    if number >= 3:
+    if number == 3:
         print("Goodbye!")
         mainloop.quit()
         return None
