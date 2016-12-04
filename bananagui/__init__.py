@@ -26,9 +26,6 @@ the same code using any of the supported GUI toolkits, including PyQt5,
 GTK+ 3 and tkinter.
 """
 
-import sys
-import warnings
-
 from bananagui import utils
 
 

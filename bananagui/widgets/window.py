@@ -21,11 +21,8 @@
 
 """Window widgets."""
 
-from gettext import gettext as _
-
 import bananagui
 from bananagui import utils
-from bananagui.bases import defaults
 from .containers import Bin
 
 _base = bananagui._get_base('widgets.window')

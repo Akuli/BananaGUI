@@ -24,6 +24,8 @@ import tkinter as tk
 import bananagui
 from bananagui import color
 
+root = None    # Make flake8 happy.
+
 
 def reinitialize():
     global root

@@ -24,6 +24,7 @@ import math
 
 # We can only import modules from bananagui.widgets because this file
 # can be loaded by bananagui.gui.__init__.
+import bananagui
 from bananagui import color, mainloop
 from bananagui.widgets import canvas
 

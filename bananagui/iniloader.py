@@ -60,8 +60,9 @@ Or you can read the ini file with Python:
         widgets = iniloader.load_ini(f)
 
     # Now widgets is a dictionary.
-    widgets['window'].on_close.append(gui.quit)
-    gui.main()
+    with widgets['window'] as window:
+        window.on_close.append(gui.quit)
+        gui.main()
 
 SECURITY NOTE: Don't use this module with untrusted input. It's
 possible to call any object in bananagui from the ini data, including

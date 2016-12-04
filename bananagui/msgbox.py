@@ -24,8 +24,7 @@
 from gettext import gettext as _
 
 import bananagui
-from bananagui import color, utils, widgets
-from bananagui.bases import defaults
+from bananagui import color, widgets
 
 _base = bananagui._get_base('msgbox')
 
@@ -119,7 +118,7 @@ def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
     return _base.colordialog(parentwindow, defaultcolor, title)
 
 
-#def fontdialog(parentwindow, *, title=None, defaultfont=bananagui.Font()):
+# def fontdialog(parentwindow, *, title=None, defaultfont=bananagui.Font()):
 #    """Ask a font from the user.
 #
 #    This returns the new font, or None if the user canceled the dialog.

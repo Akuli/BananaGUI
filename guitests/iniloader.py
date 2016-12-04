@@ -1,7 +1,7 @@
 import os
 import pprint
 
-from bananagui import mainloop, widgets, iniloader
+from bananagui import mainloop, iniloader
 
 
 def click(button):
@@ -11,11 +11,11 @@ def click(button):
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     with open(os.path.join(here, 'testgui.ini'), 'r') as f:
-        widgets = iniloader.load_ini(f)
-    pprint.pprint(widgets)
-    with widgets['window']:
-        widgets['button'].on_click.append(click)
-        widgets['window'].on_close.append(mainloop.quit)
+        the_widgets = iniloader.load_ini(f)
+    pprint.pprint(the_widgets)
+    with the_widgets['window']:
+        the_widgets['button'].on_click.append(click)
+        the_widgets['window'].on_close.append(mainloop.quit)
         mainloop.run()
 
 

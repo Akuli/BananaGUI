@@ -36,7 +36,7 @@ def over_and_over(counter):
         print("Goodbye!")
         mainloop.quit()
         return None
-    return mainloop.RUN_AGAIN
+    return bananagui.RUN_AGAIN
 
 
 def main():

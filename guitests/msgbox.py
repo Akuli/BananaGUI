@@ -19,7 +19,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
 from bananagui import color, mainloop, msgbox, widgets
 
 
@@ -56,8 +55,9 @@ class DialogTest(widgets.Window):
         print(repr(result))
 
     def warning(self, warningbutton):
-        result = msgbox.warningdialog(self, "Warning!", title="Be warned!",
-                                   buttons=["What's going to happen next?"])
+        result = msgbox.warningdialog(
+            self, "Warning!", title="Be warned!",
+            buttons=["What's going to happen next?"])
         print(repr(result))
 
     def error(self, errorbutton):
@@ -75,7 +75,7 @@ class DialogTest(widgets.Window):
 
     def choose_color(self, colorbutton):
         result = msgbox.colordialog(self, defaultcolor=color.RED,
-                                 title="Choose a color")
+                                    title="Choose a color")
         print(repr(result))
 
     # TODO: font dialog

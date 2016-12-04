@@ -29,9 +29,9 @@ def main():
     window.child = box
 
     toplabel = widgets.Label(box, text="Top label!",
-                         tooltip="Top label tooltip!")
+                             tooltip="Top label tooltip!")
     bottomlabel = widgets.Label(box, text="Bottom label!",
-                            tooltip="Bottom label tooltip!")
+                                tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
 
     window.on_close.append(mainloop.quit)

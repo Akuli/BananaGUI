@@ -42,7 +42,7 @@ def main():
         box.append(progressbar)
 
         spinbox = widgets.Spinbox(box, valuerange=range(101),
-                              expand=(True, False))
+                                  expand=(True, False))
         spin_callback = functools.partial(set_progress, progressbar)
         spinbox.on_value_changed.append(spin_callback)
         box.append(spinbox)

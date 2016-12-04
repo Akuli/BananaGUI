@@ -30,10 +30,6 @@ _base = bananagui._get_base('mainloop')
 _initialized = True
 _running = False
 
-# This is not 0 or 1 because returning True or False from a callback
-# must not be allowed.
-RUN_AGAIN = -1
-
 
 def reinitialize():
     """Initialize the mainloop again after running it.
@@ -73,9 +69,9 @@ def quit(*args):
 def add_timeout(milliseconds, callback, *args, **kwargs):
     """Run callback(*args, **kwargs) after waiting.
 
-    If the function returns RUN_AGAIN it will be called again after
-    waiting again. Depending on the GUI toolkit, this may or may not
-    work when the main loop is not running.
+    If the function returns bananagui.RUN_AGAIN it will be called again
+    after waiting again. Depending on the GUI toolkit, this may or may
+    not work when the main loop is not running.
 
     The waiting time is not guaranteed to be exact, but it's good enough
     for most purposes. Use something like time.time() if you need to
@@ -88,7 +84,7 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
 
     def real_callback():
         result = callback(*args, **kwargs)
-        if result not in {None, RUN_AGAIN}:
+        if result not in {None, bananagui.RUN_AGAIN}:
             warnings.warn("BananaGUI callback %r returned %r, expected "
                           "None or RUN_AGAIN" % (callback, result),
                           RuntimeWarning)
