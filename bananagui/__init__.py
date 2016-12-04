@@ -41,7 +41,7 @@ __all__ = [
     'color', 'font', 'iniloader', 'mainloop', 'msgbox', 'widgets',
 
     # Things defined here.
-    'HORIZONTAL', 'VERTICAL', 'load',
+    'HORIZONTAL', 'VERTICAL', 'RUN_AGAIN', 'load',
 ]
 
 
@@ -49,6 +49,10 @@ __all__ = [
 # directly.
 HORIZONTAL = 'h'
 VERTICAL = 'v'
+
+# This is not 0 or 1 because returning True or False from a callback
+# must not be allowed.
+RUN_AGAIN = -1
 
 
 _base = None
@@ -143,8 +147,3 @@ def _get_base(modulename):
     except ImportError:
         pass
     return _AttributeMix(*modules)
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())

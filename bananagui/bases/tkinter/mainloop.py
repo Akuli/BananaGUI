@@ -21,7 +21,8 @@
 
 import tkinter as tk
 
-import bananagui.color
+import bananagui
+from bananagui import color
 
 
 def reinitialize():
@@ -57,4 +58,4 @@ def _convert_color(colorstring):
     handles color names like 'red' or 'SystemDefault'.
     """
     rgb = root.winfo_rgb(colorstring)
-    return bananagui.color.rgb2hex(rgb, maxvalue=65535)
+    return color.rgb2hex(rgb, maxvalue=65535)
