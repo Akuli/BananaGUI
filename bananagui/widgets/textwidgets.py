@@ -19,27 +19,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
+"""Widgets that contain text."""
 
-from bananagui import _base, utils
+import bananagui
+from bananagui import utils
 from .basewidgets import Child
 
-
-class BaseLabel(_base.BaseLabel, Child):
-    """A label base class."""
+_base = bananagui._get_base('widgets.textwidgets')
 
 
-@utils.add_property('text')
-class Label(_base.Label, BaseLabel):
-    """A label with text in it.
+@utils.add_property('text', add_changed=True)
+class TextBase(_base.TextBase, Child):
+    """A base class for text editing widgets.
 
-    The text is always centered. If you would like to have text that
-    aligns to left or right instead, let me know and I'll implement it.
+    Setting grayed_out to True means that the user can't edit the text.
 
     Attributes:
-      text      The text in the label.
+      text              The text in the widget.
+      on_text_changed   List of callbacks that run when the text changes.
     """
-    # TODO: Add fonts and colors?
+    # TODO: Add fonts and colors.
+
+    can_focus = True
 
     def __init__(self, *args, **kwargs):
         self._text = ''
@@ -48,18 +49,42 @@ class Label(_base.Label, BaseLabel):
     def _check_text(self, text):
         assert isinstance(text, str)
 
+    def select_all(self):
+        """Select all text in the widget."""
+        self._select_all()
 
-@utils.add_property('imagepath')
-class ImageLabel(_base.ImageLabel, BaseLabel):
-    """A label that contains an image.
+
+@utils.add_property('secret')
+class Entry(_base.Entry, TextBase):
+    """A one-line text widget.
 
     Attributes:
-      imagepath     Path to the image displayed in the label or None.
+      secret    True if the text is hidden with stars or balls.
+                It's also impossible to copy-paste content from a
+                secret entry. This is useful for asking passwords.
     """
 
     def __init__(self, *args, **kwargs):
-        self._imagepath = None
+        self._secret = False
         super().__init__(*args, **kwargs)
 
-    def _check_imagepath(self, path):
-        assert path is None or isinstance(path, str)
+    def _check_secret(self, secret):
+        assert isinstance(secret, bool)
+
+
+# TODO: text wrapping.
+# TODO: text alignment?
+@utils.add_property('tab')
+class TextEdit(_base.TextEdit, TextBase):
+    """A multiline text widget.
+
+    Attributes:
+      tab       The character that pressing tab inserts.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._tab = '\t'
+        super().__init__(*args, **kwargs)
+
+    def _check_tab(self, tab):
+        assert isinstance(tab, str)

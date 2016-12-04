@@ -25,27 +25,24 @@ This is nice compared to writing the GUI in plain Python when writing
 it in Python would be repetitive.
 
 Each section in the .ini data has the name of the widget as a title.
-The section's value of `class` will be then called with other
+The section's value of class will be then called with other
 name=value pairs as keyword arguments. To avoid circular references,
-properties named `child` and `children` will be set up later.
+properties named child and children will be set up later.
 
 The values can be (limited) Python expressions. They can use widgets
-created in other sections as variables, and they also have these
-special variables:
-
-    bananagui   the bananagui module
-    gui         the bananagui.gui module
-    _           gettext.gettext for translating
+created in other sections as variables. gettext.gettext is available as
+an _ variable and everything in bananagui.__all__ is also available as
+variables.
 
 Example ini file:
 
     [window]
-    class = gui.Window
+    class = widgets.Window
     title = _("Hello World")
     child = label
 
     [label]
-    class = gui.Label
+    class = widgets.Label
     parent = window
     text = _("Hello World!")
 
@@ -57,9 +54,9 @@ Or you can read the ini file with Python:
 
     import bananagui
     bananagui.load('whatever you want')
-    from bananagui import iniloader, gui
+    from bananagui import iniloader, widgets
 
-    with open('hello-world-gui', 'r') as f:
+    with open('hello-world-gui.ini', 'r') as f:
         widgets = iniloader.load_ini(f)
 
     # Now widgets is a dictionary.
@@ -82,6 +79,7 @@ import io
 import sys
 
 import bananagui
+from bananagui import utils, widgets
 
 
 class _Loader:
@@ -120,12 +118,17 @@ class _Loader:
             if node.id == '_':
                 # The translating function.
                 return gettext.gettext
-            if node.id == 'gui':
-                return bananagui.gui
-            if node.id == 'bananagui':
-                return bananagui
+            if node.id in bananagui.__all__:
+                # It's something from BananaGUI, let's do what
+                # "from bananagui import NAME" would do.
+                try:
+                    return getattr(bananagui, node.id)
+                except AttributeError:
+                    return utils.import_module('bananagui.' + node.id)
+            # It's another widget.
             self.load_object(node.id)
             return self.loaded[node.id]
+
         raise ValueError("unknown value type: %s" % type(node).__name__)
 
     def parse_source(self, line):
@@ -164,7 +167,7 @@ class _Loader:
             for propertyname, source in properties.items():
                 value = self.parse_source(source)
                 if propertyname == 'children':
-                    if isinstance(widget, bananagui.gui.Box):
+                    if isinstance(widget, widgets.Box):
                         widget[:] = self.parse_source(source)
                     # TODO: Handle other children values here later.
                     else:
@@ -182,10 +185,6 @@ def load_ini(source) -> dict:
 
     See the SECURITY NOTE in the module documentation.
     """
-    if not hasattr(bananagui, 'gui'):
-        raise RuntimeError("bananagui.load() wasn't called before "
-                           "calling bananagui.iniloader.load_ini()")
-
     loader = _Loader()
     if isinstance(source, str):
         loader.parser.read_string(source)

@@ -22,8 +22,6 @@
 import tkinter as tk
 from tkinter import colorchooser
 
-from . import mainloop
-
 
 class BaseWindow:
 
@@ -92,7 +90,8 @@ class BaseWindow:
 class Window:
 
     def __init__(self, **kwargs):
-        self.real_widget = tk.Toplevel(mainloop.root)
+        # Tkinter will use the root window from the mainloop module.
+        self.real_widget = tk.Toplevel()
         super().__init__(**kwargs)
 
 

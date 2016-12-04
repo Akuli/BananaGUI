@@ -19,54 +19,54 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Main loop."""
+"""The BananaGUI main loop."""
 
 import warnings
 
 import bananagui
-from bananagui import _base
+
+_base = bananagui._get_base('mainloop')
+
+_initialized = True
+_running = False
+
+# This is not 0 or 1 because returning True or False from a callback
+# must not be allowed.
+RUN_AGAIN = -1
 
 
-initialized = False
-running = False
+def reinitialize():
+    """Initialize the mainloop again after running it.
 
-
-def init():
-    """Initialize bananagui.gui.
-
-    This is called automatically when bananagui.gui is imported for the
-    first time.
+    You need this only if you want to run the mainloop multiple times.
     """
-    global initialized
-    if not initialized:
-        _base.init()
-        initialized = True
+    global _initialized
+    assert not _initialized, "the mainloop is initialized already"
+    _base.reinitialize()
+    _initialized = True
 
 
-def main():
-    """Run bananagui.gui's mainloop until quit() is called.
-
-    Raise an exception on failure.
-    """
-    global initialized
-    global running
-    assert initialized, "init() wasn't called before calling main()"
-    assert not running, "two mainloops cannot be running at the same time"
-    running = True
+def run():
+    """Run the main loop until quit() is called."""
+    global _initialized
+    global _running
+    assert _initialized, "use reinitialize()"
+    assert not _running, "two mainloops cannot be ran at the same time"
+    _running = True
     try:
-        _base.main()
+        _base.run()
     finally:
-        running = False
-        initialized = False
+        _running = False
+        _initialized = False
 
 
 def quit(*args):
-    """Stop the mainloop started by main().
+    """Make run() return.
 
     Quitting when the main loop is not running does nothing. Positional
     arguments are ignored.
     """
-    if running:
+    if _running:
         _base.quit()
 
 
@@ -75,23 +75,22 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
 
     If the function returns RUN_AGAIN it will be called again after
     waiting again. Depending on the GUI toolkit, this may or may not
-    work when bananagui.main() is not running.
+    work when the main loop is not running.
 
     The waiting time is not guaranteed to be exact, but it's good enough
     for most purposes. Use something like time.time() if you need to
     measure time in the callback function.
     """
-    # Someone might pass a float time and this would fail with some
-    # toolkits.
+    # Someone might pass a float time and this would fail randomly with
+    # some GUI toolkits.
     assert isinstance(milliseconds, int)
     assert milliseconds > 0
-    assert callable(callback)
 
     def real_callback():
         result = callback(*args, **kwargs)
-        if result not in {None, bananagui.RUN_AGAIN}:
+        if result not in {None, RUN_AGAIN}:
             warnings.warn("BananaGUI callback %r returned %r, expected "
-                          "None or bananagui.RUN_AGAIN" % (callback, result),
+                          "None or RUN_AGAIN" % (callback, result),
                           RuntimeWarning)
             result = None
         return result

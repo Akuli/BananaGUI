@@ -21,33 +21,33 @@
 
 """BananaGUI TextEdit test."""
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
-class TextEditWindow(gui.Window):
+class TextEditWindow(widgets.Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        bigbox = gui.Box.vertical(self)
+        bigbox = widgets.Box.vertical(self)
         self.child = bigbox
 
-        self.textedit = gui.TextEdit(bigbox, text="Enter something...")
+        self.textedit = widgets.TextEdit(bigbox, text="Enter something...")
         self.textedit.on_text_changed.append(self.text_changed)
         bigbox.append(self.textedit)
 
-        buttonbox = gui.Box.horizontal(bigbox, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(bigbox, expand=(True, False))
         bigbox.append(buttonbox)
 
-        addbutton = gui.Button(buttonbox, text="Add text")
+        addbutton = widgets.Button(buttonbox, text="Add text")
         addbutton.on_click.append(self.add_text)
         buttonbox.append(addbutton)
 
-        clearbutton = gui.Button(buttonbox, text="Clear")
+        clearbutton = widgets.Button(buttonbox, text="Clear")
         clearbutton.on_click.append(self.clear)
         buttonbox.append(clearbutton)
 
-        selectallbutton = gui.Button(buttonbox, text="Select all")
+        selectallbutton = widgets.Button(buttonbox, text="Select all")
         selectallbutton.on_click.append(self.select_all)
         buttonbox.append(selectallbutton)
 
@@ -68,8 +68,8 @@ class TextEditWindow(gui.Window):
 def main():
     with TextEditWindow(title="TextEdit test",
                         minimum_size=(300, 200)) as window:
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

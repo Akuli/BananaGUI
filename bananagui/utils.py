@@ -19,12 +19,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI's utility functions and other things.
+"""BananaGUI's utility functions and other things."""
 
-It's not recommended to rely on this submodule. It's meant only for
-being used internally by BananaGUI and it can be changed in the future.
-"""
-
+import importlib.util
 import re
 
 
@@ -210,6 +207,46 @@ def add_property(name, *, add_changed=False):
         return cls
 
     return inner
+
+
+try:
+    resolve_modulename = importlib.util.resolve_name
+    import_module = importlib.import_module
+except AttributeError:
+    # Python 3.2, there is no importlib.util.resolve_name and
+    # importlib.import_module doesn't import parent packages
+    # automatically.
+    def resolve_modulename(modulename, package=None):
+        """Like importlib.util.resolve_modulename, but for Python 3.2.
+
+        >>> import sys
+        >>> if sys.version_info >= (3, 2):
+        ...     resolve_modulename('bananagui.bases.tkinter', 'whatever')
+        ...     resolve_modulename('.tkinter', 'bananagui.bases')
+        ...
+        'bananagui.bases.tkinter'
+        'bananagui.bases.tkinter'
+        """
+        if modulename.startswith('.'):
+            if package is None:
+                raise ValueError("a package is needed for %r" % (modulename,))
+            while modulename.startswith('..'):
+                # We need to go up one level and remove the dot that
+                # represents it.
+                package, junk = package.rsplit('.', 1)
+                modulename = modulename[1:]
+            # At this point there's still one dot left in modulename.
+            modulename = package + modulename
+        return modulename
+
+    def import_module(modulename):
+        """Import a module and its parent modules as needed."""
+        current = []
+        for part in modulename.split('.')[:-1]:
+            # Loop through and import the parent modules.
+            current.append(part)
+            importlib.import_module('.'.join(current))
+        return importlib.import_module(modulename)
 
 
 if __name__ == '__main__':

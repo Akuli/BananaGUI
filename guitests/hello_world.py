@@ -21,7 +21,7 @@
 
 """BananaGUI hello world test."""
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def resize(window):
@@ -29,12 +29,12 @@ def resize(window):
 
 
 def main():
-    with gui.Window(title="Hello World!") as window:
+    with widgets.Window(title="Hello World!") as window:
         window.on_size_changed.append(resize)
-        label = gui.Label(window, text="Hello World!")
+        label = widgets.Label(window, text="Hello World!")
         window.child = label
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

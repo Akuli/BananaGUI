@@ -19,12 +19,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Miscellaneous widgets."""
+
 import bananagui
-from bananagui import _base, utils
-from .basewidgets import Oriented, Child
-from . import mainloop
+from bananagui import utils
+from .basewidgets import __Oriented, Child
+from .. import mainloop
+
+_base = bananagui._get_base('widgets.misc')
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
+# TODO: move Checkbox, Radiostuff and everything else to a checkboxes.py?
 
 
 @utils.add_property('text')
@@ -63,7 +68,7 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-class Separator(Oriented, _base.Separator, Child):
+class Separator(__Oriented, _base.Separator, Child):
     """A horizontal or vertical line."""
 
     def __init__(self, parent, *, orientation, **kwargs):
@@ -77,7 +82,7 @@ class Separator(Oriented, _base.Separator, Child):
 
 def set_clipboard_text(text):
     """Set text to the clipboard."""
-    assert mainloop.initialized
+    assert mainloop._initialized
     assert isinstance(text, str)
     _base.set_clipboard_text(text)
 
@@ -88,7 +93,7 @@ def get_clipboard_text():
     The returned value is an empty string if there is no text on the
     clipboard.
     """
-    assert mainloop.initialized
+    assert mainloop._initialized
     return _base.get_clipboard_text()
 
 

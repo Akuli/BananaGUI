@@ -21,10 +21,7 @@
 
 import functools
 
-# We can't import bananagui.gui now because bananagui.gui may import
-# this, but bananagui.gui will be accessible through the bananagui
-# module when it's imported.
-import bananagui
+from bananagui import widgets
 
 
 def _on_click(dialog, button):
@@ -33,29 +30,25 @@ def _on_click(dialog, button):
 
 
 def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
-    gui = bananagui.gui
+    dialog = widgets.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
-    dialog = gui.Dialog(parentwindow, title=title, minimum_size=(350, 150))
-
-    mainbox = gui.Box.vertical(dialog)
+    mainbox = widgets.Box.vertical(dialog)
     dialog.child = mainbox
 
-    label = gui.Label(mainbox, text=message)
-    mainbox.append(label)
-
-    buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
-    mainbox.append(buttonbox)
+    label = widgets.Label(mainbox, text=message)
+    buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
+    mainbox.extend([label, buttonbox])
 
     focus_this = None
     for buttontext in buttons:
-        button = gui.Button(buttonbox, text=buttontext)
+        button = widgets.Button(buttonbox, text=buttontext)
         callback = functools.partial(_on_click, dialog)
         button.on_click.append(callback)
 
         # Adding a dummy on both sides will give us more space between
         # the buttons than between the buttons and the window border.
         buttonbox.extend([
-            gui.Dummy(buttonbox), button, gui.Dummy(buttonbox)])
+            widgets.Dummy(buttonbox), button, widgets.Dummy(buttonbox)])
         if buttontext == defaultbutton:
             focus_this = button
 

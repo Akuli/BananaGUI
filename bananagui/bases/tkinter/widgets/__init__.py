@@ -19,39 +19,19 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""The actual BananaGUI widgets.
-
-Call bananagui.load() before importing this.
-"""
-
+"""BananaGUI tkinter base."""
 # flake8: noqa
 
 import bananagui
-if bananagui._base is None:
-    raise ImportError("call bananagui.load() before importing bananagui.gui")
 
-from .basewidgets import Widget, Parent, Child, Oriented
-from .buttons import BaseButton, Button, ImageButton
-from .canvas import Canvas
-from .containers import Bin, Box, Scroller
-from .labels import BaseLabel, Label, ImageLabel
-from .mainloop import init as _init, main, quit, add_timeout
-from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
-                   get_clipboard_text, get_font_families)
-from .progress import Progressbar, BouncingProgressbar, Spinner
-from .ranged import Ranged, Slider, Spinbox
-from .textwidgets import TextBase, Entry, TextEdit
-#from .trayicon import TrayIcon
-from .window import (BaseWindow, Window, Dialog, infodialog, warningdialog,
-                     errordialog, questiondialog, colordialog, fontdialog)
-
-
-def reinitialize():
-    """Initialize bananagui.gui again after running main().
-
-    Call this if you want to run main() multiple times.
-    """
-    _init()
-
-
-_init()
+tkinter_orients = {
+    bananagui.HORIZONTAL: 'horizontal',
+    bananagui.VERTICAL: 'vertical',
+}
+tkinter_fills = {
+    # BananaGUI expand: tkinter's fill option, ...
+    (True, True): 'both',
+    (True, False): 'x',
+    (False, True): 'y',
+    (False, False): 'none',
+}

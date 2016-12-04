@@ -19,12 +19,17 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import _base, utils
-from .basewidgets import Child, Oriented
+"""Widgets that have a value that needs to be in a range."""
+
+import bananagui
+from bananagui import utils
+from .basewidgets import Child, __Oriented
+
+_base = bananagui._get_base('widgets.ranged')
 
 
 @utils.add_property('value', add_changed=True)
-class Ranged:
+class __Ranged:
     """Implement valuerange and value BananaGUI properties.
 
     Attributes:
@@ -47,11 +52,11 @@ class Ranged:
         assert value in self.valuerange
 
 
-class Spinbox(Ranged, _base.Spinbox, Child):
+class Spinbox(__Ranged, _base.Spinbox, Child):
     """A box for selecting a number with arrow buttons up and down."""
 
     can_focus = True
 
 
-class Slider(Oriented, Ranged, _base.Slider, Child):
+class Slider(__Oriented, __Ranged, _base.Slider, Child):
     """A slider for selecting a number."""

@@ -22,42 +22,42 @@
 """BananaGUI entry test."""
 
 import bananagui
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
-class EntryBox(gui.Box):
+class EntryBox(widgets.Box):
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
 
         # This is attached to self because we need it in other methods.
-        self.entry = gui.Entry(self, expand=(True, False))
+        self.entry = widgets.Entry(self, expand=(True, False))
         self.entry.on_text_changed.append(self.text_changed)
         self.append(self.entry)
 
-        self.append(gui.Dummy(self))
+        self.append(widgets.Dummy(self))
 
-        buttonbox = gui.Box.horizontal(self, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(self, expand=(True, False))
         self.append(buttonbox)
 
-        resetbutton = gui.Button(buttonbox, text="Reset")
+        resetbutton = widgets.Button(buttonbox, text="Reset")
         resetbutton.on_click.append(self.reset)
         buttonbox.append(resetbutton)
 
-        selectallbutton = gui.Button(buttonbox, text="Select all")
+        selectallbutton = widgets.Button(buttonbox, text="Select all")
         selectallbutton.on_click.append(self.select_all)
         buttonbox.append(selectallbutton)
 
-        focusbutton = gui.Button(buttonbox, text="Focus")
+        focusbutton = widgets.Button(buttonbox, text="Focus")
         focusbutton.on_click.append(self.get_focus)
         buttonbox.append(focusbutton)
 
-        grayedcheckbox = gui.Checkbox(buttonbox, text="Grayed out")
+        grayedcheckbox = widgets.Checkbox(buttonbox, text="Grayed out")
         grayedcheckbox.on_checked_changed.append(
             self.grayed_out_toggled)
         buttonbox.append(grayedcheckbox)
 
-        secretcheckbox = gui.Checkbox(buttonbox, text="Secret")
+        secretcheckbox = widgets.Checkbox(buttonbox, text="Secret")
         secretcheckbox.on_checked_changed.append(self.secret_toggled)
         buttonbox.append(secretcheckbox)
 
@@ -87,10 +87,10 @@ class EntryBox(gui.Box):
 
 
 def main():
-    with gui.Window(title="Entry test", size=(400, 100)) as window:
+    with widgets.Window(title="Entry test", size=(400, 100)) as window:
         window.child = EntryBox(window)
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

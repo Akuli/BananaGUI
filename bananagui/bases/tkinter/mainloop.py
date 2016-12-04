@@ -24,23 +24,20 @@ import tkinter as tk
 import bananagui.color
 
 
-root = None
-
-
-def init():
+def reinitialize():
     global root
     root = tk.Tk()
     root.withdraw()
 
+reinitialize()
 
-def main():
+
+def run():
     root.mainloop()
 
 
 def quit():
-    global root
     root.destroy()
-    root = None
 
 
 def add_timeout(milliseconds, callback):
@@ -53,13 +50,11 @@ def add_timeout(milliseconds, callback):
     after(milliseconds, real_callback)
 
 
-def convert_color(colorstring):
+def _convert_color(colorstring):
     """Convert a tkinter color string to a hexadecimal color.
 
     Tkinter colors are usually hexadecimal, but this function also
     handles color names like 'red' or 'SystemDefault'.
     """
-    # I have no idea why the biggest value is 65535. To scale it down to
-    # 255 we need to divide it by 65535/255=257.
-    rgb = [value // 257 for value in root.winfo_rgb(colorstring)]
-    return bananagui.color.rgb2hex(rgb)
+    rgb = root.winfo_rgb(colorstring)
+    return bananagui.color.rgb2hex(rgb, maxvalue=65535)

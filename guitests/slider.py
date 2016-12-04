@@ -20,25 +20,25 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import bananagui
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
-class SliderBox(gui.Box):
+class SliderBox(widgets.Box):
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
 
         values = range(0, 51, 5)
 
-        hslider = gui.Slider.horizontal(self, valuerange=values)
+        hslider = widgets.Slider.horizontal(self, valuerange=values)
         hslider.on_value_changed.append(self.value_changed)
         self.append(hslider)
 
-        vslider = gui.Slider.vertical(self, valuerange=values)
+        vslider = widgets.Slider.vertical(self, valuerange=values)
         vslider.on_value_changed.append(self.value_changed)
         self.append(vslider)
 
-        spinbox = gui.Spinbox(self, valuerange=values)
+        spinbox = widgets.Spinbox(self, valuerange=values)
         spinbox.on_value_changed.append(self.value_changed)
         self.append(spinbox)
 
@@ -52,10 +52,10 @@ class SliderBox(gui.Box):
 
 
 def main():
-    with gui.Window(title="Slider test") as window:
+    with widgets.Window(title="Slider test") as window:
         window.child = SliderBox(window)
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

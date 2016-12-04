@@ -21,28 +21,28 @@
 
 """BananaGUI spinner test."""
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
-class SpinnerWindow(gui.Window):
+class SpinnerWindow(widgets.Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        mainbox = gui.Box.vertical(self)
+        mainbox = widgets.Box.vertical(self)
         self.child = mainbox
 
-        self.spinner = gui.Spinner(mainbox)
+        self.spinner = widgets.Spinner(mainbox)
         mainbox.append(self.spinner)
 
-        buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
         mainbox.append(buttonbox)
 
-        startbutton = gui.Button(buttonbox, text="Start")
+        startbutton = widgets.Button(buttonbox, text="Start")
         startbutton.on_click.append(self.start)
         buttonbox.append(startbutton)
 
-        stopbutton = gui.Button(buttonbox, text="Stop")
+        stopbutton = widgets.Button(buttonbox, text="Stop")
         stopbutton.on_click.append(self.stop)
         buttonbox.append(stopbutton)
 
@@ -55,8 +55,8 @@ class SpinnerWindow(gui.Window):
 
 def main():
     with SpinnerWindow(title="Spinner window") as window:
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

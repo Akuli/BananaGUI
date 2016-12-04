@@ -22,7 +22,7 @@
 import itertools
 
 import bananagui
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def once():
@@ -34,7 +34,7 @@ def over_and_over():
     print("I have ran %d times before." % number)
     if number >= 3:
         print("Goodbye!")
-        gui.quit()
+        mainloop.quit()
         return None
     return bananagui.RUN_AGAIN
 
@@ -42,9 +42,9 @@ counter = itertools.count()
 
 
 def main():
-    gui.add_timeout(500, once)
-    gui.add_timeout(1000, over_and_over)
-    gui.main()
+    widgets.add_timeout(500, once)
+    widgets.add_timeout(1000, over_and_over)
+    mainloop.run()
 
 
 if __name__ == '__main__':

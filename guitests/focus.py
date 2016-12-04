@@ -21,7 +21,7 @@
 
 """Focusing GUI test."""
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def on_click(button):
@@ -37,23 +37,23 @@ def main():
     message = ("Press tab and then enter. The focus\n"
                "should move to the other button.")
 
-    with gui.Window(title="Focus test", minimum_size=(250, 150)) as window:
-        box = gui.Box.vertical(window)
+    with widgets.Window(title="Focus test", minimum_size=(250, 150)) as window:
+        box = widgets.Box.vertical(window)
         window.child = box
 
-        label = gui.Label(box, text=message)
+        label = widgets.Label(box, text=message)
         box.append(label)
 
-        button1 = gui.Button(box, text="Focus the button below")
+        button1 = widgets.Button(box, text="Focus the button below")
         button1.on_click.append(on_click)
         box.append(button1)
 
-        button2 = gui.Button(box, text="Focus the button above")
+        button2 = widgets.Button(box, text="Focus the button above")
         button2.on_click.append(on_click)
         box.append(button2)
 
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

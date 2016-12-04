@@ -19,9 +19,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""A TrayIcon widget."""
+
+# TODO: fix this.
+
 import bananagui
-from bananagui import _base
 from .basewidgets import Widget
+
+_base = bananagui._get_base('widgets.trayicon')
 
 
 class TrayIcon(_base.TrayIcon, Widget):

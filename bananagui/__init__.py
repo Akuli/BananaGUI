@@ -26,18 +26,23 @@ the same code using any of the supported GUI toolkits, including PyQt5,
 GTK+ 3 and tkinter.
 """
 
-# flake8: noqa
-
-import importlib
+import sys
 import warnings
 
-# This is imported because importlib.import_module() doesn't import
-# parent modules as needed with relative imports.
-import bananagui.bases
+from bananagui import utils
 
-# Some things in this module isn't imported here because they're
-# meant to be used internally by BananaGUI.
-from bananagui.structures import Font
+
+__author__ = 'Akuli'
+__copyright__ = 'Copyright (c) 2016 Akuli'
+__license__ = 'MIT'
+__version__ = '0.1-dev'
+__all__ = [
+    # Submodules.
+    'color', 'font', 'iniloader', 'mainloop', 'msgbox', 'widgets',
+
+    # Things defined here.
+    'HORIZONTAL', 'VERTICAL', 'load',
+]
 
 
 # These constants can be used with these variables or with their values
@@ -45,28 +50,21 @@ from bananagui.structures import Font
 HORIZONTAL = 'h'
 VERTICAL = 'v'
 
-# This is not 0 or 1 because returning True or False from a callback
-# must not be allowed.
-RUN_AGAIN = -1
-
-BLACK = '#000000'
-BROWN = '#996600'
-GRAY = '#7f7f7f'
-WHITE = '#ffffff'
-RED = '#ff0000'
-ORANGE = '#ff7f00'
-YELLOW = '#ffff00'
-GREEN = '#00ff00'
-CYAN = '#00ffff'
-BLUE = '#0000ff'
-PINK = '#ff00ff'
-
 
 _base = None
 
 
+def _load(name):
+    global _base
+
+    # Make sure the base can be imported and THEN set _base to it.
+    fullname = utils.resolve_modulename(name, 'bananagui.bases')
+    utils.import_module(fullname)
+    _base = fullname
+
+
 def load(*args):
-    """Load bananagui.gui.
+    """Load a BananaGUI base module.
 
     The arguments should be Python module names. If they are relative,
     they will be treated as relative to bananagui.bases. For example,
@@ -75,24 +73,78 @@ def load(*args):
     If multiple base modules are given, attempt to load each one until
     loading one of them succeeds. You can import bananagui.gui after
     calling this.
+
+    The possibly relative name of the loaded base module is returned.
     """
-    if not args:
-        raise ValueError("specify at least one module")
+    assert args, "specify at least one module"
 
     global _base
     if _base is not None:
         raise RuntimeError("don't call bananagui.load() twice")
 
     if len(args) == 1:
-        # Load the base.
-        _base = importlib.import_module(args[0], 'bananagui.bases')
-
+        _load(args[0])
+        return args[0]
     else:
         # Attempt to load each base.
         for arg in args:
             try:
-                load(arg)
-                return
+                _load(arg)
+                return arg
             except ImportError:
                 pass
         raise ImportError("cannot load any of the requested base modules")
+
+
+class _AttributeMix:
+    """An object that gets its attributes from two modules."""
+
+    def __init__(self, *modules):
+        self.__modules = modules
+
+    def __dir__(self):
+        result = set()
+        for module in self.__modules:
+            result |= set(dir(module))
+        return sorted(result)       # Be consistent.
+
+    def __getattr__(self, attribute):
+        for module in self.__modules:
+            try:
+                value = getattr(module, attribute)
+                break
+            except AttributeError:
+                pass
+        else:  # The attribute wasn't found.
+            raise AttributeError("no such attribute: %r" % attribute)
+
+        # The attribute is setattr()ed to self so self.__dict__ works
+        # as a cache of attributes and __getattr__ isn't called when
+        # it's not needed.
+        setattr(self, attribute, value)
+        return value
+
+
+def _get_base(modulename):
+    """Import and return a base module for modulename.
+
+    For example, if bananagui.load has been called with '.tkinter',
+    _get_base('thingy') returns an object that gets its attributes
+    from bananagui.bases.tkinter.thingy and, if it exists,
+    bananagui.bases.defaults.thingy.
+    """
+    if _base is None:
+        raise ImportError("bananagui.load() wasn't called")
+
+    modules = [utils.import_module(_base + '.' + modulename)]
+    defaultname = 'bananagui.bases.defaults.' + modulename
+    try:
+        modules.append(utils.import_module(defaultname))
+    except ImportError:
+        pass
+    return _AttributeMix(*modules)
+
+
+if __name__ == '__main__':
+    import doctest
+    print(doctest.testmod())

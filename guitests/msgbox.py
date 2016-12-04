@@ -20,61 +20,61 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import bananagui
-from bananagui import gui
+from bananagui import color, mainloop, msgbox, widgets
 
 
-class DialogTest(gui.Window):
+class DialogTest(widgets.Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        box = gui.Box.vertical(self)
+        box = widgets.Box.vertical(self)
         self.child = box
 
-        infobutton = gui.Button(box, text="Info")
+        infobutton = widgets.Button(box, text="Info")
         infobutton.on_click.append(self.info)
         box.append(infobutton)
 
-        warningbutton = gui.Button(box, text="Warning")
+        warningbutton = widgets.Button(box, text="Warning")
         warningbutton.on_click.append(self.warning)
         box.append(warningbutton)
 
-        errorbutton = gui.Button(box, text="Error")
+        errorbutton = widgets.Button(box, text="Error")
         errorbutton.on_click.append(self.error)
         box.append(errorbutton)
 
-        questionbutton = gui.Button(box, text="Question")
+        questionbutton = widgets.Button(box, text="Question")
         questionbutton.on_click.append(self.question)
         box.append(questionbutton)
 
-        colorbutton = gui.Button(box, text="Choose a color...")
+        colorbutton = widgets.Button(box, text="Choose a color...")
         colorbutton.on_click.append(self.choose_color)
         box.append(colorbutton)
 
     def info(self, infobutton):
-        result = gui.infodialog(self, "Information!")
+        result = msgbox.infodialog(self, "Information!")
         print(repr(result))
 
     def warning(self, warningbutton):
-        result = gui.warningdialog(self, "Warning!", title="Be warned!",
+        result = msgbox.warningdialog(self, "Warning!", title="Be warned!",
                                    buttons=["What's going to happen next?"])
         print(repr(result))
 
     def error(self, errorbutton):
-        result = gui.errordialog(
+        result = msgbox.errordialog(
             self, "Error!", title="Oh no!",
             buttons=["I'm screwed!", "I'm not screwed"],
             defaultbutton="I'm screwed!")
         print(repr(result))
 
     def question(self, questionbutton):
-        result = gui.questiondialog(
+        result = msgbox.questiondialog(
             self, "Do you like BananaGUI?",
             buttons=["Yes", "No"], defaultbutton="Yes")
         print(repr(result))
 
     def choose_color(self, colorbutton):
-        result = gui.colordialog(self, defaultcolor=bananagui.RED,
+        result = msgbox.colordialog(self, defaultcolor=color.RED,
                                  title="Choose a color")
         print(repr(result))
 
@@ -82,19 +82,19 @@ class DialogTest(gui.Window):
 
 
 def close_callback(window):
-    result = gui.questiondialog(
+    result = msgbox.questiondialog(
         window, "Do you really want to quit?", title="Quit?",
         buttons=["Yes", "No"], defaultbutton="Yes")
     print(repr(result))
     if result == "Yes":
-        gui.quit()
+        mainloop.quit()
 
 
 def main():
     with DialogTest(title="Dialog test") as window:
-        del window.on_close[0]  # The default handler.
+        del window.on_close[0]     # The default handler.
         window.on_close.append(close_callback)
-        gui.main()
+        mainloop.run()
 
 
 if __name__ == '__main__':

@@ -19,32 +19,30 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import _base, utils
+"""BananaGUI labels."""
+
+import bananagui
+from bananagui import utils
 from .basewidgets import Child
 
+_base = bananagui._get_base('widgets.labels')
 
-class BaseButton(_base.BaseButton, Child):
-    """Base class for other buttons.
 
-    Attributes:
-      on_click  List of callbacks that are ran when the button is clicked.
-    """
-
-    can_focus = True
-
-    def __init__(self, *args, **kwargs):
-        self.on_click = []
-        super().__init__(*args, **kwargs)
+class BaseLabel(_base.BaseLabel, Child):
+    """A label base class."""
 
 
 @utils.add_property('text')
-class Button(_base.Button, BaseButton):
-    """A button that displays text in it.
+class Label(_base.Label, BaseLabel):
+    """A label with text in it.
+
+    The text is always centered. If you would like to have text that
+    aligns to left or right instead, let me know and I'll implement it.
 
     Attributes:
-      text      The text in the button.
-                An empty string by default.
+      text      The text in the label.
     """
+    # TODO: Add fonts and colors?
 
     def __init__(self, *args, **kwargs):
         self._text = ''
@@ -55,12 +53,11 @@ class Button(_base.Button, BaseButton):
 
 
 @utils.add_property('imagepath')
-class ImageButton(_base.ImageButton, BaseButton):
-    """A button that displays an image.
+class ImageLabel(_base.ImageLabel, BaseLabel):
+    """A label that contains an image.
 
     Attributes:
-      imagepath     Path to the image displayed in the button or None.
-                    None by default.
+      imagepath     Path to the image displayed in the label or None.
     """
 
     def __init__(self, *args, **kwargs):

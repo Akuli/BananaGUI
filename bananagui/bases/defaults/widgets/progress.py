@@ -22,10 +22,10 @@
 import collections
 import math
 
-# We can only import modules from bananagui.gui because this file can be
-# loaded by bananagui.gui.__init__.
-import bananagui.color
-from bananagui.gui import canvas, mainloop
+# We can only import modules from bananagui.widgets because this file
+# can be loaded by bananagui.gui.__init__.
+from bananagui import color, mainloop
+from bananagui.widgets import canvas
 
 
 _LINES = 15
@@ -80,9 +80,9 @@ class Spinner:
             end = (x * diameter // 2 + width // 2,
                    y * diameter // 2 + height // 2)
             thickness = max(diameter // 10, 1)
-            color = bananagui.color.rgb2hex([brightness] * 3)
+            the_color = color.rgb2hex([brightness] * 3)
             self._widget.draw_line(start, end, thickness=thickness,
-                                   color=color)
+                                   color=the_color)
 
         # Keep spinning.
         return bananagui.RUN_AGAIN

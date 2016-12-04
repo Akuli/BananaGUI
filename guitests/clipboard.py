@@ -19,44 +19,44 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
-class ClipboardTestWindow(gui.Window):
+class ClipboardTestWindow(widgets.Window):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        mainbox = gui.Box.vertical(self)
+        mainbox = widgets.Box.vertical(self)
         self.child = mainbox
 
-        self.entry = gui.Entry(mainbox, expand=(True, False))
+        self.entry = widgets.Entry(mainbox, expand=(True, False))
         mainbox.append(self.entry)
 
-        mainbox.append(gui.Dummy(mainbox))
+        mainbox.append(widgets.Dummy(mainbox))
 
-        buttonbox = gui.Box.horizontal(mainbox, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
         mainbox.append(buttonbox)
 
-        copybutton = gui.Button(buttonbox, text="Copy everything")
+        copybutton = widgets.Button(buttonbox, text="Copy everything")
         copybutton.on_click.append(self.copy)
         buttonbox.append(copybutton)
 
-        pastebutton = gui.Button(buttonbox, text="Paste to the end")
+        pastebutton = widgets.Button(buttonbox, text="Paste to the end")
         pastebutton.on_click.append(self.paste)
         buttonbox.append(pastebutton)
 
     def copy(self, copybutton):
-        gui.set_clipboard_text(self.entry.text)
+        widgets.set_clipboard_text(self.entry.text)
 
     def paste(self, pastebutton):
-        self.entry.text += gui.get_clipboard_text()
+        self.entry.text += widgets.get_clipboard_text()
 
 
 def main():
     with ClipboardTestWindow(title="Clipboard test") as window:
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

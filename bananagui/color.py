@@ -19,13 +19,42 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Handy color utilities."""
+"""Handy color utilities.
+
+BananaGUI uses case-insensitive 7-character hexadecimal colors, like
+'#ffffff' or '#fFfFff'. This module provides functions for processing
+hexadecimal colors and converting colors between hexadecimal colors and
+other standards.
+"""
 
 import re
 
 
-def hex2rgb(hexcolor):
+BLACK = '#000000'
+BROWN = '#996600'
+GRAY = '#7f7f7f'
+WHITE = '#ffffff'
+RED = '#ff0000'
+ORANGE = '#ff7f00'
+YELLOW = '#ffff00'
+GREEN = '#00ff00'
+CYAN = '#00ffff'
+BLUE = '#0000ff'
+PINK = '#ff00ff'
+
+
+# def _is7charhex(hexcolor):
+#    """Check if hexcolor is a valid 7-character hexadecimal color.
+#
+#    BananaGUI uses this internally.
+#    """
+#    return re.search(r'^#[0-9a-f]{6}$', hexcolor) is not None
+
+
+def hex2rgb(hexcolor, precision=2):
     """Convert a hexadecimal color to an RGB tuple.
+
+    If precision is None, it will be guessed based on the color.
 
     >>> hex2rgb('#00ffff')
     (0, 255, 255)
@@ -34,55 +63,49 @@ def hex2rgb(hexcolor):
     >>> hex2rgb('#000ffffff')
     (0, 255, 255)
     """
+    # It must start with '#' but it must contain more than just the '#'.
     assert hexcolor.startswith('#'), \
-        "hexadecimal colors should start with '#', got %r" % (hexcolor,)
+        "invalid hexadecimal color string %r" % (hexcolor,)
+    assert hexcolor != '#', "'#' is not a valid hexadecimal color"
+
     values = hexcolor[1:]
-    assert values and len(values) % 3 == 0, \
+    assert len(values) % 3 == 0, \
         "cannot divide %r into 3 even chunks" % (values,)
     chunksize = len(values) // 3
-    if chunksize == 1:
-        # It's like '0ff', we need to double everything up so we get
-        # '00ffff' because that's the precision we'll go with.
-        r, g, b = values
-        r *= 2
-        g *= 2
-        b *= 2
-    else:
-        # We need to truncate the values to two hexadecimal digits.
-        r = values[0:2]
-        g = values[chunksize:chunksize+2]
-        b = values[chunksize*2:chunksize*2+2]
-    return int(r, 16), int(g, 16), int(b, 16)
+
+    maximum = int('f' * chunksize, 16)
+    rgb = []
+    for start in range(0, len(values), chunksize):
+        end = start + chunksize
+        string = values[start:end]
+        number = int(string, 16) * 255 // maximum
+        rgb.append(number)
+    return tuple(rgb)
 
 
-def rgb2hex(*args):
-    """Convert an rgb color to a hexadecimal color.
+def rgb2hex(rgb, maxvalue=255):
+    """Convert an RGB sequence to a hexadecimal color.
 
-    The color may be an (r, g, b) sequence or multiple arguments.
-
-    >>> rgb2hex(0, 255, 255)
-    '#00ffff'
     >>> rgb2hex([0, 255, 255])
     '#00ffff'
+    >>> rgb2hex([0, 0.5, 0.5], maxvalue=0.5)
+    '#00ffff'
     """
-    if len(args) == 1:
-        r, g, b = args[0]
-    else:
-        r, g, b = args
-    return '#%02x%02x%02x' % (r, g, b)
+    r, g, b = rgb     # Allow anything iterable of length 3.
+    rgb = []
+    for value in (r, g, b):
+        number = int(value / maxvalue * 255)
+        rgb.append(number)
+    return '#%02x%02x%02x' % tuple(rgb)
 
 
-def brightness(hexcolor):
-    """Return the brightness of the color between 0 and 1.
+def hex2rgbstring(hexcolor):
+    """Convert a hexadecimal color string to a CSS compatible color string.
 
-    >>> brightness('#000000')
-    0.0
-    >>> brightness('#ffffff')
-    1.0
-    >>> brightness('#333333')
-    0.2
+    >>> hex2rgbstring('#ffff00')
+    'rgb(255,255,0)'
     """
-    return sum(hex2rgb(hexcolor)) / 3 / 255
+    return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
 
 
 def rgbstring2hex(rgbstring):
@@ -95,6 +118,7 @@ def rgbstring2hex(rgbstring):
     >>> rgbstring2hex('rG B ( 255 , 100 % ,0) ')
     '#ffff00'
     """
+    # TODO: GTK+ style 'rgba(...)' strings.
     match = re.search(
         r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$',
         ''.join(rgbstring.split()),  # Remove whitespace.
@@ -111,13 +135,32 @@ def rgbstring2hex(rgbstring):
     return rgb2hex(rgb)
 
 
-def hex2rgbstring(hexcolor):
-    """Convert a hexadecimal color string to a CSS compatible color string.
+def clean_hex(hexcolor):
+    """Convert any hexadecimal color string to '#RRGGBB'.
 
-    >>> hex2rgbstring('#ffff00')
-    'rgb(255,255,0)'
+    Arguments are handled similarly to hex2rgb.
+
+    >>> clean_hex('#00ffff')
+    '#00ffff'
+    >>> clean_hex('#0ff')
+    '#00ffff'
+    >>> clean_hex('#000ffffff')
+    '#00ffff'
     """
-    return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
+    return rgb2hex(hex2rgb(hexcolor))
+
+
+def brightness(hexcolor):
+    """Return the brightness of the color between 0 and 1.
+
+    >>> brightness('#000000')
+    0.0
+    >>> brightness('#ffffff')
+    1.0
+    >>> brightness('#333333')
+    0.2
+    """
+    return sum(hex2rgb(hexcolor)) / 3 / 255
 
 
 if __name__ == '__main__':

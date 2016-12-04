@@ -19,23 +19,23 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def main():
-    window = gui.Window(title="Tooltip test")
+    window = widgets.Window(title="Tooltip test")
 
-    box = gui.Box.vertical(window)
+    box = widgets.Box.vertical(window)
     window.child = box
 
-    toplabel = gui.Label(box, text="Top label!",
+    toplabel = widgets.Label(box, text="Top label!",
                          tooltip="Top label tooltip!")
-    bottomlabel = gui.Label(box, text="Bottom label!",
+    bottomlabel = widgets.Label(box, text="Bottom label!",
                             tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
 
-    window.on_close.append(gui.quit)
-    gui.main()
+    window.on_close.append(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

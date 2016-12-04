@@ -19,19 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI tests.
+from tkinter import font
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
-"""
 
-import sys
-try:
-    import faulthandler
-    faulthandler.enable()
-except ImportError:
-    # Python 3.2.
-    pass
-
-import bananagui
-base = bananagui.load(*(sys.argv[1:] or ['.tkinter']))
+def get_families():
+    return font.families()

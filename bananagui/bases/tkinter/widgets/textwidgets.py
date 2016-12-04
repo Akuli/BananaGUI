@@ -77,11 +77,16 @@ class TextEdit:
         # character, which is a hidden newline.
         self.real_widget.tag_add('sel', 0.0, 'end-1c')
 
+    # TODO: the cursor likes to jump to the end of the widget and
+    # "modified" prints too often...
+
     def _on_modified(self, event):
+        print('modified')
         self.text = event.widget.get(0.0, 'end-1c')
         self.real_widget.edit_modified(False)
 
     def _set_text(self, text):
+        print('setting text')
         self.real_widget.unbind('<<Modified>>')
         self.real_widget.delete(0.0, 'end-1c')
         self.real_widget.edit_modified(False)

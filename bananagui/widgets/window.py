@@ -24,9 +24,11 @@
 from gettext import gettext as _
 
 import bananagui
-from bananagui import _base, utils
+from bananagui import utils
 from bananagui.bases import defaults
 from .containers import Bin
+
+_base = bananagui._get_base('widgets.window')
 
 
 @utils.add_property('title')
@@ -167,109 +169,3 @@ class Dialog(_base.Dialog, BaseWindow):
         assert isinstance(parentwindow, Window)
         self.parentwindow = parentwindow
         super().__init__(**kwargs)
-
-
-def _messagedialog(function):
-    """Return a new message dialog function."""
-    doc = function.__doc__
-    if doc is not None:
-        # Not running with Python's optimizations.
-        doc += """
-
-        The buttons argument should be a sequence of button texts that
-        will be added to the dialog. It defaults to "OK" translated with
-        gettext.gettext in a list.
-
-        The button with defaultbutton as its text will have keyboard
-        focus by default. If defaultbutton is None and there's one
-        button the defaultbutton defaults to it, otherwise there will
-        be no default button.
-
-        The text argument is the text that will be shown in the dialog.
-        If title is not given, the dialog's title will be the same as
-        parentwindow's title.
-
-        The text of the clicked button is returned, or None if the
-        dialog is closed. Note that the dialog doesn't have an icon on
-        some GUI toolkits.
-        """
-
-    def result(parentwindow, message, *, title=None, buttons=None,
-               defaultbutton=None):
-        assert isinstance(parentwindow, Window)
-
-        if title is None:
-            title = parentwindow.title
-
-        if buttons is None:
-            buttons = [_("OK")]
-        assert buttons, "at least one button is required"
-
-        assert defaultbutton is None or defaultbutton in buttons
-        if defaultbutton is None and len(buttons) == 1:
-            defaultbutton = buttons[0]
-
-        return function(parentwindow, message, title, buttons, defaultbutton)
-
-    # We can't use functools.wraps() because we want to avoid copying
-    # *args showing up in help().
-    result.__doc__ = doc
-    result.__name__ = function.__name__
-    try:
-        result.__qualname__ = function.__qualname__
-    except AttributeError:
-        # Python 3.2.
-        pass
-
-    return result
-
-
-_infodialog = utils.find_attribute('infodialog', _base, defaults)
-_warningdialog = utils.find_attribute('warningdialog', _base, defaults)
-_errordialog = utils.find_attribute('errordialog', _base, defaults)
-_questiondialog = utils.find_attribute('questiondialog', _base, defaults)
-_fontdialog = utils.find_attribute('fontdialog', _base, defaults)
-
-
-@_messagedialog
-def infodialog(*args):
-    """Display a dialog with an information icon."""
-    return _infodialog(*args)
-
-
-@_messagedialog
-def warningdialog(*args):
-    """Display a dialog with a warning icon."""
-    return _warningdialog(*args)
-
-
-@_messagedialog
-def errordialog(*args):
-    """Display a dialog with an error icon."""
-    return _errordialog(*args)
-
-
-@_messagedialog
-def questiondialog(*args):
-    """Display a dialog with a question icon."""
-    return _questiondialog(*args)
-
-
-def colordialog(parentwindow, *, title=None, defaultcolor=bananagui.BLACK):
-    """Ask a color from the user.
-
-    This returns the new color, or None if the user canceled the dialog.
-    """
-    if title is None:
-        title = parentwindow.title
-    return _base.colordialog(parentwindow, defaultcolor, title)
-
-
-def fontdialog(parentwindow, *, title=None, defaultfont=bananagui.Font()):
-    """Ask a font from the user.
-
-    This returns the new font, or None if the user canceled the dialog.
-    """
-    if title is None:
-        title = parentwindow.title
-    return _fontdialog(parentwindow, defaultfont, title)

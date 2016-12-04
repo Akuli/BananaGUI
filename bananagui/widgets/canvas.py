@@ -19,11 +19,13 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Canvas widget for BananaGUI."""
+"""A canvas widget for BananaGUI."""
 
 import bananagui
-from bananagui import _base
+from bananagui import color
 from .basewidgets import Child
+
+_base = bananagui._get_base('widgets.canvas')
 
 
 # TODO: implement an Image that allows drawing things on it instead of
@@ -58,7 +60,7 @@ class Canvas(_base.Canvas, Child):
         self._set_minimum_size(size)
         self._minimum_size = size
 
-    def draw_line(self, start, end, *, thickness=1, color=bananagui.BLACK):
+    def draw_line(self, start, end, *, thickness=1, color=color.BLACK):
         """Draw a line from start to end on the canvas.
 
         start and end should be two-tuples of coordinates. It doesn't
@@ -68,7 +70,7 @@ class Canvas(_base.Canvas, Child):
         super().draw_line(start, end, thickness, color)
 
     def draw_polygon(self, *corners, fillcolor=None,
-                     linecolor=bananagui.BLACK, linethickness=1):
+                     linecolor=color.BLACK, linethickness=1):
         """Draw a polygon.
 
         corners should be two-tuples of coordinates. linecolor and
@@ -82,7 +84,7 @@ class Canvas(_base.Canvas, Child):
                 linecolor=linecolor, linethickness=linethickness)
 
     def draw_oval(self, center, xradius, yradius, *, fillcolor=None,
-                  linecolor=bananagui.BLACK, linethickness=1):
+                  linecolor=color.BLACK, linethickness=1):
         """Draw an oval on the canvas.
 
         linecolor and fillcolor can be None.

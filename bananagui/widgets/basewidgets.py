@@ -24,7 +24,9 @@
 import contextlib
 
 import bananagui
-from bananagui import _base, utils
+from bananagui import utils
+
+_base = bananagui._get_base('widgets.basewidgets')
 
 
 class Widget(_base.Widget):
@@ -159,10 +161,10 @@ class Child(_base.Child, Widget):
         assert isinstance(x, bool) and isinstance(y, bool)
 
 
-class Oriented:
+class __Oriented:
     """Implement an orientation attribute and handy class methods.
 
-    There are many ways to create instances of Oriented subclasses. For
+    There are many ways to create instances of __Oriented subclasses. For
     example, all of these are valid ways to create a horizontal widget:
 
         SomeWidget.horizontal(...)

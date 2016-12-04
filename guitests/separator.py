@@ -19,33 +19,33 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def main():
-    window = gui.Window(title="Separator test")
+    window = widgets.Window(title="Separator test")
 
-    bigbox = gui.Box.vertical(window)
+    bigbox = widgets.Box.vertical(window)
     window.child = bigbox
 
-    toplabel = gui.Label(bigbox, text="Top")
+    toplabel = widgets.Label(bigbox, text="Top")
     bigbox.append(toplabel)
 
-    bigbox.append(gui.Separator.horizontal(bigbox))
+    bigbox.append(widgets.Separator.horizontal(bigbox))
 
-    bottombox = gui.Box.horizontal(bigbox)
+    bottombox = widgets.Box.horizontal(bigbox)
     bigbox.append(bottombox)
 
-    bottomleftlabel = gui.Label(bottombox, text="Bottom left")
+    bottomleftlabel = widgets.Label(bottombox, text="Bottom left")
     bottombox.append(bottomleftlabel)
 
-    bottombox.append(gui.Separator.vertical(bottombox))
+    bottombox.append(widgets.Separator.vertical(bottombox))
 
-    bottomrightlabel = gui.Label(bottombox, text="Bottom right")
+    bottomrightlabel = widgets.Label(bottombox, text="Bottom right")
     bottombox.append(bottomrightlabel)
 
-    window.on_close.append(gui.quit)
-    gui.main()
+    window.on_close.append(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

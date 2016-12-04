@@ -19,25 +19,37 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Widgets that contain text."""
+"""Button widgets."""
 
-from bananagui import _base, utils
+import bananagui
+from bananagui import utils
 from .basewidgets import Child
 
+_base = bananagui._get_base('widgets.buttons')
 
-@utils.add_property('text', add_changed=True)
-class TextBase(_base.TextBase, Child):
-    """A base class for text editing widgets.
 
-    Setting grayed_out to True means that the user can't edit the text.
+class BaseButton(_base.BaseButton, Child):
+    """Base class for other buttons.
 
     Attributes:
-      text              The text in the widget.
-      on_text_changed   List of callbacks that run when the text changes.
+      on_click  List of callbacks that are ran when the button is clicked.
     """
-    # TODO: Add fonts and colors.
 
     can_focus = True
+
+    def __init__(self, *args, **kwargs):
+        self.on_click = []
+        super().__init__(*args, **kwargs)
+
+
+@utils.add_property('text')
+class Button(_base.Button, BaseButton):
+    """A button that displays text in it.
+
+    Attributes:
+      text      The text in the button.
+                An empty string by default.
+    """
 
     def __init__(self, *args, **kwargs):
         self._text = ''
@@ -46,42 +58,19 @@ class TextBase(_base.TextBase, Child):
     def _check_text(self, text):
         assert isinstance(text, str)
 
-    def select_all(self):
-        """Select all text in the widget."""
-        self._select_all()
 
-
-@utils.add_property('secret')
-class Entry(_base.Entry, TextBase):
-    """A one-line text widget.
+@utils.add_property('imagepath')
+class ImageButton(_base.ImageButton, BaseButton):
+    """A button that displays an image.
 
     Attributes:
-      secret    True if the text is hidden with stars or balls.
-                It's also impossible to copy-paste content from a
-                secret entry. This is useful for asking passwords.
+      imagepath     Path to the image displayed in the button or None.
+                    None by default.
     """
 
     def __init__(self, *args, **kwargs):
-        self._secret = False
+        self._imagepath = None
         super().__init__(*args, **kwargs)
 
-    def _check_secret(self, secret):
-        assert isinstance(secret, bool)
-
-
-# TODO: text wrapping.
-# TODO: text alignment?
-@utils.add_property('tab')
-class TextEdit(_base.TextEdit, TextBase):
-    """A multiline text widget.
-
-    Attributes:
-      tab       The character that pressing tab inserts.
-    """
-
-    def __init__(self, *args, **kwargs):
-        self._tab = '\t'
-        super().__init__(*args, **kwargs)
-
-    def _check_tab(self, tab):
-        assert isinstance(tab, str)
+    def _check_imagepath(self, path):
+        assert path is None or isinstance(path, str)

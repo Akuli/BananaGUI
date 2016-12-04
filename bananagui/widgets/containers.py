@@ -29,8 +29,11 @@ except ImportError:
     # Python 3.2, there's no separate collections.abc.
     import collections as abcoll
 
-from bananagui import _base, utils
-from .basewidgets import Parent, Child, Oriented
+import bananagui
+from bananagui import utils
+from .basewidgets import Parent, Child, __Oriented
+
+_base = bananagui._get_base('widgets.containers')
 
 
 # This is not a Child because Window is based on this.
@@ -53,7 +56,7 @@ class Bin(_base.Bin, Parent):
             assert child.parent is self
 
 
-class Box(abcoll.MutableSequence, Oriented, _base.Box, Parent, Child):
+class Box(abcoll.MutableSequence, __Oriented, _base.Box, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
     To access the children just treat the Box object like a list:

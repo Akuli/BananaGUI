@@ -19,11 +19,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import gui
+import shutil
+
+from bananagui import font
+
+
+def table(thinglist):
+    """Pretty-print a table."""
+    maxlen = max(map(len, thinglist))
+    columns = shutil.get_terminal_size().columns // (maxlen + 2)
+    if columns < 2:
+        for thing in thinglist:
+            print(thing)
+    else:
+        for start in range(0, len(thinglist), columns):
+            end = start + columns
+            row = thinglist[start:end]
+            string = '  '.join(item.ljust(maxlen) for item in row)
+            print(string.rstrip())
 
 
 def main():
-    print(gui.get_font_families())
+    table(font.get_families())
 
 
 if __name__ == '__main__':

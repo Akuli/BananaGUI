@@ -19,9 +19,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import _base, utils
+"""Widgets that indicate progress."""
+
+import bananagui
+from bananagui import utils
 from bananagui.bases import defaults
 from .basewidgets import Child
+
+_base = bananagui._get_base('widgets.progress')
 
 
 @utils.add_property('progress')

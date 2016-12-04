@@ -21,7 +21,7 @@
 
 """BananaGUI checkbox test."""
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def on_check(checkbox):
@@ -32,13 +32,13 @@ def on_check(checkbox):
 
 
 def main():
-    with gui.Window(title="Checkbox test", size=(200, 50)) as window:
-        checkbox = gui.Checkbox(window, text="Check me!")
+    with widgets.Window(title="Checkbox test", size=(200, 50)) as window:
+        checkbox = widgets.Checkbox(window, text="Check me!")
         checkbox.on_checked_changed.append(on_check)
         window.child = checkbox
 
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':

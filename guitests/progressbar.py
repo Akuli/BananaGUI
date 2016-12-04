@@ -21,7 +21,7 @@
 
 import functools
 
-from bananagui import gui
+from bananagui import mainloop, widgets
 
 
 def set_progress(progressbar, spinbox):
@@ -33,33 +33,33 @@ def toggle_bouncing(progressbar, checkbox):
 
 
 def main():
-    with gui.Window(title="Progress bar test") as window:
-        box = gui.Box.vertical(window)
+    with widgets.Window(title="Progress bar test") as window:
+        box = widgets.Box.vertical(window)
         window.child = box
 
         # A regular progress bar.
-        progressbar = gui.Progressbar(box, expand=(True, False))
+        progressbar = widgets.Progressbar(box, expand=(True, False))
         box.append(progressbar)
 
-        spinbox = gui.Spinbox(box, valuerange=range(101),
+        spinbox = widgets.Spinbox(box, valuerange=range(101),
                               expand=(True, False))
         spin_callback = functools.partial(set_progress, progressbar)
         spinbox.on_value_changed.append(spin_callback)
         box.append(spinbox)
 
-        box.append(gui.Dummy(box))
+        box.append(widgets.Dummy(box))
 
         # A bouncing progress bar.
-        bouncingbar = gui.BouncingProgressbar(box, expand=(True, False))
+        bouncingbar = widgets.BouncingProgressbar(box, expand=(True, False))
         box.append(bouncingbar)
 
-        checkbox = gui.Checkbox(box, text="Bouncing", expand=(True, False))
+        checkbox = widgets.Checkbox(box, text="Bouncing", expand=(True, False))
         check_callback = functools.partial(toggle_bouncing, bouncingbar)
         checkbox.on_checked_changed.append(check_callback)
         box.append(checkbox)
 
-        window.on_close.append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':
