@@ -98,7 +98,10 @@ def load(*args):
 
 
 class _AttributeMix:
-    """An object that gets its attributes from two modules."""
+    """An object that gets its attributes from two modules.
+
+    This is used only internally by BananaGUI.
+    """
 
     def __init__(self, *modules):
         self.__modules = modules
