@@ -23,7 +23,7 @@
 
 # flake8: noqa
 
-from .basewidgets import Widget, Parent, Child, __Oriented
+from .basewidgets import Widget, Parent, Child, _Oriented
 from .buttons import BaseButton, Button, ImageButton
 from .canvas import Canvas
 from .containers import Bin, Box, Scroller

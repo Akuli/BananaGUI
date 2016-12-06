@@ -23,7 +23,7 @@
 
 import bananagui
 from bananagui import utils
-from .basewidgets import __Oriented, Child
+from .basewidgets import _Oriented, Child
 from .. import mainloop
 
 _base = bananagui._get_base('widgets.misc')
@@ -68,7 +68,7 @@ class Dummy(_base.Dummy, Child):
     """
 
 
-class Separator(__Oriented, _base.Separator, Child):
+class Separator(_Oriented, _base.Separator, Child):
     """A horizontal or vertical line."""
 
     def __init__(self, parent, *, orientation, **kwargs):

@@ -31,7 +31,7 @@ except ImportError:
 
 import bananagui
 from bananagui import utils
-from .basewidgets import Parent, Child, __Oriented
+from .basewidgets import Parent, Child, _Oriented
 
 _base = bananagui._get_base('widgets.containers')
 
@@ -56,7 +56,7 @@ class Bin(_base.Bin, Parent):
             assert child.parent is self
 
 
-class Box(abcoll.MutableSequence, __Oriented, _base.Box, Parent, Child):
+class Box(abcoll.MutableSequence, _Oriented, _base.Box, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
     To access the children just treat the Box object like a list:

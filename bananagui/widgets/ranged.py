@@ -23,7 +23,7 @@
 
 import bananagui
 from bananagui import utils
-from .basewidgets import Child, __Oriented
+from .basewidgets import Child, _Oriented
 
 _base = bananagui._get_base('widgets.ranged')
 
@@ -58,5 +58,5 @@ class Spinbox(__Ranged, _base.Spinbox, Child):
     can_focus = True
 
 
-class Slider(__Oriented, __Ranged, _base.Slider, Child):
+class Slider(_Oriented, __Ranged, _base.Slider, Child):
     """A slider for selecting a number."""

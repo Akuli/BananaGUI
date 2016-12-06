@@ -161,10 +161,10 @@ class Child(_base.Child, Widget):
         assert isinstance(x, bool) and isinstance(y, bool)
 
 
-class __Oriented:
+class _Oriented:
     """Implement an orientation attribute and handy class methods.
 
-    There are many ways to create instances of __Oriented subclasses. For
+    There are many ways to create instances of _Oriented subclasses. For
     example, all of these are valid ways to create a horizontal widget:
 
         SomeWidget.horizontal(...)
