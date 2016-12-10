@@ -19,29 +19,22 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""The actual BananaGUI widgets."""
+import tkinter as tk
 
-# flake8: noqa
+import bananagui
+from bananagui.color import brightness
 
-
-def _fix_modules(names):
-    """Make classes and functions seem like they come from here."""
-    for name in names:
-        class_or_func = globals()[name]
-        class_or_func.__module__ = __name__
+from . import mainloop
 
 
-_old_dir = set(dir())
+def set_text(text):
+    mainloop.root.clipboard_clear()
+    mainloop.root.clipboard_append(text)
 
-from .basewidgets import Widget, Parent, Child
-from .buttons import BaseButton, Button, ImageButton
-from .containers import Bin, Box, Scroller
-from .labels import BaseLabel, Label, ImageLabel
-from .misc import Checkbox, Dummy, Separator
-from .progress import Progressbar, BouncingProgressbar, Spinner
-from .ranged import Slider, Spinbox
-from .textwidgets import TextBase, Entry, TextEdit
-#from .trayicon import TrayIcon
-from .window import BaseWindow, Window, Dialog
 
-_fix_modules(set(dir()) - _old_dir - {'_old_dir'})
+def get_text():
+    try:
+        return mainloop.root.clipboard_get()
+    except tk.TclError:
+        # There's nothing on the clipboard.
+        return None

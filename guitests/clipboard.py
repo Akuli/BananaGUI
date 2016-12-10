@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import mainloop, widgets
+from bananagui import clipboard, mainloop, widgets
 
 
 class ClipboardTestWindow(widgets.Window):
@@ -47,10 +47,10 @@ class ClipboardTestWindow(widgets.Window):
         buttonbox.append(pastebutton)
 
     def copy(self, copybutton):
-        widgets.set_clipboard_text(self.entry.text)
+        clipboard.set_text(self.entry.text)
 
     def paste(self, pastebutton):
-        self.entry.text += widgets.get_clipboard_text()
+        self.entry.text += clipboard.get_text()
 
 
 def main():

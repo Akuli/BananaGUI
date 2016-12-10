@@ -19,29 +19,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""The actual BananaGUI widgets."""
+"""Miscellaneous widgets."""
 
-# flake8: noqa
-
-
-def _fix_modules(names):
-    """Make classes and functions seem like they come from here."""
-    for name in names:
-        class_or_func = globals()[name]
-        class_or_func.__module__ = __name__
+import bananagui
+from bananagui import mainloop
 
 
-_old_dir = set(dir())
+def _initcheck():
+    assert mainloop._initialized, \
+        "initialize the main loop before using the clipboard"
 
-from .basewidgets import Widget, Parent, Child
-from .buttons import BaseButton, Button, ImageButton
-from .containers import Bin, Box, Scroller
-from .labels import BaseLabel, Label, ImageLabel
-from .misc import Checkbox, Dummy, Separator
-from .progress import Progressbar, BouncingProgressbar, Spinner
-from .ranged import Slider, Spinbox
-from .textwidgets import TextBase, Entry, TextEdit
-#from .trayicon import TrayIcon
-from .window import BaseWindow, Window, Dialog
 
-_fix_modules(set(dir()) - _old_dir - {'_old_dir'})
+def set_text(text):
+    """Set text to the clipboard."""
+    _initcheck()
+    assert isinstance(text, str)
+    bananagui._get_base('clipboard:set_text')(text)
+
+
+def get_text():
+    """Return the text that is currently on the clipboard.
+
+    This returns None if there is no text on the clipboard.
+    """
+    _initcheck()
+    return bananagui._get_base('clipboard:get_text')()

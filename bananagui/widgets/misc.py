@@ -86,22 +86,3 @@ class Separator(_Oriented, Child):
         self.base = baseclass(self, parent, orientation)
         self.orientation = orientation
         super().__init__(parent, **kwargs)
-
-
-def set_clipboard_text(text):
-    """Set text to the clipboard."""
-    assert mainloop._initialized
-    assert isinstance(text, str)
-    basefunc = bananagui._get_base('widgets.misc:set_clipboard_text')
-    basefunc(text)
-
-
-def get_clipboard_text():
-    """Return the text that is currently on the clipboard.
-
-    The returned value is an empty string if there is no text on the
-    clipboard.
-    """
-    assert mainloop._initialized
-    basefunc = bananagui._get_base('widgets.misc:get_clipboard_text')
-    return basefunc()
