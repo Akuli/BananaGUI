@@ -56,6 +56,10 @@ class TextBase(Child):
 class Entry(TextBase):
     """A one-line text widget.
 
+        ,-----------------------.
+        | Enter something...    |
+        `-----------------------'
+
     Attributes:
       secret    True if the text is hidden with stars or balls.
                 It's also impossible to copy-paste content from a
@@ -77,6 +81,14 @@ class Entry(TextBase):
 @utils.add_property('tab')
 class TextEdit(TextBase):
     """A multiline text widget.
+
+        ,-----------.
+        | Line 0    |
+        | Line 1    |
+        | Line 2    |
+        | Line 3    |
+        |           |
+        `-----------'
 
     Attributes:
       tab       The character that pressing tab inserts.

@@ -143,6 +143,22 @@ class BaseWindow(Bin):
 class Window(BaseWindow):
     """A window that can have child windows.
 
+        ,---------------------------------------.
+        |           Window          | _ | o | X |
+        |---------------------------------------|
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        `---------------------------------------'
+
     The windows don't have a parent window. You can create multiple
     windows like this.
     """
@@ -155,6 +171,25 @@ class Window(BaseWindow):
 
 class Dialog(BaseWindow):
     """A window that has a parent window.
+
+        ,---------------------------------------.
+        |       Parent window       | _ | o | X |
+        |---------------------------------------|
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |               ,-------------------------------.
+        |               |           Dialog          | X |
+        |               |-------------------------------|
+        |               |                               |
+        |               |                               |
+        `---------------|                               |
+                        |                               |
+                        |                               |
+                        `-------------------------------'
 
     This class takes a positional parentwindow argument on initialization.
     The parent window must be an instance of Window and this window may

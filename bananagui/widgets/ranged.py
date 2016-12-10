@@ -52,7 +52,16 @@ class _Ranged:
 
 
 class Spinbox(_Ranged, Child):
-    """A box for selecting a number with arrow buttons up and down."""
+    """A widget for selecting an integer.
+
+        ,-----------------------.
+        | 123           | + | - |
+        `-----------------------'
+
+    Currently spinboxes can't be used with floats because the allowed
+    values are represented by a Python range object, so you need to use
+    an Entry if you want to use floats.
+    """
 
     can_focus = True
 
@@ -65,7 +74,17 @@ class Spinbox(_Ranged, Child):
 
 
 class Slider(_Oriented, _Ranged, Child):
-    """A slider for selecting a number."""
+    """A slider for selecting a number.
+
+        |
+        O   -----O--------
+        |
+        |
+        |
+
+    Currently floats aren't supported. If you want float support, let
+    me know and I'll implement it.
+    """
 
     def __init__(self, parent, *, orientation, valuerange, **kwargs):
         self.orientation = orientation

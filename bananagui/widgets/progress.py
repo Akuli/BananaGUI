@@ -30,6 +30,10 @@ from .basewidgets import Child
 class Progressbar(Child):
     """A progress bar widget.
 
+        ,-------------------.
+        | OOOOOOOOOOO       |
+        `-------------------'
+
     The progress bar is always horizontal. Contact me if you need a
     vertical progress bar and I'll implement it.
 
@@ -54,6 +58,10 @@ class Progressbar(Child):
 class BouncingProgressbar(Child):
     """A Progressbar-like widget that bounces back and forth.
 
+        ,-------------------.
+        |           OOOO    |
+        `-------------------'
+
     This doesn't bounce by default. Set bouncing to True to make it
     bounce.
 
@@ -72,7 +80,13 @@ class BouncingProgressbar(Child):
 
 
 class Spinner(Child):
-    """A waiting spinner.
+    r"""A waiting spinner.
+
+          .---.
+         /     \
+        | .   O |
+         \ - o /
+          `---'
 
     The spinner doesn't spin by default. You can set spinning to True
     to make it spin.

@@ -57,6 +57,14 @@ class Bin(Parent):
 class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
+        ,----------.
+        |  box[0]  |    ,-----------------------------------.
+        |----------|    |   box[0]  |   box[1]  |   box[2]  |
+        |  box[1]  |    `-----------------------------------'
+        |----------|
+        |  box[2]  |
+        `----------'
+
     To access the children just treat the Box object like a list:
 
         box.append(child)   # add a child
@@ -131,6 +139,19 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
 # TODO: allow scrolling in one direction only.
 class Scroller(Bin, Child):
     """A container that adds scrollbars around its child.
+
+        ,-------------.
+        |           | |
+        |           | |
+        |    big    | |
+        |   child   | |
+        |   widget  | |
+        |           |o|
+        |           |o|
+        |           |o|
+        |___________|_|
+        |  ooo        |
+        `-------------'
 
     The scroller displays a horizontal and a vertical scrollbar
     automatically when needed.

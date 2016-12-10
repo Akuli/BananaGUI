@@ -32,7 +32,11 @@ class BaseLabel(Child):
 
 @utils.add_property('text')
 class Label(BaseLabel):
-    """A label with text in it.
+    """A widget that displays text.
+
+        ,---------------.
+        |  Hello World! |
+        `---------------'
 
     The text is always centered. If you would like to have text that
     aligns to left or right instead, let me know and I'll implement it.
@@ -54,7 +58,16 @@ class Label(BaseLabel):
 
 @utils.add_property('imagepath')
 class ImageLabel(BaseLabel):
-    """A label that contains an image.
+    r"""A widget that displays an image.
+
+        ,---------------.
+        |        __     |
+        |    _  / /     |
+        |     )/ /      |
+        |    /  /_      |
+        |   |  |  \     |
+        |   |_/         |
+        `---------------'
 
     Attributes:
       imagepath     Path to the image displayed in the label or None.

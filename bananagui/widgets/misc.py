@@ -34,6 +34,14 @@ from .basewidgets import _Oriented, Child
 class Checkbox(Child):
     """A widget that can be checked.
 
+        ,-------------------.
+        |   |   Check me!   |
+        `-------------------'
+
+        ,-------------------.
+        | X |  Uncheck me!  |
+        `-------------------'
+
     The Checkbox widget has nothing to do with the Box widget.
 
     Attributes:
@@ -62,8 +70,13 @@ class Checkbox(Child):
 class Dummy(Child):
     """An empty widget.
 
+        ,-----------.
+        |           |
+        |           |
+        `-----------'
+
     This is useful for creating layouts with empty space that must be
-    filled with something.
+    filled with something. See Child's documentation for more info.
     """
 
     def __init__(self, parent, **kwargs):
@@ -73,7 +86,17 @@ class Dummy(Child):
 
 
 class Separator(_Oriented, Child):
-    """A horizontal or vertical line."""
+    """A horizontal or vertical line.
+
+                        ||
+            Widget 1    ||
+        ================||  Widget 3
+            Widget 2    ||
+                        ||
+
+    Usually there's no need to add separators between widgets, but they
+    are sometimes useful.
+    """
 
     def __init__(self, parent, *, orientation, **kwargs):
         # Make the separator expand correctly by default.

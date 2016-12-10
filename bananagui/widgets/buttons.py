@@ -42,7 +42,12 @@ class BaseButton(Child):
 
 @utils.add_property('text')
 class Button(BaseButton):
-    """A button that displays text in it.
+    r"""A button that displays text in it.
+
+         _______________
+        |,--------------\
+        ||   Click me!  |
+        `---------------'
 
     Attributes:
       text      The text in the button.
@@ -61,7 +66,17 @@ class Button(BaseButton):
 
 @utils.add_property('imagepath')
 class ImageButton(BaseButton):
-    """A button that displays an image.
+    r"""A button that displays an image.
+
+         _______________
+        |.--------------\
+        ||       __     |
+        ||   _  / /     |
+        ||    )/ /      |
+        ||   /  /_      |
+        ||  |  |  \     |
+        ||  |_/         |
+        `---------------'
 
     Attributes:
       imagepath     Path to the image displayed in the button or None.
