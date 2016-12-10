@@ -37,7 +37,7 @@ def main():
     message = ("Press tab and then enter. The focus\n"
                "should move to the other button.")
 
-    with widgets.Window(title="Focus test", minimum_size=(250, 150)) as window:
+    with widgets.Window("Focus test", minimum_size=(250, 150)) as window:
         box = widgets.Box.vertical(window)
         window.child = box
 

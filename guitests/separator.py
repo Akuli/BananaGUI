@@ -23,7 +23,7 @@ from bananagui import mainloop, widgets
 
 
 def main():
-    window = widgets.Window(title="Separator test")
+    window = widgets.Window("Separator test")
 
     bigbox = widgets.Box.vertical(window)
     window.child = bigbox

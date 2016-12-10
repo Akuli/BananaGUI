@@ -33,7 +33,7 @@ def toggle_bouncing(progressbar, checkbox):
 
 
 def main():
-    with widgets.Window(title="Progress bar test") as window:
+    with widgets.Window("Progress bar test") as window:
         box = widgets.Box.vertical(window)
         window.child = box
 

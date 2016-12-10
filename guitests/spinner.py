@@ -26,8 +26,8 @@ from bananagui import mainloop, widgets
 
 class SpinnerWindow(widgets.Window):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         mainbox = widgets.Box.vertical(self)
         self.child = mainbox
@@ -54,7 +54,7 @@ class SpinnerWindow(widgets.Window):
 
 
 def main():
-    with SpinnerWindow(title="Spinner window") as window:
+    with SpinnerWindow("Spinner window") as window:
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

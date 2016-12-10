@@ -24,8 +24,8 @@ from bananagui import clipboard, mainloop, widgets
 
 class ClipboardTestWindow(widgets.Window):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         mainbox = widgets.Box.vertical(self)
         self.child = mainbox
@@ -54,7 +54,7 @@ class ClipboardTestWindow(widgets.Window):
 
 
 def main():
-    with ClipboardTestWindow(title="Clipboard test") as window:
+    with ClipboardTestWindow("Clipboard test") as window:
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

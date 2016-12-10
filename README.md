@@ -13,7 +13,7 @@ import bananagui
 from bananagui import mainloop, widgets
 
 bananagui.load('.tkinter')
-with widgets.Window(title="Hello World") as window:
+with widgets.Window("Hello World") as window:
     window.child = widgets.Label(window, "Hello World!")
     window.on_close.append(mainloop.quit)
     mainloop.run()
@@ -40,7 +40,7 @@ def quit_callback(window):
 
 def main():
     bananagui.load('.tkinter')
-    with widgets.Window(title="Hello World 2", size=(300, 120)) as window:
+    with widgets.Window("Hello World 2", size=(300, 120)) as window:
         box = widgets.Box.vertical(window)
         window.child = box
 

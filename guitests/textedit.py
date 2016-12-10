@@ -26,8 +26,8 @@ from bananagui import mainloop, widgets
 
 class TextEditWindow(widgets.Window):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         bigbox = widgets.Box.vertical(self)
         self.child = bigbox
@@ -66,7 +66,7 @@ class TextEditWindow(widgets.Window):
 
 
 def main():
-    with TextEditWindow(title="TextEdit test",
+    with TextEditWindow("TextEdit test",
                         minimum_size=(300, 200)) as window:
         window.on_close.append(mainloop.quit)
         mainloop.run()

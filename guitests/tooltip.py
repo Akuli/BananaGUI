@@ -23,7 +23,7 @@ from bananagui import mainloop, widgets
 
 
 def main():
-    window = widgets.Window(title="Tooltip test")
+    window = widgets.Window("Tooltip test")
 
     box = widgets.Box.vertical(window)
     window.child = box

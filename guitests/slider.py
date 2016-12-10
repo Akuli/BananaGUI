@@ -52,7 +52,7 @@ class SliderBox(widgets.Box):
 
 
 def main():
-    with widgets.Window(title="Slider test") as window:
+    with widgets.Window("Slider test") as window:
         window.child = SliderBox(window)
         window.on_close.append(mainloop.quit)
         mainloop.run()

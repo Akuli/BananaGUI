@@ -87,7 +87,7 @@ class EntryBox(widgets.Box):
 
 
 def main():
-    with widgets.Window(title="Entry test", size=(400, 100)) as window:
+    with widgets.Window("Entry test", size=(400, 100)) as window:
         window.child = EntryBox(window)
         window.on_close.append(mainloop.quit)
         mainloop.run()

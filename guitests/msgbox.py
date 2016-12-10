@@ -24,8 +24,8 @@ from bananagui import color, mainloop, msgbox, widgets
 
 class DialogTest(widgets.Window):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         box = widgets.Box.vertical(self)
         self.child = box
@@ -91,7 +91,7 @@ def close_callback(window):
 
 
 def main():
-    with DialogTest(title="Dialog test") as window:
+    with DialogTest("Dialog test") as window:
         del window.on_close[0]     # The default handler.
         window.on_close.append(close_callback)
         mainloop.run()

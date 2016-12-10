@@ -74,7 +74,7 @@ class BaseWindow(Bin):
 
     can_focus = True
 
-    def __init__(self, *, title='', resizable=True, size=(200, 200),
+    def __init__(self, title, *, resizable=True, size=(200, 200),
                  minimum_size=(None, None), hidden=False, **kwargs):
         self._title = ''
         self._resizable = True
@@ -169,10 +169,10 @@ class Window(BaseWindow):
     windows like this.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, title='', **kwargs):
         baseclass = bananagui._get_base('widgets.window:Window')
         self.base = baseclass(self)
-        super().__init__(**kwargs)
+        super().__init__(title, **kwargs)
 
 
 class Dialog(BaseWindow):
@@ -206,9 +206,9 @@ class Dialog(BaseWindow):
       parentwindow      The parent window set on initialization.
     """
 
-    def __init__(self, parentwindow, **kwargs):
+    def __init__(self, parentwindow, title='', **kwargs):
         assert isinstance(parentwindow, Window)
         baseclass = bananagui._get_base('widgets.window:Dialog')
         self.base = baseclass(self, parentwindow)
         self.parentwindow = parentwindow
-        super().__init__(**kwargs)
+        super().__init__(title, **kwargs)
