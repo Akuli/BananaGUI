@@ -51,10 +51,8 @@ PINK = '#ff00ff'
 #    return re.search(r'^#[0-9a-f]{6}$', hexcolor) is not None
 
 
-def hex2rgb(hexcolor, precision=2):
+def hex2rgb(hexcolor):
     """Convert a hexadecimal color to an RGB tuple.
-
-    If precision is None, it will be guessed based on the color.
 
     >>> hex2rgb('#00ffff')
     (0, 255, 255)
