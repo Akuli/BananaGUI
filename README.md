@@ -1,4 +1,4 @@
-# Banana GUI :banana:
+# BananaGUI :banana:
 
 This is a wrapper around the Python Tkinter and GTK+ 3 bindings. You can
 write code using BananaGUI, and then run the same code using any of
@@ -10,13 +10,13 @@ A minimal Hello World program in BananaGUI looks like this:
 
 ```py
 import bananagui
-bananagui.load('.gtk3', '.tkinter')
-from bananagui import gui
+from bananagui import mainloop, widgets
 
-with gui.Window(title="Hello World") as window:
-    window['child'] = gui.Label(window, text="Hello World!")
-    window['on_close'].append(gui.quit)
-    gui.main()
+bananagui.load('.tkinter')
+with widgets.Window(title="Hello World") as window:
+    window.child = widgets.Label(window, text="Hello World!")
+    window.on_close.append(mainloop.quit)
+    mainloop.run()
 ```
 
 Here's a Hello World with some more features:
@@ -26,7 +26,7 @@ import bananagui
 from bananagui import mainloop, msgbox, widgets
 
 
-def click_callback(event):
+def click_callback(button):
     print("You clicked me!")
 
 
