@@ -53,12 +53,14 @@ class Checkbox(Child):
 
     can_focus = True
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, text='', checked=False, **kwargs):
         self._text = ''
         self._checked = False
         baseclass = bananagui._get_base('widgets.misc:Checkbox')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.text = text
+        self.checked = checked
 
     def _check_text(self, text):
         assert isinstance(text, str)

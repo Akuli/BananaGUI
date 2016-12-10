@@ -42,11 +42,12 @@ class Progressbar(Child):
                     This is always between 0 and 1 (inclusive).
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, progress=0, **kwargs):
         self._progress = 0
         baseclass = bananagui._get_base('widgets.progress:Progressbar')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.progress = progress
 
     def _check_progress(self, progress):
         # This also checks the type because we can't compare with a
@@ -69,11 +70,12 @@ class BouncingProgressbar(Child):
       bouncing      True if the widget bounces back and forth.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, bouncing=False, **kwargs):
         self._bouncing = False
         baseclass = bananagui._get_base('widgets.progress:BouncingProgressbar')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.bouncing = bouncing
 
     def _check_bouncing(self, bouncing):
         assert isinstance(bouncing, bool)
@@ -95,11 +97,12 @@ class Spinner(Child):
       spinning      True if the widget is currently spinning, False if not.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, spinning=False, **kwargs):
         self._spinning = False
         baseclass = bananagui._get_base('widgets.progress:Spinner')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.spinning = spinning
 
     def _check_spinning(self, spinning):
         assert isinstance(spinning, bool)

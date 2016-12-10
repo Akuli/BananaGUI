@@ -54,11 +54,12 @@ class Button(BaseButton):
                 An empty string by default.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, text='', **kwargs):
         self._text = ''
         widgetclass = bananagui._get_base('widgets.buttons:Button')
         self.base = widgetclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.text = text
 
     def _check_text(self, text):
         assert isinstance(text, str)
@@ -83,11 +84,12 @@ class ImageButton(BaseButton):
                     None by default.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, imagepath, **kwargs):
         self._imagepath = None
         widgetclass = bananagui._get_base('widgets.buttons:ImageButton')
         self.base = widgetclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.imagepath = imagepath
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

@@ -26,6 +26,7 @@ from bananagui import utils
 from .basewidgets import Child
 
 
+# TODO: do we need this?
 class BaseLabel(Child):
     """A base class for widgets that are meant for displaying things."""
 
@@ -46,11 +47,12 @@ class Label(BaseLabel):
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, text='', **kwargs):
         self._text = ''
         baseclass = bananagui._get_base('widgets.labels:Label')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.text = text
 
     def _check_text(self, text):
         assert isinstance(text, str)
@@ -73,11 +75,12 @@ class ImageLabel(BaseLabel):
       imagepath     Path to the image displayed in the label or None.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, *, imagepath=None, **kwargs):
         self._imagepath = None
         baseclass = bananagui._get_base('widgets.labels:ImageLabel')
         self.base = baseclass(self, parent)
         super().__init__(parent, **kwargs)
+        self.imagepath = imagepath
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

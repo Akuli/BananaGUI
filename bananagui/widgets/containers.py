@@ -44,9 +44,10 @@ class Bin(Parent):
                 This can be None and this is None by default.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *, child=None):
         self._child = None
-        super().__init__(*args, **kwargs)
+        super().__init__()
+        self.child = child
 
     def _check_child(self, child):
         if child is not None:

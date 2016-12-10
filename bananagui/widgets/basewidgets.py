@@ -43,24 +43,17 @@ class Widget:
 
     can_focus = False
 
-    def __init__(self, **kwargs):
+    def __init__(self):
         if not hasattr(self, 'base'):
             # A subclass didn't override __init__ and define a
             # base.
             raise TypeError("cannot create instances of %r directly, "
                             "instantiate a subclass instead"
                             % type(self).__name__)
-
         if not mainloop._initialized:
             raise ValueError("cannot create widgets without initializing "
                              "the main loop")
-
         self._blocked = set()
-        for name, value in kwargs.items():
-            # TODO: a better check here?
-            if not hasattr(self, name):
-                raise ValueError("invalid keyword argument %r" % name)
-            setattr(self, name, value)
 
     @contextlib.contextmanager
     def block(self, callback_attribute):
@@ -150,19 +143,23 @@ class Child(Widget):
       parent        The parent widget set on initialization.
       tooltip       The widget's tooltip text, or None for no tooltip.
                     None by default.
-      grayed_out    True if the widget looks grayed_out.
+      grayed_out    True if the widget looks like it's disabled.
                     This can be used to tell the user that the widget
                     can't be used for some reason.
       expand        Two-tuple of horizontal and vertical expanding.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, tooltip=None, grayed_out=False,
+                 expand=(True, True)):
         assert isinstance(parent, Parent)
         self.parent = parent
         self._tooltip = None
         self._grayed_out = False
         self._expand = (True, True)
-        super().__init__(**kwargs)
+        super().__init__()
+        self.tooltip = tooltip
+        self.grayed_out = grayed_out
+        self.expand = expand
 
     def _check_tooltip(self, tooltip):
         assert tooltip is None or isinstance(tooltip, str)

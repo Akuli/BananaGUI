@@ -41,7 +41,7 @@ class _Ranged:
     # set the valuerange attribute to it and set the _value attribute
     # to min() of that range.
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, value=None, **kwargs):
         assert isinstance(self.valuerange, range)
         assert len(self.valuerange) >= 2
         assert utils.rangestep(self.valuerange) > 0
@@ -65,12 +65,14 @@ class Spinbox(_Ranged, Child):
 
     can_focus = True
 
-    def __init__(self, parent, *, valuerange, **kwargs):
+    def __init__(self, parent, *, valuerange, value=None, **kwargs):
         self.valuerange = valuerange
         self._value = min(valuerange)
         baseclass = bananagui._get_base('widgets.ranged:Spinbox')
         self.base = baseclass(self, parent, valuerange)
         super().__init__(parent, **kwargs)
+        if value is not None:
+            self.value = value
 
 
 class Slider(_Oriented, _Ranged, Child):
@@ -86,10 +88,13 @@ class Slider(_Oriented, _Ranged, Child):
     me know and I'll implement it.
     """
 
-    def __init__(self, parent, *, orientation, valuerange, **kwargs):
+    def __init__(self, parent, *, orientation, valuerange,
+                 value=None, **kwargs):
         self.orientation = orientation
         self.valuerange = valuerange
         self._value = min(valuerange)
         baseclass = bananagui._get_base('widgets.ranged:Slider')
         self.base = baseclass(self, parent, orientation, valuerange)
         super().__init__(parent, **kwargs)
+        if value is not None:
+            self.value = value
