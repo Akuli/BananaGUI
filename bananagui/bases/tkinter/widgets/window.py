@@ -20,7 +20,6 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import tkinter as tk
-from tkinter import colorchooser
 
 from .containers import Bin
 

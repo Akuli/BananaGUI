@@ -24,10 +24,9 @@
 import bananagui
 from bananagui import utils
 from .basewidgets import _Oriented, Child
-from .. import mainloop
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
-# TODO: move Checkbox, Radiostuff and everything else to a checkboxes.py?
+# TODO: move Checkbox, Radiostuff and stuff like that to a checkboxes.py?
 
 
 @utils.add_property('text')

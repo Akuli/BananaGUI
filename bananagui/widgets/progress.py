@@ -23,7 +23,6 @@
 
 import bananagui
 from bananagui import utils
-from bananagui.bases import defaults
 from .basewidgets import Child
 
 

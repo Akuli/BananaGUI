@@ -21,9 +21,6 @@
 
 import tkinter as tk
 
-import bananagui
-from bananagui.color import brightness
-
 from . import mainloop
 
 
