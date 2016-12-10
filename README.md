@@ -23,37 +23,37 @@ Here's a Hello World with some more features:
 
 ```py
 import bananagui
-bananagui.load('.gtk3', '.tkinter')
-from bananagui import gui
+from bananagui import mainloop, msgbox, widgets
 
 
 def click_callback(event):
     print("You clicked me!")
 
 
-def quit_callback(event):
-    response = gui.questiondialog(
-        event.widget, "Are you sure you want to say Goodbye World?",
+def quit_callback(window):
+    response = msgbox.question(
+        window, "Are you sure you want to say Goodbye World?",
         title="Goodbye World", buttons=["Yes, Goodbye World!", "No"])
     if response == "Yes, Goodbye World!":
-        gui.quit()
+        mainloop.quit()
 
 
 def main():
-    with gui.Window(title="Hello World 2", size=(300, 120)) as window:
-        box = gui.Box.vertical(window)
-        window['child'] = box
+    bananagui.load('.tkinter')
+    with widgets.Window(title="Hello World 2", size=(300, 120)) as window:
+        box = widgets.Box.vertical(window)
+        window.child = box
 
-        label = gui.Label(box, text="Hello World!")
-        box['children'].append(label)
+        label = widgets.Label(box, text="Hello World!")
+        box.append(label)
 
-        button = gui.Button(box, text="Click me!")
-        button['on_click'].append(click_callback)
-        box['children'].append(button)
+        button = widgets.Button(box, text="Click me!")
+        button.on_click.append(click_callback)
+        box.append(button)
 
-        del window['on_close'][0]  # The default callback.
-        window['on_close'].append(quit_callback)
-        gui.main()
+        del window.on_close[0]  # The default callback.
+        window.on_close.append(quit_callback)
+        mainloop.run()
 
 
 if __name__ == '__main__':
@@ -65,35 +65,37 @@ You can also write your GUI using the .ini format and then load it with
 
 ```py
 import bananagui
-bananagui.load('.gtk3', '.tkinter')
-from bananagui import gui, iniloader
+from bananagui import iniloader, mainloop
 
 
 # Usually this would be in another file.
-
 INI = """\
 [window]
-class = gui.Window
+class = widgets.Window
 title = "Hello World 3"
 child = label
 
 [label]
-class = gui.Label
+class = widgets.Label
 parent = window
 text = "Hello World!"
 """
 
 
 def main():
+    bananagui.load('.tkinter')
     widgets = iniloader.load_ini(INI)
+    # Now widgets is a dictionary.
     with widgets['window'] as window:
-        window['on_close'].append(gui.quit)
-        gui.main()
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
 
 
 if __name__ == '__main__':
     main()
 ```
+
+See [the guitests directory](guitests) for more examples.
 
 I don't have good documentation anywhere yet, but calling `help()` on
 things should be useful in many places. You can also read the source if
