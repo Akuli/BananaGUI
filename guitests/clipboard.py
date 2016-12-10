@@ -38,7 +38,7 @@ class ClipboardTestWindow(widgets.Window):
         buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
         mainbox.append(buttonbox)
 
-        copybutton = widgets.Button(buttonbox, text="Copy everything")
+        copybutton = widgets.Button(buttonbox, "Copy everything")
         copybutton.on_click.append(self.copy)
         buttonbox.append(copybutton)
 

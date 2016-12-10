@@ -38,11 +38,11 @@ class SpinnerWindow(widgets.Window):
         buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
         mainbox.append(buttonbox)
 
-        startbutton = widgets.Button(buttonbox, text="Start")
+        startbutton = widgets.Button(buttonbox, "Start")
         startbutton.on_click.append(self.start)
         buttonbox.append(startbutton)
 
-        stopbutton = widgets.Button(buttonbox, text="Stop")
+        stopbutton = widgets.Button(buttonbox, "Stop")
         stopbutton.on_click.append(self.stop)
         buttonbox.append(stopbutton)
 

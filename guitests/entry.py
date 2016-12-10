@@ -40,24 +40,24 @@ class EntryBox(widgets.Box):
         buttonbox = widgets.Box.horizontal(self, expand=(True, False))
         self.append(buttonbox)
 
-        resetbutton = widgets.Button(buttonbox, text="Reset")
+        resetbutton = widgets.Button(buttonbox, "Reset")
         resetbutton.on_click.append(self.reset)
         buttonbox.append(resetbutton)
 
-        selectallbutton = widgets.Button(buttonbox, text="Select all")
+        selectallbutton = widgets.Button(buttonbox, "Select all")
         selectallbutton.on_click.append(self.select_all)
         buttonbox.append(selectallbutton)
 
-        focusbutton = widgets.Button(buttonbox, text="Focus")
+        focusbutton = widgets.Button(buttonbox, "Focus")
         focusbutton.on_click.append(self.get_focus)
         buttonbox.append(focusbutton)
 
-        grayedcheckbox = widgets.Checkbox(buttonbox, text="Grayed out")
+        grayedcheckbox = widgets.Checkbox(buttonbox, "Grayed out")
         grayedcheckbox.on_checked_changed.append(
             self.grayed_out_toggled)
         buttonbox.append(grayedcheckbox)
 
-        secretcheckbox = widgets.Checkbox(buttonbox, text="Secret")
+        secretcheckbox = widgets.Checkbox(buttonbox, "Secret")
         secretcheckbox.on_checked_changed.append(self.secret_toggled)
         buttonbox.append(secretcheckbox)
 

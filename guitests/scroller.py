@@ -11,7 +11,7 @@ def main():
         the_text = '\n'.join(map(template.format, range(20)))
 
         scroller = widgets.Scroller(window)
-        scroller.child = widgets.Label(scroller, text=the_text)
+        scroller.child = widgets.Label(scroller, the_text)
         window.child = scroller
 
         window.on_close.append(mainloop.quit)

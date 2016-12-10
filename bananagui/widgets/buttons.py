@@ -54,7 +54,7 @@ class Button(BaseButton):
                 An empty string by default.
     """
 
-    def __init__(self, parent, *, text='', **kwargs):
+    def __init__(self, parent, text='', **kwargs):
         self._text = ''
         widgetclass = bananagui._get_base('widgets.buttons:Button')
         self.base = widgetclass(self, parent)
@@ -84,7 +84,7 @@ class ImageButton(BaseButton):
                     None by default.
     """
 
-    def __init__(self, parent, *, imagepath, **kwargs):
+    def __init__(self, parent, imagepath=None, **kwargs):
         self._imagepath = None
         widgetclass = bananagui._get_base('widgets.buttons:ImageButton')
         self.base = widgetclass(self, parent)

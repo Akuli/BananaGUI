@@ -30,23 +30,23 @@ class DialogTest(widgets.Window):
         box = widgets.Box.vertical(self)
         self.child = box
 
-        infobutton = widgets.Button(box, text="Info")
+        infobutton = widgets.Button(box, "Info")
         infobutton.on_click.append(self.info)
         box.append(infobutton)
 
-        warningbutton = widgets.Button(box, text="Warning")
+        warningbutton = widgets.Button(box, "Warning")
         warningbutton.on_click.append(self.warning)
         box.append(warningbutton)
 
-        errorbutton = widgets.Button(box, text="Error")
+        errorbutton = widgets.Button(box, "Error")
         errorbutton.on_click.append(self.error)
         box.append(errorbutton)
 
-        questionbutton = widgets.Button(box, text="Question")
+        questionbutton = widgets.Button(box, "Question")
         questionbutton.on_click.append(self.question)
         box.append(questionbutton)
 
-        colorbutton = widgets.Button(box, text="Choose a color...")
+        colorbutton = widgets.Button(box, "Choose a color...")
         colorbutton.on_click.append(self.choose_color)
         box.append(colorbutton)
 

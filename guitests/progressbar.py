@@ -53,7 +53,7 @@ def main():
         bouncingbar = widgets.BouncingProgressbar(box, expand=(True, False))
         box.append(bouncingbar)
 
-        checkbox = widgets.Checkbox(box, text="Bouncing", expand=(True, False))
+        checkbox = widgets.Checkbox(box, "Bouncing", expand=(True, False))
         check_callback = functools.partial(toggle_bouncing, bouncingbar)
         checkbox.on_checked_changed.append(check_callback)
         box.append(checkbox)

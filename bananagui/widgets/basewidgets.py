@@ -149,7 +149,7 @@ class Child(Widget):
       expand        Two-tuple of horizontal and vertical expanding.
     """
 
-    def __init__(self, parent, tooltip=None, grayed_out=False,
+    def __init__(self, parent, *, tooltip=None, grayed_out=False,
                  expand=(True, True)):
         assert isinstance(parent, Parent)
         self.parent = parent

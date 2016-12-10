@@ -47,7 +47,7 @@ class Label(BaseLabel):
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, parent, *, text='', **kwargs):
+    def __init__(self, parent, text='', **kwargs):
         self._text = ''
         baseclass = bananagui._get_base('widgets.labels:Label')
         self.base = baseclass(self, parent)
@@ -75,7 +75,7 @@ class ImageLabel(BaseLabel):
       imagepath     Path to the image displayed in the label or None.
     """
 
-    def __init__(self, parent, *, imagepath=None, **kwargs):
+    def __init__(self, parent, imagepath=None, **kwargs):
         self._imagepath = None
         baseclass = bananagui._get_base('widgets.labels:ImageLabel')
         self.base = baseclass(self, parent)

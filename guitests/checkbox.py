@@ -35,7 +35,7 @@ def on_check(checkbox):
 
 def main():
     with widgets.Window(title="Checkbox test", size=(200, 50)) as window:
-        checkbox = widgets.Checkbox(window, text="Check me!")
+        checkbox = widgets.Checkbox(window, "Check me!")
         checkbox.on_checked_changed.append(on_check)
         window.child = checkbox
 

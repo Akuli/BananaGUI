@@ -30,15 +30,15 @@ class SliderBox(widgets.Box):
 
         values = range(0, 51, 5)
 
-        hslider = widgets.Slider.horizontal(self, valuerange=values)
+        hslider = widgets.Slider.horizontal(self, values)
         hslider.on_value_changed.append(self.value_changed)
         self.append(hslider)
 
-        vslider = widgets.Slider.vertical(self, valuerange=values)
+        vslider = widgets.Slider.vertical(self, values)
         vslider.on_value_changed.append(self.value_changed)
         self.append(vslider)
 
-        spinbox = widgets.Spinbox(self, valuerange=values)
+        spinbox = widgets.Spinbox(self, values)
         spinbox.on_value_changed.append(self.value_changed)
         self.append(spinbox)
 

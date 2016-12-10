@@ -44,11 +44,11 @@ def main():
         label = widgets.Label(box, text=message)
         box.append(label)
 
-        button1 = widgets.Button(box, text="Focus the button below")
+        button1 = widgets.Button(box, "Focus the button below")
         button1.on_click.append(on_click)
         box.append(button1)
 
-        button2 = widgets.Button(box, text="Focus the button above")
+        button2 = widgets.Button(box, "Focus the button above")
         button2.on_click.append(on_click)
         box.append(button2)
 

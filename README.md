@@ -14,7 +14,7 @@ from bananagui import mainloop, widgets
 
 bananagui.load('.tkinter')
 with widgets.Window(title="Hello World") as window:
-    window.child = widgets.Label(window, text="Hello World!")
+    window.child = widgets.Label(window, "Hello World!")
     window.on_close.append(mainloop.quit)
     mainloop.run()
 ```
@@ -44,14 +44,14 @@ def main():
         box = widgets.Box.vertical(window)
         window.child = box
 
-        label = widgets.Label(box, text="Hello World!")
+        label = widgets.Label(box, "Hello World!")
         box.append(label)
 
-        button = widgets.Button(box, text="Click me!")
+        button = widgets.Button(box, "Click me!")
         button.on_click.append(click_callback)
         box.append(button)
 
-        del window.on_close[0]  # The default callback.
+        del window.on_close[0]  # Delete the default callback.
         window.on_close.append(quit_callback)
         mainloop.run()
 

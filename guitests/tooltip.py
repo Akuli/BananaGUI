@@ -28,9 +28,9 @@ def main():
     box = widgets.Box.vertical(window)
     window.child = box
 
-    toplabel = widgets.Label(box, text="Top label!",
+    toplabel = widgets.Label(box, "Top label!",
                              tooltip="Top label tooltip!")
-    bottomlabel = widgets.Label(box, text="Bottom label!",
+    bottomlabel = widgets.Label(box, "Bottom label!",
                                 tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
 

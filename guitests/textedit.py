@@ -32,22 +32,22 @@ class TextEditWindow(widgets.Window):
         bigbox = widgets.Box.vertical(self)
         self.child = bigbox
 
-        self.textedit = widgets.TextEdit(bigbox, text="Enter something...")
+        self.textedit = widgets.TextEdit(bigbox, "Enter something...")
         self.textedit.on_text_changed.append(self.text_changed)
         bigbox.append(self.textedit)
 
         buttonbox = widgets.Box.horizontal(bigbox, expand=(True, False))
         bigbox.append(buttonbox)
 
-        addbutton = widgets.Button(buttonbox, text="Add text")
+        addbutton = widgets.Button(buttonbox, "Add text")
         addbutton.on_click.append(self.add_text)
         buttonbox.append(addbutton)
 
-        clearbutton = widgets.Button(buttonbox, text="Clear")
+        clearbutton = widgets.Button(buttonbox, "Clear")
         clearbutton.on_click.append(self.clear)
         buttonbox.append(clearbutton)
 
-        selectallbutton = widgets.Button(buttonbox, text="Select all")
+        selectallbutton = widgets.Button(buttonbox, "Select all")
         selectallbutton.on_click.append(self.select_all)
         buttonbox.append(selectallbutton)
 

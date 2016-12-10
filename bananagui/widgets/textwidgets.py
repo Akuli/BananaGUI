@@ -40,7 +40,7 @@ class TextBase(Child):
 
     can_focus = True
 
-    def __init__(self, parent, *, text='', **kwargs):
+    def __init__(self, parent, text='', **kwargs):
         self._text = ''
         super().__init__(parent, **kwargs)
         self.text = text
@@ -67,11 +67,11 @@ class Entry(TextBase):
                 secret entry. This is useful for asking passwords.
     """
 
-    def __init__(self, parent, *, secret=False, **kwargs):
+    def __init__(self, parent, text='', *, secret=False, **kwargs):
         self._secret = False
         baseclass = bananagui._get_base('widgets.textwidgets:Entry')
         self.base = baseclass(self, parent)
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, text=text, **kwargs)
         self.secret = secret
 
     def _check_secret(self, secret):
@@ -96,11 +96,11 @@ class TextEdit(TextBase):
       tab       The character that pressing tab inserts.
     """
 
-    def __init__(self, parent, *, tab='\t', **kwargs):
+    def __init__(self, parent, text='', *, tab='\t', **kwargs):
         self._tab = '\t'
         baseclass = bananagui._get_base('widgets.textwidgets:TextEdit')
         self.base = baseclass(self, parent)
-        super().__init__(parent, **kwargs)
+        super().__init__(parent, text=text, **kwargs)
         self.tab = tab
 
     def _check_tab(self, tab):

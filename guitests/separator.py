@@ -28,7 +28,7 @@ def main():
     bigbox = widgets.Box.vertical(window)
     window.child = bigbox
 
-    toplabel = widgets.Label(bigbox, text="Top")
+    toplabel = widgets.Label(bigbox, "Top")
     bigbox.append(toplabel)
 
     bigbox.append(widgets.Separator.horizontal(bigbox))
@@ -36,12 +36,12 @@ def main():
     bottombox = widgets.Box.horizontal(bigbox)
     bigbox.append(bottombox)
 
-    bottomleftlabel = widgets.Label(bottombox, text="Bottom left")
+    bottomleftlabel = widgets.Label(bottombox, "Bottom left")
     bottombox.append(bottomleftlabel)
 
     bottombox.append(widgets.Separator.vertical(bottombox))
 
-    bottomrightlabel = widgets.Label(bottombox, text="Bottom right")
+    bottomrightlabel = widgets.Label(bottombox, "Bottom right")
     bottombox.append(bottomrightlabel)
 
     window.on_close.append(mainloop.quit)

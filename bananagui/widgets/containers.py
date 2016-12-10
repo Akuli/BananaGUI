@@ -44,10 +44,11 @@ class Bin(Parent):
                 This can be None and this is None by default.
     """
 
-    def __init__(self, *, child=None):
+    # It's impossible to give a child on initialization because this
+    # widget needs to exist before a child can be created into this.
+    def __init__(self):
         self._child = None
         super().__init__()
-        self.child = child
 
     def _check_child(self, child):
         if child is not None:
