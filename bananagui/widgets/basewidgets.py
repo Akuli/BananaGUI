@@ -24,19 +24,18 @@
 import contextlib
 
 import bananagui
-from bananagui import utils
-
-_base = bananagui._get_base('widgets.basewidgets')
+from bananagui import mainloop, utils
 
 
-class Widget(_base.Widget):
+class Widget:
     """A baseclass for all widgets.
 
     Initialization keyword arguments are set as attributes to the
     instance.
 
     Attributes:
-      real_widget   The GUI toolkit widget that BananaGUI uses.
+      base          The real GUI toolkit widget that BananaGUI uses.
+                    This exposes all methods that the GUI toolkit has.
       can_focus     True if focus() can be called.
                     Unlike most other attributes in BananaGUI, this
                     is a class attribute.
@@ -45,9 +44,20 @@ class Widget(_base.Widget):
     can_focus = False
 
     def __init__(self, **kwargs):
+        if not hasattr(self, 'base'):
+            # A subclass didn't override __init__ and define a
+            # base.
+            raise TypeError("cannot create instances of %r directly, "
+                            "instantiate a subclass instead"
+                            % type(self).__name__)
+
+        if not mainloop._initialized:
+            raise ValueError("cannot create widgets without initializing "
+                             "the main loop")
+
         self._blocked = set()
         for name, value in kwargs.items():
-            # Don't allow setting non-existent attributes.
+            # TODO: a better check here?
             if not hasattr(self, name):
                 raise ValueError("invalid keyword argument %r" % name)
             setattr(self, name, value)
@@ -59,8 +69,11 @@ class Widget(_base.Widget):
         Blocking is instance-specific.
         """
         assert isinstance(callback_attribute, str)
-        assert callback_attribute not in self._blocked, \
-            "cannot block the same callback twice"
+
+        # This is important, we don't rely on an assertion here.
+        if callback_attribute in self._blocked:
+            raise ValueError("cannot block %r twice" % (callback_attribute,))
+
         self._blocked.add(callback_attribute)
         try:
             yield
@@ -85,18 +98,19 @@ class Widget(_base.Widget):
         one of them to make sure that the widget gets focused with
         all GUI toolkits.
         """
-        assert type(self).can_focus
-        self._focus()
+        cls = type(self)
+        assert cls.can_focus, "cannot focus %r widgets" % cls.__name__
+        self.base.focus()
 
 
-class Parent(_base.Parent, Widget):
+class Parent(Widget):
     """A base class for widgets that contain other widgets."""
 
 
 @utils.add_property('tooltip')
 @utils.add_property('grayed_out')
 @utils.add_property('expand')
-class Child(_base.Child, Widget):
+class Child(Widget):
     """A base class for widgets that can be added to Parent widgets.
 
     Children take a positional parent argument on initialization.
@@ -165,19 +179,20 @@ class _Oriented:
     """Implement an orientation attribute and handy class methods.
 
     There are many ways to create instances of _Oriented subclasses. For
-    example, all of these are valid ways to create a horizontal widget:
+    example, all of these do the same thing:
 
-        SomeWidget.horizontal(...)
-        SomeWidget(..., orientation='h')
         SomeWidget(..., orientation=bananagui.HORIZONTAL)
+        SomeWidget(..., orientation='h')
+        SomeWidget.horizontal(...)
 
     Attributes:
       orientation       The orientation set on initialization.
     """
 
-    def __init__(self, *args, orientation, **kwargs):
-        assert orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}
-        self.orientation = orientation
+    # Subclasses should define self.orientation from a keyword-only
+    # orientation argument.
+    def __init__(self, *args, **kwargs):
+        assert self.orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}
         super().__init__(*args, **kwargs)
 
     @classmethod

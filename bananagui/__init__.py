@@ -26,7 +26,9 @@ the same code using any of the supported GUI toolkits, including PyQt5,
 GTK+ 3 and tkinter.
 """
 
-from bananagui import utils
+import functools
+
+from bananagui import mainloop, utils
 
 
 __author__ = 'Akuli'
@@ -55,16 +57,7 @@ RUN_AGAIN = -1
 _base = None
 
 
-def _load(name):
-    global _base
-
-    # Make sure the base can be imported and THEN set _base to it.
-    fullname = utils.resolve_modulename(name, 'bananagui.bases')
-    utils.import_module(fullname)
-    _base = fullname
-
-
-def load(*args):
+def load(*args, init_mainloop=True):
     """Load a BananaGUI base module.
 
     The arguments should be Python module names. If they are relative,
@@ -75,7 +68,9 @@ def load(*args):
     loading one of them succeeds. You can import bananagui.gui after
     calling this.
 
-    The possibly relative name of the loaded base module is returned.
+    For convenience, bananagui.mainloop.init() will be called if
+    init_mainloop is True. The possibly relative name of the loaded
+    base module is returned.
     """
     assert args, "specify at least one module"
 
@@ -84,66 +79,51 @@ def load(*args):
         raise RuntimeError("don't call bananagui.load() twice")
 
     if len(args) == 1:
-        _load(args[0])
+        # Make sure the base can be imported and THEN set _base to it.
+        fullname = utils.resolve_modulename(args[0], 'bananagui.bases')
+        assert fullname != 'bananagui.bases.defaults', \
+            "the '.defaults' base can't be loaded directly"
+        utils.import_module(fullname)
+        _base = fullname
+        if init_mainloop:
+            mainloop.init()
         return args[0]
     else:
         # Attempt to load each base.
         for arg in args:
             try:
-                _load(arg)
-                return arg
+                return load(arg)
             except ImportError:
                 pass
         raise ImportError("cannot load any of the requested base modules")
 
 
-class _AttributeMix:
-    """An object that gets its attributes from two modules.
-
-    This is used only internally by BananaGUI.
-    """
-
-    def __init__(self, *modules):
-        self.__modules = modules
-
-    def __dir__(self):
-        result = set()
-        for module in self.__modules:
-            result |= set(dir(module))
-        return sorted(result)       # Be consistent.
-
-    def __getattr__(self, attribute):
-        for module in self.__modules:
-            try:
-                value = getattr(module, attribute)
-                break
-            except AttributeError:
-                pass
-        else:  # The attribute wasn't found.
-            raise AttributeError("no such attribute: %r" % attribute)
-
-        # The attribute is setattr()ed to self so self.__dict__ works
-        # as a cache of attributes and __getattr__ isn't called when
-        # it's not needed.
-        setattr(self, attribute, value)
-        return value
-
-
-def _get_base(modulename):
-    """Import and return a base module for modulename.
+# This is a bit hacky because different things can come from the base
+# or an alternative default base.
+@functools.lru_cache()
+def _get_base(name):
+    """Get an object from the base module.
 
     For example, if bananagui.load has been called with '.tkinter',
-    _get_base('thingy') returns an object that gets its attributes
-    from bananagui.bases.tkinter.thingy and, if it exists,
-    bananagui.bases.defaults.thingy.
+    _get_base('a.b:c') imports bananagui.bases.tkinter.a.b and returns
+    its c attribute. An exception is raised if load() hasn't been
+    called.
     """
     if _base is None:
         raise ImportError("bananagui.load() wasn't called")
 
-    modules = [utils.import_module(_base + '.' + modulename)]
-    defaultname = 'bananagui.bases.defaults.' + modulename
+    modulename, attribute = name.split(':')
+    basemodule = utils.import_module(_base + '.' + modulename)
     try:
-        modules.append(utils.import_module(defaultname))
+        defaultmodule = utils.import_module(
+            'bananagui.bases.defaults.' + modulename)
     except ImportError:
-        pass
-    return _AttributeMix(*modules)
+        # There isn't a default base, basemodule needs to have the
+        # attribute.
+        return getattr(basemodule, attribute)
+    # There is a default base, we can use that if the base module
+    # doesn't have the attribute.
+    try:
+        return getattr(basemodule, attribute)
+    except AttributeError:
+        return getattr(defaultmodule, attribute)

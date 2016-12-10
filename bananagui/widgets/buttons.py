@@ -25,10 +25,8 @@ import bananagui
 from bananagui import utils
 from .basewidgets import Child
 
-_base = bananagui._get_base('widgets.buttons')
 
-
-class BaseButton(_base.BaseButton, Child):
+class BaseButton(Child):
     """Base class for other buttons.
 
     Attributes:
@@ -37,13 +35,13 @@ class BaseButton(_base.BaseButton, Child):
 
     can_focus = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self.on_click = []
-        super().__init__(*args, **kwargs)
+        super().__init__(parent, **kwargs)
 
 
 @utils.add_property('text')
-class Button(_base.Button, BaseButton):
+class Button(BaseButton):
     """A button that displays text in it.
 
     Attributes:
@@ -51,16 +49,18 @@ class Button(_base.Button, BaseButton):
                 An empty string by default.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._text = ''
-        super().__init__(*args, **kwargs)
+        widgetclass = bananagui._get_base('widgets.buttons:Button')
+        self.base = widgetclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_text(self, text):
         assert isinstance(text, str)
 
 
 @utils.add_property('imagepath')
-class ImageButton(_base.ImageButton, BaseButton):
+class ImageButton(BaseButton):
     """A button that displays an image.
 
     Attributes:
@@ -68,9 +68,11 @@ class ImageButton(_base.ImageButton, BaseButton):
                     None by default.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._imagepath = None
-        super().__init__(*args, **kwargs)
+        widgetclass = bananagui._get_base('widgets.buttons:ImageButton')
+        self.base = widgetclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

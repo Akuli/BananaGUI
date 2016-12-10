@@ -23,15 +23,26 @@
 
 # flake8: noqa
 
-from .basewidgets import Widget, Parent, Child, _Oriented
+
+def _fix_modules(names):
+    """Make classes and functions seem like they come from here."""
+    for name in names:
+        class_or_func = globals()[name]
+        class_or_func.__module__ = __name__
+
+
+_old_dir = set(dir())
+
+from .basewidgets import Widget, Parent, Child
 from .buttons import BaseButton, Button, ImageButton
-from .canvas import Canvas
 from .containers import Bin, Box, Scroller
 from .labels import BaseLabel, Label, ImageLabel
 from .misc import (Checkbox, Dummy, Separator, set_clipboard_text,
-                   get_clipboard_text, get_font_families)
+                   get_clipboard_text)
 from .progress import Progressbar, BouncingProgressbar, Spinner
-from .ranged import __Ranged, Slider, Spinbox
+from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, TextEdit
 #from .trayicon import TrayIcon
 from .window import BaseWindow, Window, Dialog
+
+_fix_modules(set(dir()) - _old_dir - {'_old_dir'})

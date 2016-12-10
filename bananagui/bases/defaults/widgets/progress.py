@@ -37,7 +37,7 @@ class Spinner:
 
     def __init__(self, parent, **kwargs):
         self._widget = canvas.Canvas(parent, minimum_size=(25, 25))
-        self.real_widget = self._widget.real_widget
+        self.base = self._widget.base
         self._positions = collections.deque()
         for i in range(_LINES):
             #          /|

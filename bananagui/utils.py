@@ -87,19 +87,6 @@ def find_attribute(attribute, *objects):
                          % attribute)
 
 
-def register(abstract_baseclass):
-    """Return a decorator that calls abstract_baseclass.register.
-
-    @abstract_baseclass.register also works since Python 3.3, but this
-    works on 3.2 also.
-    """
-    def inner(subclass):
-        abstract_baseclass.register(subclass)
-        return subclass
-
-    return inner
-
-
 def rangestep(range_object):
     """Return a range object's step.
 
@@ -127,36 +114,44 @@ def rangestep(range_object):
         return int(match.group(1))
 
 
+# TODO: update the docstring.
 def add_property(name, *, add_changed=False):
     """A handy way to add a property to a class.
 
+    >>> class Base:
+    ...     def set_test(self, test):
+    ...         print("base sets test to", test)
+    ...
     >>> @add_property('test', add_changed=True)
-    ... class Thing:
+    ... class Thingy:
+    ...     def __init__(self):
+    ...         self.base = Base()
+    ...         self._test = 'default test'
+    ...     def run_callbacks(self, name):
+    ...         # bananagui.widgets.Widget implements this.
+    ...         for callback in getattr(self, name):
+    ...             callback(self)
     ...     def __repr__(self):
-    ...         return '<the thing>'
+    ...         return '<the thingy object>'
     ...     def _check_test(self, test):
     ...         assert isinstance(test, str)
-    ...     def _set_test(self, test):
-    ...         print("setting test to", repr(test))
     ...
-    >>> thing = Thing()
+    >>> thing = Thingy()
     >>> thing
-    <the thing>
-    >>> thing._test = 'default test'
+    <the thingy object>
     >>> thing.test
     'default test'
     >>> thing.test = 'new test'
-    setting test to 'new test'
+    base sets test to new test
     >>> thing.test = 'new test'  # does nothing
     >>>
     >>> def user_callback(arg):
-    ...     print("callback called with arg", arg,
-    ...           "and arg.test is", repr(arg.test))
+    ...     print("callback called with arg", arg)
     ...
     >>> thing.on_test_changed.append(user_callback)
     >>> thing.test = 'even newer test'
-    setting test to 'even newer test'
-    callback called with arg <the thing> and arg.test is 'even newer test'
+    base sets test to even newer test
+    callback called with arg <the thingy object>
 
     If the new value is equal to the old value, setting the property
     sets the _NAME attribute to the new value and doesn't do anything
@@ -184,10 +179,11 @@ def add_property(name, *, add_changed=False):
             # invalid values doesn't get setattr()ed.
             getattr(self, '_check_' + name)(value)
 
-            # The _set_NAME can run this again, so we need to just
-            # return and do nothing if it happens.
+            # The setter can run this again, so we need to just
+            # return and do nothing if it happens. That's why the
+            # setattr is here first.
             setattr(self, '_' + name, value)
-            getattr(self, '_set_' + name)(value)
+            getattr(self.base, 'set_' + name)(value)
 
             if add_changed:
                 self.run_callbacks('on_%s_changed' % name)
@@ -215,16 +211,14 @@ try:
 except AttributeError:
     # Python 3.2, there is no importlib.util.resolve_name and
     # importlib.import_module doesn't import parent packages
-    # automatically.
+    # automatically. This doctest also runs with 3.2 only.
     def resolve_modulename(modulename, package=None):
         """Like importlib.util.resolve_modulename, but for Python 3.2.
 
         >>> import sys
-        >>> if sys.version_info >= (3, 2):
-        ...     resolve_modulename('bananagui.bases.tkinter', 'whatever')
-        ...     resolve_modulename('.tkinter', 'bananagui.bases')
-        ...
+        >>> resolve_modulename('bananagui.bases.tkinter', 'whatever')
         'bananagui.bases.tkinter'
+        >>> resolve_modulename('.tkinter', 'bananagui.bases')
         'bananagui.bases.tkinter'
         """
         if modulename.startswith('.'):

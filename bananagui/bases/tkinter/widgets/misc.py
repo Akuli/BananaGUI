@@ -23,60 +23,59 @@ import tkinter as tk
 
 import bananagui
 from bananagui.color import brightness
+
+from .basewidgets import Child
 from .. import mainloop
 
 
-class Checkbox:
+class Checkbox(Child, tk.Checkbutton):
 
-    def __init__(self, parent, **kwargs):
-        self._tkinter_var = tk.IntVar()
-        self._tkinter_var.trace('w', self._tkinter_var_changed)
-
-        self.real_widget = tk.Checkbutton(
-            parent.real_widget, variable=self._tkinter_var)
+    def __init__(self, widget, parent):
+        self._var = tk.IntVar()
+        self._var.trace('w', self._var_changed)
+        super().__init__(widget, parent, parent.base, variable=self._var)
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        box_bg = mainloop._convert_color(self.real_widget['selectcolor'])
-        checkmark = mainloop._convert_color(self.real_widget['fg'])
+        box_bg = mainloop._convert_color(self['selectcolor'])
+        checkmark = mainloop._convert_color(self['fg'])
         if brightness(box_bg) < 0.5 and brightness(checkmark) < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
-            self.real_widget['selectcolor'] = '#ffffff'
+            self['selectcolor'] = '#ffffff'
         if brightness(box_bg) >= 0.5 and brightness(checkmark) >= 0.5:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
-            self.real_widget['selectcolor'] = '#000000'
+            self['selectcolor'] = '#000000'
 
-        super().__init__(parent, **kwargs)
+        self.bananawidget = widget
 
-    def _tkinter_var_changed(self, name, empty_string, mode):
-        self.checked = bool(self._tkinter_var.get())
+    def _var_changed(self, name, empty_string, mode):
+        self.bananawidget.checked = (self._var.get() != 0)
 
-    def _set_text(self, text):
-        self.real_widget['text'] = text
+    def set_text(self, text):
+        self['text'] = text
 
-    def _set_checked(self, checked):
-        self._tkinter_var.set(1 if checked else 0)
-
-
-class Dummy:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget = tk.Frame(parent.real_widget)
-        super().__init__(parent, **kwargs)
+    def set_checked(self, checked):
+        self._var.set(1 if checked else 0)
 
 
-class Separator:
+class Dummy(Child, tk.Frame):
 
-    def __init__(self, parent, **kwargs):
-        widget = tk.Frame(parent.real_widget, border=1, relief='sunken')
-        if self.orientation == bananagui.HORIZONTAL:
-            widget['height'] = 3
-        if self.orientation == bananagui.VERTICAL:
-            widget['width'] = 3
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+    def __init__(self, widget, parent):
+        super().__init__(widget, parent, parent.base)
+
+
+class Separator(Child, tk.Frame):
+
+    def __init__(self, widget, parent, orientation):
+        super().__init__(widget, parent, parent.base)
+        self['border'] = 1
+        self['relief'] = 'sunken'
+        if orientation == bananagui.HORIZONTAL:
+            self['height'] = 3
+        if orientation == bananagui.VERTICAL:
+            self['width'] = 3
 
 
 def set_clipboard_text(text):

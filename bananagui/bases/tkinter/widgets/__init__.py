@@ -28,7 +28,7 @@ tkinter_orients = {
     bananagui.VERTICAL: 'vertical',
 }
 tkinter_fills = {
-    # BananaGUI expand: tkinter's fill option, ...
+    # {BananaGUI expand: tkinter's fill option, ...}
     (True, True): 'both',
     (True, False): 'x',
     (False, True): 'y',

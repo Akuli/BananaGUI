@@ -24,7 +24,7 @@ import shutil
 from bananagui import font
 
 
-def table(thinglist):
+def print_table(thinglist):
     """Pretty-print a table."""
     maxlen = max(map(len, thinglist))
     columns = shutil.get_terminal_size().columns // (maxlen + 2)
@@ -40,7 +40,8 @@ def table(thinglist):
 
 
 def main():
-    table(font.get_families())
+    families = sorted(font.get_families())
+    print_table(families)
 
 
 if __name__ == '__main__':

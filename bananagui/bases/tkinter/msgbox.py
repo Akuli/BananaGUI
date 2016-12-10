@@ -26,7 +26,7 @@ from . import mainloop
 def colordialog(parentwindow, color, title):
     rgb, hex = colorchooser.askcolor(
         color, title=title,
-        parent=parentwindow.real_widget)
+        parent=parentwindow.base)
     if hex is not None:
         hex = mainloop._convert_color(hex)
     return hex

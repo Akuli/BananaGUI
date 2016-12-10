@@ -22,88 +22,79 @@
 import tkinter as tk
 from tkinter import colorchooser
 
+from .containers import Bin
 
-class BaseWindow:
 
-    def __init__(self, **kwargs):
-        self.real_widget.title(self.title)
-        self.real_widget.bind('<Configure>', self._do_configure)
-        self.real_widget.protocol(
-            'WM_DELETE_WINDOW', self._do_deletewindow)
-        self.__setting_size = False
-        super().__init__(**kwargs)
+class Window(Bin, tk.Toplevel):
+
+    def __init__(self, widget, parentwindow=None):
+        if parentwindow is None:
+            # BananaGUI Window.
+            super().__init__(widget)
+        else:
+            # BananaGUI Dialog.
+            super().__init__(widget, parentwindow.base)
+        self.bananawidget = widget
+        self.title('')
+        self.bind('<Configure>', self._do_configure)
+        self.protocol('WM_DELETE_WINDOW', self._do_delete)
+        self._setting_size = False
 
     def _do_configure(self, event):
+        # The window is smaller than the minimum size when it's not
+        # fully showing yed.
+        min_width, min_height = self.bananawidget.minimum_size
+        if min_width is not None and event.width < min_width:
+            return
+        if min_height is not None and event.height < min_height:
+            return
+
         # I have no idea why the window becomes ridiculously small
-        # without this __setting_size guard thingy.
-        self.__setting_size = True
-        try:
-            self.size = (event.width, event.height)
-        except AssertionError:
-            # The window is currently smaller than the minimum size but
-            # it will expand it in a moment.
-            pass
-        self.__setting_size = False
+        # without this _setting_size guard thingy.
+        self._setting_size = True
+        self.bananawidget.size = (event.width, event.height)
+        self._setting_size = False
 
-    def _do_deletewindow(self):
-        self.run_callbacks('on_close')
+    def _do_delete(self):
+        self.bananawidget.run_callbacks('on_close')
 
-    def _set_title(self, title):
-        self.real_widget.title(title)
+    def set_title(self, title):
+        self.title(title)
 
-    def _set_resizable(self, resizable):
-        self.real_widget.resizable(resizable, resizable)
+    def set_resizable(self, resizable):
+        self.resizable(resizable, resizable)
 
-    def _set_size(self, size):
-        if not self.__setting_size:
-            self.real_widget.geometry('%dx%d' % size)
+    def set_size(self, size):
+        if not self._setting_size:
+            self.geometry('%dx%d' % size)
 
-    def _set_minimum_size(self, size):
+    def set_minimum_size(self, size):
         width, height = size
         if width is None:
             width = 1
         if height is None:
             height = 1
-        self.real_widget.minsize(width, height)
+        self.minsize(width, height)
 
-    def _set_showing(self, showing):
-        if showing:
-            self.real_widget.deiconify()
+    def set_hidden(self, hidden):
+        if hidden:
+            self.withdraw()
         else:
-            self.real_widget.withdraw()
+            self.deiconify()
 
-    def _close(self):
+    def close(self):
         try:
-            self.real_widget.destroy()
+            self.destroy()
         except tk.TclError:
             # The widget has already been closed.
             pass
 
-    def _wait(self):
-        self.real_widget.wait_window()
+    def wait(self):
+        self.wait_window()
 
-    def _focus(self):
-        self.real_widget.lift()
-        self.real_widget.attributes('-topmost', True)
-
-
-class Window:
-
-    def __init__(self, **kwargs):
-        # Tkinter will use the root window from the mainloop module.
-        self.real_widget = tk.Toplevel()
-        super().__init__(**kwargs)
+    def focus(self):
+        self.lift()
+        self.attributes('-topmost', True)
 
 
-class Dialog:
-
-    def __init__(self, **kwargs):
-        self.real_widget = tk.Toplevel(self.parentwindow.real_widget)
-        super().__init__(**kwargs)
-
-
-def colordialog(parentwindow, color, title):
-    rgb, hex = colorchooser.askcolor(
-        color, title=title,
-        parent=parentwindow.real_widget)
-    return hex      # This may be None.
+Dialog = Window

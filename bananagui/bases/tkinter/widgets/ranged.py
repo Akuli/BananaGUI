@@ -23,32 +23,31 @@ import tkinter as tk
 
 from bananagui import utils
 from . import tkinter_orients
+from .basewidgets import Child
 
 
-class Slider:
+class Slider(Child, tk.Scale):
 
-    def __init__(self, parent, **kwargs):
-        minimum = min(self.valuerange)
-        maximum = max(self.valuerange)
-        step = utils.rangestep(self.valuerange)
-        widget = tk.Scale(parent.real_widget, from_=minimum,
-                          to=maximum, resolution=step,
-                          orient=tkinter_orients[self.orientation])
+    def __init__(self, widget, parent, orientation, valuerange):
+        minimum = min(valuerange)
+        maximum = max(valuerange)
+        step = utils.rangestep(valuerange)
+        super().__init__(
+            widget, parent, parent.base, from_=minimum, to=maximum,
+            resolution=step, orient=tkinter_orients[orientation])
 
         # There seems to be no way to change a Scale's value with the
         # keyboard so this seems to work. There's a stackoverflow answer
         # that recommends binding <Button1-Release>, but it doesn't
         # change the value immediately when the scale is moved.
-        widget.bind('<Button1-Motion>', self._on_motion)
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+        self.bind('<Button1-Motion>', self._on_motion)
 
     def _on_motion(self, event):
         # This doesn't do anything if the value hasn't changed.
-        self.value = event.widget.get()
+        self.bananawidget.value = event.widget.get()
 
-    def _set_value(self, value):
-        self.real_widget.set(value)
+    def set_value(self, value):
+        self.set(value)
 
 
 def _select_all(event):
@@ -62,31 +61,29 @@ def _select_all(event):
         pass
 
 
-class Spinbox:
+class Spinbox(Child, tk.Spinbox):
 
-    def __init__(self, parent, **kwargs):
-        self._tkinter_var = tk.StringVar()
-        self._tkinter_var.trace('w', self._tkinter_var_changed)
+    def __init__(self, widget, parent, valuerange):
+        self._var = tk.StringVar()
+        self._var.trace('w', self._var_changed)
 
-        widget = tk.Spinbox(
-            parent.real_widget, textvariable=self._tkinter_var,
+        super().__init__(
+            widget, parent, parent.base, textvariable=self._var,
             # Tkinter doesn't know how to handle ranges.
-            values=tuple(self.valuerange))
-        widget.bind('<Control-A>', _select_all)
-        widget.bind('<Control-a>', _select_all)
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+            values=tuple(valuerange))
+        self.bind('<Control-A>', _select_all)
+        self.bind('<Control-a>', _select_all)
 
-    def _tkinter_var_changed(self, tkname, empty_string, mode):
+    def _var_changed(self, tkname, empty_string, mode):
         try:
-            value = int(self._tkinter_var.get())
-            if value not in self.valuerange:
+            value = int(self._var.get())
+            if value not in self.bananawidget.valuerange:
                 return
         except ValueError:
             return
-        self.value = value
+        self.bananawidget.value = value
 
-    def _set_value(self, value):
+    def set_value(self, value):
         # This tells tkinter to call self._tkinter_var_changed and the
         # callbacks are ran.
-        self._tkinter_var.set(str(value))
+        self._var.set(str(value))

@@ -26,15 +26,13 @@ from bananagui import utils
 from .basewidgets import _Oriented, Child
 from .. import mainloop
 
-_base = bananagui._get_base('widgets.misc')
-
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 # TODO: move Checkbox, Radiostuff and everything else to a checkboxes.py?
 
 
 @utils.add_property('text')
 @utils.add_property('checked', add_changed=True)
-class Checkbox(_base.Checkbox, Child):
+class Checkbox(Child):
     """A widget that can be checked.
 
     The Checkbox widget has nothing to do with the Box widget.
@@ -48,10 +46,12 @@ class Checkbox(_base.Checkbox, Child):
 
     can_focus = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._text = ''
         self._checked = False
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.misc:Checkbox')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_text(self, text):
         assert isinstance(text, str)
@@ -60,15 +60,20 @@ class Checkbox(_base.Checkbox, Child):
         assert isinstance(checked, bool)
 
 
-class Dummy(_base.Dummy, Child):
+class Dummy(Child):
     """An empty widget.
 
     This is useful for creating layouts with empty space that must be
     filled with something.
     """
 
+    def __init__(self, parent, **kwargs):
+        baseclass = bananagui._get_base('widgets.misc:Dummy')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
-class Separator(_Oriented, _base.Separator, Child):
+
+class Separator(_Oriented, Child):
     """A horizontal or vertical line."""
 
     def __init__(self, parent, *, orientation, **kwargs):
@@ -77,14 +82,18 @@ class Separator(_Oriented, _base.Separator, Child):
             kwargs.setdefault('expand', (True, False))
         if orientation == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
-        super().__init__(parent, orientation=orientation, **kwargs)
+        baseclass = bananagui._get_base('widgets.misc:Separator')
+        self.base = baseclass(self, parent, orientation)
+        self.orientation = orientation
+        super().__init__(parent, **kwargs)
 
 
 def set_clipboard_text(text):
     """Set text to the clipboard."""
     assert mainloop._initialized
     assert isinstance(text, str)
-    _base.set_clipboard_text(text)
+    basefunc = bananagui._get_base('widgets.misc:set_clipboard_text')
+    basefunc(text)
 
 
 def get_clipboard_text():
@@ -94,17 +103,5 @@ def get_clipboard_text():
     clipboard.
     """
     assert mainloop._initialized
-    return _base.get_clipboard_text()
-
-
-font_family_cache = []
-
-
-def get_font_families():
-    """Return a list of all avaliable font families as strings."""
-    if not font_family_cache:
-        # This is converted to a set to make sure that we don't get any
-        # duplicates. The base function can return anything iterable.
-        font_family_cache.extend(set(_base.get_font_families()))
-        font_family_cache.sort()  # Undefined order wouldn't be nice.
-    return font_family_cache
+    basefunc = bananagui._get_base('widgets.misc:get_clipboard_text')
+    return basefunc()

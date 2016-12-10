@@ -25,15 +25,13 @@ import bananagui
 from bananagui import utils
 from .containers import Bin
 
-_base = bananagui._get_base('widgets.window')
-
 
 @utils.add_property('title')
 @utils.add_property('resizable')
 @utils.add_property('size', add_changed=True)
 @utils.add_property('minimum_size')
-@utils.add_property('showing')
-class BaseWindow(_base.BaseWindow, Bin):
+@utils.add_property('hidden')
+class BaseWindow(Bin):
     """A window baseclass.
 
     BananaGUI windows have a close() method, and it should be called
@@ -50,6 +48,7 @@ class BaseWindow(_base.BaseWindow, Bin):
 
     Attributes:
       title             The text in the top bar.
+                        This defaults to an empty string.
       resizable         True if the user can resize the window.
       size              The current window size.
                         Like most other sizes, this is a two-tuple of
@@ -59,9 +58,8 @@ class BaseWindow(_base.BaseWindow, Bin):
                         This is (None, None) by default, so the window
                         can be however big it needs to be in both
                         directions.
-      showing           True if the window hasn't been hidden.
-                        Hiding the window is done by setting this to
-                        False and it's easier than creating a new
+      hidden            True if the window is not showing.
+                        Hiding the window is easier than creating a new
                         window when a window with the same content
                         needs to be displayed multiple times.
       on_close          List of callbacks that run when the user tries to
@@ -77,11 +75,11 @@ class BaseWindow(_base.BaseWindow, Bin):
     can_focus = True
 
     def __init__(self, **kwargs):
-        self._title = "BananaGUI Window"
+        self._title = ''
         self._resizable = True
         self._size = (200, 200)
         self._minimum_size = (None, None)
-        self._showing = True
+        self._hidden = False
         self.on_close = [lambda w: w.close()]
         self.closed = False
         super().__init__(**kwargs)
@@ -113,11 +111,11 @@ class BaseWindow(_base.BaseWindow, Bin):
             min_y = 1
         x, y = size
         assert isinstance(x, int) and isinstance(y, int)
-        assert x >= min_x and y >= min_y, (x, y, min_x, min_y)
+        assert x >= min_x and y >= min_y
 
-    def _check_showing(self, showing):
+    def _check_hidden(self, hidden):
         assert not self.closed
-        assert isinstance(showing, bool)
+        assert isinstance(hidden, bool)
 
     def close(self):
         """Close the window and set the closed attribute to True.
@@ -127,13 +125,13 @@ class BaseWindow(_base.BaseWindow, Bin):
         a callback to the on_close list instead.
         """
         if not self.closed:
-            self._close()
+            self.base.close()
             self.closed = True
 
     def wait(self):
         """Wait until the window is closed."""
         assert not self.closed
-        self._wait()
+        self.base.wait()
 
     def __enter__(self):
         return self
@@ -142,15 +140,20 @@ class BaseWindow(_base.BaseWindow, Bin):
         self.close()
 
 
-class Window(_base.Window, BaseWindow):
+class Window(BaseWindow):
     """A window that can have child windows.
 
     The windows don't have a parent window. You can create multiple
     windows like this.
     """
 
+    def __init__(self, **kwargs):
+        baseclass = bananagui._get_base('widgets.window:Window')
+        self.base = baseclass(self)
+        super().__init__(**kwargs)
 
-class Dialog(_base.Dialog, BaseWindow):
+
+class Dialog(BaseWindow):
     """A window that has a parent window.
 
     This class takes a positional parentwindow argument on initialization.
@@ -164,5 +167,7 @@ class Dialog(_base.Dialog, BaseWindow):
 
     def __init__(self, parentwindow, **kwargs):
         assert isinstance(parentwindow, Window)
+        baseclass = bananagui._get_base('widgets.window:Dialog')
+        self.base = baseclass(self, parentwindow)
         self.parentwindow = parentwindow
         super().__init__(**kwargs)

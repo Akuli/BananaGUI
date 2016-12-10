@@ -25,20 +25,18 @@ import warnings
 
 import bananagui
 
-_base = bananagui._get_base('mainloop')
-
-_initialized = True
+_initialized = False
 _running = False
 
 
-def reinitialize():
+def init():
     """Initialize the mainloop again after running it.
 
     You need this only if you want to run the mainloop multiple times.
     """
     global _initialized
     assert not _initialized, "the mainloop is initialized already"
-    _base.reinitialize()
+    bananagui._get_base('mainloop:init')()
     _initialized = True
 
 
@@ -46,11 +44,14 @@ def run():
     """Run the main loop until quit() is called."""
     global _initialized
     global _running
-    assert _initialized, "use reinitialize()"
-    assert not _running, "two mainloops cannot be ran at the same time"
+    if not _initialized:
+        raise RuntimeError("init() wasn't called")
+    if _running:
+        raise RuntimeError("two mainloops cannot be ran at the same time")
+    basefunc = bananagui._get_base('mainloop:run')
     _running = True
     try:
-        _base.run()
+        basefunc()
     finally:
         _running = False
         _initialized = False
@@ -63,7 +64,8 @@ def quit(*args):
     arguments are ignored.
     """
     if _running:
-        _base.quit()
+        basefunc = bananagui._get_base('mainloop:quit')
+        basefunc()
 
 
 def add_timeout(milliseconds, callback, *args, **kwargs):
@@ -91,4 +93,5 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
             result = None
         return result
 
-    _base.add_timeout(milliseconds, real_callback)
+    basefunc = bananagui._get_base('mainloop:add_timeout')
+    basefunc(milliseconds, real_callback)

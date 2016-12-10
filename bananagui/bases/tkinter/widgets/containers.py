@@ -23,18 +23,23 @@ import tkinter as tk
 
 import bananagui
 from . import tkinter_fills
+from .basewidgets import Child, Widget
 
 
-class Bin:
+class Bin(Widget):
 
-    def _set_child(self, child):
-        if self.child is not None:
-            self.child.real_widget.pack_forget()
-            self.child._tkinter_packed = False
+    def set_child(self, child):
+        old_child = self.bananawidget.child
+        if old_child is not None:
+            old_child.base.pack_forget()
+            old_child.base._packed = False
         if child is not None:
-            child.real_widget.pack()
-            child._tkinter_packed = True
-            child._set_expand(child.expand)  # Update the packing.
+            child.base.pack()
+            child.base._packed = True
+            child.base.set_expand(child.expand)  # Update the packing.
+
+
+# TODO: Scroller.
 
 
 _appendsides = {
@@ -46,27 +51,19 @@ _appendsides = {
 }
 
 
-class Box:
+class Box(Child, tk.Frame):
 
-    def __init__(self, parent, **kwargs):
-        self.real_widget = tk.Frame(parent.real_widget)
-        super().__init__(parent, **kwargs)
+    def __init__(self, widget, parent, orientation):
+        super().__init__(widget, parent, parent.base)
 
-    def _append(self, child):
-        child.real_widget.pack(
-            side=_appendsides[self.orientation],
+    def append(self, child):
+        child.base.pack(
+            side=_appendsides[self.bananawidget.orientation],
             fill=tkinter_fills[child.expand],
         )
-        child._tkinter_packed = True
-        child._set_expand(child.expand)  # Update the packing.
+        child.base._packed = True
+        child.base.set_expand(child.expand)  # Update the packing.
 
-    def _remove(self, child):
-        child.real_widget.pack_forget()
-        child._tkinter_packed = False
-
-
-class Scroller:
-
-    def __init__(self, parent, **kwargs):
-        # TODO: implement this.
-        raise NotImplementedError
+    def remove(self, child):
+        child.base.pack_forget()
+        child.base._packed = False

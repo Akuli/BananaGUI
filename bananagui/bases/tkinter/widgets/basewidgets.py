@@ -23,7 +23,6 @@ import tkinter as tk
 
 import bananagui
 from . import tkinter_fills
-from .containers import Box
 
 
 class _Tooltip:
@@ -92,45 +91,44 @@ class _Tooltip:
             label.pack()
 
 
-class Widget:
-
-    def _focus(self):
-        self.real_widget.focus()
-
-
-class Parent:
-    pass
-
-
 _expand_indexes = {
     bananagui.HORIZONTAL: 0,
     bananagui.VERTICAL: 1,
 }
 
 
-class Child:
+class Widget:
 
-    def __init__(self, **kwargs):
-        self._tkinter_tooltip = _Tooltip(self.real_widget)
-        self._tkinter_packed = False  # See also containers.py.
-        super().__init__(**kwargs)
+    def __init__(self, bananawidget, *args, **kwargs):
+        self.bananawidget = bananawidget
+        super().__init__(*args, **kwargs)
 
-    def _set_expand(self, expand):
-        if self._tkinter_packed:
+
+class Child(Widget):
+
+    def __init__(self, bananawidget, bananaparent, *args, **kwargs):
+        self._packed = False  # See also containers.py.
+        self.bananaparent = bananaparent
+        super().__init__(bananawidget, *args, **kwargs)
+        self._tooltip = _Tooltip(self)
+
+    def set_expand(self, expand):
+        if self._packed:
             # Update the pack expanding. By having this here we can make
             # sure that the pack options are changed when the expand is
             # changed.
             pack_kwargs = {'fill': tkinter_fills[expand]}
-            if isinstance(self.parent, Box):
+            try:
+                # Maybe it's a Box and we can use its orientation?
                 index = _expand_indexes[self.parent.orientation]
                 pack_kwargs['expand'] = expand[index]
-            else:
+            except AttributeError:
                 # It's not a box. We need a default value.
                 pack_kwargs['expand'] = (expand == (True, True))
-            self.real_widget.pack(**pack_kwargs)
+            self.pack(**pack_kwargs)
 
-    def _set_tooltip(self, tooltip):
-        self._tkinter_tooltip.content = tooltip
+    def set_tooltip(self, tooltip):
+        self._tooltip.content = tooltip
 
-    def _set_grayed_out(self, grayed_out):
-        self.real_widget['state'] = 'disable' if grayed_out else 'normal'
+    def set_grayed_out(self, grayed_out):
+        self.base['state'] = 'disable' if grayed_out else 'normal'

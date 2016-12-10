@@ -61,8 +61,7 @@ def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
 
 
 # TODO: support icons?
-infodialog = warningdialog = errordialog = questiondialog = _messagedialog
+info = warning = error = question = _messagedialog
 
 
-def fontdialog(parentwindow, default, title):
-    raise NotImplementedError("TODO")
+# TODO: font dialog.

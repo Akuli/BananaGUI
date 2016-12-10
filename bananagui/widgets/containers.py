@@ -33,12 +33,10 @@ import bananagui
 from bananagui import utils
 from .basewidgets import Parent, Child, _Oriented
 
-_base = bananagui._get_base('widgets.containers')
-
 
 # This is not a Child because Window is based on this.
 @utils.add_property('child')
-class Bin(_base.Bin, Parent):
+class Bin(Parent):
     """A widget that may contain one child widget.
 
     Attributes:
@@ -56,7 +54,7 @@ class Bin(_base.Bin, Parent):
             assert child.parent is self
 
 
-class Box(abcoll.MutableSequence, _Oriented, _base.Box, Parent, Child):
+class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
     To access the children just treat the Box object like a list:
@@ -67,16 +65,27 @@ class Box(abcoll.MutableSequence, _Oriented, _base.Box, Parent, Child):
         box[:3]             # get a list of first three children
         del box[:3]         # remove first three children
         box[:]              # get a list of children
-        if box: ...         # check if there's children in the box
+        if box: ...         # check if there are children in the box
     """
-    # The base should define an _append method that adds a child widget
-    # to the end of the box and a _remove method that removes a child.
+    # The base should define append and remove methods.
 
-    def __init__(self, *args, **kwargs):
-        self._children = []
-        super().__init__(*args, **kwargs)
+    def __init__(self, parent, *, orientation, **kwargs):
+        self.__children = []
+        baseclass = bananagui._get_base('widgets.containers:Box')
+        self.base = baseclass(self, parent, orientation)
+        self.orientation = orientation
+        super().__init__(parent, **kwargs)
 
-    def _set_children(self, new):
+    def __repr__(self):
+        cls = type(self)
+        if len(self) == 1:
+            childcount = '1 child'
+        else:
+            childcount = '%d children' % len(self)
+        return '<%s.%s object, contains %s>' % (
+            cls.__module__, cls.__name__, childcount)
+
+    def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"
         old = self[:]
 
@@ -84,29 +93,30 @@ class Box(abcoll.MutableSequence, _Oriented, _base.Box, Parent, Child):
         # beginning? Optimize this.
         common = utils.common_beginning(old, new)
         for child in old[common:]:
-            self._remove(child)
+            self.base.remove(child)
         for child in new[common:]:
             assert isinstance(child, Child)
-            assert child.parent is self
-            self._append(child)
+            assert child.parent is self, \
+                "cannot add %r into %r" % (child, self)
+            self.base.append(child)
 
-        self._children = new
+        self.__children = new
 
     def __setitem__(self, item, value):
         children = self[:]
         children[item] = value
-        self._set_children(children)
+        self.__set_children(children)
 
     def __getitem__(self, item):
-        return self._children[item]
+        return self.__children[item]
 
     def __delitem__(self, item):
         children = self[:]
         del children[item]
-        self._set_children(children)
+        self.__set_children(children)
 
     def __len__(self):
-        return len(self._children)
+        return len(self.__children)
 
     # MutableMapping doesn't do this because it doesn't require that
     # subclasses support slicing. We also can't use functools.wraps()
@@ -119,9 +129,14 @@ class Box(abcoll.MutableSequence, _Oriented, _base.Box, Parent, Child):
 
 
 # TODO: allow scrolling in one direction only.
-class Scroller(_base.Scroller, Bin, Child):
+class Scroller(Bin, Child):
     """A container that adds scrollbars around its child.
 
     The scroller displays a horizontal and a vertical scrollbar
     automatically when needed.
     """
+
+    def __init__(self, parent, **kwargs):
+        baseclass = bananagui._get_base('widgets.containers:Scroller')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)

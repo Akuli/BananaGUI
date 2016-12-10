@@ -26,21 +26,24 @@ from bananagui import utils
 from bananagui.bases import defaults
 from .basewidgets import Child
 
-_base = bananagui._get_base('widgets.progress')
-
 
 @utils.add_property('progress')
-class Progressbar(_base.Progressbar, Child):
+class Progressbar(Child):
     """A progress bar widget.
+
+    The progress bar is always horizontal. Contact me if you need a
+    vertical progress bar and I'll implement it.
 
     Attributes:
       progress      The progressbar's position.
                     This is always between 0 and 1 (inclusive).
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._progress = 0
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.progress:Progressbar')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_progress(self, progress):
         # This also checks the type because we can't compare with a
@@ -49,7 +52,7 @@ class Progressbar(_base.Progressbar, Child):
 
 
 @utils.add_property('bouncing')
-class BouncingProgressbar(_base.BouncingProgressbar, Child):
+class BouncingProgressbar(Child):
     """A Progressbar-like widget that bounces back and forth.
 
     This doesn't bounce by default. Set bouncing to True to make it
@@ -59,15 +62,17 @@ class BouncingProgressbar(_base.BouncingProgressbar, Child):
       bouncing      True if the widget bounces back and forth.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._bouncing = False
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.progress:BouncingProgressbar')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_bouncing(self, bouncing):
         assert isinstance(bouncing, bool)
 
 
-class Spinner(utils.find_attribute('Spinner', _base, defaults), Child):
+class Spinner(Child):
     """A waiting spinner.
 
     The spinner doesn't spin by default. You can set spinning to True
@@ -77,9 +82,11 @@ class Spinner(utils.find_attribute('Spinner', _base, defaults), Child):
       spinning      True if the widget is currently spinning, False if not.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._spinning = False
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.progress:Spinner')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_spinning(self, spinning):
         assert isinstance(spinning, bool)

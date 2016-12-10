@@ -51,24 +51,24 @@ class DialogTest(widgets.Window):
         box.append(colorbutton)
 
     def info(self, infobutton):
-        result = msgbox.infodialog(self, "Information!")
+        result = msgbox.info(self, "Information!")
         print(repr(result))
 
     def warning(self, warningbutton):
-        result = msgbox.warningdialog(
+        result = msgbox.warning(
             self, "Warning!", title="Be warned!",
             buttons=["What's going to happen next?"])
         print(repr(result))
 
     def error(self, errorbutton):
-        result = msgbox.errordialog(
+        result = msgbox.error(
             self, "Error!", title="Oh no!",
             buttons=["I'm screwed!", "I'm not screwed"],
             defaultbutton="I'm screwed!")
         print(repr(result))
 
     def question(self, questionbutton):
-        result = msgbox.questiondialog(
+        result = msgbox.question(
             self, "Do you like BananaGUI?",
             buttons=["Yes", "No"], defaultbutton="Yes")
         print(repr(result))
@@ -82,7 +82,7 @@ class DialogTest(widgets.Window):
 
 
 def close_callback(window):
-    result = msgbox.questiondialog(
+    result = msgbox.question(
         window, "Do you really want to quit?", title="Quit?",
         buttons=["Yes", "No"], defaultbutton="Yes")
     print(repr(result))

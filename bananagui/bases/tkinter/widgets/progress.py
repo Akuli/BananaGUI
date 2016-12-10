@@ -21,36 +21,32 @@
 
 from tkinter import ttk
 
+from .basewidgets import Child
 
-class Progressbar:
 
-    def __init__(self, parent, **kwargs):
-        widget = ttk.Progressbar(parent.real_widget)
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+class Progressbar(Child, ttk.Progressbar):
 
-    def _set_progress(self, progress):
-        self.real_widget.stop()  # Reset it.
+    def __init__(self, widget, parent):
+        super().__init__(widget, parent, parent.base)
+
+    def set_bouncing(self, bouncing):
+        if bouncing:
+            self['mode'] = 'indeterminate'
+            self.start(20)  # Move every 20 milliseconds.
+        else:
+            # Unfortunately there's no better way to hide the moving
+            # part of the bar when we don't want it to bounce.
+            self['mode'] = 'determinate'
+            self.stop()
+
+    def set_progress(self, progress):
+        self.stop()  # Reset it.
         step = progress * 100
         if step > 99.99:
             # The widget would go back to zero if we stepped it this
             # much.
             step = 99.99
-        self.real_widget.step(step)
+        self.step(step)
 
 
-class BouncingProgressbar:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget = ttk.Progressbar(parent.real_widget)
-        super().__init__(parent, **kwargs)
-
-    def _set_bouncing(self, bouncing):
-        # Unfortunately there's no better way to hide the moving
-        # part of the bar when we don't want it to bounce.
-        if bouncing:
-            self.real_widget['mode'] = 'indeterminate'
-            self.real_widget.start(20)  # Move every 20 milliseconds.
-        else:
-            self.real_widget['mode'] = 'determinate'
-            self.real_widget.stop()
+BouncingProgressbar = Progressbar

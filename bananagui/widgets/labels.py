@@ -25,15 +25,13 @@ import bananagui
 from bananagui import utils
 from .basewidgets import Child
 
-_base = bananagui._get_base('widgets.labels')
 
-
-class BaseLabel(_base.BaseLabel, Child):
-    """A label base class."""
+class BaseLabel(Child):
+    """A base class for widgets that are meant for displaying things."""
 
 
 @utils.add_property('text')
-class Label(_base.Label, BaseLabel):
+class Label(BaseLabel):
     """A label with text in it.
 
     The text is always centered. If you would like to have text that
@@ -44,25 +42,29 @@ class Label(_base.Label, BaseLabel):
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._text = ''
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.labels:Label')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_text(self, text):
         assert isinstance(text, str)
 
 
 @utils.add_property('imagepath')
-class ImageLabel(_base.ImageLabel, BaseLabel):
+class ImageLabel(BaseLabel):
     """A label that contains an image.
 
     Attributes:
       imagepath     Path to the image displayed in the label or None.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._imagepath = None
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.labels:ImageLabel')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

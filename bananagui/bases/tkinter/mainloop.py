@@ -27,12 +27,10 @@ from bananagui import color
 root = None    # Make flake8 happy.
 
 
-def reinitialize():
+def init():
     global root
     root = tk.Tk()
     root.withdraw()
-
-reinitialize()
 
 
 def run():

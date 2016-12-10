@@ -25,11 +25,9 @@ import bananagui
 from bananagui import utils
 from .basewidgets import Child
 
-_base = bananagui._get_base('widgets.textwidgets')
-
 
 @utils.add_property('text', add_changed=True)
-class TextBase(_base.TextBase, Child):
+class TextBase(Child):
     """A base class for text editing widgets.
 
     Setting grayed_out to True means that the user can't edit the text.
@@ -51,11 +49,11 @@ class TextBase(_base.TextBase, Child):
 
     def select_all(self):
         """Select all text in the widget."""
-        self._select_all()
+        self.base.select_all()
 
 
 @utils.add_property('secret')
-class Entry(_base.Entry, TextBase):
+class Entry(TextBase):
     """A one-line text widget.
 
     Attributes:
@@ -64,9 +62,11 @@ class Entry(_base.Entry, TextBase):
                 secret entry. This is useful for asking passwords.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._secret = False
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.textwidgets:Entry')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_secret(self, secret):
         assert isinstance(secret, bool)
@@ -75,16 +75,18 @@ class Entry(_base.Entry, TextBase):
 # TODO: text wrapping.
 # TODO: text alignment?
 @utils.add_property('tab')
-class TextEdit(_base.TextEdit, TextBase):
+class TextEdit(TextBase):
     """A multiline text widget.
 
     Attributes:
       tab       The character that pressing tab inserts.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, **kwargs):
         self._tab = '\t'
-        super().__init__(*args, **kwargs)
+        baseclass = bananagui._get_base('widgets.textwidgets:TextEdit')
+        self.base = baseclass(self, parent)
+        super().__init__(parent, **kwargs)
 
     def _check_tab(self, tab):
         assert isinstance(tab, str)

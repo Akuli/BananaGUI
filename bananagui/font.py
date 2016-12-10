@@ -24,8 +24,6 @@
 import bananagui
 from bananagui import mainloop, utils
 
-_base = bananagui._get_base('font')
-
 
 # The base doesn't need to provide anything for this, it just needs to
 # use this with widgets that have a font attribute.
@@ -109,7 +107,10 @@ class Font:
     _check_overline = _check_boolean
 
 
-_family_cache = []
+# This isn't done with functools.lru_cache to make sure that an error
+# is raised if this is called with the mainloop uninitialized.
+
+_family_cache = set()
 
 
 def get_families():
@@ -117,12 +118,9 @@ def get_families():
     assert mainloop._initialized, \
         "initialize the main loop before calling get_families()"
     if not _family_cache:
-        # This is converted to a set to make sure that we don't get any
-        # duplicates. The base function can return anything iterable.
-        families = set(_base.get_families())
-        families.add('Monospace')
-        _family_cache.extend(families)
-        _family_cache.sort()  # Undefined order wouldn't be nice.
+        basefunc = bananagui._get_base('font:get_families')
+        _family_cache.update(basefunc())
+        _family_cache.add('Monospace')
     return _family_cache
 
 

@@ -25,11 +25,9 @@ import bananagui
 from bananagui import utils
 from .basewidgets import Child, _Oriented
 
-_base = bananagui._get_base('widgets.ranged')
-
 
 @utils.add_property('value', add_changed=True)
-class __Ranged:
+class _Ranged:
     """Implement valuerange and value BananaGUI properties.
 
     Attributes:
@@ -39,24 +37,40 @@ class __Ranged:
                         smallest value of valuerange by default.
       on_value_changed  List of callbacks that are ran when value changes.
     """
+    # Subclasses should get a valuerange argument on initialization,
+    # set the valuerange attribute to it and set the _value attribute
+    # to min() of that range.
 
-    def __init__(self, *args, valuerange=range(11), **kwargs):
-        assert isinstance(valuerange, range)
-        assert len(valuerange) >= 2
-        assert utils.rangestep(valuerange) > 0
-        self.valuerange = valuerange
-        self._value = min(valuerange)
+    def __init__(self, *args, **kwargs):
+        assert isinstance(self.valuerange, range)
+        assert len(self.valuerange) >= 2
+        assert utils.rangestep(self.valuerange) > 0
         super().__init__(*args, **kwargs)
 
     def _check_value(self, value):
         assert value in self.valuerange
 
 
-class Spinbox(__Ranged, _base.Spinbox, Child):
+class Spinbox(_Ranged, Child):
     """A box for selecting a number with arrow buttons up and down."""
 
     can_focus = True
 
+    def __init__(self, parent, *, valuerange, **kwargs):
+        self.valuerange = valuerange
+        self._value = min(valuerange)
+        baseclass = bananagui._get_base('widgets.ranged:Spinbox')
+        self.base = baseclass(self, parent, valuerange)
+        super().__init__(parent, **kwargs)
 
-class Slider(_Oriented, __Ranged, _base.Slider, Child):
+
+class Slider(_Oriented, _Ranged, Child):
     """A slider for selecting a number."""
+
+    def __init__(self, parent, *, orientation, valuerange, **kwargs):
+        self.orientation = orientation
+        self.valuerange = valuerange
+        self._value = min(valuerange)
+        baseclass = bananagui._get_base('widgets.ranged:Slider')
+        self.base = baseclass(self, parent, orientation, valuerange)
+        super().__init__(parent, **kwargs)

@@ -21,77 +21,77 @@
 
 import tkinter as tk
 
+from .basewidgets import Child
 
-class TextBase:
 
-    def __init__(self, parent, **kwargs):
-        self.real_widget.bind('<Control-A>', self._on_control_a)
-        self.real_widget.bind('<Control-a>', self._on_control_a)
-        super().__init__(parent, **kwargs)
+class _TextBase:
+
+    def __init__(self, *args, **kwargs):
+        # TODO: Add more keyboard shortcuts.
+        super().__init__(*args, **kwargs)
+        self.bind('<Control-A>', self._on_control_a)
+        self.bind('<Control-a>', self._on_control_a)
 
     def _on_control_a(self, event):
         self.select_all()
         return 'break'
 
 
-class Entry:
+class Entry(_TextBase, Child, tk.Entry):
 
-    def __init__(self, parent, **kwargs):
-        self._tkinter_var = tk.StringVar()
-        self._tkinter_var.trace('w', self._tkinter_var_changed)
-        widget = tk.Entry(parent.real_widget, textvariable=self._tkinter_var)
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+    def __init__(self, widget, parent):
+        self._var = tk.StringVar()
+        self._var.trace('w', self._var_changed)
+        super().__init__(widget, parent, parent.base,
+                         textvariable=self._var)
+        self.bananawidget = widget
 
-    def _tkinter_var_changed(self, tkname, empty_string, mode):
-        self.text = self._tkinter_var.get()
+    def _var_changed(self, tkname, empty_string, mode):
+        self.bananawidget.text = self._var.get()
 
-    def _set_text(self, text):
-        self._tkinter_var.set(text)
+    def set_text(self, text):
+        self._var.set(text)
 
-    # This overrides the _set_grayed_out defined in basewidgets.py.
-    def _set_grayed_out(self, grayed_out):
-        state = 'readonly' if grayed_out else 'normal'
-        self.real_widget['state'] = state
+    # This overrides the set_grayed_out defined in basewidgets.py.
+    def set_grayed_out(self, grayed_out):
+        self['state'] = 'readonly' if grayed_out else 'normal'
 
-    def _set_secret(self, secret):
-        self.real_widget['show'] = '*' if secret else ''
+    def set_secret(self, secret):
+        self['show'] = '*' if secret else ''
 
-    def _select_all(self):
-        self.real_widget.selection_range(0, 'end')
+    def select_all(self):
+        self.selection_range(0, 'end')
 
 
-class TextEdit:
+class TextEdit(_TextBase, Child, tk.Text):
 
-    def __init__(self, parent, **kwargs):
-        # TODO: Add more keyboard shortcuts.
+    def __init__(self, widget, parent):
         # A larger width or height would prevent the widget from
         # shrinking when needed.
-        self.real_widget = tk.Text(parent.real_widget, width=1, height=1)
-        self.real_widget.bind('<<Modified>>', self._on_modified)
-        super().__init__(parent, **kwargs)
+        super().__init__(widget, parent, parent.base, width=1, height=1)
+        self.bind('<<Modified>>', self._on_modified)
 
-    def _select_all(self):
+    def select_all(self):
         """Select all text in the widget."""
         # The end-1c doesn't get what tkinter thinks of as the last
         # character, which is a hidden newline.
-        self.real_widget.tag_add('sel', 0.0, 'end-1c')
+        self.base.tag_add('sel', 0.0, 'end-1c')
 
     # TODO: the cursor likes to jump to the end of the widget and
     # "modified" prints too often...
 
     def _on_modified(self, event):
         print('modified')
-        self.text = event.widget.get(0.0, 'end-1c')
-        self.real_widget.edit_modified(False)
+        self.bananawidget.text = event.widget.get(0.0, 'end-1c')
+        self.edit_modified(False)
 
-    def _set_text(self, text):
+    def set_text(self, text):
         print('setting text')
-        self.real_widget.unbind('<<Modified>>')
-        self.real_widget.delete(0.0, 'end-1c')
-        self.real_widget.edit_modified(False)
-        self.real_widget.bind('<<Modified>>', self._on_modified)
-        self.real_widget.insert(0.0, text)
+        self.unbind('<<Modified>>')
+        self.delete(0.0, 'end-1c')
+        self.edit_modified(False)
+        self.bind('<<Modified>>', self._on_modified)
+        self.insert(0.0, text)
 
-    def _set_grayed_out(self, grayed_out):
-        self.real_widget['state'] = 'disable' if grayed_out else 'normal'
+    def set_grayed_out(self, grayed_out):
+        self['state'] = 'disable' if grayed_out else 'normal'

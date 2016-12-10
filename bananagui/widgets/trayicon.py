@@ -26,8 +26,6 @@
 import bananagui
 from .basewidgets import Widget
 
-_base = bananagui._get_base('widgets.trayicon')
-
 
 class TrayIcon(_base.TrayIcon, Widget):
     """An application indicator that will be displayed in the system tray."""
