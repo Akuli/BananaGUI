@@ -57,5 +57,7 @@ def _convert_color(colorstring):
     Tkinter colors are usually hexadecimal, but this function also
     handles color names like 'red' or 'SystemDefault'.
     """
-    rgb = root.winfo_rgb(colorstring)
-    return color.rgb2hex(rgb, maxvalue=65535)
+    # Tkinter uses 65535 as the maximum value. We need to divide the
+    # values by 65535//255=257.
+    rgb = (value // 257 for value in root.winfo_rgb(colorstring))
+    return color.rgb2hex(rgb)

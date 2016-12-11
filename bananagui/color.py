@@ -54,6 +54,8 @@ PINK = '#ff00ff'
 def hex2rgb(hexcolor):
     """Convert a hexadecimal color to an RGB tuple.
 
+    The returned values are always integers in range(255).
+
     >>> hex2rgb('#00ffff')
     (0, 255, 255)
     >>> hex2rgb('#0ff')
@@ -61,7 +63,6 @@ def hex2rgb(hexcolor):
     >>> hex2rgb('#000ffffff')
     (0, 255, 255)
     """
-    # It must start with '#' but it must contain more than just the '#'.
     assert hexcolor.startswith('#'), \
         "invalid hexadecimal color string %r" % (hexcolor,)
     assert hexcolor != '#', "'#' is not a valid hexadecimal color"
@@ -71,30 +72,27 @@ def hex2rgb(hexcolor):
         "cannot divide %r into 3 even chunks" % (values,)
     chunksize = len(values) // 3
 
-    maximum = int('f' * chunksize, 16)
     rgb = []
     for start in range(0, len(values), chunksize):
         end = start + chunksize
         string = values[start:end]
-        number = int(string, 16) * 255 // maximum
+        number = int(string, 16) * 255 // int('f' * chunksize, 16)
         rgb.append(number)
     return tuple(rgb)
 
 
-def rgb2hex(rgb, maxvalue=255):
+def rgb2hex(rgb):
     """Convert an RGB sequence to a hexadecimal color.
+
+    The values need to be in range(256).
 
     >>> rgb2hex([0, 255, 255])
     '#00ffff'
-    >>> rgb2hex([0, 0.5, 0.5], maxvalue=0.5)
-    '#00ffff'
     """
     r, g, b = rgb     # Allow anything iterable of length 3.
-    rgb = []
     for value in (r, g, b):
-        number = int(value / maxvalue * 255)
-        rgb.append(number)
-    return '#%02x%02x%02x' % tuple(rgb)
+        assert value in range(256), "invalid R/G/B value %r" % (value,)
+    return '#%02x%02x%02x' % (r, g, b)
 
 
 def hex2rgbstring(hexcolor):
@@ -106,6 +104,13 @@ def hex2rgbstring(hexcolor):
     return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
 
 
+_number = r'(\d+\.?\d*%?)'  # Integer or float as a group, may end with %.
+_rgbstring_patterns = [
+    r'^rgb\(' + ','.join([_number] * 3) + '\)$',    # rgb(R,G,B)
+    r'^rgba\(' + ','.join([_number] * 4) + '\)$',   # rgba(R,G,B,A)
+]
+
+
 def rgbstring2hex(rgbstring):
     """Convert a CSS compatible color string to a hexadecimal color string.
 
@@ -115,37 +120,23 @@ def rgbstring2hex(rgbstring):
     '#ffff00'
     >>> rgbstring2hex('rG B ( 255 , 100 % ,0) ')
     '#ffff00'
+    >>> rgbstring2hex('rgba(255,100%,0,0.5)')  # alpha value is ignored
+    '#ffff00'
     """
-    # TODO: GTK+ style 'rgba(...)' strings.
-    match = re.search(
-        r'^rgb\((\d+%?),(\d+%?),(\d+%?)\)$',
-        ''.join(rgbstring.split()),  # Remove whitespace.
-        flags=re.IGNORECASE,
-    )
-    assert match is not None, "invalid RGB color string %r" % (rgbstring,)
-
-    rgb = []
-    for value in match.groups():
-        if value.endswith('%'):
-            rgb.append(int(value[:-1]) * 255 // 100)
-        else:
-            rgb.append(int(value))
-    return rgb2hex(rgb)
-
-
-def clean_hex(hexcolor):
-    """Convert any hexadecimal color string to '#RRGGBB'.
-
-    Arguments are handled similarly to hex2rgb.
-
-    >>> clean_hex('#00ffff')
-    '#00ffff'
-    >>> clean_hex('#0ff')
-    '#00ffff'
-    >>> clean_hex('#000ffffff')
-    '#00ffff'
-    """
-    return rgb2hex(hex2rgb(hexcolor))
+    rgbstring = ''.join(rgbstring.split())  # Remove whitespace.
+    for pattern in _rgbstring_patterns:
+        match = re.search(pattern, rgbstring, flags=re.IGNORECASE)
+        if match is None:
+            continue
+        rgb = []
+        for i in (1, 2, 3):
+            value = match.group(i)
+            if value.endswith('%'):
+                rgb.append(int(value[:-1]) * 255 // 100)
+            else:
+                rgb.append(int(value))
+        return rgb2hex(rgb)
+    raise ValueError("invalid RGB color string %r" % (rgbstring,))
 
 
 def brightness(hexcolor):
