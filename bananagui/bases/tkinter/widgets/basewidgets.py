@@ -103,6 +103,8 @@ class Widget:
         self.bananawidget = bananawidget
         super().__init__(*args, **kwargs)
 
+    # BananaGUI will call tkinter's focus method correctly.
+
 
 class Child(Widget):
 
