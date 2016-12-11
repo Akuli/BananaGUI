@@ -24,14 +24,11 @@
 import contextlib
 
 import bananagui
-from bananagui import mainloop, utils
+from bananagui import mainloop, types
 
 
-class Widget:
+class Widget(types.BananaObject):
     """A baseclass for all widgets.
-
-    Initialization keyword arguments are set as attributes to the
-    instance.
 
     Attributes:
       base          The real GUI toolkit widget that BananaGUI uses.
@@ -44,16 +41,10 @@ class Widget:
     can_focus = False
 
     def __init__(self):
-        if not hasattr(self, 'base'):
-            # A subclass didn't override __init__ and define a
-            # base.
-            raise TypeError("cannot create instances of %r directly, "
-                            "instantiate a subclass instead"
-                            % type(self).__name__)
         if not mainloop._initialized:
             raise ValueError("cannot create widgets without initializing "
                              "the main loop")
-        self._blocked = set()
+        super().__init__()
 
     @contextlib.contextmanager
     def block(self, callback_attribute):
@@ -100,9 +91,9 @@ class Parent(Widget):
     """A base class for widgets that contain other widgets."""
 
 
-@utils.add_property('tooltip')
-@utils.add_property('grayed_out')
-@utils.add_property('expand')
+@types.add_property('tooltip')
+@types.add_property('grayed_out')
+@types.add_property('expand')
 class Child(Widget):
     """A base class for widgets that can be added to Parent widgets.
 

@@ -22,11 +22,11 @@
 """Widgets that indicate progress."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .basewidgets import Child
 
 
-@utils.add_property('progress')
+@types.add_property('progress')
 class Progressbar(Child):
     """A progress bar widget.
 
@@ -55,7 +55,7 @@ class Progressbar(Child):
         assert 0 <= progress <= 1
 
 
-@utils.add_property('bouncing')
+@types.add_property('bouncing')
 class BouncingProgressbar(Child):
     """A Progressbar-like widget that bounces back and forth.
 

@@ -30,12 +30,12 @@ except ImportError:
     import collections as abcoll
 
 import bananagui
-from bananagui import utils
+from bananagui import types, utils
 from .basewidgets import Parent, Child, _Oriented
 
 
 # This is not a Child because Window is based on this.
-@utils.add_property('child')
+@types.add_property('child')
 class Bin(Parent):
     """A widget that may contain one child widget.
 

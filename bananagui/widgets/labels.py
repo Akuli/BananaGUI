@@ -22,7 +22,7 @@
 """BananaGUI labels."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .basewidgets import Child
 
 
@@ -31,7 +31,7 @@ class BaseLabel(Child):
     """A base class for widgets that are meant for displaying things."""
 
 
-@utils.add_property('text')
+@types.add_property('text')
 class Label(BaseLabel):
     """A widget that displays text.
 
@@ -58,7 +58,7 @@ class Label(BaseLabel):
         assert isinstance(text, str)
 
 
-@utils.add_property('imagepath')
+@types.add_property('imagepath')
 class ImageLabel(BaseLabel):
     r"""A widget that displays an image.
 

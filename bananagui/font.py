@@ -22,18 +22,18 @@
 """Font-related things for BananaGUI."""
 
 import bananagui
-from bananagui import mainloop, utils
+from bananagui import mainloop, types
 
 
 # The base doesn't need to provide anything for this, it just needs to
 # use this with widgets that have a font attribute.
 
-@utils.add_property('family')
-@utils.add_property('size')
-@utils.add_property('bold')
-@utils.add_property('italic')
-@utils.add_property('underline')
-@utils.add_property('overline')
+@types.add_property('family')
+@types.add_property('size')
+@types.add_property('bold')
+@types.add_property('italic')
+@types.add_property('underline')
+@types.add_property('overline')
 class Font:
     """A class that represents a font.
 

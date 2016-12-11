@@ -62,6 +62,7 @@ def common_beginning(*iterables):
     return result
 
 
+# TODO: do we need this?
 def find_attribute(attribute, *objects):
     """Get an attribute from any of objects.
 
@@ -114,97 +115,6 @@ def rangestep(range_object):
         return int(match.group(1))
 
 
-# TODO: update the docstring.
-def add_property(name, *, add_changed=False):
-    """A handy way to add a property to a class.
-
-    >>> class Base:
-    ...     def set_test(self, test):
-    ...         print("base sets test to", test)
-    ...
-    >>> @add_property('test', add_changed=True)
-    ... class Thingy:
-    ...     def __init__(self):
-    ...         self.base = Base()
-    ...         self._test = 'default test'
-    ...     def run_callbacks(self, name):
-    ...         # bananagui.widgets.Widget implements this.
-    ...         for callback in getattr(self, name):
-    ...             callback(self)
-    ...     def __repr__(self):
-    ...         return '<the thingy object>'
-    ...     def _check_test(self, test):
-    ...         assert isinstance(test, str)
-    ...
-    >>> thing = Thingy()
-    >>> thing
-    <the thingy object>
-    >>> thing.test
-    'default test'
-    >>> thing.test = 'new test'
-    base sets test to new test
-    >>> thing.test = 'new test'  # does nothing
-    >>>
-    >>> def user_callback(arg):
-    ...     print("callback called with arg", arg)
-    ...
-    >>> thing.on_test_changed.append(user_callback)
-    >>> thing.test = 'even newer test'
-    base sets test to even newer test
-    callback called with arg <the thingy object>
-
-    If the new value is equal to the old value, setting the property
-    sets the _NAME attribute to the new value and doesn't do anything
-    else.
-
-    If add_changed is True, an on_NAME_changed list will be created and
-    everything in it will be called when the value is set to a new
-    value that is not equal to the old value. The callbacks will get
-    the instance as an argument.
-
-    A _set_NAME method will be called with the new value as an argument.
-    This method may raise an exception if the value is invalid.
-    """
-    def inner(cls):
-        def getter(self):
-            return getattr(self, '_' + name)
-
-        def setter(self, value):
-            if getattr(self, '_' + name) == value:
-                # Skip a bunch of things.
-                setattr(self, '_' + name, value)
-                return
-
-            # This needs to be before the setattr() to make sure that
-            # invalid values doesn't get setattr()ed.
-            getattr(self, '_check_' + name)(value)
-
-            # The setter can run this again, so we need to just
-            # return and do nothing if it happens. That's why the
-            # setattr is here first.
-            setattr(self, '_' + name, value)
-            getattr(self.base, 'set_' + name)(value)
-
-            if add_changed:
-                self.run_callbacks('on_%s_changed' % name)
-
-        setattr(cls, name, property(getter, setter))
-
-        if add_changed:
-            def changed_getter(self):
-                try:
-                    return getattr(self, '_on_%s_changed' % name)
-                except AttributeError:
-                    setattr(self, '_on_%s_changed' % name, [])
-                    return getattr(self, '_on_%s_changed' % name)
-
-            setattr(cls, 'on_%s_changed' % name, property(changed_getter))
-
-        return cls
-
-    return inner
-
-
 try:
     resolve_modulename = importlib.util.resolve_name
     import_module = importlib.import_module
@@ -215,7 +125,6 @@ except AttributeError:
     def resolve_modulename(modulename, package=None):
         """Like importlib.util.resolve_modulename, but for Python 3.2.
 
-        >>> import sys
         >>> resolve_modulename('bananagui.bases.tkinter', 'whatever')
         'bananagui.bases.tkinter'
         >>> resolve_modulename('.tkinter', 'bananagui.bases')

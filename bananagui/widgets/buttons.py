@@ -22,7 +22,7 @@
 """Button widgets."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .basewidgets import Child
 
 
@@ -40,7 +40,7 @@ class BaseButton(Child):
         super().__init__(parent, **kwargs)
 
 
-@utils.add_property('text')
+@types.add_property('text')
 class Button(BaseButton):
     r"""A button that displays text in it.
 
@@ -65,7 +65,7 @@ class Button(BaseButton):
         assert isinstance(text, str)
 
 
-@utils.add_property('imagepath')
+@types.add_property('imagepath')
 class ImageButton(BaseButton):
     r"""A button that displays an image.
 

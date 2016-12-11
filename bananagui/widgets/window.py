@@ -22,15 +22,15 @@
 """Window widgets."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .containers import Bin
 
 
-@utils.add_property('title')
-@utils.add_property('resizable')
-@utils.add_property('size', add_changed=True)
-@utils.add_property('minimum_size')
-@utils.add_property('hidden')
+@types.add_property('title')
+@types.add_property('resizable')
+@types.add_property('size', add_changed=True)
+@types.add_property('minimum_size')
+@types.add_property('hidden')
 class BaseWindow(Bin):
     """A window baseclass.
 

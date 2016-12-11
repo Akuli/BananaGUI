@@ -22,11 +22,11 @@
 """Widgets that contain text."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .basewidgets import Child
 
 
-@utils.add_property('text', add_changed=True)
+@types.add_property('text', add_changed=True)
 class TextBase(Child):
     """A base class for text editing widgets.
 
@@ -53,7 +53,7 @@ class TextBase(Child):
         self.base.select_all()
 
 
-@utils.add_property('secret')
+@types.add_property('secret')
 class Entry(TextBase):
     """A one-line text widget.
 
@@ -80,7 +80,7 @@ class Entry(TextBase):
 
 # TODO: text wrapping.
 # TODO: text alignment?
-@utils.add_property('tab')
+@types.add_property('tab')
 class TextEdit(TextBase):
     """A multiline text widget.
 

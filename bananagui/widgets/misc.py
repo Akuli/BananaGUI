@@ -22,15 +22,15 @@
 """Miscellaneous widgets."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types
 from .basewidgets import _Oriented, Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 # TODO: move Checkbox, Radiostuff and stuff like that to a checkboxes.py?
 
 
-@utils.add_property('text')
-@utils.add_property('checked', add_changed=True)
+@types.add_property('text')
+@types.add_property('checked', add_changed=True)
 class Checkbox(Child):
     """A widget that can be checked.
 

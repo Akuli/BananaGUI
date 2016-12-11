@@ -22,11 +22,11 @@
 """Widgets that have a value that needs to be in a range."""
 
 import bananagui
-from bananagui import utils
+from bananagui import types, utils
 from .basewidgets import Child, _Oriented
 
 
-@utils.add_property('value', add_changed=True)
+@types.add_property('value', add_changed=True)
 class _Ranged:
     """Implement valuerange and value BananaGUI properties.
 
