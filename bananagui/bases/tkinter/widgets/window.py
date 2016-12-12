@@ -34,6 +34,7 @@ class Window(Bin):
             # BananaGUI Dialog.
             self.real_widget = tk.Toplevel(parentwindow.real_widget)
         super().__init__(bananawidget)
+        self.real_widget.title('')  # Get rid of the default title.
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
         self._setting_size = False

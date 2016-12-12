@@ -48,7 +48,7 @@ class Slider(Child):
         self.bananawidget.value = event.widget.get()
 
     def set_value(self, value):
-        self.set(value)
+        self.real_widget.set(value)
 
 
 def _select_all(event):
