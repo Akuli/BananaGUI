@@ -26,6 +26,7 @@ from bananagui import types
 from .basewidgets import Child
 
 
+# TODO: get rid of this
 class BaseButton(Child):
     """Base class for other buttons.
 
@@ -56,8 +57,8 @@ class Button(BaseButton):
 
     def __init__(self, parent, text='', **kwargs):
         self._text = ''
-        widgetclass = bananagui._get_base('widgets.buttons:Button')
-        self.base = widgetclass(self, parent)
+        baseclass = bananagui._get_base('widgets.buttons:Button')
+        self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.text = text
 
@@ -86,8 +87,8 @@ class ImageButton(BaseButton):
 
     def __init__(self, parent, imagepath=None, **kwargs):
         self._imagepath = None
-        widgetclass = bananagui._get_base('widgets.buttons:ImageButton')
-        self.base = widgetclass(self, parent)
+        baseclass = bananagui._get_base('widgets.buttons:ImageButton')
+        self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.imagepath = imagepath
 

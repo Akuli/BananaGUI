@@ -50,12 +50,17 @@ class Label(BaseLabel):
     def __init__(self, parent, text='', **kwargs):
         self._text = ''
         baseclass = bananagui._get_base('widgets.labels:Label')
-        self.base = baseclass(self, parent)
+        self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.text = text
 
     def _check_text(self, text):
         assert isinstance(text, str)
+
+    def __repr__(self):
+        cls = type(self)
+        return '<%s.%s widget, text=%r>' % (
+            cls.__module__, cls.__name__, self.text)
 
 
 @types.add_property('imagepath')
@@ -78,7 +83,7 @@ class ImageLabel(BaseLabel):
     def __init__(self, parent, imagepath=None, **kwargs):
         self._imagepath = None
         baseclass = bananagui._get_base('widgets.labels:ImageLabel')
-        self.base = baseclass(self, parent)
+        self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.imagepath = imagepath
 

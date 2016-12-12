@@ -31,8 +31,7 @@ class Widget(types.BananaObject):
     """A baseclass for all widgets.
 
     Attributes:
-      base          The real GUI toolkit widget that BananaGUI uses.
-                    This exposes all methods that the GUI toolkit has.
+      real_widget   The real GUI toolkit widget that BananaGUI uses.
       can_focus     True if focus() can be called.
                     Unlike most other attributes in BananaGUI, this
                     is a class attribute.
@@ -74,6 +73,10 @@ class Widget(types.BananaObject):
             for callback in getattr(self, callback_attribute):
                 callback(self, *extra_args)
 
+    @property
+    def real_widget(self):
+        return self._base.real_widget
+
     def focus(self):
         """Give the keyboard focus to this widget.
 
@@ -84,7 +87,7 @@ class Widget(types.BananaObject):
         """
         cls = type(self)
         assert cls.can_focus, "cannot focus %r widgets" % cls.__name__
-        self.base.focus()
+        self._base.focus()
 
 
 class Parent(Widget):

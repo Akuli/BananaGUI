@@ -99,20 +99,20 @@ _expand_indexes = {
 
 class Widget:
 
-    def __init__(self, bananawidget, *args, **kwargs):
+    def __init__(self, bananawidget):
         self.bananawidget = bananawidget
-        super().__init__(*args, **kwargs)
 
-    # BananaGUI will call tkinter's focus method correctly.
+    def focus(self):
+        self.real_widget.focus()
 
 
 class Child(Widget):
 
-    def __init__(self, bananawidget, bananaparent, *args, **kwargs):
+    def __init__(self, bananawidget, parent):
         self._packed = False  # See also containers.py.
-        self.bananaparent = bananaparent
-        super().__init__(bananawidget, *args, **kwargs)
-        self._tooltip = _Tooltip(self)
+        self.parent = parent
+        super().__init__(bananawidget)
+        self._tooltip = _Tooltip(self.real_widget)
 
     def set_expand(self, expand):
         if self._packed:
@@ -127,10 +127,10 @@ class Child(Widget):
             except AttributeError:
                 # It's not a box. We need a default value.
                 pack_kwargs['expand'] = (expand == (True, True))
-            self.pack(**pack_kwargs)
+            self.real_widget.pack(**pack_kwargs)
 
     def set_tooltip(self, tooltip):
         self._tooltip.content = tooltip
 
     def set_grayed_out(self, grayed_out):
-        self.base['state'] = 'disable' if grayed_out else 'normal'
+        self.real_widget['state'] = 'disable' if grayed_out else 'normal'

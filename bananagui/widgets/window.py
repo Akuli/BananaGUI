@@ -131,13 +131,13 @@ class BaseWindow(Bin):
         a callback to the on_close list instead.
         """
         if not self.closed:
-            self.base.close()
+            self._base.close()
             self.closed = True
 
     def wait(self):
         """Wait until the window is closed."""
         assert not self.closed
-        self.base.wait()
+        self._base.wait()
 
     def __enter__(self):
         return self
@@ -171,7 +171,7 @@ class Window(BaseWindow):
 
     def __init__(self, title='', **kwargs):
         baseclass = bananagui._get_base('widgets.window:Window')
-        self.base = baseclass(self)
+        self._base = baseclass(self)
         super().__init__(title, **kwargs)
 
 
@@ -209,6 +209,6 @@ class Dialog(BaseWindow):
     def __init__(self, parentwindow, title='', **kwargs):
         assert isinstance(parentwindow, Window)
         baseclass = bananagui._get_base('widgets.window:Dialog')
-        self.base = baseclass(self, parentwindow)
+        self._base = baseclass(self, parentwindow._base)
         self.parentwindow = parentwindow
         super().__init__(title, **kwargs)

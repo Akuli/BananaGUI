@@ -24,7 +24,7 @@
 # TODO: Add a grid widget.
 
 try:
-    from collections import abc as abcoll
+    import collections.abc as abcoll
 except ImportError:
     # Python 3.2, there's no separate collections.abc.
     import collections as abcoll
@@ -35,7 +35,6 @@ from .basewidgets import Parent, Child, _Oriented
 
 
 # This is not a Child because Window is based on this.
-@types.add_property('child')
 class Bin(Parent):
     """A widget that may contain one child widget.
 
@@ -47,13 +46,30 @@ class Bin(Parent):
     # It's impossible to give a child on initialization because this
     # widget needs to exist before a child can be created into this.
     def __init__(self):
-        self._child = None
+        self.__child = None
         super().__init__()
 
-    def _check_child(self, child):
+    # The base should define add and remove methods.
+    @property
+    def child(self):
+        return self.__child
+
+    @child.setter
+    def child(self, child):
+        if child is self.__child:
+            # It's None or the same widget, nothing needs to be done.
+            return
+
         if child is not None:
-            assert isinstance(child, Child)
-            assert child.parent is self
+            assert isinstance(child, Child), \
+                "expected a Child widget, got %r" % (child,)
+            assert child.parent is self, "child widget has wrong parent"
+
+        if self.__child is not None:
+            self._base.remove(self.__child._base)
+        if child is not None:
+            self._base.add(child._base)
+        self.__child = child
 
 
 class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
@@ -76,24 +92,23 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         del box[:3]         # remove first three children
         box[:]              # get a list of children
         if box: ...         # check if there are children in the box
+
+    Unfortunately random.shuffle(box) doesn't work because it wants to
+    temporarily add the same children to the box twice. You need to do
+    this instead:
+
+        children = box[:]
+        random.shuffle(children)
+        box[:] = children
     """
     # The base should define append and remove methods.
 
     def __init__(self, parent, *, orientation, **kwargs):
         self.__children = []
         baseclass = bananagui._get_base('widgets.containers:Box')
-        self.base = baseclass(self, parent, orientation)
+        self._base = baseclass(self, parent._base, orientation)
         self.orientation = orientation
         super().__init__(parent, **kwargs)
-
-    def __repr__(self):
-        cls = type(self)
-        if len(self) == 1:
-            childcount = '1 child'
-        else:
-            childcount = '%d children' % len(self)
-        return '<%s.%s object, contains %s>' % (
-            cls.__module__, cls.__name__, childcount)
 
     def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"
@@ -103,12 +118,12 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         # beginning? Optimize this.
         common = utils.common_beginning(old, new)
         for child in old[common:]:
-            self.base.remove(child)
+            self._base.remove(child._base)
         for child in new[common:]:
             assert isinstance(child, Child)
             assert child.parent is self, \
                 "cannot add %r into %r" % (child, self)
-            self.base.append(child)
+            self._base.append(child._base)
 
         self.__children = new
 
@@ -133,9 +148,8 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
     # to get the doc because then abc will think that our insert is
     # an abstract method that needs to be overrided.
     def insert(self, index, value):
+        """Insert an item to the box, before the index."""
         self[index:index] = [value]
-
-    insert.__doc__ = abcoll.MutableSequence.insert.__doc__
 
 
 # TODO: allow scrolling in one direction only.
@@ -161,5 +175,5 @@ class Scroller(Bin, Child):
 
     def __init__(self, parent, **kwargs):
         baseclass = bananagui._get_base('widgets.containers:Scroller')
-        self.base = baseclass(self, parent)
+        self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)

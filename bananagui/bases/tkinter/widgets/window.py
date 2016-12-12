@@ -24,19 +24,18 @@ import tkinter as tk
 from .containers import Bin
 
 
-class Window(Bin, tk.Toplevel):
+class Window(Bin):
 
-    def __init__(self, widget, parentwindow=None):
+    def __init__(self, bananawidget, parentwindow=None):
         if parentwindow is None:
-            # BananaGUI Window.
-            super().__init__(widget)
+            # BananaGUI Window, this will default to mainloop's root.
+            self.real_widget = tk.Toplevel()
         else:
             # BananaGUI Dialog.
-            super().__init__(widget, parentwindow.base)
-        self.bananawidget = widget
-        self.title('')
-        self.bind('<Configure>', self._do_configure)
-        self.protocol('WM_DELETE_WINDOW', self._do_delete)
+            self.real_widget = tk.Toplevel(parentwindow.real_widget)
+        super().__init__(bananawidget)
+        self.real_widget.bind('<Configure>', self._do_configure)
+        self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
         self._setting_size = False
 
     def _do_configure(self, event):
@@ -58,14 +57,14 @@ class Window(Bin, tk.Toplevel):
         self.bananawidget.run_callbacks('on_close')
 
     def set_title(self, title):
-        self.title(title)
+        self.real_widget.title(title)
 
     def set_resizable(self, resizable):
-        self.resizable(resizable, resizable)
+        self.real_widget.resizable(resizable, resizable)
 
     def set_size(self, size):
         if not self._setting_size:
-            self.geometry('%dx%d' % size)
+            self.real_widget.geometry('%dx%d' % size)
 
     def set_minimum_size(self, size):
         width, height = size
@@ -73,27 +72,28 @@ class Window(Bin, tk.Toplevel):
             width = 1
         if height is None:
             height = 1
-        self.minsize(width, height)
+        self.real_widget.minsize(width, height)
 
     def set_hidden(self, hidden):
         if hidden:
-            self.withdraw()
+            self.real_widget.withdraw()
         else:
-            self.deiconify()
+            self.real_widget.deiconify()
 
     def close(self):
         try:
-            self.destroy()
+            self.real_widget.destroy()
         except tk.TclError:
             # The widget has already been closed.
             pass
 
     def wait(self):
-        self.wait_window()
+        # TODO: a modal wait_for method for Window objects.
+        self.real_widget.wait_window()
 
     def focus(self):
-        self.lift()
-        self.attributes('-topmost', True)
+        self.real_widget.lift()
+        self.real_widget.attributes('-topmost', True)
 
 
 Dialog = Window

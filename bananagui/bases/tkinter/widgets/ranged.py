@@ -26,21 +26,22 @@ from . import tkinter_orients
 from .basewidgets import Child
 
 
-class Slider(Child, tk.Scale):
+class Slider(Child):
 
-    def __init__(self, widget, parent, orientation, valuerange):
+    def __init__(self, bananawidget, parent, orientation, valuerange):
         minimum = min(valuerange)
         maximum = max(valuerange)
         step = utils.rangestep(valuerange)
-        super().__init__(
-            widget, parent, parent.base, from_=minimum, to=maximum,
+        self.real_widget = tk.Scale(
+            parent.real_widget, from_=minimum, to=maximum,
             resolution=step, orient=tkinter_orients[orientation])
-
         # There seems to be no way to change a Scale's value with the
         # keyboard so this seems to work. There's a stackoverflow answer
-        # that recommends binding <Button1-Release>, but it doesn't
+        # that recommends binding <ButtonRelease-1>, but it doesn't
         # change the value immediately when the scale is moved.
-        self.bind('<Button1-Motion>', self._on_motion)
+        self.real_widget.bind('<Button1-Motion>', self._on_motion)
+
+        super().__init__(bananawidget, parent)
 
     def _on_motion(self, event):
         # This doesn't do anything if the value hasn't changed.
@@ -61,18 +62,24 @@ def _select_all(event):
         pass
 
 
-class Spinbox(Child, tk.Spinbox):
+class Spinbox(Child):
 
-    def __init__(self, widget, parent, valuerange):
+    def __init__(self, bananawidget, parent, valuerange):
         self._var = tk.StringVar()
         self._var.trace('w', self._var_changed)
 
-        super().__init__(
-            widget, parent, parent.base, textvariable=self._var,
+        self.real_widget = tk.Spinbox(
+            parent.real_widget,
             # Tkinter doesn't know how to handle ranges.
             values=tuple(valuerange))
-        self.bind('<Control-A>', _select_all)
-        self.bind('<Control-a>', _select_all)
+        print('real_widget' in dir(self))
+        self.real_widget.bind('<Control-A>', _select_all)
+        self.real_widget.bind('<Control-a>', _select_all)
+
+        # The textvariable needs to be set after setting bananawidget
+        # with super().__init__().
+        super().__init__(bananawidget, parent)
+        self.real_widget['textvariable'] = self._var
 
     def _var_changed(self, tkname, empty_string, mode):
         try:

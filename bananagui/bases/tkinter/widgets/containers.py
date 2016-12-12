@@ -28,15 +28,14 @@ from .basewidgets import Child, Widget
 
 class Bin(Widget):
 
-    def set_child(self, child):
-        old_child = self.bananawidget.child
-        if old_child is not None:
-            old_child.base.pack_forget()
-            old_child.base._packed = False
-        if child is not None:
-            child.base.pack()
-            child.base._packed = True
-            child.base.set_expand(child.expand)  # Update the packing.
+    def add(self, child):
+        child.real_widget.pack()
+        child._packed = True
+        child.set_expand(child.bananawidget.expand)  # Update the packing.
+
+    def remove(self, child):
+        child.real_widget.pack_forget()
+        child._packed = False
 
 
 # TODO: Scroller.
@@ -51,19 +50,20 @@ _appendsides = {
 }
 
 
-class Box(Child, tk.Frame):
+class Box(Child):
 
     def __init__(self, widget, parent, orientation):
-        super().__init__(widget, parent, parent.base)
+        self.real_widget = tk.Frame(parent.real_widget)
+        super().__init__(widget, parent)
 
     def append(self, child):
-        child.base.pack(
+        child.real_widget.pack(
             side=_appendsides[self.bananawidget.orientation],
-            fill=tkinter_fills[child.expand],
+            fill=tkinter_fills[child.bananawidget.expand],
         )
-        child.base._packed = True
-        child.base.set_expand(child.expand)  # Update the packing.
+        child._packed = True
+        child.set_expand(child.bananawidget.expand)  # Update the packing.
 
     def remove(self, child):
-        child.base.pack_forget()
-        child.base._packed = False
+        child.real_widget.pack_forget()
+        child._packed = False

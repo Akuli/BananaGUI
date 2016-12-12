@@ -24,22 +24,23 @@ import tkinter as tk
 from .basewidgets import Child
 
 
-class Label(Child, tk.Label):
+class Label(Child):
 
-    def __init__(self, widget, parent):
-        super().__init__(widget, parent, parent.base)
+    def __init__(self, bananawidget, parent):
+        self.real_widget = tk.Label(parent.real_widget)
+        super().__init__(bananawidget, parent)
 
     def set_text(self, text):
-        self['text'] = text
+        self.real_widget['text'] = text
 
     def set_path(self, path):
         if path is None:
             # Remove the old image if any.
-            self._image = self['image'] = ''
+            self._image = self.real_widget['image'] = ''
         else:
             # Tkinter needs a reference to the PhotoImage to avoid
             # garbage collection.
-            self._image = self['image'] = tk.PhotoImage(file=path)
+            self._image = self.real_widget['image'] = tk.PhotoImage(file=path)
 
 
 ImageLabel = Label

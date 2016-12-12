@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI's utility functions and other things."""
+"""Things that BananaGUI uses internally."""
 
 import contextlib
 
@@ -39,15 +39,12 @@ class BananaObject:
 
     Some BananaGUI classes aren't subclasses of this class because they
     don't need a base or callbacks.
-
-    Attributes:
-      base      An object from the BananaGUI base loaded with load().
     """
 
     def __init__(self):
         cls = type(self)
-        if not hasattr(self, 'base'):
-            # A subclass didn't override __init__ and define a base.
+        if not hasattr(self, '_base'):
+            # A subclass didn't override __init__ and define a _base.
             # Getting the base with _get_base() when load() hasn't been
             # called will raise an error, so we don't need to worry
             # about that here.
@@ -95,7 +92,7 @@ def add_property(name, *, add_changed=False):
         >>> @add_property('test', add_changed=True)
         ... class Thingy(BananaObject):
         ...     def __init__(self):
-        ...         self.base = Base()
+        ...         self._base = Base()
         ...         self._test = 'default test'
         ...         super().__init__()
         ...     def __repr__(self):
@@ -129,7 +126,7 @@ def add_property(name, *, add_changed=False):
     value that is not equal to the old value. The callbacks will get
     the instance as an argument.
 
-    A base.set_NAME method will be called with the new value as an
+    A _base.set_NAME method will be called with the new value as an
     argument after checking the value with _check_NAME.
     """
     def inner(cls):
@@ -150,7 +147,7 @@ def add_property(name, *, add_changed=False):
             # return and do nothing if it happens. That's why the
             # setattr is here first.
             setattr(self, '_' + name, value)
-            getattr(self.base, 'set_' + name)(value)
+            getattr(self._base, 'set_' + name)(value)
 
             if add_changed:
                 self.run_callbacks('on_%s_changed' % name)

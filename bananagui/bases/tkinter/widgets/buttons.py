@@ -24,24 +24,25 @@ import tkinter as tk
 from .basewidgets import Child
 
 
-class Button(Child, tk.Button):
+class Button(Child):
 
-    def __init__(self, widget, parent):
-        super().__init__(widget, parent, parent.base, command=self._do_click)
-        self.bind('<Return>', self._do_click)
+    def __init__(self, bananawidget, parent):
+        self.real_widget = tk.Button(parent.real_widget, command=self._do_click)
+        self.real_widget.bind('<Return>', self._do_click)
+        super().__init__(bananawidget, parent)
 
     def _do_click(self, event=None):
         self.bananawidget.run_callbacks('on_click')
 
     def set_text(self, text):
-        self['text'] = text
+        self.real_widget['text'] = text
 
     def set_imagepath(self, path):
         if path is None:
-            self._image = self['image'] = ''
+            self._image = self.real_widget['image'] = ''
         else:
             # The _image reference is needed to avoid garbage collection.
-            self._image = self['image'] = tk.PhotoImage(file=path)
+            self._image = self.real_widget['image'] = tk.PhotoImage(file=path)
 
 
 ImageButton = Button

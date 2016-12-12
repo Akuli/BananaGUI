@@ -28,51 +28,51 @@ from .basewidgets import Child
 from .. import mainloop
 
 
-class Checkbox(Child, tk.Checkbutton):
+class Checkbox(Child):
 
-    def __init__(self, widget, parent):
+    def __init__(self, bananawidget, parent):
         self._var = tk.IntVar()
         self._var.trace('w', self._var_changed)
-        super().__init__(widget, parent, parent.base, variable=self._var)
+        self.real_widget = tk.Checkbutton(parent.real_widget, variable=self._var)
+        super().__init__(bananawidget, parent)
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
-        box_bg = mainloop._convert_color(self['selectcolor'])
-        checkmark = mainloop._convert_color(self['fg'])
+        box_bg = mainloop._convert_color(self.real_widget['selectcolor'])
+        checkmark = mainloop._convert_color(self.real_widget['fg'])
         if brightness(box_bg) < 0.5 and brightness(checkmark) < 0.5:
             # Make the background of the actual box where the checkmark
             # goes white, and leave the checkmark dark.
-            self['selectcolor'] = '#ffffff'
+            self.real_widget['selectcolor'] = '#ffffff'
         if brightness(box_bg) >= 0.5 and brightness(checkmark) >= 0.5:
             # Make the background black and leave the checkmark light.
             # This runs with my GTK+ theme.
-            self['selectcolor'] = '#000000'
-
-        self.bananawidget = widget
+            self.real_widget['selectcolor'] = '#000000'
 
     def _var_changed(self, name, empty_string, mode):
         self.bananawidget.checked = (self._var.get() != 0)
 
     def set_text(self, text):
-        self['text'] = text
+        self.real_widget['text'] = text
 
     def set_checked(self, checked):
         self._var.set(1 if checked else 0)
 
 
-class Dummy(Child, tk.Frame):
+class Dummy(Child):
 
-    def __init__(self, widget, parent):
-        super().__init__(widget, parent, parent.base)
+    def __init__(self, bananawidget, parent):
+        self.real_widget = tk.Frame(parent.real_widget)
+        super().__init__(bananawidget, parent)
 
 
-class Separator(Child, tk.Frame):
+class Separator(Child):
 
-    def __init__(self, widget, parent, orientation):
-        super().__init__(widget, parent, parent.base)
-        self['border'] = 1
-        self['relief'] = 'sunken'
+    def __init__(self, bananawidget, parent, orientation):
+        self.real_widget = tk.Frame(parent.real_widget, border=1,
+                                    relief='sunken')
+        super().__init__(bananawidget, parent)
         if orientation == bananagui.HORIZONTAL:
-            self['height'] = 3
+            self.real_widget['height'] = 3
         if orientation == bananagui.VERTICAL:
-            self['width'] = 3
+            self.real_widget['width'] = 3
