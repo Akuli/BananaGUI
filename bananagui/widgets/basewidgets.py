@@ -45,34 +45,6 @@ class Widget(types.BananaObject):
                              "the main loop")
         super().__init__()
 
-    @contextlib.contextmanager
-    def block(self, callback_attribute):
-        """Prevent callbacks from running temporarily.
-
-        Blocking is instance-specific.
-        """
-        assert isinstance(callback_attribute, str)
-
-        # This is important, we don't rely on an assertion here.
-        if callback_attribute in self._blocked:
-            raise ValueError("cannot block %r twice" % (callback_attribute,))
-
-        self._blocked.add(callback_attribute)
-        try:
-            yield
-        finally:
-            self._blocked.remove(callback_attribute)
-
-    def run_callbacks(self, callback_attribute, *extra_args):
-        """Run each callback in self.CALLBACK_ATTRIBUTE.
-
-        This does nothing if the callback is blocked. The callbacks are
-        ran with the widget and extra_args as arguments.
-        """
-        if callback_attribute not in self._blocked:
-            for callback in getattr(self, callback_attribute):
-                callback(self, *extra_args)
-
     @property
     def real_widget(self):
         return self._base.real_widget
@@ -82,8 +54,8 @@ class Widget(types.BananaObject):
 
         Focusing a window also brings it in front of other windows.
         It's recommended to first create the widgets and then focus
-        one of them to make sure that the widget gets focused with
-        all GUI toolkits.
+        one of them to make sure that the widget gets focused correctly
+        with all GUI toolkits.
         """
         cls = type(self)
         assert cls.can_focus, "cannot focus %r widgets" % cls.__name__
