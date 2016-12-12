@@ -22,7 +22,7 @@
 """Widgets that contain text."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .basewidgets import Child
 
 
@@ -74,12 +74,16 @@ class Entry(TextBase):
         super().__init__(parent, text=text, **kwargs)
         self.secret = secret
 
+    def _repr_parts(self):
+        return super()._repr_parts() + ['text=' + repr(self.text)]
+
     def _check_secret(self, secret):
         assert isinstance(secret, bool)
 
 
 # TODO: text wrapping.
 # TODO: text alignment?
+# TODO: make this behave like a list of lines.
 @types.add_property('tab')
 class TextEdit(TextBase):
     """A multiline text widget.
@@ -102,6 +106,12 @@ class TextEdit(TextBase):
         self._base = baseclass(self, parent._base)
         super().__init__(parent, text=text, **kwargs)
         self.tab = tab
+
+    # We can't add the whole text here because it would be too long.
+    def _repr_parts(self):
+        linecount = self.text.count('\n') + 1
+        amount = "one line" if linecount == 1 else "%d lines" % linecount
+        return super()._repr_parts() + ["contains %s of text" % amount]
 
     def _check_tab(self, tab):
         assert isinstance(tab, str)

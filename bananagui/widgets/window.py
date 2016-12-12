@@ -22,7 +22,7 @@
 """Window widgets."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .containers import Bin
 
 
@@ -89,6 +89,16 @@ class BaseWindow(Bin):
         self.size = size
         self.minimum_size = minimum_size
         self.hidden = hidden
+
+    def _repr_parts(self):
+        # The title is first because it's easiest to identify the
+        # window based on the title.
+        parts = ['title=' + repr(self.title)] + super()._repr_parts()
+        if self.closed:
+            # This is in caps because it's important, not much can be
+            # done to closed Window objects.
+            parts.append('CLOSED')
+        return parts
 
     def _check_title(self, title):
         assert not self.closed

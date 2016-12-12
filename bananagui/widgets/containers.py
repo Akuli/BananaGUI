@@ -49,6 +49,16 @@ class Bin(Parent):
         self.__child = None
         super().__init__()
 
+    def _repr_parts(self):
+        if self.child is None:
+            part = "doesn't contain a child"
+        else:
+            childtype = type(self.child)
+            prefix = 'an' if childtype.__module__[0] in 'aeiouy' else 'a'
+            part = "contains %s %s.%s" % (
+                prefix, childtype.__module__, childtype.__name__)
+        return super()._repr_parts() + [part]
+
     # The base should define add and remove methods.
     @property
     def child(self):
@@ -109,6 +119,10 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         self._base = baseclass(self, parent._base, orientation)
         self.orientation = orientation
         super().__init__(parent, **kwargs)
+
+    def _repr_parts(self):
+        end = "one child" if len(self) == 1 else "%d children" % len(self)
+        return super()._repr_parts() + ["contains " + end]
 
     def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"

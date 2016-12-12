@@ -158,6 +158,11 @@ class _Oriented:
         assert self.orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}
         super().__init__(*args, **kwargs)
 
+    def _repr_parts(self):
+        names = {bananagui.HORIZONTAL: 'horizontal',
+                 bananagui.VERTICAL: 'vertical'}
+        return super()._repr_parts() + [names[self.orientation]]
+
     @classmethod
     def horizontal(cls, *args, **kwargs):
         """Create and return a new horizontal instance."""

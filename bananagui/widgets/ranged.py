@@ -47,6 +47,11 @@ class _Ranged:
         assert utils.rangestep(self.valuerange) > 0
         super().__init__(*args, **kwargs)
 
+    def _repr_parts(self):
+        return super()._repr_parts() + [
+            'value=' + repr(self.value),
+            'valuerange=' + repr(self.valuerange)]
+
     def _check_value(self, value):
         assert value in self.valuerange
 

@@ -22,7 +22,7 @@
 """Widgets that indicate progress."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .basewidgets import Child
 
 
@@ -48,6 +48,9 @@ class Progressbar(Child):
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.progress = progress
+
+    def _repr_parts(self):
+        return super()._repr_parts() + ['progress=' + repr(self.progress)]
 
     def _check_progress(self, progress):
         # This also checks the type because we can't compare with a
@@ -77,6 +80,9 @@ class BouncingProgressbar(Child):
         super().__init__(parent, **kwargs)
         self.bouncing = bouncing
 
+    def _repr_parts(self):
+        return super()._repr_parts() + ['bouncing=' + repr(self.bouncing)]
+
     def _check_bouncing(self, bouncing):
         assert isinstance(bouncing, bool)
 
@@ -103,6 +109,9 @@ class Spinner(Child):
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.spinning = spinning
+
+    def _repr_parts(self):
+        return super()._repr_parts() + ['spinning=' + repr(self.spinning)]
 
     def _check_spinning(self, spinning):
         assert isinstance(spinning, bool)

@@ -22,7 +22,7 @@
 """BananaGUI labels."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .basewidgets import Child
 
 
@@ -54,13 +54,11 @@ class Label(BaseLabel):
         super().__init__(parent, **kwargs)
         self.text = text
 
+    def _repr_parts(self):
+        return super()._repr_parts() + ['text=' + repr(self.text)]
+
     def _check_text(self, text):
         assert isinstance(text, str)
-
-    def __repr__(self):
-        cls = type(self)
-        return '<%s.%s widget, text=%r>' % (
-            cls.__module__, cls.__name__, self.text)
 
 
 @types.add_property('imagepath')
@@ -86,6 +84,9 @@ class ImageLabel(BaseLabel):
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.imagepath = imagepath
+
+    def _repr_parts(self):
+        return super()._repr_parts() + ['imagepath=' + repr(self.imagepath)]
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

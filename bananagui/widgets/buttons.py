@@ -22,7 +22,7 @@
 """Button widgets."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .basewidgets import Child
 
 
@@ -65,6 +65,9 @@ class Button(BaseButton):
     def _check_text(self, text):
         assert isinstance(text, str)
 
+    def _repr_parts(self):
+        return super()._repr_parts() + ['text=' + repr(self.text)]
+
 
 @types.add_property('imagepath')
 class ImageButton(BaseButton):
@@ -91,6 +94,9 @@ class ImageButton(BaseButton):
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.imagepath = imagepath
+
+    def _repr_parts(self):
+        return super()._repr_parts() + ['imagepath=' + repr(self.imagepath)]
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

@@ -22,7 +22,7 @@
 """Miscellaneous widgets."""
 
 import bananagui
-from bananagui import types
+from bananagui import types, utils
 from .basewidgets import _Oriented, Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
@@ -61,6 +61,11 @@ class Checkbox(Child):
         super().__init__(parent, **kwargs)
         self.text = text
         self.checked = checked
+
+    def _repr_parts(self):
+        return super()._repr_parts() + [
+            'text=' + repr(self.text),
+            'checked=' + repr(self.checked)]
 
     def _check_text(self, text):
         assert isinstance(text, str)
