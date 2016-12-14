@@ -69,8 +69,7 @@ def load(*args, init_mainloop=True):
     calling this.
 
     For convenience, bananagui.mainloop.init() will be called if
-    init_mainloop is True. The possibly relative name of the loaded
-    base module is returned.
+    init_mainloop is True.
     """
     assert args, "specify at least one module"
 
@@ -87,12 +86,12 @@ def load(*args, init_mainloop=True):
         _base = fullname
         if init_mainloop:
             mainloop.init()
-        return args[0]
     else:
         # Attempt to load each base.
         for arg in args:
             try:
-                return load(arg)
+                load(arg)
+                return
             except ImportError:
                 pass
         raise ImportError("cannot load any of the requested base modules")
