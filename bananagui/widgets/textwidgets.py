@@ -75,7 +75,7 @@ class Entry(TextBase):
         self.secret = secret
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['text=' + repr(self.text)]
+        return ['text=' + repr(self.text)] + super()._repr_parts()
 
     def _check_secret(self, secret):
         assert isinstance(secret, bool)

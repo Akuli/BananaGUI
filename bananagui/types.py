@@ -64,8 +64,7 @@ class BananaObject:
         It's recommended to do something like this in _repr_parts:
 
             def _repr_parts(self):
-                return super()._repr_parts() + ['thing=stuff']
-
+                return ['thing=stuff'] + super()._repr_parts()
         """
         parts = self._repr_parts()
         if not parts:

@@ -55,7 +55,7 @@ class Label(BaseLabel):
         self.text = text
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['text=' + repr(self.text)]
+        return ['text=' + repr(self.text)] + super()._repr_parts()
 
     def _check_text(self, text):
         assert isinstance(text, str)
@@ -86,7 +86,7 @@ class ImageLabel(BaseLabel):
         self.imagepath = imagepath
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['imagepath=' + repr(self.imagepath)]
+        return ['imagepath=' + repr(self.imagepath)] + super()._repr_parts()
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)

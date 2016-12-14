@@ -50,7 +50,7 @@ class Progressbar(Child):
         self.progress = progress
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['progress=' + repr(self.progress)]
+        return ['progress=' + repr(self.progress)] + super()._repr_parts()
 
     def _check_progress(self, progress):
         # This also checks the type because we can't compare with a

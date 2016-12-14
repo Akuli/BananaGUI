@@ -70,6 +70,10 @@ class BaseWindow(Bin):
                         is called.
       closed            True if close() has been called.
     """
+    # Most things check that the window is closed. Things that come
+    # from Bin don't, but I don't think that's worth overriding
+    # everything here.
+
     # TODO: window icon?
 
     can_focus = True
@@ -95,8 +99,8 @@ class BaseWindow(Bin):
         # window based on the title.
         parts = ['title=' + repr(self.title)] + super()._repr_parts()
         if self.closed:
-            # This is in caps because it's important, not much can be
-            # done to closed Window objects.
+            # This is the last thing and in caps because it's
+            # important. Not much can be done to closed Window objects.
             parts.append('CLOSED')
         return parts
 

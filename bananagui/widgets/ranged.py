@@ -48,9 +48,10 @@ class _Ranged:
         super().__init__(*args, **kwargs)
 
     def _repr_parts(self):
-        return super()._repr_parts() + [
+        return [
             'value=' + repr(self.value),
-            'valuerange=' + repr(self.valuerange)]
+            'valuerange=' + repr(self.valuerange),
+        ] + super()._repr_parts()
 
     def _check_value(self, value):
         assert value in self.valuerange

@@ -138,6 +138,10 @@ class Child(Widget):
         assert isinstance(x, bool) and isinstance(y, bool)
 
 
+_orientation_names = {bananagui.HORIZONTAL: 'horizontal',
+                      bananagui.VERTICAL: 'vertical'}
+
+
 class _Oriented:
     """Implement an orientation attribute and handy class methods.
 
@@ -159,9 +163,8 @@ class _Oriented:
         super().__init__(*args, **kwargs)
 
     def _repr_parts(self):
-        names = {bananagui.HORIZONTAL: 'horizontal',
-                 bananagui.VERTICAL: 'vertical'}
-        return super()._repr_parts() + [names[self.orientation]]
+        name = _orientation_names[self.orientation]
+        return [name] + super()._repr_parts()
 
     @classmethod
     def horizontal(cls, *args, **kwargs):

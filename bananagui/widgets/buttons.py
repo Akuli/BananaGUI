@@ -66,7 +66,7 @@ class Button(BaseButton):
         assert isinstance(text, str)
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['text=' + repr(self.text)]
+        return ['text=' + repr(self.text)] + super()._repr_parts()
 
 
 @types.add_property('imagepath')
@@ -96,7 +96,7 @@ class ImageButton(BaseButton):
         self.imagepath = imagepath
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['imagepath=' + repr(self.imagepath)]
+        return ['imagepath=' + repr(self.imagepath)] + super()._repr_parts()
 
     def _check_imagepath(self, path):
         assert path is None or isinstance(path, str)
