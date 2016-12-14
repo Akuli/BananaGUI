@@ -50,7 +50,11 @@ class ClipboardTestWindow(widgets.Window):
         clipboard.set_text(self.entry.text)
 
     def paste(self, pastebutton):
-        self.entry.text += clipboard.get_text()
+        text = clipboard.get_text()
+        if text is None:
+            print("there's no text on the clipboard")
+        else:
+            self.entry.text += text
 
 
 def main():
