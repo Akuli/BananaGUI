@@ -13,6 +13,7 @@ def main():
         scroller = widgets.Scroller(window)
         scroller.child = widgets.Label(scroller, the_text)
         window.child = scroller
+        print(scroller)
 
         window.on_close.append(mainloop.quit)
         mainloop.run()

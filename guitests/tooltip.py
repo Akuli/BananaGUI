@@ -33,6 +33,8 @@ def main():
     bottomlabel = widgets.Label(box, "Bottom label!",
                                 tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
+    print(toplabel)
+    print(bottomlabel)
 
     window.on_close.append(mainloop.quit)
     mainloop.run()

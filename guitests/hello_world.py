@@ -34,6 +34,7 @@ def main():
         label = widgets.Label(window, "Hello World!")
         window.child = label
         window.on_close.append(mainloop.quit)
+        print(window)
         mainloop.run()
 
 

@@ -26,11 +26,10 @@ from bananagui import mainloop, widgets
 
 def on_check(checkbox):
     if checkbox.checked:
-        print("You checked me!")
         checkbox.text = "Uncheck me!"
     else:
-        print("You unchecked me!")
         checkbox.text = "Check me!"
+    print(checkbox)
 
 
 def main():

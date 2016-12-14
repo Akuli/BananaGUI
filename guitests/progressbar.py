@@ -26,10 +26,12 @@ from bananagui import mainloop, widgets
 
 def set_progress(progressbar, spinbox):
     progressbar.progress = spinbox.value / 100
+    print(progressbar)
 
 
-def toggle_bouncing(progressbar, checkbox):
-    progressbar.bouncing = checkbox.checked
+def toggle_bouncing(bouncingbar, checkbox):
+    bouncingbar.bouncing = checkbox.checked
+    print(bouncingbar)
 
 
 def main():

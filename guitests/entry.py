@@ -67,7 +67,7 @@ class EntryBox(widgets.Box):
         self.entry.text = "Enter something..."
 
     def text_changed(self, entry):
-        print("text changed to %r" % entry.text)
+        print(entry)
 
     def select_all(self, selectallbutton):
         self.entry.select_all()

@@ -31,7 +31,9 @@ def main():
     toplabel = widgets.Label(bigbox, "Top")
     bigbox.append(toplabel)
 
-    bigbox.append(widgets.Separator.horizontal(bigbox))
+    hsep = widgets.Separator.horizontal(bigbox)
+    bigbox.append(hsep)
+    print(hsep)
 
     bottombox = widgets.Box.horizontal(bigbox)
     bigbox.append(bottombox)
@@ -39,7 +41,9 @@ def main():
     bottomleftlabel = widgets.Label(bottombox, "Bottom left")
     bottombox.append(bottomleftlabel)
 
-    bottombox.append(widgets.Separator.vertical(bottombox))
+    vsep = widgets.Separator.vertical(bottombox)
+    bottombox.append(vsep)
+    print(vsep)
 
     bottomrightlabel = widgets.Label(bottombox, "Bottom right")
     bottombox.append(bottomrightlabel)
