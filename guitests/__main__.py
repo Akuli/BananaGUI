@@ -23,8 +23,6 @@ import os
 import subprocess
 import sys
 
-from . import base
-
 try:
     import faulthandler
     faulthandler.enable()
@@ -41,4 +39,5 @@ for filename in listing:
     name, extension = os.path.splitext(filename)
     if extension == '.py' and not name.startswith('_'):
         print((" %s " % filename).center(70, '*'))
-        subprocess.call([sys.executable, '-m', 'guitests.%s' % name, base])
+        subprocess.call(
+            [sys.executable, '-m', 'guitests.%s' % name] + sys.argv[1:])

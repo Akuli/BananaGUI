@@ -34,4 +34,5 @@ except ImportError:
     pass
 
 import bananagui
-base = bananagui.load(*(sys.argv[1:] or ['.tkinter']))
+load_args = sys.argv[1:] or ['.tkinter']
+bananagui.load(*load_args)
