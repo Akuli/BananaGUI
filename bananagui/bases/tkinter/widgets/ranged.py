@@ -72,7 +72,6 @@ class Spinbox(Child):
             parent.real_widget,
             # Tkinter doesn't know how to handle ranges.
             values=tuple(valuerange))
-        print('real_widget' in dir(self))
         self.real_widget.bind('<Control-A>', _select_all)
         self.real_widget.bind('<Control-a>', _select_all)
 
