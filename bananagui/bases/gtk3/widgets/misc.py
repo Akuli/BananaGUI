@@ -19,11 +19,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
 
 from . import orientations
 from .basewidgets import Child
-from .. import mainloop
 
 
 class Checkbox(Child):

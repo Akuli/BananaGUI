@@ -21,7 +21,7 @@
 
 import functools
 
-from gi.repository import Gdk, GLib, Gtk
+from gi.repository import Gdk, Gtk
 
 from bananagui import color
 from . import GTK_VERSION
