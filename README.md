@@ -12,52 +12,11 @@ A minimal Hello World program in BananaGUI looks like this:
 import bananagui
 from bananagui import mainloop, widgets
 
-bananagui.load('.tkinter')
+bananagui.load('.tkinter')  # if you have it installed, try '.gtk3' also :)
 with widgets.Window("Hello World") as window:
     window.child = widgets.Label(window, "Hello World!")
     window.on_close.append(mainloop.quit)
     mainloop.run()
-```
-
-Here's a Hello World with some more features:
-
-```py
-import bananagui
-from bananagui import mainloop, msgbox, widgets
-
-
-def click_callback(button):
-    print("You clicked me!")
-
-
-def quit_callback(window):
-    response = msgbox.question(
-        window, "Are you sure you want to say Goodbye World?",
-        title="Goodbye World", buttons=["Yes, Goodbye World!", "No"])
-    if response == "Yes, Goodbye World!":
-        mainloop.quit()
-
-
-def main():
-    bananagui.load('.tkinter')
-    with widgets.Window("Hello World 2", size=(300, 120)) as window:
-        box = widgets.Box.vertical(window)
-        window.child = box
-
-        label = widgets.Label(box, "Hello World!")
-        box.append(label)
-
-        button = widgets.Button(box, "Click me!")
-        button.on_click.append(click_callback)
-        box.append(button)
-
-        del window.on_close[0]  # Delete the default callback.
-        window.on_close.append(quit_callback)
-        mainloop.run()
-
-
-if __name__ == '__main__':
-    main()
 ```
 
 You can also write your GUI using the .ini format and then load it with
@@ -90,16 +49,207 @@ def main():
         window.on_close.append(mainloop.quit)
         mainloop.run()
 
-
 if __name__ == '__main__':
     main()
 ```
 
 See [the guitests directory](guitests) for more examples.
 
-I don't have good documentation anywhere yet, but calling `help()` on
-things should be useful in many places. You can also read the source if
-you're wondering something.
+## Why BananaGUI?
+
+### The main reason
+
+Many Python beginners have had a conversation like this:
+
+    <beginner>      I want to make a simple GUI program with Python.
+                    Which GUI toolkit should I use?
+    <qtfan>         Use PyQt, it's cross-platform.
+    <windowsuser>   I hate PyQt. It's a huge library with more than
+                    enough features, installing the Windows version is
+                    a real pain and their licensing solution sucks. Use
+                    tkinter, it comes with Python so you don't need to
+                    install anything.
+    <linuxuser>     Tkinter looks like crap on my GTK+ based desktop,
+                    and it doesn't come preinstalled on my system. Use
+                    GTK+, it comes with my system and looks great.
+    <windowsuser>   But installing GTK+ on Windows is even worse than
+                    installing PyQt! It also looks awful on Windows.
+
+As you can see, choosing the right GUI toolkit is not easy. Each
+toolkit has its pros and cons, and none of them satisfies everyone's
+needs. In the worst possible case, people choose one toolkit and later
+rewrite the program using another toolkit. I have done this several
+times.
+
+This is when BananaGUI comes in. It allows you to write your
+application once, and then run it with tkinter or GTK+ 3. Future
+versions of BananaGUI will probably provide Qt support also. BananaGUI
+isn't meant to replace any of these existing toolkits, it just provides
+a high-level way to use them.
+
+### Built-in documentation
+
+PyQt and GTK+ Python bindings don't provide good documentation
+strings for `help()`. For example, let's say that we want to know
+something about checkboxes. This example uses GTK+, but PyQt works
+similarly.
+
+```
+>>> from gi.repository import Gtk
+>>> help(Gtk.CheckButton)
+Help on class CheckButton in module gi.repository.Gtk:
+
+class CheckButton(ToggleButton)
+ |  :Constructors:
+ |
+ |  ::
+ |
+ |      CheckButton(**properties)
+ |      new()
+ |      new_with_label(label:str)
+ |      new_with_mnemonic(label:str)
+ |
+ |  Method resolution order:
+ |      CheckButton
+ |      ToggleButton
+ |      gi.overrides.Gtk.Button
+ |      Button
+ |      Bin
+ |      gi.overrides.Gtk.Container
+ |      Container
+ |      gi.overrides.Gtk.Widget
+ |      Widget
+ |      gi.repository.GObject.InitiallyUnowned
+ |      gi.overrides.GObject.Object
+ |      gi.repository.GObject.Object
+ |      gi._gobject._gobject.GObject
+ |      gi.repository.Atk.ImplementorIface
+ |      Buildable
+ |      Actionable
+ |      Activatable
+ |      gobject.GInterface
+ |      builtins.object
+ |
+ |  Data descriptors defined here:
+ |
+ |  toggle_button
+ |
+ |  ----------------------------------------------------------------------
+ |  Data and other attributes defined here:
+ |
+ |  __gsignals__ = {}
+ |
+ |  __gtype__ = <GType GtkCheckButton (30187408)>
+ |
+ |  __info__ = ObjectInfo(CheckButton)
+ |
+ |  do_draw_indicator = gi.VFuncInfo(draw_indicator)
+ |      draw_indicator(self, cr:cairo.Context)
+ |
+ |  new = gi.FunctionInfo(new)
+ |      new()
+ |
+ |  new_with_label = gi.FunctionInfo(new_with_label)
+ |      new_with_label(label:str)
+ |
+ |  new_with_mnemonic = gi.FunctionInfo(new_with_mnemonic)
+ |      new_with_mnemonic(label:str)
+ |
+...
+```
+
+We have the names of all methods and information about the arguments
+they take, but that's about it. There are no descriptions about what
+the methods actually do. Instead, there are many implementation details
+that we are not interested in and a ton of methods that we don't use
+99% of the time. Tkinter is a little bit better when it comes to this,
+but it's not perfect either.
+
+I try my best to add docstrings everywhere in BananaGUI to make
+`help()` as informative as possible. Here's the same thing in
+BananaGUI:
+
+```
+>>> from bananagui import widgets
+>>> help(widgets.Checkbox)
+Help on class Checkbox in module bananagui.widgets:
+
+class Checkbox(Child)
+ |  A widget that can be checked.
+ |
+ |      ,-------------------.
+ |      |   |   Check me!   |
+ |      `-------------------'
+ |
+ |      ,-------------------.
+ |      | X |  Uncheck me!  |
+ |      `-------------------'
+ |
+ |  The Checkbox widget has nothing to do with the Box widget.
+ |
+ |  Attributes:
+ |    text                  The text next to the checkbox.
+ |    checked               True if the checkbox is checked currently.
+ |                          False by default.
+ |    on_checked_changed    List of callbacks that are called on (un)check.
+ |
+ |  Method resolution order:
+ |      Checkbox
+ |      Child
+ |      Widget
+ |      bananagui.types.BananaObject
+ |      builtins.object
+ |
+ |  Methods defined here:
+ |
+ |  __init__(self, parent, text='', *, checked=False, **kwargs)
+...
+```
+
+I think this is a lot better. We can get a good idea of what the
+Checkbox is and how it works with just `help()`. There are no useless
+implementation details showing up, and we even have ascii art pictures
+of the widget.
+
+BananaGUI doesn't implement the methods that we don't usually need, but
+it exposes the real GUI toolkit widget it uses internally and it can be
+accessed like `some_bananagui_widget.real_widget`.
+
+### Debugging
+
+When writing BananaGUI, I try to create informative error messages and
+representations to make debugging easier. For example, let's create a
+checkbox with tkinter and then have a look at it on the interactive
+`>>>` prompt. This problem isn't tkinter-specific, GTK+ and PyQt5 also
+have this.
+
+```py
+>>> import tkinter as tk
+>>> root = tk.Tk()
+>>> checkbox = tk.Checkbutton(root, text="Check me!")
+>>> checkbox
+<tkinter.Checkbutton object at 0x7f38ac29dd30>
+>>>
+```
+
+So we know that it's a `tkinter.Checkbutton` and we know its memory
+address. But if we have multiple checkboxes, that isn't really useful
+for distinguishing them from each other.
+
+Let's do the same thing with BananaGUI:
+
+```py
+>>> from bananagui import load, widgets
+>>> load('.tkinter')
+>>> window = widgets.Window()
+>>> checkbox = widgets.Checkbox(window, "Check me!")
+>>> checkbox
+<bananagui.widgets.Checkbox object, text='Check me!', checked=False>
+```
+
+I think this is a lot better. The `__repr__` method returned a good
+description of the widget. It's brief, but a lot more helpful than a
+memory address.
 
 ## Thanks
 
