@@ -23,8 +23,6 @@
 
 import contextlib
 
-from bananagui import mainloop
-
 
 class BananaObject:
     """A base for classes that need something from a BananaGUI base.

@@ -33,7 +33,8 @@ class Checkbox(Child):
     def __init__(self, bananawidget, parent):
         self._var = tk.IntVar()
         self._var.trace('w', self._var_changed)
-        self.real_widget = tk.Checkbutton(parent.real_widget, variable=self._var)
+        self.real_widget = tk.Checkbutton(
+            parent.real_widget, variable=self._var)
         super().__init__(bananawidget, parent)
 
         # The checkboxes have white foreground on a white background by

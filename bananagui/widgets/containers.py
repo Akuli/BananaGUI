@@ -30,7 +30,7 @@ except ImportError:
     import collections as abcoll
 
 import bananagui
-from bananagui import types, utils
+from bananagui import utils
 from .basewidgets import Parent, Child, _Oriented
 
 

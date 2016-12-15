@@ -27,7 +27,8 @@ from .basewidgets import Child
 class Button(Child):
 
     def __init__(self, bananawidget, parent):
-        self.real_widget = tk.Button(parent.real_widget, command=self._do_click)
+        self.real_widget = tk.Button(
+            parent.real_widget, command=self._do_click)
         self.real_widget.bind('<Return>', self._do_click)
         super().__init__(bananawidget, parent)
 

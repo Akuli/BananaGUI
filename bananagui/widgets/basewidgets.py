@@ -21,8 +21,6 @@
 
 """Base classes for various widgets."""
 
-import contextlib
-
 import bananagui
 from bananagui import mainloop, types
 

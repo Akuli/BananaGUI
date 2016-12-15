@@ -22,7 +22,7 @@
 """Window widgets."""
 
 import bananagui
-from bananagui import types, utils
+from bananagui import types
 from .containers import Bin
 
 

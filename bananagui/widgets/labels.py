@@ -22,7 +22,7 @@
 """BananaGUI labels."""
 
 import bananagui
-from bananagui import types, utils
+from bananagui import types
 from .basewidgets import Child
 
 

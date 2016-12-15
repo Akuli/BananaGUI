@@ -22,7 +22,7 @@
 """Miscellaneous widgets."""
 
 import bananagui
-from bananagui import types, utils
+from bananagui import types
 from .basewidgets import _Oriented, Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
