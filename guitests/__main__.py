@@ -37,7 +37,16 @@ listing = os.listdir(here)
 listing.sort()
 for filename in listing:
     name, extension = os.path.splitext(filename)
-    if extension == '.py' and not name.startswith('_'):
-        print((" %s " % filename).center(70, '*'))
-        subprocess.call(
-            [sys.executable, '-m', 'guitests.%s' % name] + sys.argv[1:])
+    if extension != '.py' or name.startswith('_'):
+        continue
+    command = [sys.executable, '-m', 'guitests.%s' % name] + sys.argv[1:]
+    gonna_break = False
+    print((" %s " % filename).center(70, '*'))
+    with subprocess.Popen(command, stderr=subprocess.PIPE) as process:
+        for line in process.stderr:
+            if line.startswith(b'KeyboardInterrupt'):
+                gonna_break = True
+            sys.stderr.buffer.write(line)
+            sys.stderr.buffer.flush()
+    if gonna_break:
+        break
