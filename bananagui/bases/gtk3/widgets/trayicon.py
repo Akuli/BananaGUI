@@ -40,30 +40,30 @@ class TrayIcon:
             # This is a bit bad. There's no good way to get the name of
             # the application, and we also need to set the icon to a
             # dummy value if we don't have that.
-            self.real_widget = Indicator.new(
+            self.base = Indicator.new(
                 'bananagui-application',
                 kwargs.get('iconpath', 'dummy-icon-name'),
                 IndicatorCategory.APPLICATION_STATUS,
             )
-            self.real_widget.set_status(IndicatorStatus.ACTIVE)
+            self.base.set_status(IndicatorStatus.ACTIVE)
             # We need to set a menu to show the indicator.
-            self.real_widget.set_menu(Gtk.Menu())
+            self.base.set_menu(Gtk.Menu())
         else:
             # Fall back to deprecated Gtk.StatusIcon.
-            self.real_widget = Gtk.StatusIcon()
+            self.base = Gtk.StatusIcon()
         super().__init__(**kwargs)
 
     def _set_iconpath(self, path):
         if GOT_APPINDICATOR:
             # This needs to be absolute path or AppIndicator3 thinks
             # it's an icon name.
-            self.real_widget.set_icon(os.path.abspath(path))
+            self.base.set_icon(os.path.abspath(path))
         else:
-            self.real_widget.set_from_file(path)
+            self.base.set_from_file(path)
 
     def _set_tooltip(self, tooltip):
         if GOT_APPINDICATOR:
             warnings.warn("AppIndicator3 doesn't support tooltips",
                           RuntimeWarning)
         else:
-            self.real_widget.set_tooltip_text(tooltip)
+            self.base.set_tooltip_text(tooltip)

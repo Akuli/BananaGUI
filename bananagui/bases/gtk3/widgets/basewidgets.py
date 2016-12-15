@@ -28,7 +28,7 @@ class Widget:
     #    # a non-deprecated (not-removed) way such a pain.
     #    self.__css = {}
     #    self.__provider = Gtk.CssProvider()
-    #    context = self['real_widget'].get_style_context()
+    #    context = self['base'].get_style_context()
     #    context.add_provider(self.__provider,
     #                         Gtk.STYLE_PROVIDER_PRIORITY_USER)
     #    super().__init__(**kwargs)
@@ -50,23 +50,26 @@ class Widget:
     #        self.__css['background-color'] = color.rgbstring
     #    self.__update_css()
 
-    def _focus(self):
+    def __init__(self, bananawidget):
+        self.bananawidget = bananawidget
+
+    def focus(self):
         self.real_widget.grab_focus()
 
 
-class Parent:
-    pass
+class Child(Widget):
 
+    def __init__(self, bananawidget, parent):
+        self.parent = parent
+        super().__init__(bananawidget)
 
-class Child:
-
-    def _set_expand(self, expand):
+    def set_expand(self, expand):
         h, v = expand
         self.real_widget.set_hexpand(h)
         self.real_widget.set_vexpand(v)
 
-    def _set_tooltip(self, tooltip):
+    def set_tooltip(self, tooltip):
         self.real_widget.set_tooltip_text(tooltip)
 
-    def _set_grayed_out(self, grayed_out):
+    def set_grayed_out(self, grayed_out):
         self.real_widget.set_sensitive(not grayed_out)

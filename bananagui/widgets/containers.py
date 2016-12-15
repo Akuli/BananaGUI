@@ -164,7 +164,7 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
 
 
 # TODO: allow scrolling in one direction only.
-class Scroller(Bin, Child):
+class Scroller(Child, Bin):
     """A container that adds scrollbars around its child.
 
         ,-------------.

@@ -19,27 +19,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import bananagui
+
 from gi.repository import Gtk
 
 
-class BaseButton:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget = Gtk.Button()
-        self.real_widget.connect('clicked', self._do_click)
-        super().__init__(parent, **kwargs)
-
-    def _do_click(self, real_widget):
-        self.run_callbacks('on_click')
-
-
-class Button:
-
-    def _set_text(self, text):
-        self.real_widget.set_label(text)
-
-
-class ImageButton:
-
-    def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
+orientations = {
+    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
+    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
+}

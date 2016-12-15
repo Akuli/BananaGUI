@@ -80,7 +80,7 @@ class BaseWindow(Bin):
 
     def __init__(self, title, *, resizable=True, size=(200, 200),
                  minimum_size=(None, None), hidden=False, **kwargs):
-        self._title = ''
+        self._title = title
         self._resizable = True
         self._size = (200, 200)
         self._minimum_size = (None, None)
@@ -88,7 +88,6 @@ class BaseWindow(Bin):
         self.on_close = [lambda w: w.close()]
         self.closed = False
         super().__init__(**kwargs)
-        self.title = title
         self.resizable = resizable
         self.size = size
         self.minimum_size = minimum_size
@@ -184,8 +183,9 @@ class Window(BaseWindow):
     """
 
     def __init__(self, title='', **kwargs):
+        assert isinstance(title, str)
         baseclass = bananagui._get_base('widgets.window:Window')
-        self._base = baseclass(self)
+        self._base = baseclass(self, title)
         super().__init__(title, **kwargs)
 
 
@@ -216,13 +216,19 @@ class Dialog(BaseWindow):
     be centered over the parent window, it may be modal or whatever the
     real GUI toolkit supports.
 
+    The title of a Dialog defaults to the parent window's title.
+
     Attributes:
       parentwindow      The parent window set on initialization.
     """
 
-    def __init__(self, parentwindow, title='', **kwargs):
+    def __init__(self, parentwindow, title=None, **kwargs):
         assert isinstance(parentwindow, Window)
+        if title is None:
+            title = parentwindow.title
+        else:
+            assert isinstance(title, str)
         baseclass = bananagui._get_base('widgets.window:Dialog')
-        self._base = baseclass(self, parentwindow._base)
+        self._base = baseclass(self, parentwindow._base, title)
         self.parentwindow = parentwindow
         super().__init__(title, **kwargs)

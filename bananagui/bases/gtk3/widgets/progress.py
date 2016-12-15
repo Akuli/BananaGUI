@@ -21,31 +21,33 @@
 
 from gi.repository import Gtk, GLib
 
+from .basewidgets import Child
 
-class Progressbar:
 
-    def __init__(self, parent, **kwargs):
+class Progressbar(Child):
+
+    def __init__(self, bananawidget, parent):
         self.real_widget = Gtk.ProgressBar()
-        super().__init__(parent, **kwargs)
+        super().__init__(bananawidget, parent)
 
-    def _set_progress(self, progress):
+    def set_progress(self, progress):
         self.real_widget.set_fraction(progress)
 
 
-class BouncingProgressbar:
+class BouncingProgressbar(Child):
 
-    def __init__(self, parent, **kwargs):
-        widget = Gtk.ProgressBar(orientation=Gtk.Orientation.HORIZONTAL)
-        self.real_widget = widget
-        super().__init__(parent, **kwargs)
+    def __init__(self, bananawidget, parent):
+        self.real_widget = Gtk.ProgressBar()
+        super().__init__(bananawidget, parent)
 
     def _on_timeout(self):
-        if not self.bouncing:
-            return False
+        if not self._bouncing:
+            return False  # Stop this.
         self.real_widget.pulse()
-        return True  # Run this again.
+        return True     # Run this again.
 
-    def _set_bouncing(self, bouncing):
+    def set_bouncing(self, bouncing):
+        self._bouncing = bouncing
         if bouncing:
             GLib.timeout_add(100, self._on_timeout)
         else:
@@ -54,13 +56,13 @@ class BouncingProgressbar:
             self.real_widget.set_fraction(0)
 
 
-class Spinner:
+class Spinner(Child):
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, bananawidget, parent):
         self.real_widget = Gtk.Spinner()
-        super().__init__(parent, **kwargs)
+        super().__init__(bananawidget, parent)
 
-    def _set_spinning(self, spinning):
+    def set_spinning(self, spinning):
         if spinning:
             self.real_widget.start()
         else:

@@ -24,17 +24,11 @@ import tkinter as tk
 from .containers import Bin
 
 
-class Window(Bin):
+class _BaseWindow(Bin):
 
-    def __init__(self, bananawidget, parentwindow=None):
-        if parentwindow is None:
-            # BananaGUI Window, this will default to mainloop's root.
-            self.real_widget = tk.Toplevel()
-        else:
-            # BananaGUI Dialog.
-            self.real_widget = tk.Toplevel(parentwindow.real_widget)
+    def __init__(self, bananawidget, title):
         super().__init__(bananawidget)
-        self.real_widget.title('')  # Get rid of the default title.
+        self.real_widget.title(title)
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
         self._setting_size = False
@@ -97,4 +91,16 @@ class Window(Bin):
         self.real_widget.attributes('-topmost', True)
 
 
-Dialog = Window
+class Window(_BaseWindow):
+
+    def __init__(self, bananawidget, title):
+        # This will default to mainloop's root.
+        self.real_widget = tk.Toplevel()
+        super().__init__(bananawidget, title)
+
+
+class Dialog(_BaseWindow):
+
+    def __init__(self, bananawidget, parentwindow, title):
+        self.real_widget = tk.Toplevel(parentwindow.real_widget)
+        super().__init__(bananawidget, title)

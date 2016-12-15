@@ -21,57 +21,55 @@
 
 from gi.repository import Gtk
 
-
-class TextBase:
-    pass
+from .basewidgets import Child
 
 
-class Entry:
+class Entry(Child):
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, bananawidget, parent):
         self.real_widget = Gtk.Entry()
         self.real_widget.connect('changed', self._do_changed)
-        super().__init__(parent, **kwargs)
+        super().__init__(bananawidget, parent)
 
     def _do_changed(self, entry):
-        self.text = entry.get_text()
+        self.bananawidget.text = entry.get_text()
 
-    def _set_text(self, text):
+    def set_text(self, text):
         self.real_widget.set_text(text)
 
-    def _set_grayed_out(self, grayed_out):
+    def set_grayed_out(self, grayed_out):
         self.real_widget.set_editable(not grayed_out)
 
-    def _set_secret(self, secret):
+    def set_secret(self, secret):
         self.real_widget.set_visibility(not secret)
 
     def select_all(self):
         self.real_widget.select_region(0, -1)
 
 
-class TextEdit:
+class TextEdit(Child):
     # TODO: tabchar
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, bananawidget, parent):
         self.real_widget = Gtk.TextView()
         self._textbuf = self.real_widget.get_buffer()
         self._changed_id = self._textbuf.connect('changed', self._do_changed)
-        self.__setting_text = False
-        super().__init__(parent, **kwargs)
+        self._setting_text = False
+        super().__init__(bananawidget, parent)
 
     def _do_changed(self, buf):
-        self.__setting_text = True
+        self._setting_text = True
         self.text = buf.get_text(buf.get_start_iter(),
                                  buf.get_end_iter(), True)
-        self.__setting_text = False
+        self._setting_text = False
 
     def select_all(self):
         self._textbuf.select_range(self._textbuf.get_start_iter(),
                                    self._textbuf.get_end_iter())
 
-    def _set_text(self, text):
+    def set_text(self, text):
         # We get weird warnings if we remove this check.
-        if not self.__setting_text:
+        if not self._setting_text:
             # set_text() first clears the buffer and then inserts to
             # it, but we must not run the callback twice.
             with self._textbuf.handler_block(self._changed_id):

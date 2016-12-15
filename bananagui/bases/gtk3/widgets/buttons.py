@@ -19,9 +19,25 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+from gi.repository import Gtk
 
-class Canvas:
+from .basewidgets import Child
 
-    def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
-        super().__init__(parent, **kwargs)
+
+class Button(Child):
+
+    def __init__(self, bananawidget, parent):
+        self.real_widget = Gtk.Button()
+        self.real_widget.connect('clicked', self._do_click)
+        super().__init__(bananawidget, parent)
+
+    def _do_click(self, button):
+        self.bananawidget.run_callbacks('on_click')
+
+    def set_text(self, text):
+        self.real_widget.set_label(text)
+
+    # TODO: set_imagepath.
+
+
+ImageButton = Button

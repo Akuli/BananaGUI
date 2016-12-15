@@ -19,25 +19,27 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 
-class BaseLabel:
-    pass
+_clipboard = None
 
 
-class Label:
-
-    def __init__(self, parent, **kwargs):
-        self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
-        super().__init__(parent, **kwargs)
-
-    def _set_text(self, text):
-        self.real_widget.set_text(text)
+def _init_clipboard():
+    global _clipboard
+    if _clipboard is None:
+        _clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
 
-# TODO: implement this with Gtk.Image.
-class ImageLabel:
+def set_text(text):
+    _init_clipboard()
+    _clipboard.set_text(text, -1)
+    _clipboard.store()
 
-    def __init__(self, parent, **kwargs):
-        raise NotImplementedError  # TODO
+
+def get_text():
+    _init_clipboard()
+    # clipboard.wait_for_text() returns None if there's no text on the
+    # clipboard. I have no idea why it's called waiting because it
+    # doesn't actually wait.
+    return _clipboard.wait_for_text()

@@ -19,30 +19,18 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from gi.repository import GLib
+from gi.repository import Gtk
 
-import bananagui
-
-
-_loop = None  # Make flake8 happy.
+from .basewidgets import Child
 
 
-def init():
-    # Gtk.main() cannot be interrupted with Ctrl+C.
-    global _loop
-    _loop = GLib.MainLoop()
+class Label(Child):
 
+    def __init__(self, bananawidget, parent):
+        self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
+        super().__init__(bananawidget, parent)
 
-def run():
-    _loop.run()
+    def set_text(self, text):
+        self.real_widget.set_text(text)
 
-
-def quit():
-    _loop.quit()
-
-
-def add_timeout(milliseconds, callback):
-    def real_callback():
-        return callback() == bananagui.RUN_AGAIN
-
-    GLib.timeout_add(milliseconds, real_callback)
+    # TODO: implement set_path.
