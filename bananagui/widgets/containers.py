@@ -54,7 +54,7 @@ class Bin(Parent):
             part = "doesn't contain a child"
         else:
             part = "contains a child"
-        return [part] + super()._repr_parts()
+        return super()._repr_parts() + [part]
 
     # The base should define add and remove methods.
     @property
@@ -119,7 +119,7 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
 
     def _repr_parts(self):
         end = "one child" if len(self) == 1 else "%d children" % len(self)
-        return ["contains " + end] + super()._repr_parts()
+        return super()._repr_parts() + ["contains " + end]
 
     def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"

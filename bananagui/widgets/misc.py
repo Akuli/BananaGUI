@@ -63,10 +63,8 @@ class Checkbox(Child):
         self.checked = checked
 
     def _repr_parts(self):
-        return [
-            'text=' + repr(self.text),
-            'checked=' + repr(self.checked),
-        ] + super()._repr_parts()
+        return ['text=%r' % self.text,
+                'checked=%r' % self.checked] + super()._repr_parts()
 
     def _check_text(self, text):
         assert isinstance(text, str)

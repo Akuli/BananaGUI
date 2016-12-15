@@ -75,7 +75,10 @@ class Entry(TextBase):
         self.secret = secret
 
     def _repr_parts(self):
-        return ['text=' + repr(self.text)] + super()._repr_parts()
+        parts = ['text=%r' % self.text] + super()._repr_parts()
+        if self.secret:
+            parts.append('secret=True')
+        return parts
 
     def _check_secret(self, secret):
         assert isinstance(secret, bool)

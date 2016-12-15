@@ -81,7 +81,7 @@ class BouncingProgressbar(Child):
         self.bouncing = bouncing
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['bouncing=' + repr(self.bouncing)]
+        return ['bouncing=' + repr(self.bouncing)] + super()._repr_parts()
 
     def _check_bouncing(self, bouncing):
         assert isinstance(bouncing, bool)
@@ -111,7 +111,7 @@ class Spinner(Child):
         self.spinning = spinning
 
     def _repr_parts(self):
-        return super()._repr_parts() + ['spinning=' + repr(self.spinning)]
+        return ['spinning=' + repr(self.spinning)] + super()._repr_parts()
 
     def _check_spinning(self, spinning):
         assert isinstance(spinning, bool)

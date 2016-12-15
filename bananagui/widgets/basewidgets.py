@@ -126,11 +126,12 @@ class Child(Widget):
         self.expand = expand
 
     def _repr_parts(self):
-        if self.tooltip is None:
-            # No need to add anything.
-            return super()._repr_parts()
-        # The tooltip can help with distinguishing widgets.
-        return ['tooltip=' + repr(self.tooltip)] + super()._repr_parts()
+        parts = super()._repr_parts()
+        if self.tooltip is not None:
+            parts.append('tooltip=%r' % self.tooltip)
+        if self.grayed_out:
+            parts.append('grayed_out=True')
+        return parts
 
     def _check_tooltip(self, tooltip):
         assert tooltip is None or isinstance(tooltip, str)
