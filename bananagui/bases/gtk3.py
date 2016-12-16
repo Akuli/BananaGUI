@@ -19,14 +19,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI GTK+ 3 base."""
-
 # flake8: noqa
 
+"""Set up gtkbase for GTK+ 3 and replace this module with it."""
+
+import sys
 import gi
-
-import bananagui
-
 try:
     gi.require_version('Gtk', '3.0')
     gi.require_version('Gdk', '3.0')
@@ -34,17 +32,5 @@ try:
 except ValueError as e:
     # BananaGUI expects an ImportError.
     raise ImportError from e
-
-try:
-    gi.require_version('AppIndicator3', '0.1')
-    GOT_APPINDICATOR = True
-except ValueError:
-    GOT_APPINDICATOR = False
-
-from gi.repository import Gtk
-
-GTK_VERSION = (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION)
-orientations = {
-    bananagui.HORIZONTAL: Gtk.Orientation.HORIZONTAL,
-    bananagui.VERTICAL: Gtk.Orientation.VERTICAL,
-}
+from . import gtkbase
+sys.modules[__name__] = gtkbase
