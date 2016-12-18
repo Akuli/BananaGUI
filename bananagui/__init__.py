@@ -83,12 +83,9 @@ def load(*args, init_mainloop=True):
         assert fullname != 'bananagui.bases.defaults', \
             "the '.defaults' base can't be loaded directly"
         utils.import_module(fullname)
+        _base = fullname    # mainloop.init() needs this.
         if init_mainloop:
             mainloop.init()
-
-        # This needs to be after everything to make sure that _base
-        # doesn't get set if loading fails.
-        _base = fullname
     else:
         # Attempt to load each base.
         for arg in args:
