@@ -83,16 +83,20 @@ def load(*args, init_mainloop=True):
         assert fullname != 'bananagui.bases.defaults', \
             "the '.defaults' base can't be loaded directly"
         utils.import_module(fullname)
-        _base = fullname
         if init_mainloop:
             mainloop.init()
+
+        # This needs to be after everything to make sure that _base
+        # doesn't get set if loading fails.
+        _base = fullname
     else:
         # Attempt to load each base.
         for arg in args:
             try:
                 load(arg)
                 return
-            except ImportError:
+            # I have no idea what different toolkits can raise.
+            except Exception:
                 pass
         raise ImportError("cannot load any of the requested base modules")
 

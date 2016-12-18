@@ -25,12 +25,10 @@
 
 import sys
 import gi
-try:
-    gi.require_version('Gtk', '3.0')
-    gi.require_version('Gdk', '3.0')
-    gi.require_version('GLib', '2.0')
-except ValueError as e:
-    # BananaGUI expects an ImportError.
-    raise ImportError from e
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
+gi.require_version('GLib', '2.0')
+
 from . import gtkbase
 sys.modules[__name__] = gtkbase

@@ -30,14 +30,11 @@ import gi
 # Ignore the GTK+ 2 warning.
 with warnings.catch_warnings():
     warnings.simplefilter('ignore')
-    try:
-        gi.require_version('Gtk', '2.0')
-        gi.require_version('Gdk', '2.0')
-        gi.require_version('GLib', '2.0')
-    except ValueError as e:
-        # BananaGUI expects an ImportError.
-        raise ImportError from e
-    from gi.repository import Gtk, Gdk, GLib
+    gi.require_version('Gtk', '2.0')
+    from gi.repository import Gtk
+
+gi.require_version('Gdk', '2.0')
+gi.require_version('GLib', '2.0')
 
 from . import gtkbase
 sys.modules[__name__] = gtkbase
