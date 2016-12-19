@@ -26,11 +26,6 @@ from bananagui import types
 from .basewidgets import Child
 
 
-# TODO: do we need this?
-class BaseLabel(Child):
-    """A base class for widgets that are meant for displaying things."""
-
-
 @types.add_property('text')
 class Label(BaseLabel):
     """A widget that displays text.

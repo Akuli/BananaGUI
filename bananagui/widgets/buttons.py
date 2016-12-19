@@ -26,21 +26,6 @@ from bananagui import types
 from .basewidgets import Child
 
 
-# TODO: get rid of this
-class BaseButton(Child):
-    """Base class for other buttons.
-
-    Attributes:
-      on_click  List of callbacks that are ran when the button is clicked.
-    """
-
-    can_focus = True
-
-    def __init__(self, parent, **kwargs):
-        self.on_click = []
-        super().__init__(parent, **kwargs)
-
-
 @types.add_property('text')
 class Button(BaseButton):
     r"""A button that displays text in it.
@@ -53,10 +38,15 @@ class Button(BaseButton):
     Attributes:
       text      The text in the button.
                 An empty string by default.
+      on_click  List of callbacks that are ran when the button is
+                clicked.
     """
+
+    can_focus = True
 
     def __init__(self, parent, text='', **kwargs):
         self._text = ''
+        self.on_click = []
         baseclass = bananagui._get_base('widgets.buttons:Button')
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
@@ -86,10 +76,15 @@ class ImageButton(BaseButton):
     Attributes:
       imagepath     Path to the image displayed in the button or None.
                     None by default.
+      on_click      List of callbacks that are ran when the button is
+                    clicked.
     """
+
+    can_focus = True
 
     def __init__(self, parent, imagepath=None, **kwargs):
         self._imagepath = None
+        self.on_click = []
         baseclass = bananagui._get_base('widgets.buttons:ImageButton')
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
