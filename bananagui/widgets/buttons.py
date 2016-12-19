@@ -27,7 +27,7 @@ from .basewidgets import Child
 
 
 @types.add_property('text')
-class Button(BaseButton):
+class Button(Child):
     r"""A button that displays text in it.
 
          _______________
@@ -60,7 +60,7 @@ class Button(BaseButton):
 
 
 @types.add_property('imagepath')
-class ImageButton(BaseButton):
+class ImageButton(Child):
     r"""A button that displays an image.
 
          _______________

@@ -87,6 +87,7 @@ class BouncingProgressbar(Child):
         assert isinstance(bouncing, bool)
 
 
+@types.add_property('spinning')
 class Spinner(Child):
     r"""A waiting spinner.
 

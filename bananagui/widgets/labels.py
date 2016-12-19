@@ -27,7 +27,7 @@ from .basewidgets import Child
 
 
 @types.add_property('text')
-class Label(BaseLabel):
+class Label(Child):
     """A widget that displays text.
 
         ,---------------.
@@ -57,7 +57,7 @@ class Label(BaseLabel):
 
 
 @types.add_property('imagepath')
-class ImageLabel(BaseLabel):
+class ImageLabel(Child):
     r"""A widget that displays an image.
 
         ,---------------.

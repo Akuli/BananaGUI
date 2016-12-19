@@ -34,9 +34,9 @@ def _fix_modules(names):
 _old_dir = set(dir())
 
 from .basewidgets import Widget, Parent, Child
-from .buttons import BaseButton, Button, ImageButton
+from .buttons import Button, ImageButton
 from .containers import Bin, Box, Scroller
-from .labels import BaseLabel, Label, ImageLabel
+from .labels import Label, ImageLabel
 from .misc import Checkbox, Dummy, Separator
 from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox

@@ -48,9 +48,11 @@ class SpinnerWindow(widgets.Window):
 
     def start(self, startbutton):
         self.spinner.spinning = True
+        print(self.spinner)
 
     def stop(self, stopbutton):
         self.spinner.spinning = False
+        print(self.spinner)
 
 
 def main():
