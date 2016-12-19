@@ -104,7 +104,7 @@ def hex2rgbstring(hexcolor):
     return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
 
 
-_number = r'(\d+\.?\d*%?)'  # Integer or float as a group, may end with %.
+_number = r'(\d*\.?\d*%?)'  # Integer or float as a group, may end with %.
 _rgbstring_patterns = [
     r'^rgb\(' + ','.join([_number] * 3) + '\)$',    # rgb(R,G,B)
     r'^rgba\(' + ','.join([_number] * 4) + '\)$',   # rgba(R,G,B,A)
