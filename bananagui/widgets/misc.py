@@ -29,8 +29,8 @@ from .basewidgets import _Oriented, Child
 # TODO: move Checkbox, Radiostuff and stuff like that to a checkboxes.py?
 
 
-@types.add_property('text')
-@types.add_property('checked', add_changed=True)
+@types.add_property('text', type=str)
+@types.add_property('checked', type=bool, add_changed=True)
 class Checkbox(Child):
     """A widget that can be checked.
 
@@ -65,12 +65,6 @@ class Checkbox(Child):
     def _repr_parts(self):
         return ['text=%r' % self.text,
                 'checked=%r' % self.checked] + super()._repr_parts()
-
-    def _check_text(self, text):
-        assert isinstance(text, str)
-
-    def _check_checked(self, checked):
-        assert isinstance(checked, bool)
 
 
 class Dummy(Child):

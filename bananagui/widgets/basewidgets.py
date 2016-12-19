@@ -64,9 +64,9 @@ class Parent(Widget):
     """A base class for widgets that contain other widgets."""
 
 
-@types.add_property('tooltip')
-@types.add_property('grayed_out')
-@types.add_property('expand')
+@types.add_property('tooltip', type=str, allow_none=True)
+@types.add_property('grayed_out', type=bool)
+@types.add_property('expand', type=bool, how_many=2)
 class Child(Widget):
     """A base class for widgets that can be added to Parent widgets.
 
@@ -115,7 +115,8 @@ class Child(Widget):
 
     def __init__(self, parent, *, tooltip=None, grayed_out=False,
                  expand=(True, True)):
-        assert isinstance(parent, Parent)
+        if not isinstance(parent, Parent):
+            raise TypeError("expected a Parent, got %r" % (parent,))
         self.parent = parent
         self._tooltip = None
         self._grayed_out = False
@@ -132,16 +133,6 @@ class Child(Widget):
         if self.grayed_out:
             parts.append('grayed_out=True')
         return parts
-
-    def _check_tooltip(self, tooltip):
-        assert tooltip is None or isinstance(tooltip, str)
-
-    def _check_grayed_out(self, grayed_out):
-        assert isinstance(grayed_out, bool)
-
-    def _check_expand(self, expand):
-        x, y = expand
-        assert isinstance(x, bool) and isinstance(y, bool)
 
 
 _orientation_names = {bananagui.HORIZONTAL: 'horizontal',

@@ -80,8 +80,6 @@ def load(*args, init_mainloop=True):
     if len(args) == 1:
         # Make sure the base can be imported and THEN set _base to it.
         fullname = utils.resolve_modulename(args[0], 'bananagui.bases')
-        assert fullname != 'bananagui.bases.defaults', \
-            "the '.defaults' base can't be loaded directly"
         utils.import_module(fullname)
         _base = fullname    # mainloop.init() needs this.
         if init_mainloop:

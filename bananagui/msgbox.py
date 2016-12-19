@@ -23,27 +23,44 @@
 
 from gettext import gettext as _
 
+try:
+    import collections.abc as abcoll
+except ImportError:
+    import collections as abcoll
+
 import bananagui
 from bananagui import color, widgets
+
+
+def _check(parentwindow, title):
+    if not isinstance(parentwindow, (widgets.Window, widgets.Dialog)):
+        raise TypeError("expected a Window or a Dialog, got %r"
+                        % (parentwindow,))
+    if title is None:
+        title = parentwindow.title
+    if not isinstance(title, str):
+        raise TypeError("title should be a string, not %r" % (title,))
+    return title
 
 
 def _msgfunc(name, doc):
     """Return a new message dialog function."""
     def result(parentwindow, message, *, title=None, buttons=None,
                defaultbutton=None):
-        assert isinstance(parentwindow, widgets.Window)
-
-        if title is None:
-            title = parentwindow.title
-
+        title = _check(parentwindow, title)
         if buttons is None:
             buttons = [_("OK")]
-        assert buttons, "at least one button is required"
+        elif not isinstance(buttons, abcoll.Sequence):
+            # Anything iterable can't be allowed because we need to for
+            # loop over this multiple times and len() this.
+            raise TypeError("expected a sequence, got %r" % (buttons,))
 
-        assert defaultbutton is None or defaultbutton in buttons
-        if defaultbutton is None and len(buttons) == 1:
-            defaultbutton = buttons[0]
-
+        if defaultbutton is None:
+            if len(buttons) == 1:
+                defaultbutton = buttons[0]
+        elif defaultbutton not in buttons:
+            raise ValueError("default button %r not in buttons"
+                             % (defaultbutton,))
         basefunc = bananagui._get_base('msgbox:%s' % name)
         return basefunc(parentwindow, message, title, buttons, defaultbutton)
 
@@ -83,8 +100,11 @@ def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
 
     This returns the new color, or None if the user canceled the dialog.
     """
-    if title is None:
-        title = parentwindow.title
+    title = _check(parentwindow, title)
+    if not color._is_valid_color(defaultcolor):
+        raise ValueError(
+            "%r is not a valid '#RRGGBB' color, use "
+            "bananagui.color to convert it" % (defaultcolor,))
     basefunc = bananagui._get_base('msgbox:colordialog')
     return basefunc(parentwindow, defaultcolor, title)
 

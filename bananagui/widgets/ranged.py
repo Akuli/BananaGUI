@@ -26,7 +26,13 @@ from bananagui import types, utils
 from .basewidgets import Child, _Oriented
 
 
-@types.add_property('value', add_changed=True)
+def _valuecheck(widget, value):
+    if value not in widget.valuerange:
+        raise ValueError("value %r is out of %r"
+                         % (value, widget.valuerange))
+
+
+@types.add_property('value', extra_setter=_valuecheck, add_changed=True)
 class _Ranged:
     """Implement valuerange and value BananaGUI properties.
 
@@ -42,9 +48,15 @@ class _Ranged:
     # to min() of that range.
 
     def __init__(self, *args, value=None, **kwargs):
-        assert isinstance(self.valuerange, range)
-        assert len(self.valuerange) >= 2
-        assert utils.rangestep(self.valuerange) > 0
+        if not isinstance(self.valuerange, range):
+            raise TypeError("valuerange needs to be a range object, not %r"
+                            % (self.valuerange,))
+        if len(self.valuerange) < 2:
+            raise ValueError("valuerange %r contains too little values"
+                             % (self.valuerange,))
+        # Ranges can't have a step of 0.
+        if utils.rangestep(self.valuerange) < 0:
+            raise ValueError("valuerange has negative step")
         super().__init__(*args, **kwargs)
 
     def _repr_parts(self):
@@ -52,9 +64,6 @@ class _Ranged:
             'value=' + repr(self.value),
             'valuerange=' + repr(self.valuerange),
         ] + super()._repr_parts()
-
-    def _check_value(self, value):
-        assert value in self.valuerange
 
 
 class Spinbox(_Ranged, Child):

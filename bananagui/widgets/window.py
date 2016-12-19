@@ -26,11 +26,32 @@ from bananagui import types
 from .containers import Bin
 
 
-@types.add_property('title')
-@types.add_property('resizable')
-@types.add_property('size', add_changed=True)
-@types.add_property('minimum_size')
-@types.add_property('hidden')
+def _closecheck(window, junk=None):
+    if window.closed:
+        raise RuntimeError("the window has been closed")
+
+
+def _sizecheck(window, size):
+    _closecheck(window)
+    min_x, min_y = window.minimum_size
+    if min_x is None:
+        min_x = 1
+    if min_y is None:
+        min_y = 1
+    x, y = size
+    if x < min_x or y < min_y:
+        raise ValueError("size %r is smaller than minimum_size %r"
+                         % (size, window.minimum_size))
+
+
+@types.add_property('title', type=str, extra_setter=_closecheck)
+@types.add_property('resizable', type=bool, extra_setter=_closecheck)
+@types.add_property('minimum_size', type=int, minimum=1, how_many=2,
+                    allow_none=True, add_changed=True,
+                    extra_setter=_closecheck)
+@types.add_property('size', type=int, how_many=2, extra_setter=_sizecheck,
+                    add_changed=True)
+@types.add_property('hidden', type=bool, extra_setter=_closecheck)
 class BaseWindow(Bin):
     """A window baseclass.
 
@@ -38,7 +59,7 @@ class BaseWindow(Bin):
     when you don't need the window anymore. The windows can also be used
     as context managers, and the closing will be done automatically:
 
-        with Window() as the_window:
+        with widgets.Window("Test window") as the_window:
             ...
 
     There's no maximum_size attribute because X doesn't support maximum
@@ -103,39 +124,6 @@ class BaseWindow(Bin):
             parts.append('CLOSED')
         return parts
 
-    def _check_title(self, title):
-        assert not self.closed
-        assert isinstance(title, str)
-
-    def _check_resizable(self, resizable):
-        assert not self.closed
-        assert isinstance(resizable, bool)
-
-    def _check_minimum_size(self, size):
-        assert not self.closed
-        x, y = size
-        if x is not None:
-            assert isinstance(x, int)
-            assert x > 0
-        if y is not None:
-            assert isinstance(y, int)
-            assert y > 0
-
-    def _check_size(self, size):
-        assert not self.closed
-        min_x, min_y = self.minimum_size
-        if min_x is None:
-            min_x = 1
-        if min_y is None:
-            min_y = 1
-        x, y = size
-        assert isinstance(x, int) and isinstance(y, int)
-        assert x >= min_x and y >= min_y
-
-    def _check_hidden(self, hidden):
-        assert not self.closed
-        assert isinstance(hidden, bool)
-
     def close(self):
         """Close the window and set the closed attribute to True.
 
@@ -149,10 +137,11 @@ class BaseWindow(Bin):
 
     def wait(self):
         """Wait until the window is closed."""
-        assert not self.closed
+        _closecheck(self)
         self._base.wait()
 
     def __enter__(self):
+        _closecheck(self)
         return self
 
     def __exit__(self, *error):
@@ -183,7 +172,9 @@ class Window(BaseWindow):
     """
 
     def __init__(self, title='', **kwargs):
-        assert isinstance(title, str)
+        if not isinstance(title, str):
+            raise TypeError("window title needs to be a string, not %r"
+                            % (title,))
         baseclass = bananagui._get_base('widgets.window:Window')
         self._base = baseclass(self, title)
         super().__init__(title, **kwargs)
@@ -226,8 +217,9 @@ class Dialog(BaseWindow):
         assert isinstance(parentwindow, Window)
         if title is None:
             title = parentwindow.title
-        else:
-            assert isinstance(title, str)
+        elif not isinstance(title, str):
+            raise TypeError("Dialog title needs to be a string, not %r"
+                            % (title,))
         baseclass = bananagui._get_base('widgets.window:Dialog')
         self._base = baseclass(self, parentwindow._base, title)
         self.parentwindow = parentwindow

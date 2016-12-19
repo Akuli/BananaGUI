@@ -21,6 +21,8 @@
 
 """Font-related things for BananaGUI."""
 
+import functools
+
 import bananagui
 from bananagui import mainloop, types
 
@@ -107,21 +109,16 @@ class Font:
     _check_overline = _check_boolean
 
 
-# This isn't done with functools.lru_cache to make sure that an error
-# is raised if this is called with the mainloop uninitialized.
-
-_family_cache = set()
-
-
+@functools.lru_cache()
 def get_families():
     """Return a list of all avaliable font families as strings."""
-    assert mainloop._initialized, \
-        "initialize the main loop before calling get_families()"
-    if not _family_cache:
-        basefunc = bananagui._get_base('font:get_families')
-        _family_cache.update(basefunc())
-        _family_cache.add('Monospace')
-    return _family_cache
+    if not mainloop._initialized:
+        raise RuntimeError("the mainloop wasn't initialized")
+
+    # The base function can return anything iterable.
+    fonts = {'Monospace'}
+    fonts.update(bananagui._get_base('font:get_families')())
+    return frozenset(fonts)
 
 
 if __name__ == '__main__':

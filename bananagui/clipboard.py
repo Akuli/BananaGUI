@@ -26,14 +26,16 @@ from bananagui import mainloop
 
 
 def _initcheck():
-    assert mainloop._initialized, \
-        "initialize the main loop before using the clipboard"
+    if not mainloop._initialized:
+        raise RuntimeError("initialize the main loop before using "
+                           "the clipboard")
 
 
 def set_text(text):
     """Set text to the clipboard."""
     _initcheck()
-    assert isinstance(text, str)
+    if not isinstance(text, str):
+        raise TypeError("expected a string, got %r" % (text,))
     bananagui._get_base('clipboard:set_text')(text)
 
 

@@ -26,7 +26,7 @@ from bananagui import types
 from .basewidgets import Child
 
 
-@types.add_property('text')
+@types.add_property('text', type=str)
 class Label(Child):
     """A widget that displays text.
 
@@ -52,11 +52,8 @@ class Label(Child):
     def _repr_parts(self):
         return ['text=' + repr(self.text)] + super()._repr_parts()
 
-    def _check_text(self, text):
-        assert isinstance(text, str)
 
-
-@types.add_property('imagepath')
+@types.add_property('imagepath', type=str, allow_none=True)
 class ImageLabel(Child):
     r"""A widget that displays an image.
 
@@ -82,6 +79,3 @@ class ImageLabel(Child):
 
     def _repr_parts(self):
         return ['imagepath=' + repr(self.imagepath)] + super()._repr_parts()
-
-    def _check_imagepath(self, path):
-        assert path is None or isinstance(path, str)

@@ -43,12 +43,23 @@ BLUE = '#0000ff'
 PINK = '#ff00ff'
 
 
-# def _is7charhex(hexcolor):
-#    """Check if hexcolor is a valid 7-character hexadecimal color.
-#
-#    BananaGUI uses this internally.
-#    """
-#    return re.search(r'^#[0-9a-f]{6}$', hexcolor) is not None
+def _is_valid_color(hexcolor):
+    """Check if hexcolor is a valid 7-character hexadecimal color.
+
+    BananaGUI uses this internally.
+
+    >>> _is_valid_color('#fFffFf')
+    True
+    >>> _is_valid_color('#fffgff')
+    False
+    >>> _is_valid_color('#fff')     # consistency is needed
+    False
+    >>> _is_valid_color(123)
+    False
+    """
+    if not isinstance(hexcolor, str):
+        return False
+    return re.search(r'^#[0-9A-Fa-f]{6}$', hexcolor) is not None
 
 
 def hex2rgb(hexcolor):
@@ -63,21 +74,18 @@ def hex2rgb(hexcolor):
     >>> hex2rgb('#000ffffff')
     (0, 255, 255)
     """
-    assert hexcolor.startswith('#'), \
-        "invalid hexadecimal color string %r" % (hexcolor,)
-    assert hexcolor != '#', "'#' is not a valid hexadecimal color"
+    if hexcolor == '#' or not hexcolor.startswith('#'):
+        raise ValueError("invalid hexadecimal color string %r" % (hexcolor,))
+    if len(hexcolor) % 3 != 1:  # 1 is the '#'
+        raise ValueError("cannot divide %r into a # and 3 equally "
+                         "sized chunks" % (hexcolor,))
 
-    values = hexcolor[1:]
-    assert len(values) % 3 == 0, \
-        "cannot divide %r into 3 even chunks" % (values,)
-    chunksize = len(values) // 3
-
+    chunksize = len(hexcolor) // 3
+    maximum = int('f' * chunksize, 16)
     rgb = []
-    for start in range(0, len(values), chunksize):
+    for start in range(1, len(hexcolor), chunksize):
         end = start + chunksize
-        string = values[start:end]
-        number = int(string, 16) * 255 // int('f' * chunksize, 16)
-        rgb.append(number)
+        rgb.append(int(hexcolor[start:end], 16) * 255 // maximum)
     return tuple(rgb)
 
 
@@ -106,8 +114,8 @@ def hex2rgbstring(hexcolor):
 
 _number = r'(\d*\.?\d*%?)'  # Integer or float as a group, may end with %.
 _rgbstring_patterns = [
-    r'^rgb\(' + ','.join([_number] * 3) + '\)$',    # rgb(R,G,B)
-    r'^rgba\(' + ','.join([_number] * 4) + '\)$',   # rgba(R,G,B,A)
+    r'^rgb\(' + ','.join([_number] * 3) + r'\)$',   # rgb(R,G,B)
+    r'^rgba\(' + ','.join([_number] * 4) + r'\)$',  # rgba(R,G,B,A)
 ]
 
 

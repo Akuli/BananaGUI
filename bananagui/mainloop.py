@@ -35,7 +35,8 @@ def init():
     You need this only if you want to run the mainloop multiple times.
     """
     global _initialized
-    assert not _initialized, "the mainloop is initialized already"
+    if _initialized:
+        raise RuntimeError("the mainloop is initialized already")
     bananagui._get_base('mainloop:init')()
     _initialized = True
 
@@ -64,8 +65,7 @@ def quit(*args):
     arguments are ignored.
     """
     if _running:
-        basefunc = bananagui._get_base('mainloop:quit')
-        basefunc()
+        bananagui._get_base('mainloop:quit')()
 
 
 def add_timeout(milliseconds, callback, *args, **kwargs):
@@ -79,10 +79,10 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
     for most purposes. Use something like time.time() if you need to
     measure time in the callback function.
     """
-    # Someone might pass a float time and this would fail randomly with
-    # some GUI toolkits.
-    assert isinstance(milliseconds, int)
-    assert milliseconds > 0
+    if not isinstance(milliseconds, int):
+        raise TypeError("expected an integer, got %r" % (milliseconds,))
+    if milliseconds <= 0:
+        raise ValueError("non-positive timeout %d" % milliseconds)
 
     def real_callback():
         result = callback(*args, **kwargs)

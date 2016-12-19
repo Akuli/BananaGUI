@@ -26,7 +26,7 @@ from bananagui import types
 from .basewidgets import Child
 
 
-@types.add_property('text', add_changed=True)
+@types.add_property('text', type=str, add_changed=True)
 class TextBase(Child):
     """A base class for text editing widgets.
 
@@ -45,15 +45,12 @@ class TextBase(Child):
         super().__init__(parent, **kwargs)
         self.text = text
 
-    def _check_text(self, text):
-        assert isinstance(text, str)
-
     def select_all(self):
         """Select all text in the widget."""
         self._base.select_all()
 
 
-@types.add_property('secret')
+@types.add_property('secret', type=bool)
 class Entry(TextBase):
     """A one-line text widget.
 
@@ -80,14 +77,11 @@ class Entry(TextBase):
             parts.append('secret=True')
         return parts
 
-    def _check_secret(self, secret):
-        assert isinstance(secret, bool)
-
 
 # TODO: text wrapping.
 # TODO: text alignment?
 # TODO: make this behave like a list of lines.
-@types.add_property('tab')
+@types.add_property('tab', type=str)
 class TextEdit(TextBase):
     """A multiline text widget.
 
@@ -115,6 +109,3 @@ class TextEdit(TextBase):
         linecount = self.text.count('\n') + 1
         amount = "one line" if linecount == 1 else "%d lines" % linecount
         return super()._repr_parts() + ["contains %s of text" % amount]
-
-    def _check_tab(self, tab):
-        assert isinstance(tab, str)

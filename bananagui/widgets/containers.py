@@ -68,9 +68,12 @@ class Bin(Parent):
             return
 
         if child is not None:
-            assert isinstance(child, Child), \
-                "expected a Child widget, got %r" % (child,)
-            assert child.parent is self, "child widget has wrong parent"
+            if not isinstance(child, Child):
+                raise TypeError("expected a Child widget, got %r"
+                                % (child,))
+            if child.parent is not self:
+                raise ValueError("child widget %r has the wrong parent"
+                                 % (child,))
 
         if self.__child is not None:
             self._base.remove(self.__child._base)

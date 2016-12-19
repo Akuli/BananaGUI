@@ -26,7 +26,7 @@ from bananagui import types
 from .basewidgets import Child
 
 
-@types.add_property('progress')
+@types.add_property('progress', type=(float, int), minimum=0, maximum=1)
 class Progressbar(Child):
     """A progress bar widget.
 
@@ -52,13 +52,8 @@ class Progressbar(Child):
     def _repr_parts(self):
         return ['progress=' + repr(self.progress)] + super()._repr_parts()
 
-    def _check_progress(self, progress):
-        # This also checks the type because we can't compare with a
-        # value of a wrong type.
-        assert 0 <= progress <= 1
 
-
-@types.add_property('bouncing')
+@types.add_property('bouncing', type=bool)
 class BouncingProgressbar(Child):
     """A Progressbar-like widget that bounces back and forth.
 
@@ -83,11 +78,8 @@ class BouncingProgressbar(Child):
     def _repr_parts(self):
         return ['bouncing=' + repr(self.bouncing)] + super()._repr_parts()
 
-    def _check_bouncing(self, bouncing):
-        assert isinstance(bouncing, bool)
 
-
-@types.add_property('spinning')
+@types.add_property('spinning', type=bool)
 class Spinner(Child):
     r"""A waiting spinner.
 
@@ -113,6 +105,3 @@ class Spinner(Child):
 
     def _repr_parts(self):
         return ['spinning=' + repr(self.spinning)] + super()._repr_parts()
-
-    def _check_spinning(self, spinning):
-        assert isinstance(spinning, bool)
