@@ -19,30 +19,25 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+"""Images for the BananaGUI tkinter base."""
+
 import tkinter as tk
 
-from .basewidgets import Child
 
+class Image:
 
-class Button(Child):
+    def __init__(self, real_image):
+        self.real_image = real_image
 
-    def __init__(self, bananawidget, parent):
-        self.real_widget = tk.Button(
-            parent.real_widget, command=self._do_click)
-        self.real_widget.bind('<Return>', self._do_click)
-        super().__init__(bananawidget, parent)
+    def copy(self):
+        return Image(self.real_image.copy())
 
-    def _do_click(self, event=None):
-        self.bananawidget.run_callbacks('on_click')
+    @classmethod
+    def from_file(cls, path, imagetype):
+        self = cls(tk.PhotoImage(file=path, format=imagetype))
+        size = (self.real_image.width(), self.real_image.height())
+        return self, size
 
-    def set_text(self, text):
-        self.real_widget['text'] = text
-
-    def set_image(self, image):
-        if image is None:
-            self.real_widget['image'] = ''
-        else:
-            self.real_widget['image'] = image.real_image
-
-
-ImageButton = Button
+    @classmethod
+    def from_size(cls, width, height):
+        return cls(tk.PhotoImage(width=width, height=height))

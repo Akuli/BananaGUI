@@ -3,14 +3,15 @@ import pprint
 
 from bananagui import mainloop, iniloader
 
+filename = os.path.join('guitests', 'data', 'testgui.ini')
+
 
 def click(button):
     print("Click!")
 
 
 def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(here, 'testgui.ini'), 'r') as f:
+    with open(filename, 'r') as f:
         the_widgets = iniloader.load_ini(f)
     pprint.pprint(the_widgets)
     with the_widgets['window']:

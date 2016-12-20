@@ -19,30 +19,32 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import tkinter as tk
+"""BananaGUI test for widgets that use images."""
 
-from .basewidgets import Child
+import os
 
+from bananagui import images, mainloop, widgets
 
-class Button(Child):
-
-    def __init__(self, bananawidget, parent):
-        self.real_widget = tk.Button(
-            parent.real_widget, command=self._do_click)
-        self.real_widget.bind('<Return>', self._do_click)
-        super().__init__(bananawidget, parent)
-
-    def _do_click(self, event=None):
-        self.bananawidget.run_callbacks('on_click')
-
-    def set_text(self, text):
-        self.real_widget['text'] = text
-
-    def set_image(self, image):
-        if image is None:
-            self.real_widget['image'] = ''
-        else:
-            self.real_widget['image'] = image.real_image
+filename = os.path.join('guitests', 'data', 'banana.png')
 
 
-ImageButton = Button
+def main():
+    with widgets.Window("Image test") as window:
+        image = images.Image(filename)
+
+        box = widgets.Box.horizontal(window)
+        window.child = box
+
+        label = widgets.ImageLabel(box, image)
+        box.append(label)
+
+        button = widgets.ImageButton(box, image)
+        button.on_click.append(print)
+        box.append(button)
+
+        window.on_close.append(mainloop.quit)
+        mainloop.run()
+
+
+if __name__ == '__main__':
+    main()

@@ -33,14 +33,11 @@ class Label(Child):
     def set_text(self, text):
         self.real_widget['text'] = text
 
-    def set_path(self, path):
-        if path is None:
-            # Remove the old image if any.
-            self._image = self.real_widget['image'] = ''
+    def set_image(self, image):
+        if image is None:
+            self.real_widget['image'] = ''
         else:
-            # Tkinter needs a reference to the PhotoImage to avoid
-            # garbage collection.
-            self._image = self.real_widget['image'] = tk.PhotoImage(file=path)
+            self.real_widget['image'] = image.real_image
 
 
 ImageLabel = Label

@@ -22,7 +22,7 @@
 """Button widgets."""
 
 import bananagui
-from bananagui import types
+from bananagui import images, types
 from .basewidgets import Child
 
 
@@ -56,7 +56,7 @@ class Button(Child):
         return ['text=' + repr(self.text)] + super()._repr_parts()
 
 
-@types.add_property('imagepath', type=str, allow_none=True)
+@types.add_property('image', type=images.Image, allow_none=True)
 class ImageButton(Child):
     r"""A button that displays an image.
 
@@ -71,21 +71,21 @@ class ImageButton(Child):
         `---------------'
 
     Attributes:
-      imagepath     Path to the image displayed in the button or None.
-                    None by default.
+      image         The image displayed in the button or None.
+                    Setting this copies the image.
       on_click      List of callbacks that are ran when the button is
                     clicked.
     """
 
     can_focus = True
 
-    def __init__(self, parent, imagepath=None, **kwargs):
-        self._imagepath = None
+    def __init__(self, parent, image=None, **kwargs):
+        self._image = None
         self.on_click = []
         baseclass = bananagui._get_base('widgets.buttons:ImageButton')
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
-        self.imagepath = imagepath
+        self.image = image
 
     def _repr_parts(self):
-        return ['imagepath=' + repr(self.imagepath)] + super()._repr_parts()
+        return ['image=' + repr(self.image)] + super()._repr_parts()

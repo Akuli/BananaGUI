@@ -22,7 +22,7 @@
 """Base classes for various widgets."""
 
 import bananagui
-from bananagui import mainloop, types
+from bananagui import images, mainloop, types
 
 
 class Widget(types.BananaObject):

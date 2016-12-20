@@ -22,7 +22,7 @@
 """BananaGUI labels."""
 
 import bananagui
-from bananagui import types
+from bananagui import images, types
 from .basewidgets import Child
 
 
@@ -53,7 +53,7 @@ class Label(Child):
         return ['text=' + repr(self.text)] + super()._repr_parts()
 
 
-@types.add_property('imagepath', type=str, allow_none=True)
+@types.add_property('image', type=images.Image, allow_none=True)
 class ImageLabel(Child):
     r"""A widget that displays an image.
 
@@ -67,15 +67,16 @@ class ImageLabel(Child):
         `---------------'
 
     Attributes:
-      imagepath     Path to the image displayed in the label or None.
+      image     The bananagui.images.Image in the widget or None.
+                Setting this copies the image.
     """
 
-    def __init__(self, parent, imagepath=None, **kwargs):
-        self._imagepath = None
+    def __init__(self, parent, image=None, **kwargs):
+        self._image = None
         baseclass = bananagui._get_base('widgets.labels:ImageLabel')
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
-        self.imagepath = imagepath
+        self.image = image
 
     def _repr_parts(self):
-        return ['imagepath=' + repr(self.imagepath)] + super()._repr_parts()
+        return ['image=' + repr(self.image)] + super()._repr_parts()
