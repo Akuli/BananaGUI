@@ -25,12 +25,10 @@ import os
 
 from bananagui import images, mainloop, widgets
 
-filename = os.path.join('guitests', 'data', 'banana.png')
-
 
 def main():
     with widgets.Window("Image test") as window:
-        image = images.Image(filename)
+        image = images.Image(os.path.join('guitests', 'banana.png'))
 
         box = widgets.Box.horizontal(window)
         window.child = box
