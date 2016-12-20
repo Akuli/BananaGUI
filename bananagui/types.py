@@ -118,8 +118,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
         ...     def set_test(self, test):
         ...         print("base sets test to", test)
         ...
-        >>> @add_property('test', add_changed=True, type=str,
-        ...               doc="This is a test.")
+        >>> @add_property('test', add_changed=True, type=str)
         ... class Thingy(BananaObject):
         ...     def __init__(self):
         ...         self._base = Base()
@@ -130,8 +129,6 @@ def add_property(name, *, add_changed=False, allow_none=False,
         ...
         >>> Thingy.test     # doctest: +ELLIPSIS
         <property object at 0x...>
-        >>> Thingy.test.__doc__
-        'This is a test.'
         >>> thing = Thingy()
         >>> thing
         <the thingy object>
