@@ -32,6 +32,8 @@ class _BaseWindow(Bin):
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
         self.real_widget['border'] = 5  # Looks nicer.
+        # The window may jump around randomly sometimes without this.
+        self._can_set_size = True
 
     def _do_configure(self, event):
         if event.widget is self.real_widget:
@@ -40,7 +42,9 @@ class _BaseWindow(Bin):
             # than the minimum size when it's not yet fully showing.
             minwidth, minheight = self.real_widget.minsize()
             if event.width > minwidth and event.height > minheight:
+                self._can_set_size = False
                 self.bananawidget.size = (event.width, event.height)
+                self._can_set_size = True
         else:
             # A child changed, let's make sure the minimum_size is set
             # correctly.
@@ -56,7 +60,8 @@ class _BaseWindow(Bin):
         self.real_widget.resizable(resizable, resizable)
 
     def set_size(self, size):
-        self.real_widget.geometry('%dx%d' % size)
+        if self._can_set_size:
+            self.real_widget.geometry('%dx%d' % size)
 
     def set_minimum_size(self, size):
         # Tkinter's windows don't avoid becoming too small by default.
