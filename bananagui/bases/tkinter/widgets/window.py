@@ -28,6 +28,7 @@ class _BaseWindow(Bin):
 
     def __init__(self, bananawidget, title):
         super().__init__(bananawidget)
+        self.real_widget['border'] = 5  # Looks nicer.
         self.real_widget.title(title)
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
