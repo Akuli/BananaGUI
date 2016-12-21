@@ -28,10 +28,10 @@ class _BaseWindow(Bin):
 
     def __init__(self, bananawidget, title):
         super().__init__(bananawidget)
-        self.real_widget['border'] = 5  # Looks nicer.
         self.real_widget.title(title)
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
+        self.real_widget['border'] = 5  # Looks nicer.
 
     def _do_configure(self, event):
         if event.widget is self.real_widget:
@@ -39,7 +39,7 @@ class _BaseWindow(Bin):
             # current window size based on it. The window is smaller
             # than the minimum size when it's not yet fully showing.
             minwidth, minheight = self.real_widget.minsize()
-            if event.width >= minwidth or event.height >= minheight:
+            if event.width > minwidth and event.height > minheight:
                 self.bananawidget.size = (event.width, event.height)
         else:
             # A child changed, let's make sure the minimum_size is set
