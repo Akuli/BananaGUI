@@ -32,12 +32,9 @@ def _closecheck(window, junk=None):
 
 
 def _sizecheck(window, size):
-    _closecheck(window)
+    if window.closed:
+        raise RuntimeError("the window has been closed")
     min_x, min_y = window.minimum_size
-    if min_x is None:
-        min_x = 1
-    if min_y is None:
-        min_y = 1
     x, y = size
     if x < min_x or y < min_y:
         raise ValueError("size %r is smaller than minimum_size %r"
@@ -46,11 +43,10 @@ def _sizecheck(window, size):
 
 @types.add_property('title', type=str, extra_setter=_closecheck)
 @types.add_property('resizable', type=bool, extra_setter=_closecheck)
-@types.add_property('minimum_size', type=int, minimum=1, how_many=2,
-                    allow_none=True, add_changed=True,
-                    extra_setter=_closecheck)
 @types.add_property('size', type=int, how_many=2, extra_setter=_sizecheck,
                     add_changed=True)
+@types.add_property('minimum_size', type=int, minimum=0, how_many=2,
+                    add_changed=True, extra_setter=_closecheck)
 @types.add_property('hidden', type=bool, extra_setter=_closecheck)
 class BaseWindow(Bin):
     """A window baseclass.
@@ -73,12 +69,15 @@ class BaseWindow(Bin):
       resizable         True if the user can resize the window.
       size              The current window size.
                         Like most other sizes, this is a two-tuple of
-                        integers.
+                        integers. Adding widgets to the window may
+                        change this, so setting this on initialization
+                        is not supported.
       on_size_changed   List of callbacks that are ran when size changes.
       minimum_size      Two-tuple of smallest allowed width and height.
-                        This is (None, None) by default, so the window
-                        can be however big it needs to be in both
-                        directions.
+                        If the content of the window take up more space
+                        than this, this is ignored. This is (0, 0) by
+                        default, so the window is always large enough
+                        for its content.
       hidden            True if the window is not showing.
                         Hiding the window is easier than creating a new
                         window when a window with the same content
@@ -99,18 +98,17 @@ class BaseWindow(Bin):
 
     can_focus = True
 
-    def __init__(self, title, *, resizable=True, size=(200, 200),
-                 minimum_size=(None, None), hidden=False, **kwargs):
+    def __init__(self, title, *, resizable=True,
+                 minimum_size=(0, 0), hidden=False, **kwargs):
         self._title = title
         self._resizable = True
         self._size = (200, 200)
-        self._minimum_size = (None, None)
+        self._minimum_size = (0, 0)
         self._hidden = False
         self.on_close = [lambda w: w.close()]
         self.closed = False
         super().__init__(**kwargs)
         self.resizable = resizable
-        self.size = size
         self.minimum_size = minimum_size
         self.hidden = hidden
 

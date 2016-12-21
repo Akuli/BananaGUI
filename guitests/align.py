@@ -26,7 +26,7 @@ from bananagui import mainloop, widgets
 
 
 def main():
-    window = widgets.Window("Label align test", size=(300, 200))
+    window = widgets.Window("Label align test")
     box = widgets.Box.vertical(window)
     window.child = box
 

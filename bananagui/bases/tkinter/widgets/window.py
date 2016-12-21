@@ -31,22 +31,19 @@ class _BaseWindow(Bin):
         self.real_widget.title(title)
         self.real_widget.bind('<Configure>', self._do_configure)
         self.real_widget.protocol('WM_DELETE_WINDOW', self._do_delete)
-        self._setting_size = False
 
     def _do_configure(self, event):
-        # The window is smaller than the minimum size when it's not
-        # fully showing yed.
-        min_width, min_height = self.bananawidget.minimum_size
-        if min_width is not None and event.width < min_width:
-            return
-        if min_height is not None and event.height < min_height:
-            return
-
-        # I have no idea why the window becomes ridiculously small
-        # without this _setting_size guard thingy.
-        self._setting_size = True
-        self.bananawidget.size = (event.width, event.height)
-        self._setting_size = False
+        if event.widget is self.real_widget:
+            # The event was created by this window, so we can set the
+            # current window size based on it. The window is smaller
+            # than the minimum size when it's not yet fully showing.
+            minwidth, minheight = self.real_widget.minsize()
+            if event.width >= minwidth or event.height >= minheight:
+                self.bananawidget.size = (event.width, event.height)
+        else:
+            # A child changed, let's make sure the minimum_size is set
+            # correctly.
+            self.set_minimum_size(self.bananawidget.minimum_size)
 
     def _do_delete(self):
         self.bananawidget.run_callbacks('on_close')
@@ -58,16 +55,13 @@ class _BaseWindow(Bin):
         self.real_widget.resizable(resizable, resizable)
 
     def set_size(self, size):
-        if not self._setting_size:
-            self.real_widget.geometry('%dx%d' % size)
+        self.real_widget.geometry('%dx%d' % size)
 
     def set_minimum_size(self, size):
-        width, height = size
-        if width is None:
-            width = 1
-        if height is None:
-            height = 1
-        self.real_widget.minsize(width, height)
+        # Tkinter's windows don't avoid becoming too small by default.
+        minwidth = max(size[0], self.real_widget.winfo_reqwidth())
+        minheight = max(size[1], self.real_widget.winfo_reqheight())
+        self.real_widget.minsize(minwidth, minheight)
 
     def set_hidden(self, hidden):
         if hidden:

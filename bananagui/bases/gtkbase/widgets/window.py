@@ -56,9 +56,9 @@ class _BaseWindow(Bin):
 
     def set_minimum_size(self, size):
         width, height = size
-        if width is None:
+        if width == 0:
             width = -1
-        if height is None:
+        if height == 0:
             height = -1
         self.real_widget.set_size_request(width, height)
 

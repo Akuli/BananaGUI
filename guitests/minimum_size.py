@@ -19,25 +19,36 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI checkbox test."""
+"""BananaGUI size test."""
 
 from bananagui import mainloop, widgets
 
+instructions = ("The window should always fully show\n"
+                "this text and the button you clicked.")
 
-def on_check(checkbox):
-    if checkbox.checked:
-        checkbox.text = "Uncheck me!"
+
+def click_callback(button):
+    box = button.parent
+    label = box[0]
+    if button.text == "Hide instructions":
+        label.text = 'hidden'
+        button.text = "Show instructions"
     else:
-        checkbox.text = "Check me!"
-    print(checkbox)
+        label.text = instructions
+        button.text = "Hide instructions"
 
 
 def main():
-    with widgets.Window("Checkbox test") as window:
-        checkbox = widgets.Checkbox(window, "Check me!")
-        checkbox.on_checked_changed.append(on_check)
-        window.child = checkbox
-
+    # minimum_size=(1, 1) tests if setting it on initialization makes
+    # a difference (it shouldn't).
+    with widgets.Window("Minimum size test",
+                        minimum_size=(1, 1)) as window:
+        box = widgets.Box.vertical(window)
+        window.child = box
+        box.append(widgets.Label(box, 'hidden'))
+        button = widgets.Button(box, "Show instructions")
+        button.on_click.append(click_callback)
+        box.append(button)
         window.on_close.append(mainloop.quit)
         mainloop.run()
 
