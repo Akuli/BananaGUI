@@ -111,7 +111,7 @@ class BananaObject:
 
 def add_property(name, *, add_changed=False, allow_none=False,
                  type=object, how_many=1, minimum=None, maximum=None,
-                 extra_setter=None):
+                 choices=None, extra_setter=None):
     """A handy way to add a property to a class.
 
         >>> class Base:
@@ -197,6 +197,9 @@ def add_property(name, *, add_changed=False, allow_none=False,
                     if not isinstance(value, type):
                         raise TypeError("expected a value of type %s, got %r"
                                         % (type.__name__, value))
+                    if choices is not None and value not in choices:
+                        raise ValueError("invalid value %r, not in %r"
+                                         % (value, choices))
                     if minimum is not None and value < minimum:
                         raise ValueError("%r is too small, needs to be >= %r"
                                          % (value, minimum))

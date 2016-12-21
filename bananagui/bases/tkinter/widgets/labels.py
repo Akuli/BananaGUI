@@ -21,7 +21,16 @@
 
 import tkinter as tk
 
+import bananagui
 from .basewidgets import Child
+
+
+justifys = {bananagui.LEFT: 'left',
+            bananagui.RIGHT: 'right',
+            bananagui.CENTER: 'center'}
+anchors = {bananagui.LEFT: 'w',
+           bananagui.CENTER: 'center',
+           bananagui.RIGHT: 'e'}
 
 
 class Label(Child):
@@ -32,6 +41,10 @@ class Label(Child):
 
     def set_text(self, text):
         self.real_widget['text'] = text
+
+    def set_align(self, align):
+        self.real_widget['justify'] = justifys[align]
+        self.real_widget['anchor'] = anchors[align]
 
     def set_image(self, image):
         if image is None:

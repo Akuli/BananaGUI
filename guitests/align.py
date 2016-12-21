@@ -19,31 +19,26 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from gi.repository import Gtk
+"""BananaGUI label align test."""
 
 import bananagui
-from .basewidgets import Child
+from bananagui import mainloop, widgets
 
 
-justifys = {bananagui.LEFT: Gtk.Justification.LEFT,
-            bananagui.CENTER: Gtk.Justification.CENTER,
-            bananagui.RIGHT: Gtk.Justification.RIGHT}
-aligns = {bananagui.LEFT: Gtk.Align.START,
-          bananagui.CENTER: Gtk.Align.FILL,
-          bananagui.RIGHT: Gtk.Align.END}
+def main():
+    window = widgets.Window("Label align test", size=(300, 200))
+    box = widgets.Box.vertical(window)
+    window.child = box
+
+    names = ['left', 'center', 'right']
+    aligns = [bananagui.LEFT, bananagui.CENTER, bananagui.RIGHT]
+    for name, align in zip(names, aligns):
+        label = widgets.Label(box, "this is aligned to\n" + name, align=align)
+        box.append(label)
+
+    window.on_close.append(mainloop.quit)
+    mainloop.run()
 
 
-class Label(Child):
-
-    def __init__(self, bananawidget, parent):
-        self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
-        super().__init__(bananawidget, parent)
-
-    def set_text(self, text):
-        self.real_widget.set_text(text)
-
-    def set_align(self, align):
-        self.real_widget.set_halign(aligns[align])
-        self.real_widget.set_justify(justifys[align])
-
-    # TODO: implement set_image.
+if __name__ == '__main__':
+    main()

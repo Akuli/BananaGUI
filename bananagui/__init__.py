@@ -40,7 +40,8 @@ __all__ = [
     'color', 'font', 'iniloader', 'mainloop', 'msgbox', 'widgets',
 
     # Things defined here.
-    'HORIZONTAL', 'VERTICAL', 'RUN_AGAIN', 'load',
+    'HORIZONTAL', 'VERTICAL', 'LEFT', 'CENTER', 'RIGHT', 'RUN_AGAIN',
+    'load',
 ]
 
 
@@ -48,6 +49,10 @@ __all__ = [
 # directly.
 HORIZONTAL = 'h'
 VERTICAL = 'v'
+
+LEFT = 'l'
+CENTER = 'c'
+RIGHT = 'r'
 
 # This is not 0 or 1 because returning True or False from a callback
 # must not be allowed.

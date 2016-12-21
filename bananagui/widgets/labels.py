@@ -27,6 +27,8 @@ from .basewidgets import Child
 
 
 @types.add_property('text', type=str)
+@types.add_property('align', choices={bananagui.LEFT, bananagui.CENTER,
+                                      bananagui.RIGHT})
 class Label(Child):
     """A widget that displays text.
 
@@ -34,20 +36,19 @@ class Label(Child):
         |  Hello World! |
         `---------------'
 
-    The text is always centered. If you would like to have text that
-    aligns to left or right instead, let me know and I'll implement it.
-
     Attributes:
       text      The text in the label.
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, parent, text='', **kwargs):
+    def __init__(self, parent, text='', *, align=bananagui.CENTER, **kwargs):
         self._text = ''
+        self._align = bananagui.CENTER
         baseclass = bananagui._get_base('widgets.labels:Label')
         self._base = baseclass(self, parent._base)
         super().__init__(parent, **kwargs)
         self.text = text
+        self.align = align
 
     def _repr_parts(self):
         return ['text=' + repr(self.text)] + super()._repr_parts()
