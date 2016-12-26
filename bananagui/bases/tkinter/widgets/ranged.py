@@ -32,20 +32,16 @@ class Slider(Child):
         minimum = min(valuerange)
         maximum = max(valuerange)
         step = utils.rangestep(valuerange)
+		# The command is way better than binding anything manually. I
+		# found it from the scale(3tk) man page.
         self.real_widget = tk.Scale(
             parent.real_widget, from_=minimum, to=maximum,
-            resolution=step, orient=tkinter_orients[orientation])
-        # There seems to be no way to change a Scale's value with the
-        # keyboard so this seems to work. There's a stackoverflow answer
-        # that recommends binding <ButtonRelease-1>, but it doesn't
-        # change the value immediately when the scale is moved.
-        self.real_widget.bind('<Button1-Motion>', self._on_motion)
-
+            resolution=step, orient=tkinter_orients[orientation],
+            command=self._do_changed)
         super().__init__(bananawidget, parent)
 
-    def _on_motion(self, event):
-        # This doesn't do anything if the value hasn't changed.
-        self.bananawidget.value = event.widget.get()
+    def _do_changed(self, new_value):
+        self.bananawidget.value = int(new_value)
 
     def set_value(self, value):
         self.real_widget.set(value)
