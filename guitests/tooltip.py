@@ -25,12 +25,11 @@ from bananagui import mainloop, widgets
 def main():
     window = widgets.Window("Tooltip test")
 
-    box = widgets.Box.vertical(window)
+    box = widgets.Box.vertical()
     window.child = box
 
-    toplabel = widgets.Label(box, "Top label!",
-                             tooltip="Top label tooltip!")
-    bottomlabel = widgets.Label(box, "Bottom label!",
+    toplabel = widgets.Label("Top label!", tooltip="Top label tooltip!")
+    bottomlabel = widgets.Label("Bottom label!",
                                 tooltip="Bottom label tooltip!")
     box.extend([toplabel, bottomlabel])
     print(toplabel)

@@ -30,13 +30,13 @@ def main():
     with widgets.Window("Image test") as window:
         image = images.Image(os.path.join('guitests', 'banana.png'))
 
-        box = widgets.Box.horizontal(window)
+        box = widgets.Box.horizontal()
         window.child = box
 
-        label = widgets.ImageLabel(box, image)
+        label = widgets.ImageLabel(image)
         box.append(label)
 
-        button = widgets.ImageButton(box, image)
+        button = widgets.ImageButton(image)
         button.on_click.append(print)
         box.append(button)
 

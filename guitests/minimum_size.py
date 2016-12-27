@@ -21,15 +21,15 @@
 
 """BananaGUI size test."""
 
+import functools
+
 from bananagui import mainloop, widgets
 
 instructions = ("The window should always fully show\n"
                 "this text and the button you clicked.")
 
 
-def click_callback(button):
-    box = button.parent
-    label = box[0]
+def on_click(label, button):
     if button.text == "Hide instructions":
         label.text = 'hidden'
         button.text = "Show instructions"
@@ -43,12 +43,15 @@ def main():
     # a difference (it shouldn't).
     with widgets.Window("Minimum size test",
                         minimum_size=(1, 1)) as window:
-        box = widgets.Box.vertical(window)
+        box = widgets.Box.vertical()
         window.child = box
-        box.append(widgets.Label(box, 'hidden'))
-        button = widgets.Button(box, "Show instructions")
-        button.on_click.append(click_callback)
+
+        label = widgets.Label('hidden')
+        box.append(label)
+        button = widgets.Button("Show instructions")
+        button.on_click.append(functools.partial(on_click, label))
         box.append(button)
+
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

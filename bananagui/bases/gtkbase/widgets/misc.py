@@ -27,10 +27,10 @@ from .basewidgets import Child
 
 class Checkbox(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.CheckButton()
         self.real_widget.connect('notify::active', self._do_check)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_check(self, real_widget, gparam):
         self.bananawidget.checked = real_widget.get_active()
@@ -44,14 +44,14 @@ class Checkbox(Child):
 
 class Dummy(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.Label()
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
 
 class Separator(Child):
 
-    def __init__(self, bananawidget, parent, orientation):
+    def __init__(self, bananawidget, orientation):
         gtk_orientation = orientations[orientation]
         self.real_widget = Gtk.Separator(orientation=gtk_orientation)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)

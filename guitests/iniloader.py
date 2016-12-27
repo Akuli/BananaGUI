@@ -4,7 +4,6 @@ import pprint
 from bananagui import mainloop, iniloader
 
 
-
 def click(button):
     print("Click!")
 

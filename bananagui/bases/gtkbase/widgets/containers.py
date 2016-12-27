@@ -52,9 +52,9 @@ _expand_indexes = {
 
 class Box(Child):
 
-    def __init__(self, bananawidget, parent, orientation):
+    def __init__(self, bananawidget, orientation):
         self.real_widget = Gtk.Box(orientation=orientations[orientation])
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def append(self, child):
         # TODO: What if the widget is added and then its expandiness is
@@ -70,6 +70,6 @@ class Box(Child):
 
 class Scroller(Child, Bin):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.ScrolledWindow()
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)

@@ -27,37 +27,37 @@ from bananagui import mainloop, widgets
 
 class EntryBox(widgets.Box):
 
-    def __init__(self, parent, **kwargs):
-        super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         # This is attached to self because we need it in other methods.
-        self.entry = widgets.Entry(self, expand=(True, False))
+        self.entry = widgets.Entry(expand=(True, False))
         self.entry.on_text_changed.append(self.text_changed)
         self.append(self.entry)
 
-        self.append(widgets.Dummy(self))
+        self.append(widgets.Dummy())
 
-        buttonbox = widgets.Box.horizontal(self, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(expand=(True, False))
         self.append(buttonbox)
 
-        resetbutton = widgets.Button(buttonbox, "Reset")
+        resetbutton = widgets.Button("Reset")
         resetbutton.on_click.append(self.reset)
         buttonbox.append(resetbutton)
 
-        selectallbutton = widgets.Button(buttonbox, "Select all")
+        selectallbutton = widgets.Button("Select all")
         selectallbutton.on_click.append(self.select_all)
         buttonbox.append(selectallbutton)
 
-        focusbutton = widgets.Button(buttonbox, "Focus")
+        focusbutton = widgets.Button("Focus")
         focusbutton.on_click.append(self.get_focus)
         buttonbox.append(focusbutton)
 
-        grayedcheckbox = widgets.Checkbox(buttonbox, "Grayed out")
+        grayedcheckbox = widgets.Checkbox("Grayed out")
         grayedcheckbox.on_checked_changed.append(
             self.grayed_out_toggled)
         buttonbox.append(grayedcheckbox)
 
-        secretcheckbox = widgets.Checkbox(buttonbox, "Secret")
+        secretcheckbox = widgets.Checkbox("Secret")
         secretcheckbox.on_checked_changed.append(self.secret_toggled)
         buttonbox.append(secretcheckbox)
 
@@ -88,7 +88,10 @@ class EntryBox(widgets.Box):
 
 def main():
     with widgets.Window("Entry test") as window:
-        window.child = EntryBox(window)
+        # EntryBox.vertical() does the same thing as
+        # EntryBox(orientation=bananagui.VERTICAL), so taking keyword
+        # arguments in __init__ is enough.
+        window.child = EntryBox.vertical()
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

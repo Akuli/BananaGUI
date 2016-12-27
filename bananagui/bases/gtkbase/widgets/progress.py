@@ -26,9 +26,9 @@ from .basewidgets import Child
 
 class Progressbar(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.ProgressBar()
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def set_progress(self, progress):
         self.real_widget.set_fraction(progress)
@@ -36,9 +36,9 @@ class Progressbar(Child):
 
 class BouncingProgressbar(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.ProgressBar()
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _on_timeout(self):
         if not self._bouncing:
@@ -58,9 +58,9 @@ class BouncingProgressbar(Child):
 
 class Spinner(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.Spinner()
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def set_spinning(self, spinning):
         if spinning:

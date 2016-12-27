@@ -27,28 +27,16 @@ class DialogTest(widgets.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        box = widgets.Box.vertical(self)
+        box = widgets.Box.vertical()
         self.child = box
 
-        infobutton = widgets.Button(box, "Info")
-        infobutton.on_click.append(self.info)
-        box.append(infobutton)
-
-        warningbutton = widgets.Button(box, "Warning")
-        warningbutton.on_click.append(self.warning)
-        box.append(warningbutton)
-
-        errorbutton = widgets.Button(box, "Error")
-        errorbutton.on_click.append(self.error)
-        box.append(errorbutton)
-
-        questionbutton = widgets.Button(box, "Question")
-        questionbutton.on_click.append(self.question)
-        box.append(questionbutton)
-
-        colorbutton = widgets.Button(box, "Choose a color...")
-        colorbutton.on_click.append(self.choose_color)
-        box.append(colorbutton)
+        texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
+        methods = [self.info, self.warning, self.error, self.question,
+                   self.choose_color]
+        for text, method in zip(texts, methods):
+            button = widgets.Button(text)
+            button.on_click.append(method)
+            box.append(button)
 
     def info(self, infobutton):
         result = msgbox.info(self, "Information!")

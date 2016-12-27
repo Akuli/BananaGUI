@@ -27,13 +27,13 @@ from bananagui import mainloop, widgets
 
 def main():
     window = widgets.Window("Label align test")
-    box = widgets.Box.vertical(window)
+    box = widgets.Box.vertical()
     window.child = box
 
     names = ['left', 'center', 'right']
     aligns = [bananagui.LEFT, bananagui.CENTER, bananagui.RIGHT]
     for name, align in zip(names, aligns):
-        label = widgets.Label(box, "this is aligned to\n" + name, align=align)
+        label = widgets.Label("this is aligned to\n" + name, align=align)
         box.append(label)
 
     window.on_close.append(mainloop.quit)

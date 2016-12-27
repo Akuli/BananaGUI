@@ -25,27 +25,27 @@ from bananagui import mainloop, widgets
 def main():
     window = widgets.Window("Separator test")
 
-    bigbox = widgets.Box.vertical(window)
+    bigbox = widgets.Box.vertical()
     window.child = bigbox
 
-    toplabel = widgets.Label(bigbox, "Top")
+    toplabel = widgets.Label("Top")
     bigbox.append(toplabel)
 
-    hsep = widgets.Separator.horizontal(bigbox)
+    hsep = widgets.Separator.horizontal()
     bigbox.append(hsep)
     print(hsep)
 
-    bottombox = widgets.Box.horizontal(bigbox)
+    bottombox = widgets.Box.horizontal()
     bigbox.append(bottombox)
 
-    bottomleftlabel = widgets.Label(bottombox, "Bottom left")
+    bottomleftlabel = widgets.Label("Bottom left")
     bottombox.append(bottomleftlabel)
 
-    vsep = widgets.Separator.vertical(bottombox)
+    vsep = widgets.Separator.vertical()
     bottombox.append(vsep)
     print(vsep)
 
-    bottomrightlabel = widgets.Label(bottombox, "Bottom right")
+    bottomrightlabel = widgets.Label("Bottom right")
     bottombox.append(bottomrightlabel)
 
     window.on_close.append(mainloop.quit)

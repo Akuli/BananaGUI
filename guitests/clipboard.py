@@ -27,22 +27,22 @@ class ClipboardTestWindow(widgets.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        mainbox = widgets.Box.vertical(self)
+        mainbox = widgets.Box.vertical()
         self.child = mainbox
 
-        self.entry = widgets.Entry(mainbox, expand=(True, False))
+        self.entry = widgets.Entry(expand=(True, False))
         mainbox.append(self.entry)
 
-        mainbox.append(widgets.Dummy(mainbox))
+        mainbox.append(widgets.Dummy())
 
-        buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(expand=(True, False))
         mainbox.append(buttonbox)
 
-        copybutton = widgets.Button(buttonbox, "Copy everything")
+        copybutton = widgets.Button("Copy everything")
         copybutton.on_click.append(self.copy)
         buttonbox.append(copybutton)
 
-        pastebutton = widgets.Button(buttonbox, text="Paste to the end")
+        pastebutton = widgets.Button("Paste to the end")
         pastebutton.on_click.append(self.paste)
         buttonbox.append(pastebutton)
 

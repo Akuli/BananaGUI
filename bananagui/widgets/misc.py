@@ -53,12 +53,12 @@ class Checkbox(Child):
 
     can_focus = True
 
-    def __init__(self, parent, text='', *, checked=False, **kwargs):
+    def __init__(self, text='', *, checked=False, **kwargs):
         self._text = ''
         self._checked = False
         baseclass = bananagui._get_base('widgets.misc:Checkbox')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
         self.text = text
         self.checked = checked
 
@@ -79,10 +79,10 @@ class Dummy(Child):
     filled with something. See Child's documentation for more info.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, **kwargs):
         baseclass = bananagui._get_base('widgets.misc:Dummy')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
 
 
 class Separator(_Oriented, Child):
@@ -98,13 +98,13 @@ class Separator(_Oriented, Child):
     are sometimes useful.
     """
 
-    def __init__(self, parent, *, orientation, **kwargs):
+    def __init__(self, *, orientation, **kwargs):
         # Make the separator expand correctly by default.
         if orientation == bananagui.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
         if orientation == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
         baseclass = bananagui._get_base('widgets.misc:Separator')
-        self._base = baseclass(self, parent._base, orientation)
+        self._base = baseclass(self, orientation)
         self.orientation = orientation
-        super().__init__(parent, **kwargs)
+        super().__init__(**kwargs)

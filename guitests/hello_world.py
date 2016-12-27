@@ -31,7 +31,7 @@ def resize(window):
 def main():
     with widgets.Window("Hello World!") as window:
         window.on_size_changed.append(resize)
-        label = widgets.Label(window, "Hello World!")
+        label = widgets.Label("Hello World!")
         window.child = label
         window.on_close.append(mainloop.quit)
         print(window)

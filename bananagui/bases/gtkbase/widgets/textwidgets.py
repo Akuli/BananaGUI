@@ -26,10 +26,10 @@ from .basewidgets import Child
 
 class Entry(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.Entry()
         self.real_widget.connect('changed', self._do_changed)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_changed(self, entry):
         self.bananawidget.text = entry.get_text()
@@ -50,12 +50,12 @@ class Entry(Child):
 class TextEdit(Child):
     # TODO: tabchar
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.TextView()
         self._textbuf = self.real_widget.get_buffer()
         self._changed_id = self._textbuf.connect('changed', self._do_changed)
         self._setting_text = False
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_changed(self, buf):
         self._setting_text = True

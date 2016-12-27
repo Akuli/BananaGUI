@@ -59,10 +59,6 @@ class Widget:
 
 class Child(Widget):
 
-    def __init__(self, bananawidget, parent):
-        self.parent = parent
-        super().__init__(bananawidget)
-
     def set_expand(self, expand):
         h, v = expand
         self.real_widget.set_hexpand(h)

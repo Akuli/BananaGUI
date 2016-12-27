@@ -26,10 +26,10 @@ from .basewidgets import Child
 
 class Button(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.Button()
         self.real_widget.connect('clicked', self._do_click)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_click(self, button):
         self.bananawidget.run_callbacks('on_click')

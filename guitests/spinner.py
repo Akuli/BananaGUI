@@ -29,20 +29,20 @@ class SpinnerWindow(widgets.Window):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        mainbox = widgets.Box.vertical(self)
+        mainbox = widgets.Box.vertical()
         self.child = mainbox
 
-        self.spinner = widgets.Spinner(mainbox)
+        self.spinner = widgets.Spinner()
         mainbox.append(self.spinner)
 
-        buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
+        buttonbox = widgets.Box.horizontal(expand=(True, False))
         mainbox.append(buttonbox)
 
-        startbutton = widgets.Button(buttonbox, "Start")
+        startbutton = widgets.Button("Start")
         startbutton.on_click.append(self.start)
         buttonbox.append(startbutton)
 
-        stopbutton = widgets.Button(buttonbox, "Stop")
+        stopbutton = widgets.Button("Stop")
         stopbutton.on_click.append(self.stop)
         buttonbox.append(stopbutton)
 

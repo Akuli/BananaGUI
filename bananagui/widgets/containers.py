@@ -34,6 +34,12 @@ from bananagui import utils
 from .basewidgets import Parent, Child, _Oriented
 
 
+_wrong_parent_msg = (
+    "the child widget has already been in another widget, "
+    "it can't be added to this widget anymore. See "
+    "help('bananagui.widgets.Child').")
+
+
 # This is not a Child because Window is based on this.
 class Bin(Parent):
     """A widget that may contain one child widget.
@@ -71,9 +77,10 @@ class Bin(Parent):
             if not isinstance(child, Child):
                 raise TypeError("expected a Child widget, got %r"
                                 % (child,))
-            if child.parent is not self:
-                raise ValueError("child widget %r has the wrong parent"
-                                 % (child,))
+            if child._parent is None:
+                child._parent = self
+            elif child._parent is not self:
+                raise RuntimeError(_wrong_parent_msg)
 
         if self.__child is not None:
             self._base.remove(self.__child._base)
@@ -113,12 +120,12 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
     """
     # The base should define append and remove methods.
 
-    def __init__(self, parent, *, orientation, **kwargs):
+    def __init__(self, *, orientation, **kwargs):
         self.__children = []
         baseclass = bananagui._get_base('widgets.containers:Box')
-        self._base = baseclass(self, parent._base, orientation)
+        self._base = baseclass(self, orientation)
         self.orientation = orientation
-        super().__init__(parent, **kwargs)
+        super().__init__(**kwargs)
 
     def _repr_parts(self):
         end = "one child" if len(self) == 1 else "%d children" % len(self)
@@ -135,8 +142,10 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
             self._base.remove(child._base)
         for child in new[common:]:
             assert isinstance(child, Child)
-            assert child.parent is self, \
-                "cannot add %r into %r" % (child, self)
+            if child._parent is None:
+                child._parent = self
+            elif child._parent is not self:
+                raise RuntimeError(_wrong_parent_msg)
             self._base.append(child._base)
 
         self.__children = new
@@ -187,7 +196,7 @@ class Scroller(Child, Bin):
     automatically when needed.
     """
 
-    def __init__(self, parent, **kwargs):
+    def __init__(self, **kwargs):
         baseclass = bananagui._get_base('widgets.containers:Scroller')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)

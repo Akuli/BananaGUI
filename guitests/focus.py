@@ -21,16 +21,13 @@
 
 """Focusing GUI test."""
 
+import functools
+
 from bananagui import mainloop, widgets
 
 
-def on_click(button):
-    box = button.parent
-    # box[0] is the label, so box[1] and box[2] are the buttons.
-    if button == box[1]:
-        box[2].focus()
-    if button == box[2]:
-        box[1].focus()
+def on_click(other_button, this_button):
+    other_button.focus()
 
 
 def main():
@@ -38,19 +35,17 @@ def main():
                "should move to the other button.")
 
     with widgets.Window("Focus test", minimum_size=(250, 150)) as window:
-        box = widgets.Box.vertical(window)
+        box = widgets.Box.vertical()
         window.child = box
 
-        label = widgets.Label(box, text=message)
+        label = widgets.Label(message)
         box.append(label)
 
-        button1 = widgets.Button(box, "Focus the button below")
-        button1.on_click.append(on_click)
-        box.append(button1)
-
-        button2 = widgets.Button(box, "Focus the button above")
-        button2.on_click.append(on_click)
-        box.append(button2)
+        button1 = widgets.Button("Focus the button below")
+        button2 = widgets.Button("Focus the button above")
+        button1.on_click.append(functools.partial(on_click, button2))
+        button2.on_click.append(functools.partial(on_click, button1))
+        box.extend([button1, button2])
 
         window.on_close.append(mainloop.quit)
         mainloop.run()

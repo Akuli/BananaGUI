@@ -37,11 +37,12 @@ class Widget(types.BananaObject):
 
     can_focus = False
 
-    def __init__(self):
+    # This is in __new__ because it runs before __init__.
+    def __new__(cls, *args, **kwargs):
         if not mainloop._initialized:
             raise ValueError("cannot create widgets without initializing "
                              "the main loop")
-        super().__init__()
+        return super(Widget, cls).__new__(cls)
 
     @property
     def real_widget(self):
@@ -70,8 +71,18 @@ class Parent(Widget):
 class Child(Widget):
     """A base class for widgets that can be added to Parent widgets.
 
-    Children take a positional parent argument on initialization.
-    The parent cannot be changed afterwards.
+    Children don't take a parent argument on initialization, but
+    BananaGUI keeps track of the parent internally. When a child is
+    added to a parent widget, BananaGUI remembers it. The child can be
+    removed from the parent widget and added into it again, but it
+    cannot be added to other parent widgets. Example:
+
+        box1 = widgets.Box.horizontal()
+        box2 = widgets.Box.horizontal()
+        label = widgets.Label()     # label doesn't have a parent
+        box1.append(label)          # label's parent is box1
+        box1.remove(label)          # label's parent is still box1
+        box2.append(label)          # this raises an exception!
 
     The expand attribute determines the directions that the widget
     expands in. It's (True, True) by default, so the widget expands
@@ -104,7 +115,6 @@ class Child(Widget):
         `------------------------------------------------'
 
     Attributes:
-      parent        The parent widget set on initialization.
       tooltip       The widget's tooltip text, or None for no tooltip.
                     None by default.
       grayed_out    True if the widget looks like it's disabled.
@@ -113,11 +123,15 @@ class Child(Widget):
       expand        Two-tuple of horizontal and vertical expanding.
     """
 
-    def __init__(self, parent, *, tooltip=None, grayed_out=False,
+    # TODO: cycle handling
+    #   box1 = widgets.Box()
+    #   box2 = widgets.Box()
+    #   box1.append(box2)
+    #   box2.append(box1)   # raise an error with a descriptive message here
+
+    def __init__(self, *, tooltip=None, grayed_out=False,
                  expand=(True, True)):
-        if not isinstance(parent, Parent):
-            raise TypeError("expected a Parent, got %r" % (parent,))
-        self.parent = parent
+        self._parent = None     # Other files rely on this also.
         self._tooltip = None
         self._grayed_out = False
         self._expand = (True, True)

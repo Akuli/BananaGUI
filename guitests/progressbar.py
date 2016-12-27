@@ -36,26 +36,25 @@ def toggle_bouncing(bouncingbar, checkbox):
 
 def main():
     with widgets.Window("Progress bar test") as window:
-        box = widgets.Box.vertical(window)
+        box = widgets.Box.vertical()
         window.child = box
 
         # A regular progress bar.
-        progressbar = widgets.Progressbar(box, expand=(True, False))
+        progressbar = widgets.Progressbar(expand=(True, False))
         box.append(progressbar)
 
-        spinbox = widgets.Spinbox(box, valuerange=range(101),
-                                  expand=(True, False))
+        spinbox = widgets.Spinbox(valuerange=range(101), expand=(True, False))
         spin_callback = functools.partial(set_progress, progressbar)
         spinbox.on_value_changed.append(spin_callback)
         box.append(spinbox)
 
-        box.append(widgets.Dummy(box))
+        box.append(widgets.Dummy())
 
         # A bouncing progress bar.
-        bouncingbar = widgets.BouncingProgressbar(box, expand=(True, False))
+        bouncingbar = widgets.BouncingProgressbar(expand=(True, False))
         box.append(bouncingbar)
 
-        checkbox = widgets.Checkbox(box, "Bouncing", expand=(True, False))
+        checkbox = widgets.Checkbox("Bouncing", expand=(True, False))
         check_callback = functools.partial(toggle_bouncing, bouncingbar)
         checkbox.on_checked_changed.append(check_callback)
         box.append(checkbox)

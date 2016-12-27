@@ -41,12 +41,12 @@ class Label(Child):
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, parent, text='', *, align=bananagui.CENTER, **kwargs):
+    def __init__(self, text='', *, align=bananagui.CENTER, **kwargs):
         self._text = ''
         self._align = bananagui.CENTER
         baseclass = bananagui._get_base('widgets.labels:Label')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
         self.text = text
         self.align = align
 
@@ -72,11 +72,11 @@ class ImageLabel(Child):
                 Setting this copies the image.
     """
 
-    def __init__(self, parent, image=None, **kwargs):
+    def __init__(self, image=None, **kwargs):
         self._image = None
         baseclass = bananagui._get_base('widgets.labels:ImageLabel')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
         self.image = image
 
     def _repr_parts(self):

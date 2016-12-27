@@ -28,13 +28,13 @@ from .basewidgets import Child
 
 class Slider(Child):
 
-    def __init__(self, bananawidget, parent, orientation, valuerange):
+    def __init__(self, bananawidget, orientation, valuerange):
         range_args = (min(valuerange), max(valuerange),
                       utils.rangestep(valuerange))
         self.real_widget = Gtk.Scale.new_with_range(
             orientations[orientation], *range_args)
         self.real_widget.connect('value-changed', self._do_value_changed)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_value_changed(self, real_widget):
         value = int(real_widget.get_value())
@@ -64,12 +64,12 @@ class Slider(Child):
 
 class Spinbox(Child):
 
-    def __init__(self, bananawidget, parent, valuerange):
+    def __init__(self, bananawidget, valuerange):
         range_args = (min(valuerange), max(valuerange),
                       utils.rangestep(valuerange))
         self.real_widget = Gtk.SpinButton.new_with_range(*range_args)
         self.real_widget.connect('notify::value', self._do_value_changed)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def _do_value_changed(self, real_widget, gparam):
         self.bananawidget.value = real_widget.get_value_as_int()

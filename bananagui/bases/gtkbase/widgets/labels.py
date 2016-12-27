@@ -35,9 +35,9 @@ aligns = {bananagui.LEFT: Gtk.Align.START,
 
 class Label(Child):
 
-    def __init__(self, bananawidget, parent):
+    def __init__(self, bananawidget):
         self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
-        super().__init__(bananawidget, parent)
+        super().__init__(bananawidget)
 
     def set_text(self, text):
         self.real_widget.set_text(text)

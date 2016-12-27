@@ -25,20 +25,20 @@ from bananagui import mainloop, widgets
 
 class SliderBox(widgets.Box):
 
-    def __init__(self, parent, **kwargs):
-        super().__init__(parent, orientation=bananagui.VERTICAL, **kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
         values = range(0, 51, 5)
 
-        hslider = widgets.Slider.horizontal(self, values)
+        hslider = widgets.Slider.horizontal(values)
         hslider.on_value_changed.append(self.value_changed)
         self.append(hslider)
 
-        vslider = widgets.Slider.vertical(self, values)
+        vslider = widgets.Slider.vertical(values)
         vslider.on_value_changed.append(self.value_changed)
         self.append(vslider)
 
-        spinbox = widgets.Spinbox(self, values)
+        spinbox = widgets.Spinbox(values)
         spinbox.on_value_changed.append(self.value_changed)
         self.append(spinbox)
 
@@ -52,8 +52,8 @@ class SliderBox(widgets.Box):
 
 
 def main():
-    with widgets.Window("Slider test") as window:
-        window.child = SliderBox(window)
+    with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
+        window.child = SliderBox.horizontal()
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

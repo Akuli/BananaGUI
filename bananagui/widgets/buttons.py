@@ -44,12 +44,12 @@ class Button(Child):
 
     can_focus = True
 
-    def __init__(self, parent, text='', **kwargs):
+    def __init__(self, text='', **kwargs):
         self._text = ''
         self.on_click = []
         baseclass = bananagui._get_base('widgets.buttons:Button')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
         self.text = text
 
     def _repr_parts(self):
@@ -79,12 +79,12 @@ class ImageButton(Child):
 
     can_focus = True
 
-    def __init__(self, parent, image=None, **kwargs):
+    def __init__(self, image=None, **kwargs):
         self._image = None
         self.on_click = []
         baseclass = bananagui._get_base('widgets.buttons:ImageButton')
-        self._base = baseclass(self, parent._base)
-        super().__init__(parent, **kwargs)
+        self._base = baseclass(self)
+        super().__init__(**kwargs)
         self.image = image
 
     def _repr_parts(self):

@@ -10,8 +10,8 @@ def main():
         # actually useful.
         the_text = '\n'.join(map(template.format, range(20)))
 
-        scroller = widgets.Scroller(window)
-        scroller.child = widgets.Label(scroller, the_text)
+        scroller = widgets.Scroller()
+        scroller.child = widgets.Label(the_text)
         window.child = scroller
         print(scroller)
 

@@ -38,7 +38,12 @@ class _BaseWindow(Bin):
         super().__init__(bananawidget)
 
     def _do_configure_event(self, widget, event):
-        self.bananawidget.size = widget.get_size()
+        # The window is smaller than the minimum size when it's not
+        # fully created yet, so we need to ignore that here.
+        width, height = widget.get_size()
+        minwidth, minheight = self.bananawidget.minimum_size
+        if width >= minwidth and height >= minheight:
+            self.bananawidget.size = (width, height)
 
     def _do_delete_event(self, widget, event):
         self.bananawidget.run_callbacks('on_close')

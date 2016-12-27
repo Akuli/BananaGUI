@@ -43,7 +43,6 @@ Example ini file:
 
     [label]
     class = widgets.Label
-    parent = window
     text = _("Hello World!")
 
 You can preview the file without loading it in Python manually.
