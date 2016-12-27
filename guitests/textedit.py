@@ -30,7 +30,7 @@ class TextEditWindow(widgets.Window):
         super().__init__(*args, **kwargs)
 
         bigbox = widgets.Box.vertical()
-        self.child = bigbox
+        self.add(bigbox)
 
         self.textedit = widgets.TextEdit("Enter something...")
         self.textedit.on_text_changed.append(self.text_changed)

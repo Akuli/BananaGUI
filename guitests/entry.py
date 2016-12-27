@@ -91,7 +91,7 @@ def main():
         # EntryBox.vertical() does the same thing as
         # EntryBox(orientation=bananagui.VERTICAL), so taking keyword
         # arguments in __init__ is enough.
-        window.child = EntryBox.vertical()
+        window.add(EntryBox.vertical())
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

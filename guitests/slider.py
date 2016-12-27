@@ -53,7 +53,7 @@ class SliderBox(widgets.Box):
 
 def main():
     with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
-        window.child = SliderBox.horizontal()
+        window.add(SliderBox.horizontal())
         window.on_close.append(mainloop.quit)
         mainloop.run()
 

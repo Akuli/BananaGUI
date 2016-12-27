@@ -51,42 +51,43 @@ class Bin(Parent):
 
     # It's impossible to give a child on initialization because this
     # widget needs to exist before a child can be created into this.
-    def __init__(self):
+    def __init__(self, child=None):
         self.__child = None
         super().__init__()
+        if child is not None:
+            self.add(child)
 
-    def _repr_parts(self):
-        if self.child is None:
-            part = "doesn't contain a child"
-        else:
-            part = "contains a child"
-        return super()._repr_parts() + [part]
-
-    # The base should define add and remove methods.
     @property
     def child(self):
         return self.__child
 
-    @child.setter
-    def child(self, child):
-        if child is self.__child:
-            # It's None or the same widget, nothing needs to be done.
-            return
+    def _repr_parts(self):
+        if self.__child is None:
+            part = "contains nothing"
+        else:
+            part = "contains a child"
+        return super()._repr_parts() + [part]
 
-        if child is not None:
-            if not isinstance(child, Child):
-                raise TypeError("expected a Child widget, got %r"
-                                % (child,))
-            if child._parent is None:
-                child._parent = self
-            elif child._parent is not self:
-                raise RuntimeError(_wrong_parent_msg)
-
+    def add(self, child):
         if self.__child is not None:
-            self._base.remove(self.__child._base)
-        if child is not None:
-            self._base.add(child._base)
+            raise RuntimeError("there's already a child, cannot add()")
+        if not isinstance(child, Child):
+            raise TypeError("expected a Child widget, got %r" % (child,))
+        if child._parent is None:
+            child._parent = self
+        elif child._parent is not self:
+            raise RuntimeError(_wrong_parent_msg)
+        self._base.add(child._base)
         self.__child = child
+
+    def remove(self, child):
+        if child is None:
+            raise ValueError("cannot remove None")
+        if child is not self.__child:
+            raise ValueError("cannot remove a child that is not in "
+                             "the widget")
+        self._base.remove(child._base)
+        # child._parent is left as is here.
 
 
 class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
@@ -176,7 +177,7 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
 
 
 # TODO: allow scrolling in one direction only.
-class Scroller(Child, Bin):
+class Scroller(Bin, Child):
     """A container that adds scrollbars around its child.
 
         ,-------------.
@@ -196,7 +197,7 @@ class Scroller(Child, Bin):
     automatically when needed.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         baseclass = bananagui._get_base('widgets.containers:Scroller')
         self._base = baseclass(self)
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)

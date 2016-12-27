@@ -36,7 +36,7 @@ def main():
 
     with widgets.Window("Focus test", minimum_size=(250, 150)) as window:
         box = widgets.Box.vertical()
-        window.child = box
+        window.add(box)
 
         label = widgets.Label(message)
         box.append(label)

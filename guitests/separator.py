@@ -26,7 +26,7 @@ def main():
     window = widgets.Window("Separator test")
 
     bigbox = widgets.Box.vertical()
-    window.child = bigbox
+    window.add(bigbox)
 
     toplabel = widgets.Label("Top")
     bigbox.append(toplabel)

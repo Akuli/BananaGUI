@@ -31,7 +31,7 @@ def main():
         image = images.Image(os.path.join('guitests', 'banana.png'))
 
         box = widgets.Box.horizontal()
-        window.child = box
+        window.add(box)
 
         label = widgets.ImageLabel(image)
         box.append(label)

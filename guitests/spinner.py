@@ -30,7 +30,7 @@ class SpinnerWindow(widgets.Window):
         super().__init__(*args, **kwargs)
 
         mainbox = widgets.Box.vertical()
-        self.child = mainbox
+        self.add(mainbox)
 
         self.spinner = widgets.Spinner()
         mainbox.append(self.spinner)

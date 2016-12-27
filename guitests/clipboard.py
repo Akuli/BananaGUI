@@ -28,7 +28,7 @@ class ClipboardTestWindow(widgets.Window):
         super().__init__(*args, **kwargs)
 
         mainbox = widgets.Box.vertical()
-        self.child = mainbox
+        self.add(mainbox)
 
         self.entry = widgets.Entry(expand=(True, False))
         mainbox.append(self.entry)

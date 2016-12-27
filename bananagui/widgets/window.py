@@ -98,7 +98,7 @@ class BaseWindow(Bin):
 
     can_focus = True
 
-    def __init__(self, title, *, resizable=True,
+    def __init__(self, title, *, child=None, resizable=True,
                  minimum_size=(0, 0), hidden=False, **kwargs):
         self._title = title
         self._resizable = True
@@ -107,7 +107,7 @@ class BaseWindow(Bin):
         self._hidden = False
         self.on_close = [lambda w: w.close()]
         self.closed = False
-        super().__init__(**kwargs)
+        super().__init__(child, **kwargs)
         self.resizable = resizable
         self.minimum_size = minimum_size
         self.hidden = hidden

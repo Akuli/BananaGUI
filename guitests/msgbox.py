@@ -28,7 +28,7 @@ class DialogTest(widgets.Window):
         super().__init__(*args, **kwargs)
 
         box = widgets.Box.vertical()
-        self.child = box
+        self.add(box)
 
         texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
         methods = [self.info, self.warning, self.error, self.question,

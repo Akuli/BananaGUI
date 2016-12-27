@@ -26,7 +26,7 @@ def main():
     window = widgets.Window("Tooltip test")
 
     box = widgets.Box.vertical()
-    window.child = box
+    window.add(box)
 
     toplabel = widgets.Label("Top label!", tooltip="Top label tooltip!")
     bottomlabel = widgets.Label("Bottom label!",

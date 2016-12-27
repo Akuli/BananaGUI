@@ -32,7 +32,7 @@ def main():
     with widgets.Window("Hello World!") as window:
         window.on_size_changed.append(resize)
         label = widgets.Label("Hello World!")
-        window.child = label
+        window.add(label)
         window.on_close.append(mainloop.quit)
         print(window)
         mainloop.run()

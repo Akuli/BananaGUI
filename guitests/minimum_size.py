@@ -44,7 +44,7 @@ def main():
     with widgets.Window("Minimum size test",
                         minimum_size=(1, 1)) as window:
         box = widgets.Box.vertical()
-        window.child = box
+        window.add(box)
 
         label = widgets.Label('hidden')
         box.append(label)
