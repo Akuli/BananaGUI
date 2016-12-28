@@ -22,7 +22,7 @@
 import tkinter as tk
 
 import bananagui
-from .basewidgets import Child
+from .basewidgets import Child, run_when_ready
 
 
 justifys = {bananagui.LEFT: 'left',
@@ -35,17 +35,19 @@ anchors = {bananagui.LEFT: 'w',
 
 class Label(Child):
 
-    def __init__(self, bananawidget, parent):
-        self.real_widget = tk.Label(parent.real_widget)
-        super().__init__(bananawidget, parent)
+    def create_widget(self, parent):
+        return tk.Label(parent.real_widget)
 
+    @run_when_ready
     def set_text(self, text):
         self.real_widget['text'] = text
 
+    @run_when_ready
     def set_align(self, align):
         self.real_widget['justify'] = justifys[align]
         self.real_widget['anchor'] = anchors[align]
 
+    @run_when_ready
     def set_image(self, image):
         if image is None:
             self.real_widget['image'] = ''

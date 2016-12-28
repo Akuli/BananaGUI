@@ -23,26 +23,29 @@ import tkinter as tk
 
 from bananagui import utils
 from . import tkinter_orients
-from .basewidgets import Child
+from .basewidgets import Child, run_when_ready
 
 
 class Slider(Child):
 
-    def __init__(self, bananawidget, parent, orientation, valuerange):
-        minimum = min(valuerange)
-        maximum = max(valuerange)
-        step = utils.rangestep(valuerange)
-		# The command is way better than binding anything manually. I
-		# found it from the scale(3tk) man page.
-        self.real_widget = tk.Scale(
-            parent.real_widget, from_=minimum, to=maximum,
-            resolution=step, orient=tkinter_orients[orientation],
-            command=self._do_changed)
-        super().__init__(bananawidget, parent)
+    def __init__(self, bananawidget, orientation, valuerange):
+        self._minimum = min(valuerange)
+        self._maximum = max(valuerange)
+        self._step = utils.rangestep(valuerange)
+        self._orient = tkinter_orients[orientation]
+        super().__init__(bananawidget)
+
+    def create_widget(self, parent):
+        # The command is way better than binding anything manually. I
+        # found it from the scale(3tk) man page.
+        return tk.Scale(parent.real_widget, from_=self._minimum,
+                        to=self._maximum, resolution=self._step,
+                        orient=self._orient, command=self._do_changed)
 
     def _do_changed(self, new_value):
         self.bananawidget.value = int(new_value)
 
+    @run_when_ready
     def set_value(self, value):
         self.real_widget.set(value)
 
@@ -60,21 +63,20 @@ def _select_all(event):
 
 class Spinbox(Child):
 
-    def __init__(self, bananawidget, parent, valuerange):
+    def __init__(self, bananawidget, valuerange):
+        self._valuerange = valuerange
         self._var = tk.StringVar()
         self._var.trace('w', self._var_changed)
+        super().__init__(bananawidget)
 
-        self.real_widget = tk.Spinbox(
-            parent.real_widget,
-            # Tkinter doesn't know how to handle ranges.
-            values=tuple(valuerange))
-        self.real_widget.bind('<Control-A>', _select_all)
-        self.real_widget.bind('<Control-a>', _select_all)
-
-        # The textvariable needs to be set after setting bananawidget
-        # with super().__init__().
-        super().__init__(bananawidget, parent)
-        self.real_widget['textvariable'] = self._var
+    def create_widget(self, parent):
+        widget = tk.Spinbox(parent.real_widget,
+                            # Tkinter doesn't know how to handle ranges.
+                            values=tuple(self._valuerange))
+        widget.bind('<Control-A>', _select_all)
+        widget.bind('<Control-a>', _select_all)
+        widget['textvariable'] = self._var
+        return widget
 
     def _var_changed(self, tkname, empty_string, mode):
         try:
@@ -85,6 +87,7 @@ class Spinbox(Child):
             return
         self.bananawidget.value = value
 
+    @run_when_ready
     def set_value(self, value):
         # This tells tkinter to call self._tkinter_var_changed and the
         # callbacks are ran.

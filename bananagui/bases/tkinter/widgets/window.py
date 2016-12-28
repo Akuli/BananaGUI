@@ -21,6 +21,7 @@
 
 import tkinter as tk
 
+from .basewidgets import Parent
 from .containers import Bin
 
 
@@ -34,6 +35,11 @@ class _BaseWindow(Bin):
         self.real_widget['border'] = 5  # Looks nicer.
         # The window may jump around randomly sometimes without this.
         self._can_set_size = True
+
+    def add(self, child):
+        # This constructs all widgets of the child.
+        child.create(self)
+        self._real_add(child)   # See basewidgets.py.
 
     def _do_configure(self, event):
         if event.widget is self.real_widget:

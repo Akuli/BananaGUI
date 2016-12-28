@@ -21,15 +21,15 @@
 
 from tkinter import ttk
 
-from .basewidgets import Child
+from .basewidgets import Child, run_when_ready
 
 
 class Progressbar(Child):
 
-    def __init__(self, bananawidget, parent):
-        self.real_widget = ttk.Progressbar(parent.real_widget)
-        super().__init__(bananawidget, parent)
+    def create_widget(self, parent):
+        return ttk.Progressbar(parent.real_widget)
 
+    @run_when_ready
     def set_bouncing(self, bouncing):
         if bouncing:
             self.real_widget['mode'] = 'indeterminate'
@@ -40,6 +40,7 @@ class Progressbar(Child):
             self.real_widget['mode'] = 'determinate'
             self.real_widget.stop()
 
+    @run_when_ready
     def set_progress(self, progress):
         self.real_widget.stop()  # Reset it.
         step = progress * 100

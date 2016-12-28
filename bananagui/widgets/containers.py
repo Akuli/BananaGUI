@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Layout widgets."""
+"""Parent subclasses."""
 
 # TODO: Add a grid widget.
 
@@ -49,8 +49,6 @@ class Bin(Parent):
                 This can be None and this is None by default.
     """
 
-    # It's impossible to give a child on initialization because this
-    # widget needs to exist before a child can be created into this.
     def __init__(self, child=None):
         self.__child = None
         super().__init__()
@@ -62,14 +60,23 @@ class Bin(Parent):
         return self.__child
 
     def _repr_parts(self):
-        if self.__child is None:
+        if self.child is None:
             part = "contains nothing"
         else:
             part = "contains a child"
         return super()._repr_parts() + [part]
 
+    def _get_children(self):
+        if self.child is not None:
+            yield self.child
+
     def add(self, child):
-        if self.__child is not None:
+        """Add the child widget into this widget.
+
+        This widget must not contain another child. The value of the
+        child property will be set to the new child.
+        """
+        if self.child is not None:
             raise RuntimeError("there's already a child, cannot add()")
         if not isinstance(child, Child):
             raise TypeError("expected a Child widget, got %r" % (child,))
@@ -81,11 +88,17 @@ class Bin(Parent):
         self.__child = child
 
     def remove(self, child):
+        """Remove the child from the widget
+
+        The child attribute is set to None. The argument must be a
+        Child widget that is currently in this widget.
+        """
         if child is None:
             raise ValueError("cannot remove None")
         if child is not self.__child:
             raise ValueError("cannot remove a child that is not in "
                              "the widget")
+        self.__child = None
         self._base.remove(child._base)
         # child._parent is left as is here.
 
@@ -131,6 +144,9 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
     def _repr_parts(self):
         end = "one child" if len(self) == 1 else "%d children" % len(self)
         return super()._repr_parts() + ["contains " + end]
+
+    def _get_children(self):
+        return self
 
     def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"

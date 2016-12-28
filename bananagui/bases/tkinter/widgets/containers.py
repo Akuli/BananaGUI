@@ -23,19 +23,23 @@ import tkinter as tk
 
 import bananagui
 from . import tkinter_fills
-from .basewidgets import Child, Widget
+from .basewidgets import Child, Parent, run_when_ready
 
 
-class Bin(Widget):
+class Bin(Parent):
 
-    def add(self, child):
+    # The _real_add is used in window.py.
+    def _real_add(self, child):
+        self._prepare_add(child)
         child.real_widget.pack()
-        child._packed = True
         child.set_expand(child.bananawidget.expand)  # Update the packing.
 
+    add = run_when_ready(_real_add)
+
+    @run_when_ready
     def remove(self, child):
+        self._prepare_remove(child)
         child.real_widget.pack_forget()
-        child._packed = False
 
 
 # TODO: Scroller.
@@ -50,20 +54,26 @@ _appendsides = {
 }
 
 
-class Box(Child):
+class Box(Parent, Child):
 
-    def __init__(self, widget, parent, orientation):
-        self.real_widget = tk.Frame(parent.real_widget)
-        super().__init__(widget, parent)
+    def __init__(self, bananawidget, orientation):
+        self.orientation = orientation
+        super().__init__(bananawidget)
 
+    def create_widget(self, parent):
+        return tk.Frame(parent.real_widget)
+
+    @run_when_ready
     def append(self, child):
+        self._prepare_add(child)
         child.real_widget.pack(
             side=_appendsides[self.bananawidget.orientation],
             fill=tkinter_fills[child.bananawidget.expand],
         )
-        child._packed = True
-        child.set_expand(child.bananawidget.expand)  # Update the packing.
+        # Make pack expand it correctly.
+        child.set_expand(child.bananawidget.expand)
 
+    @run_when_ready
     def remove(self, child):
         child.real_widget.pack_forget()
-        child._packed = False
+        self._prepare_remove(child)

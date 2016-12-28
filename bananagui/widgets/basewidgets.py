@@ -64,6 +64,21 @@ class Widget(types.BananaObject):
 class Parent(Widget):
     """A base class for widgets that contain other widgets."""
 
+    def iter_children(self, *, recursive=False):
+        """Yield all children of this Parent widget.
+
+        If recursive is True, also yield all of the childrens'
+        children. This is consistent and works the same way with
+        different kinds of Parent widgets.
+        """
+        # Subclasses should provide _get_children().
+        for child in self._get_children():
+            yield child
+            if recursive and isinstance(child, Parent):
+                # yield from is new in Python 3.3.
+                for subchild in child.iter_children(recursive=True):
+                    yield subchild
+
 
 @types.add_property('tooltip', type=str, allow_none=True)
 @types.add_property('grayed_out', type=bool)

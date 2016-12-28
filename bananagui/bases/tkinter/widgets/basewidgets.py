@@ -19,6 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import functools
 import tkinter as tk
 
 import bananagui
@@ -97,6 +98,21 @@ _expand_indexes = {
 }
 
 
+def run_when_ready(method):
+    @functools.wraps(method)
+    def inner(self, *args, **kwargs):
+        if (not isinstance(self, Child)) or self.todo is None:
+            # We have a widget and we can just run this.
+            return method(self, *args, **kwargs)
+        # We need to do this later. Unfortunately we don't get a return
+        # value this way, which might be a problem in some cases...
+        partial = functools.partial(method, self, *args, **kwargs)
+        self.todo.append(partial)
+        return None
+
+    return inner
+
+
 class Widget:
 
     def __init__(self, bananawidget):
@@ -106,14 +122,69 @@ class Widget:
         self.real_widget.focus()
 
 
-class Child(Widget):
+class Parent(Widget):
 
-    def __init__(self, bananawidget, parent):
-        self._packed = False  # See also containers.py.
-        self.parent = parent
+    def __init__(self, bananawidget):
+        # This is for compatibility with run_when_ready().
+        if not hasattr(self, 'parent'):
+            self.parent = None
         super().__init__(bananawidget)
-        self._tooltip = _Tooltip(self.real_widget)
 
+    def create(self, parent):
+        # self can be a subclass of Child, and there's no guarantees
+        # about which order Parent and Child appear in the mro. Window
+        # and Dialog objects also have this method, but it's never
+        # called.
+        if hasattr(super(), 'create'):
+            # It's a Child, not a Window or Dialog.
+            assert parent is not None
+            super().create(parent)
+        for child in self.bananawidget.iter_children():
+            child._base.create(self)
+
+    def _prepare_add(self, child):
+        """Prepare a child for being added to this widget."""
+        child._packed = True
+        if child.real_widget is None:
+            child.create(self)
+
+    def _prepare_remove(self, child):
+        """Prepare a child for being removed from this widget."""
+
+
+class Child(Widget):
+    # This is a bit tricky because tkinter widgets need to know their
+    # parent when they are created. There's a create method that
+    # creates the widgets when their parents are known all the way to
+    # the top window. It calls everything in the todo list with no
+    # arguments. The run_when_ready decorator can be used for
+    # automatically adding a partial to the todo list instead of trying
+    # to run the function. The todo list is set to None when the widget
+    # has been created.
+
+    def __init__(self, bananawidget):
+        self.todo = []
+        self.parent = None
+        self._packed = False  # See also containers.py.
+        self.real_widget = None
+        super().__init__(bananawidget)
+
+    def create(self, parent):
+        # Subclasses should provide a create_widget method.
+        if self.todo is None:
+            # It has been created already.
+            return
+        self.parent = parent
+        self.real_widget = self.create_widget(self.parent)
+        self._tooltip = _Tooltip(self.real_widget)
+        for thing in self.todo:
+            thing()
+        self.todo = None
+        if hasattr(super(), 'create'):
+            # Run Parent.create. See its documentation for more info.
+            super().create(parent)
+
+    @run_when_ready
     def set_expand(self, expand):
         if self._packed:
             # Update the pack expanding. By having this here we can make
@@ -129,8 +200,10 @@ class Child(Widget):
                 pack_kwargs['expand'] = (expand == (True, True))
             self.real_widget.pack(**pack_kwargs)
 
+    @run_when_ready
     def set_tooltip(self, tooltip):
         self._tooltip.content = tooltip
 
+    @run_when_ready
     def set_grayed_out(self, grayed_out):
         self.real_widget['state'] = 'disable' if grayed_out else 'normal'

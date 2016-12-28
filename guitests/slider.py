@@ -38,7 +38,7 @@ class SliderBox(widgets.Box):
         vslider.on_value_changed.append(self.value_changed)
         self.append(vslider)
 
-        spinbox = widgets.Spinbox(values)
+        spinbox = widgets.Spinbox(values, expand=(True, False))
         spinbox.on_value_changed.append(self.value_changed)
         self.append(spinbox)
 
