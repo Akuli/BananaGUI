@@ -14,7 +14,7 @@ from bananagui import mainloop, widgets
 
 bananagui.load('.tkinter')  # if you have it installed, try '.gtk3' also :)
 with widgets.Window("Hello World") as window:
-    window.child = widgets.Label(window, "Hello World!")
+    window.add(widgets.Label("Hello World!"))
     window.on_close.append(mainloop.quit)
     mainloop.run()
 ```
@@ -29,23 +29,23 @@ from bananagui import iniloader, mainloop
 
 # Usually this would be in another file.
 INI = """\
+from bananagui import widgets
+
 [window]
 class = widgets.Window
 title = "Hello World 3"
-child = label
 
-[label]
+[label -> window]
 class = widgets.Label
-parent = window
 text = "Hello World!"
 """
 
 
 def main():
     bananagui.load('.tkinter')
-    widgets = iniloader.load_ini(INI)
-    # Now widgets is a dictionary.
-    with widgets['window'] as window:
+    widgetdict = iniloader.load_ini(INI)
+    # Now widgetdict is a dictionary.
+    with widgetdict['window'] as window:
         window.on_close.append(mainloop.quit)
         mainloop.run()
 
@@ -241,8 +241,7 @@ Let's do the same thing with BananaGUI:
 ```py
 >>> from bananagui import load, widgets
 >>> load('.tkinter')
->>> window = widgets.Window()
->>> checkbox = widgets.Checkbox(window, "Check me!")
+>>> checkbox = widgets.Checkbox("Check me!")
 >>> checkbox
 <bananagui.widgets.Checkbox object, text='Check me!', checked=False>
 ```
