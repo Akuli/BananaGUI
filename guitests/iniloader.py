@@ -5,16 +5,16 @@ from bananagui import mainloop, iniloader
 
 
 def click(button):
-    print("Click!")
+    print("You clicked me!")
 
 
 def main():
     with open(os.path.join('guitests', 'testgui.ini'), 'r') as f:
-        the_widgets = iniloader.load_ini(f)
-    pprint.pprint(the_widgets)
-    with the_widgets['window']:
-        the_widgets['button'].on_click.append(click)
-        the_widgets['window'].on_close.append(mainloop.quit)
+        widgetdict = iniloader.load(f)
+    pprint.pprint(widgetdict)
+    widgetdict['button'].on_click.append(click)
+    with widgetdict['window'] as window:
+        window.on_close.append(mainloop.quit)
         mainloop.run()
 
 
