@@ -108,25 +108,27 @@ def _get_wrapper(name):
     """Get an object from the wrapper module.
 
     For example, if bananagui.load has been called with '.tkinter',
-    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and returns
-    its c attribute. An exception is raised if load() hasn't been
-    called.
+    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and
+    returns its c attribute. An exception is raised if load() hasn't
+    been called.
     """
     if _wrapper is None:
-        raise ImportError("bananagui.load() wasn't called")
+        raise RuntimeError("bananagui.load() wasn't called")
 
     modulename, attribute = name.split(':')
-    wrappermodule = utils.import_module(_wrapper + '.' + modulename)
+    try:
+        wrappermodule = utils.import_module(_wrapper + '.' + modulename)
+        return getattr(wrappermodule, attribute)
+    except (ImportError, AttributeError):
+        # Use a default, if any.
+        pass
+
     try:
         defaultmodule = utils.import_module(
             'bananagui.wrappers.defaults.' + modulename)
-    except ImportError:
-        # There isn't a default wrapper, wrappermodule needs to have the
-        # attribute.
-        return getattr(wrappermodule, attribute)
-    # There is a default wrapper, we can use that if the wrapper module
-    # doesn't have the attribute.
-    try:
-        return getattr(wrappermodule, attribute)
-    except AttributeError:
         return getattr(defaultmodule, attribute)
+    except (ImportError, AttributeError):
+        # We don't have a default :(
+        pass
+
+    raise NotImplementedError("cannot find a wrapper for %s" % name)
