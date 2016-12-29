@@ -150,6 +150,7 @@ class Parent(Widget):
 
     def _prepare_remove(self, child):
         """Prepare a child for being removed from this widget."""
+        child._packed = False
 
 
 class Child(Widget):
