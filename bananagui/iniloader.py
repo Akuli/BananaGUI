@@ -40,7 +40,7 @@ useful using this example GUI file:
     class = widgets.Window
     title = "Hello"
 
-    [label -> window]
+    [label in window]
     class = widgets.Label
     text = "Hello World!"
 
@@ -62,10 +62,11 @@ When this file is loaded, this module performs these steps:
    variable called window and sets it to the variable. The value of
    class will be used as constructor and other arguments will be given
    to it as keyword arguments.
-4. The next section is otherwise similar, but the header has an arrow
-   that points to a parent widget. This calls parent.add() or
-   parent.append() depending on the type of the parent. In this case,
-   the parent is a Window so add() is called.
+4. The next section is otherwise similar, but the header is like
+   "child in parent". When the child widget has been created, this
+   calls parent.add(child) or parent.append(child) depending on the
+   type of the parent. In this case, the parent is a Window so add()
+   is called.
 
 In other words, the GUI file above does roughly the same thing as this
 Python code:
@@ -93,6 +94,10 @@ another file, and load it from a Python file like this:
         window.on_close.append(mainloop.quit)
         mainloop.run()
 
+Section names and the keys of the sections must be identifiers
+(see help(str.isidentifier)) and not keywords. The only exception is
+the class key that specifies the constructor.
+
 The values of the sections can be any Python expressions, including
 comments, function calls, list comprehensions and so on. Other
 statements (like function and class definitions) are not supported
@@ -111,38 +116,24 @@ import bananagui
 from bananagui import mainloop, widgets
 
 
-_NOT_SET = object()
+class ParsingError(Exception):
+    r"""An error occurred while parsing."""
 
+    def __init__(self, message, filename=None, lineno=None, line=None):
+        self.message = message
+        self.filename = filename
+        self.lineno = lineno
+        self.line = line
 
-class ParsingError(SyntaxError):
-    r"""An error occurred while parsing.
-
-    This exception behaves like SyntaxError.
-
-    >>> raise ParsingError(
-    ...     "oh no", ('test.ini', 123, 3, "this is the line\n"))
-    Traceback (most recent call last):
-      File "<stdin>", line 2, in <module>
-      File "test.ini", line 123
-        this is the line
-          ^
-    ParsingError: oh no
-    >>>
-
-    Sometimes lineno and offset aren't available, so they will be None.
-    """
-    # I didn't find any documentation about constructing SyntaxError,
-    # but this seems to work. Here's how I found this:
-    #
-    #   >>> try:
-    #   ...     exec('lol lol')
-    #   ... except SyntaxError as e:
-    #   ...     args = e.args
-    #   ...
-    #   >>> args
-    #   ('invalid syntax', ('<string>', 1, 7, 'lol lol\n'))
-    #   >>> SyntaxError(*args).args
-    #   ('invalid syntax', ('<string>', 1, 7, 'lol lol\n'))
+    def __str__(self):
+        result = self.message
+        if self.filename is not None:
+            result += "\nfile %r" % self.filename
+            if self.lineno is not None:
+                result += ", line %d" % self.lineno
+        if self.line is not None:
+            result += "\n  %s" % self.line.strip()
+        return result
 
 
 def _valid_varname(s):
@@ -150,11 +141,14 @@ def _valid_varname(s):
     return s.isidentifier() and not keyword.iskeyword(s)
 
 
+_NOT_SET = object()
+
+
 class _Parser:
 
-    def __init__(self, file):
+    def __init__(self, file, filename):
         self._file = file
-        self._filename = getattr(file, 'name', '<unknown>')
+        self._filename = filename
         self.namespace = {}
 
     def parse_imports(self):
@@ -173,7 +167,11 @@ class _Parser:
                 # many bytes the lines we read are in the file's
                 # encoding. Relative seeking with a negative value
                 # doesn't seem to work for some reason.
-                importbytes = ''.join(lines).encode(self._file.encoding)
+                encoding = self._file.encoding
+                if encoding is None:
+                    # e.g. StringIO
+                    encoding = 'utf-8'
+                importbytes = ''.join(lines).encode(encoding)
                 self._file.seek(len(importbytes))
                 break
             # More imports.
@@ -182,26 +180,28 @@ class _Parser:
         # Now we can parse the imports with ast.
         try:
             mod = ast.parse(''.join(lines), filename=self._filename)
-        except SyntaxError as error:
-            args = error.args
-            if sys.version[:2] >= (3, 3):
+        except SyntaxError as e:
+            # I didn't find any documentation about the msg attribute,
+            # but it seems to wrok in 3.2 and 3.5.
+            args = (e.msg, self._filename, e.lineno, e.text)
+            if sys.version_info[:2] >= (3, 3):
                 # Raising from None is new in Python 3.3.
-                error = None
-            raise ParsingError(*args) from error
+                e = None
+            raise ParsingError(*args) from e
         for node in mod.body:
             if not isinstance(node, (ast.Import, ast.ImportFrom)):
                 raise ParsingError(
                     "the top of the ini file can only contain imports",
-                    (self._filename, node.lineno, node.col_offset,
-                     lines[node.lineno-1]))
+                    self._filename, node.lineno, lines[node.lineno-1])
 
         # Importing based on ast.parse's return values turned out to be a
         # lot of work to implement, so I'm lazy and I'll use exec() after
         # making sure there are nothing but imports there. The collections
         # module is written by Raymond Hettinger and it uses exec() for
-        # creating namedtuple classes, so it can't be too bad.
+        # creating namedtuple classes, so David Beazley thought that it
+        # can't be too bad and used exec().
         #
-        # In other words, it's not an awful hack; it's metaprogramming!
+        # In other words, it's not an awful hack. It's metaprogramming!
         exec(''.join(lines), self.namespace)
         return len(lines)
 
@@ -226,10 +226,18 @@ class _Parser:
         # first section.
         except configparser.ParsingError as e:
             lineno, line = e.errors[0]    # First error.
+            try:
+                # ConfigParser reprs its lines, so we'll try to undo
+                # that here.
+                line = ast.parse(line).body[0].value.s
+            except Exception:
+                pass
             lineno += linenostart
-            raise ParsingError(
-                "invalid ini syntax",
-                (self._filename, lineno + linenostart, None, line + '\n'))
+            if sys.version_info[:2] >= (3, 3):
+                # Raising from None is new in Python 3.3.
+                e = None
+            raise ParsingError("invalid ini syntax",
+                               self._filename, lineno, line) from e
 
         # The sections method does not include the default section in
         # its return value.
@@ -237,23 +245,26 @@ class _Parser:
             self._parse_section(header, parser[header])
 
     def _parse_section(self, header, section):
-        if '->' not in header:
+        parts = header.split()
+        if len(parts) == 1:
             widgetname = header.strip()
             parentname = None
             parent = None
-        elif header.count('->') == 1:
-            widgetname, parentname = header.split('->', 1)
-            widgetname = widgetname.strip()
-            parentname = parentname.strip()
+        elif len(parts) == 3:
+            widgetname, in_, parentname = parts
+            if in_ != 'in':
+                raise ParsingError(
+                    "the second word of 3-word headers must be 'in'",
+                    self._filename, None, '[%s]' % header)
             parent = self.namespace.get(parentname, _NOT_SET)
             if parent is _NOT_SET:
                 raise ParsingError(
-                    "undefined variable: %r" % parentname,
-                    (self._filename, None, None, '[%s]\n' % header))
+                    "undefined variable %r" % parentname,
+                    self._filename, None, '[%s]' % header)
         else:
             raise ParsingError(
-                "headers can contain at most one arrow",
-                (self._filename, None, None, '[%s]\n' % header))
+                "headers can contain one or three words, not %d" % len(parts),
+                self._filename, None, '[%s]' % header)
 
         problem = None
         if not _valid_varname(widgetname):
@@ -264,7 +275,7 @@ class _Parser:
             raise ParsingError(
                 "widget names need to be valid Python variable "
                 "names, not %r" % problem,
-                (self._filename, None, None, "[%s]\n" % header))
+                self._filename, None, "[%s]\n" % header)
 
         kwargs = {}
         for unstripped_key, valuesource in section.items():
@@ -276,15 +287,14 @@ class _Parser:
             else:
                 sourceline = valuesource.partition('\n')[0]
                 raise ParsingError(
-                    "invalid variable name %r" % key,
-                    (self._filename, None, len(key) // 2,
-                     "%s = %s\n" % (unstripped_key, sourceline)))
+                    "invalid variable name %r" % key, self._filename,
+                    None, unstripped_key + " = " + sourceline)
 
         constsrc = section.get('class', None)
         if constsrc is None:
             raise ParsingError(
                 "the [%s] section doesn't define a class" % header,
-                (self._filename, None, None, None))
+                self._filename)
         constructor = eval(constsrc.lstrip(), self.namespace)
         widget = constructor(**kwargs)
         if parent is None:
@@ -294,8 +304,9 @@ class _Parser:
         elif isinstance(parent, widgets.Box):
             parent.append(widget)
         else:
-            raise TypeError("don't know how to add a child to a %r widget"
-                            % type(parent).__name__)
+            cls = type(parent)
+            raise TypeError("don't know how to add a child to a %s.%s widget"
+                            % (cls.__module__, cls.__name__))
         self.namespace[widgetname] = widget
 
 
@@ -311,16 +322,16 @@ def load(source) -> dict:
     """
     if isinstance(source, io.TextIOBase):
         # It's already a file object.
-        pass
+        file = source
+        filename = getattr(source, 'name', '<unknown>')
     elif isinstance(source, str):
         # We need a StringIO object with a name attribute.
-        source = io.StringIO(source)
-        source.name = '<string>'
+        file = io.StringIO(source)
+        filename = '<string>'
     else:
-        raise TypeError("don't know how to parse a value of type %r"
-                        % type(source).__name__)
+        raise TypeError("don't know how to parse %r" % (source,))
 
-    parser = _Parser(source)
+    parser = _Parser(file, filename)
     lineno = parser.parse_imports()
     # Copy of keys, '__builtins__' is one of these.
     imported_vars = list(parser.namespace)
@@ -335,10 +346,11 @@ def _preview():
     """Simple way to preview BananaGUI ini files."""
     # When running with -m, sys.argv[0] is '__main__' and argparse uses
     # it as the default prog. That's obviously not what we want.
-    parser = argparse.ArgumentParser(prog='bananagui.iniloader')
+    parser = argparse.ArgumentParser(prog='bananagui-iniloader')
+    # Previewing stdin is not supported because the stream needs to be
+    # seeked.
     parser.add_argument(
         'inifile', type=argparse.FileType('r'),
-        default=sys.stdin, nargs=argparse.OPTIONAL,
         help="path to the ini file that will be loaded, defaults to stdin")
     parser.add_argument(
         '--load-args', default='.tkinter',
@@ -348,6 +360,8 @@ def _preview():
     load_args = map(str.strip, args.load_args.split(','))
     bananagui.load(*load_args)
 
+    # We can be sure that args.inifile has a name attribute because
+    # it's an io.TextIOWrapper returned by argparse.FileType.
     print("Previewing", args.inifile.name, "...")
     with args.inifile as f:
         widgetdict = load(f)
@@ -355,13 +369,10 @@ def _preview():
     windows = {widget for widget in widgetdict.values()
                if isinstance(widget, widgets.Window)}
     if not windows:
-        # We can be sure that args.inifile has a name attribute because
-        # it's always either sys.stdin or an io.TextIOWrapper returned
-        # by argparse.FileType. It's also important not to say "windows
-        # is required" to avoid confusion with Windows the operating
-        # system.
-        print("bananagui.iniloader: no Window objects were found in %s"
-              % args.inifile.name, file=sys.stderr)
+        # It's important not to say "this needs windows" to avoid
+        # confusion with Windows the operating system.
+        print("bananagui.iniloader: no Window objects were found",
+              file=sys.stderr)
         sys.exit(1)
 
     def do_close(window):
@@ -372,11 +383,9 @@ def _preview():
     for window in windows:
         window.on_close.append(do_close)
 
-    try:
-        mainloop.run()
-    finally:
-        for window in windows:
-            window.destroy()
+    # There's no need to worry about closing the windows because
+    # mainloop.quit() is not called until they are all closed.
+    mainloop.run()
 
 
 if __name__ == '__main__':

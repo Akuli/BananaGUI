@@ -35,7 +35,7 @@ from bananagui import widgets
 class = widgets.Window
 title = "Hello World 3"
 
-[label -> window]
+[label in window]
 class = widgets.Label
 text = "Hello World!"
 """
