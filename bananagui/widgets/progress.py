@@ -44,8 +44,8 @@ class Progressbar(Child):
 
     def __init__(self, *, progress=0, **kwargs):
         self._progress = 0
-        baseclass = bananagui._get_base('widgets.progress:Progressbar')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.progress:Progressbar')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.progress = progress
 
@@ -70,8 +70,8 @@ class BouncingProgressbar(Child):
 
     def __init__(self, *, bouncing=False, **kwargs):
         self._bouncing = False
-        baseclass = bananagui._get_base('widgets.progress:BouncingProgressbar')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.progress:BouncingProgressbar')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.bouncing = bouncing
 
@@ -98,8 +98,8 @@ class Spinner(Child):
 
     def __init__(self, *, spinning=False, **kwargs):
         self._spinning = False
-        baseclass = bananagui._get_base('widgets.progress:Spinner')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.progress:Spinner')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.spinning = spinning
 

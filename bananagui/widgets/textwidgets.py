@@ -47,7 +47,7 @@ class TextBase(Child):
 
     def select_all(self):
         """Select all text in the widget."""
-        self._base.select_all()
+        self._wrapper.select_all()
 
 
 @types.add_property('secret', type=bool)
@@ -66,8 +66,8 @@ class Entry(TextBase):
 
     def __init__(self, text='', *, secret=False, **kwargs):
         self._secret = False
-        baseclass = bananagui._get_base('widgets.textwidgets:Entry')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.textwidgets:Entry')
+        self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)
         self.secret = secret
 
@@ -99,8 +99,8 @@ class TextEdit(TextBase):
 
     def __init__(self, text='', *, tab='\t', **kwargs):
         self._tab = '\t'
-        baseclass = bananagui._get_base('widgets.textwidgets:TextEdit')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.textwidgets:TextEdit')
+        self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)
         self.tab = tab
 

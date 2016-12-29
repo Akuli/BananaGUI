@@ -44,8 +44,8 @@ class Label(Child):
     def __init__(self, text='', *, align=bananagui.CENTER, **kwargs):
         self._text = ''
         self._align = bananagui.CENTER
-        baseclass = bananagui._get_base('widgets.labels:Label')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.labels:Label')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
         self.align = align
@@ -74,8 +74,8 @@ class ImageLabel(Child):
 
     def __init__(self, image=None, **kwargs):
         self._image = None
-        baseclass = bananagui._get_base('widgets.labels:ImageLabel')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.labels:ImageLabel')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.image = image
 

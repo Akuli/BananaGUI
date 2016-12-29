@@ -84,7 +84,7 @@ class Bin(Parent):
             child._parent = self
         elif child._parent is not self:
             raise RuntimeError(_wrong_parent_msg)
-        self._base.add(child._base)
+        self._wrapper.add(child._wrapper)
         self.__child = child
 
     def remove(self, child):
@@ -99,7 +99,7 @@ class Bin(Parent):
             raise ValueError("cannot remove a child that is not in "
                              "the widget")
         self.__child = None
-        self._base.remove(child._base)
+        self._wrapper.remove(child._wrapper)
         # child._parent is left as is here.
 
 
@@ -132,12 +132,12 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         random.shuffle(children)
         box[:] = children
     """
-    # The base should define append and remove methods.
+    # The wrapper should define append and remove methods.
 
     def __init__(self, *, orientation, **kwargs):
         self.__children = []
-        baseclass = bananagui._get_base('widgets.containers:Box')
-        self._base = baseclass(self, orientation)
+        wrapperclass = bananagui._get_wrapper('widgets.containers:Box')
+        self._wrapper = wrapperclass(self, orientation)
         self.orientation = orientation
         super().__init__(**kwargs)
 
@@ -156,14 +156,14 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         # beginning? Optimize this.
         common = utils.common_beginning(old, new)
         for child in old[common:]:
-            self._base.remove(child._base)
+            self._wrapper.remove(child._wrapper)
         for child in new[common:]:
             assert isinstance(child, Child)
             if child._parent is None:
                 child._parent = self
             elif child._parent is not self:
                 raise RuntimeError(_wrong_parent_msg)
-            self._base.append(child._base)
+            self._wrapper.append(child._wrapper)
 
         self.__children = new
 
@@ -214,6 +214,6 @@ class Scroller(Bin, Child):
     """
 
     def __init__(self, *args, **kwargs):
-        baseclass = bananagui._get_base('widgets.containers:Scroller')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.containers:Scroller')
+        self._wrapper = wrapperclass(self)
         super().__init__(*args, **kwargs)

@@ -130,13 +130,13 @@ class BaseWindow(Bin):
         a callback to the on_close list instead.
         """
         if not self.closed:
-            self._base.close()
+            self._wrapper.close()
             self.closed = True
 
     def wait(self):
         """Wait until the window is closed."""
         _closecheck(self)
-        self._base.wait()
+        self._wrapper.wait()
 
     def __enter__(self):
         _closecheck(self)
@@ -173,8 +173,8 @@ class Window(BaseWindow):
         if not isinstance(title, str):
             raise TypeError("window title needs to be a string, not %r"
                             % (title,))
-        baseclass = bananagui._get_base('widgets.window:Window')
-        self._base = baseclass(self, title)
+        wrapperclass = bananagui._get_wrapper('widgets.window:Window')
+        self._wrapper = wrapperclass(self, title)
         super().__init__(title, **kwargs)
 
 
@@ -218,7 +218,7 @@ class Dialog(BaseWindow):
         elif not isinstance(title, str):
             raise TypeError("Dialog title needs to be a string, not %r"
                             % (title,))
-        baseclass = bananagui._get_base('widgets.window:Dialog')
-        self._base = baseclass(self, parentwindow._base, title)
+        wrapperclass = bananagui._get_wrapper('widgets.window:Dialog')
+        self._wrapper = wrapperclass(self, parentwindow._wrapper, title)
         self.parentwindow = parentwindow
         super().__init__(title, **kwargs)

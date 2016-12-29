@@ -56,8 +56,8 @@ class Checkbox(Child):
     def __init__(self, text='', *, checked=False, **kwargs):
         self._text = ''
         self._checked = False
-        baseclass = bananagui._get_base('widgets.misc:Checkbox')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.misc:Checkbox')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
         self.checked = checked
@@ -80,8 +80,8 @@ class Dummy(Child):
     """
 
     def __init__(self, **kwargs):
-        baseclass = bananagui._get_base('widgets.misc:Dummy')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.misc:Dummy')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
 
 
@@ -104,7 +104,7 @@ class Separator(_Oriented, Child):
             kwargs.setdefault('expand', (True, False))
         if orientation == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
-        baseclass = bananagui._get_base('widgets.misc:Separator')
-        self._base = baseclass(self, orientation)
+        wrapperclass = bananagui._get_wrapper('widgets.misc:Separator')
+        self._wrapper = wrapperclass(self, orientation)
         self.orientation = orientation
         super().__init__(**kwargs)

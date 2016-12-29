@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Images for the BananaGUI tkinter base."""
+"""Images for the BananaGUI tkinter wrapper."""
 
 import tkinter as tk
 

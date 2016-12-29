@@ -21,8 +21,8 @@
 
 """BananaGUI tests.
 
-This file sets up a BananaGUI base. If you use the -m option to run
-tests, this file will always be ran also.
+This file sets up a BananaGUI wrapper. If you use the -m option to run
+the tests, this file will always be ran also.
 """
 
 import sys

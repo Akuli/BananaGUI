@@ -140,7 +140,7 @@ class Parent(Widget):
             assert parent is not None
             super().create(parent)
         for child in self.bananawidget.iter_children():
-            child._base.create(self)
+            child._wrapper.create(self)
 
     def _prepare_add(self, child):
         """Prepare a child for being added to this widget."""

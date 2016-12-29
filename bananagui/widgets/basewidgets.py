@@ -46,7 +46,7 @@ class Widget(types.BananaObject):
 
     @property
     def real_widget(self):
-        return self._base.real_widget
+        return self._wrapper.real_widget
 
     def focus(self):
         """Give the keyboard focus to this widget.
@@ -58,7 +58,7 @@ class Widget(types.BananaObject):
         """
         cls = type(self)
         assert cls.can_focus, "cannot focus %r widgets" % cls.__name__
-        self._base.focus()
+        self._wrapper.focus()
 
 
 class Parent(Widget):

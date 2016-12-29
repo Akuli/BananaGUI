@@ -37,7 +37,7 @@ def init():
     global _initialized
     if _initialized:
         raise RuntimeError("the mainloop is initialized already")
-    bananagui._get_base('mainloop:init')()
+    bananagui._get_wrapper('mainloop:init')()
     _initialized = True
 
 
@@ -49,10 +49,10 @@ def run():
         raise RuntimeError("init() wasn't called")
     if _running:
         raise RuntimeError("two mainloops cannot be ran at the same time")
-    basefunc = bananagui._get_base('mainloop:run')
+    wrapperfunc = bananagui._get_wrapper('mainloop:run')
     _running = True
     try:
-        basefunc()
+        wrapperfunc()
     finally:
         _running = False
         _initialized = False
@@ -65,7 +65,7 @@ def quit(*args):
     arguments are ignored.
     """
     if _running:
-        bananagui._get_base('mainloop:quit')()
+        bananagui._get_wrapper('mainloop:quit')()
 
 
 def add_timeout(milliseconds, callback, *args, **kwargs):
@@ -93,5 +93,5 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
             result = None
         return result
 
-    basefunc = bananagui._get_base('mainloop:add_timeout')
-    basefunc(milliseconds, real_callback)
+    wrapperfunc = bananagui._get_wrapper('mainloop:add_timeout')
+    wrapperfunc(milliseconds, real_callback)

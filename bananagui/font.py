@@ -27,7 +27,7 @@ import bananagui
 from bananagui import mainloop, types
 
 
-# The base doesn't need to provide anything for this, it just needs to
+# The wrapper doesn't need to provide anything for this, it just needs to
 # use this with widgets that have a font attribute.
 
 @types.add_property('family')
@@ -115,9 +115,9 @@ def get_families():
     if not mainloop._initialized:
         raise RuntimeError("the mainloop wasn't initialized")
 
-    # The base function can return anything iterable.
+    # The wrapper function can return anything iterable.
     fonts = {'Monospace'}
-    fonts.update(bananagui._get_base('font:get_families')())
+    fonts.update(bananagui._get_wrapper('font:get_families')())
     return frozenset(fonts)
 
 

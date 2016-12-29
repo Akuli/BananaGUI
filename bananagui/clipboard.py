@@ -36,7 +36,7 @@ def set_text(text):
     _initcheck()
     if not isinstance(text, str):
         raise TypeError("expected a string, got %r" % (text,))
-    bananagui._get_base('clipboard:set_text')(text)
+    bananagui._get_wrapper('clipboard:set_text')(text)
 
 
 def get_text():
@@ -45,4 +45,4 @@ def get_text():
     This returns None if there is no text on the clipboard.
     """
     _initcheck()
-    return bananagui._get_base('clipboard:get_text')()
+    return bananagui._get_wrapper('clipboard:get_text')()

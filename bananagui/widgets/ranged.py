@@ -83,8 +83,8 @@ class Spinbox(_Ranged, Child):
     def __init__(self, valuerange, *, value=None, **kwargs):
         self.valuerange = valuerange
         self._value = min(valuerange)
-        baseclass = bananagui._get_base('widgets.ranged:Spinbox')
-        self._base = baseclass(self, valuerange)
+        wrapperclass = bananagui._get_wrapper('widgets.ranged:Spinbox')
+        self._wrapper = wrapperclass(self, valuerange)
         super().__init__(**kwargs)
         if value is not None:
             self.value = value
@@ -108,8 +108,8 @@ class Slider(_Oriented, _Ranged, Child):
         self.orientation = orientation
         self.valuerange = valuerange
         self._value = min(valuerange)
-        baseclass = bananagui._get_base('widgets.ranged:Slider')
-        self._base = baseclass(self, orientation, valuerange)
+        wrapperclass = bananagui._get_wrapper('widgets.ranged:Slider')
+        self._wrapper = wrapperclass(self, orientation, valuerange)
         super().__init__(**kwargs)
         if value is not None:
             self.value = value

@@ -59,17 +59,17 @@ RIGHT = 'r'
 RUN_AGAIN = -1
 
 
-_base = None
+_wrapper = None
 
 
 def load(*args, init_mainloop=True):
-    """Load a BananaGUI base module.
+    """Load a BananaGUI wrapper module.
 
     The arguments should be Python module names. If they are relative,
-    they will be treated as relative to bananagui.bases. For example,
-    '.tkinter' is equivalent to 'bananagui.bases.tkinter'.
+    they will be treated as relative to bananagui.wrappers. For example,
+    '.tkinter' is equivalent to 'bananagui.wrappers.tkinter'.
 
-    If multiple base modules are given, attempt to load each one until
+    If multiple wrapper modules are given, attempt to load each one until
     loading one of them succeeds. You can import bananagui.gui after
     calling this.
 
@@ -78,19 +78,19 @@ def load(*args, init_mainloop=True):
     """
     assert args, "specify at least one module"
 
-    global _base
-    if _base is not None:
+    global _wrapper
+    if _wrapper is not None:
         raise RuntimeError("don't call bananagui.load() twice")
 
     if len(args) == 1:
-        # Make sure the base can be imported and THEN set _base to it.
-        fullname = utils.resolve_modulename(args[0], 'bananagui.bases')
+        # Make sure the wrapper can be imported and THEN set _wrapper to it.
+        fullname = utils.resolve_modulename(args[0], 'bananagui.wrappers')
         utils.import_module(fullname)
-        _base = fullname    # mainloop.init() needs this.
+        _wrapper = fullname    # mainloop.init() needs this.
         if init_mainloop:
             mainloop.init()
     else:
-        # Attempt to load each base.
+        # Attempt to load each wrapper.
         for arg in args:
             try:
                 load(arg)
@@ -98,35 +98,35 @@ def load(*args, init_mainloop=True):
             # I have no idea what different toolkits can raise.
             except Exception:
                 pass
-        raise ImportError("cannot load any of the requested base modules")
+        raise ImportError("cannot load any of the requested wrapper modules")
 
 
-# This is a bit hacky because different things can come from the base
-# or an alternative default base.
+# This is a bit hacky because different things can come from the wrapper
+# or an alternative default wrapper.
 @functools.lru_cache()
-def _get_base(name):
-    """Get an object from the base module.
+def _get_wrapper(name):
+    """Get an object from the wrapper module.
 
     For example, if bananagui.load has been called with '.tkinter',
-    _get_base('a.b:c') imports bananagui.bases.tkinter.a.b and returns
+    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and returns
     its c attribute. An exception is raised if load() hasn't been
     called.
     """
-    if _base is None:
+    if _wrapper is None:
         raise ImportError("bananagui.load() wasn't called")
 
     modulename, attribute = name.split(':')
-    basemodule = utils.import_module(_base + '.' + modulename)
+    wrappermodule = utils.import_module(_wrapper + '.' + modulename)
     try:
         defaultmodule = utils.import_module(
-            'bananagui.bases.defaults.' + modulename)
+            'bananagui.wrappers.defaults.' + modulename)
     except ImportError:
-        # There isn't a default base, basemodule needs to have the
+        # There isn't a default wrapper, wrappermodule needs to have the
         # attribute.
-        return getattr(basemodule, attribute)
-    # There is a default base, we can use that if the base module
+        return getattr(wrappermodule, attribute)
+    # There is a default wrapper, we can use that if the wrapper module
     # doesn't have the attribute.
     try:
-        return getattr(basemodule, attribute)
+        return getattr(wrappermodule, attribute)
     except AttributeError:
         return getattr(defaultmodule, attribute)

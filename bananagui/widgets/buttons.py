@@ -47,8 +47,8 @@ class Button(Child):
     def __init__(self, text='', **kwargs):
         self._text = ''
         self.on_click = []
-        baseclass = bananagui._get_base('widgets.buttons:Button')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.buttons:Button')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
 
@@ -82,8 +82,8 @@ class ImageButton(Child):
     def __init__(self, image=None, **kwargs):
         self._image = None
         self.on_click = []
-        baseclass = bananagui._get_base('widgets.buttons:ImageButton')
-        self._base = baseclass(self)
+        wrapperclass = bananagui._get_wrapper('widgets.buttons:ImageButton')
+        self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.image = image
 

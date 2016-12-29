@@ -125,10 +125,10 @@ except AttributeError:
     def resolve_modulename(modulename, package=None):
         """Like importlib.util.resolve_modulename, but for Python 3.2.
 
-        >>> resolve_modulename('bananagui.bases.tkinter', 'whatever')
-        'bananagui.bases.tkinter'
-        >>> resolve_modulename('.tkinter', 'bananagui.bases')
-        'bananagui.bases.tkinter'
+        >>> resolve_modulename('bananagui.wrappers.tkinter', 'whatever')
+        'bananagui.wrappers.tkinter'
+        >>> resolve_modulename('.tkinter', 'bananagui.wrappers')
+        'bananagui.wrappers.tkinter'
         """
         if modulename.startswith('.'):
             if package is None:

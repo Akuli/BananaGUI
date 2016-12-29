@@ -61,8 +61,8 @@ def _msgfunc(name, doc):
         elif defaultbutton not in buttons:
             raise ValueError("default button %r not in buttons"
                              % (defaultbutton,))
-        basefunc = bananagui._get_base('msgbox:%s' % name)
-        return basefunc(parentwindow, message, title, buttons, defaultbutton)
+        wrapperfunc = bananagui._get_wrapper('msgbox:%s' % name)
+        return wrapperfunc(parentwindow, message, title, buttons, defaultbutton)
 
     # __qualname__ doesn't do anything on Python 3.2, but having it
     # doesn't matter.
@@ -105,8 +105,8 @@ def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
         raise ValueError(
             "%r is not a valid '#RRGGBB' color, use "
             "bananagui.color to convert it" % (defaultcolor,))
-    basefunc = bananagui._get_base('msgbox:colordialog')
-    return basefunc(parentwindow, defaultcolor, title)
+    wrapperfunc = bananagui._get_wrapper('msgbox:colordialog')
+    return wrapperfunc(parentwindow, defaultcolor, title)
 
 
 # def fontdialog(parentwindow, *, title=None, defaultfont=bananagui.Font()):
@@ -116,4 +116,4 @@ def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
 #    """
 #    if title is None:
 #        title = parentwindow.title
-#    return _base.fontdialog(parentwindow, defaultfont, title)
+#    return _wrapper.fontdialog(parentwindow, defaultfont, title)

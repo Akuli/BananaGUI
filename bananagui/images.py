@@ -54,8 +54,8 @@ class Image:
         See the class documentation for more information about filetypes.
         """
         imagetype = _guess_imagetype(path, imagetype)
-        baseclass = bananagui._get_base('images:Image')
-        self._base, self._size = baseclass.from_file(path, imagetype)
+        wrapperclass = bananagui._get_wrapper('images:Image')
+        self._wrapper, self._size = wrapperclass.from_file(path, imagetype)
         self._path = path
 
     @classmethod
@@ -66,9 +66,9 @@ class Image:
                 raise TypeError("expected an integer, got %r" % (value,))
             if value < 0:
                 raise ValueError("%r is negative" % (value,))
-        baseclass = bananagui._get_base('images:Image')
+        wrapperclass = bananagui._get_wrapper('images:Image')
         self = cls.__new__(cls)     # Don't run __init__.
-        self._base = baseclass.from_size(width, height)
+        self._wrapper = wrapperclass.from_size(width, height)
         self._size = (width, height)
         self._path = None
         return self
@@ -87,7 +87,7 @@ class Image:
     @property
     def real_image(self):
         """The real GUI toolkit's image object."""
-        return self._base.real_image
+        return self._wrapper.real_image
 
     @property
     def size(self):
@@ -102,7 +102,7 @@ class Image:
         """
         cls = type(self)
         copy = cls.__new__(cls)     # Don't run __init__.
-        copy._base = self._base.copy()
+        copy._wrapper = self._wrapper.copy()
         copy._size = self._size
         copy._path = self._path
         return copy
@@ -113,7 +113,7 @@ class Image:
         See the class documentation for more information about filetypes.
         """
         imagetype = _guess_imagetype(path, imagetype)
-        self._base.save(path, imagetype)
+        self._wrapper.save(path, imagetype)
         self._path = path
 
 

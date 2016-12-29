@@ -26,9 +26,9 @@ import itertools
 
 
 class BananaObject:
-    """A base for classes that need something from a BananaGUI base.
+    """A base for classes that need something from a BananaGUI wrapper.
 
-    Subclasses of this class cannot be instantiated if a base hasn't
+    Subclasses of this class cannot be instantiated if a wrapper hasn't
     been loaded with load().
 
     This class also implements callbacks. They are lists of functions
@@ -37,18 +37,19 @@ class BananaObject:
     with more arguments than that.
 
     Some BananaGUI classes aren't subclasses of this class because they
-    don't need a base or callbacks.
+    don't need a wrapper or callbacks.
     """
 
     def __init__(self):
-        if not hasattr(self, '_base'):
-            # A subclass didn't override __init__ and define a _base.
-            # Getting the base with _get_base() when load() hasn't been
-            # called will raise an error, so we don't need to worry
-            # about that here.
-            raise TypeError("cannot create instances of %r directly, "
+        if not hasattr(self, '_wrapper'):
+            # A subclass didn't override __init__ and define a _wrapper.
+            # Getting the wrapper with _get_wrapper() when bananagui.load()
+            # hasn't been called will raise an error, so we don't need
+            # to worry about that here.
+            cls = type(self)
+            raise TypeError("cannot create instances of %s.%s directly, "
                             "instantiate a subclass instead"
-                            % type(self).__name__)
+                            % (cls.__module__, cls.__name__))
         self._blocked = set()
 
     def __repr__(self):
@@ -114,14 +115,14 @@ def add_property(name, *, add_changed=False, allow_none=False,
                  choices=None, extra_setter=None):
     """A handy way to add a property to a class.
 
-        >>> class Base:
+        >>> class Wrapper:
         ...     def set_test(self, test):
-        ...         print("base sets test to", test)
+        ...         print("wrapper sets test to", test)
         ...
         >>> @add_property('test', add_changed=True, type=str)
         ... class Thingy(BananaObject):
         ...     def __init__(self):
-        ...         self._base = Base()
+        ...         self._wrapper = Wrapper()
         ...         self._test = 'default test'
         ...         super().__init__()
         ...     def __repr__(self):
@@ -135,7 +136,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
         >>> thing.test
         'default test'
         >>> thing.test = 'new test'
-        base sets test to new test
+        wrapper sets test to new test
         >>> thing.test = 'new test'  # does nothing
         >>> thing.test = 123
         Traceback (most recent call last):
@@ -147,7 +148,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
         ...
         >>> thing.on_test_changed.append(user_callback)
         >>> thing.test = 'even newer test'
-        base sets test to even newer test
+        wrapper sets test to even newer test
         callback called with arg <the thingy object>
         >>>
 
@@ -164,7 +165,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
     for checking the value, and the extra_setter will be called after
     the checking. It may raise an exception if the value is invalid.
 
-    A _base.set_NAME method will be called with the new value as an
+    A _wrapper.set_NAME method will be called with the new value as an
     argument after checking the value.
     """
     def inner(cls):
@@ -213,7 +214,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
             # return and do nothing if it happens. That's why the
             # setattr is here first.
             setattr(self, '_' + name, new_value)
-            getattr(self._base, 'set_' + name)(new_value)
+            getattr(self._wrapper, 'set_' + name)(new_value)
 
             if add_changed:
                 self.run_callbacks('on_%s_changed' % name)
