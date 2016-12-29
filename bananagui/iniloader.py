@@ -94,9 +94,8 @@ another file, and load it from a Python file like this:
         window.on_close.append(mainloop.quit)
         mainloop.run()
 
-Section names and the keys of the sections must be identifiers
-(see help(str.isidentifier)) and not keywords. The only exception is
-the class key that specifies the constructor.
+Section names and the keys in the sections must be valid variable
+names, except the class key that specifies the constructor.
 
 The values of the sections can be any Python expressions, including
 comments, function calls, list comprehensions and so on. Other
@@ -118,12 +117,20 @@ from bananagui import mainloop, widgets
 
 
 class ParsingError(Exception):
-    r"""An error occurred while parsing."""
+    """An error occurred while parsing.
 
-    def __init__(self, message, filename=None, lineno=None, line=None):
+    Note that this is not the only error that can be raised while
+    parsing. This error is typically raised if the non-Python syntax of
+    the file is invalid.
+    """
+
+    def __init__(self, message, filename=None, lineno=None,
+                 line=None, *, add_repr=True):
         self.message = message
         self.filename = filename
         self.lineno = lineno
+        if line is not None and add_repr:
+            line = repr(line)
         self.line = line
 
     def __str__(self):
@@ -180,14 +187,7 @@ class _Parser:
             lines.append(line)
 
         # Now we can parse the imports with ast.
-        try:
-            mod = ast.parse(''.join(lines), filename=self._filename)
-        except SyntaxError as e:
-            args = ("invalid Python syntax", self._filename, e.lineno, e.text)
-            if sys.version_info[:2] >= (3, 3):
-                # Raising from None is new in Python 3.3.
-                e = None
-            raise ParsingError(*args) from e
+        mod = ast.parse(''.join(lines), filename=self._filename)
         for node in mod.body:
             if not isinstance(node, (ast.Import, ast.ImportFrom)):
                 raise ParsingError(
@@ -219,25 +219,22 @@ class _Parser:
         parser = configparser.ConfigParser(
             default_section='the default', interpolation=None,
             delimiters=['='], comment_prefixes=['#'])
-        try:
-            parser.read_file(self._file)
+
         # configparser.MissingSectionHeaderError will never be raised
         # because _parse_imports() searches for the beginning of the
-        # first section.
+        # first section, so we don't need to handle that.
+        try:
+            parser.read_file(self._file)
         except configparser.ParsingError as e:
+            # We could edit the exception to correct its line numbers,
+            # but it's easier to just raise our own ParsingError.
             lineno, line = e.errors[0]    # First error.
-            try:
-                # ConfigParser reprs its lines, so we'll try to undo
-                # that here.
-                line = ast.parse(line).body[0].value.s
-            except Exception:
-                pass
             lineno += linenostart
             if sys.version_info[:2] >= (3, 3):
                 # Raising from None is new in Python 3.3.
                 e = None
-            raise ParsingError("invalid ini syntax",
-                               self._filename, lineno, line) from e
+            raise ParsingError("invalid ini syntax", self._filename,
+                               lineno, line, add_repr=False) from e
 
         # The sections method does not include the default section in
         # its return value.
