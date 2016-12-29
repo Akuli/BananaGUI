@@ -110,6 +110,7 @@ import ast
 import configparser
 import io
 import keyword
+import re
 import sys
 
 import bananagui
@@ -160,7 +161,7 @@ class _Parser:
         """
         lines = []
         for line in self._file:
-            if line.startswith('[') and line.endswith(']\n'):
+            if re.search(r'^\[.*\]\s*(#.*)?$', line.rstrip('\n')) is not None:
                 # Oops, we went a bit too far. Let's seek back.
                 # The problem with seeking text files is that we need
                 # the position in bytes, so we need to find out how
@@ -170,9 +171,10 @@ class _Parser:
                 encoding = self._file.encoding
                 if encoding is None:
                     # e.g. StringIO
-                    encoding = 'utf-8'
-                importbytes = ''.join(lines).encode(encoding)
-                self._file.seek(len(importbytes))
+                    seekcount = len(''.join(lines))
+                else:
+                    seekcount = len(''.join(lines).encode(encoding))
+                self._file.seek(seekcount)
                 break
             # More imports.
             lines.append(line)
@@ -181,9 +183,7 @@ class _Parser:
         try:
             mod = ast.parse(''.join(lines), filename=self._filename)
         except SyntaxError as e:
-            # I didn't find any documentation about the msg attribute,
-            # but it seems to wrok in 3.2 and 3.5.
-            args = (e.msg, self._filename, e.lineno, e.text)
+            args = ("invalid Python syntax", self._filename, e.lineno, e.text)
             if sys.version_info[:2] >= (3, 3):
                 # Raising from None is new in Python 3.3.
                 e = None
