@@ -9,11 +9,6 @@ import bananagui
 from bananagui import iniloader
 
 
-@pytest.fixture(scope='module')
-def dummywrapper():
-    bananagui.load('tests.dummywrapper')
-
-
 def test_errors(dummywrapper):
     with pytest.raises(SyntaxError):
         iniloader.load("this is invalid syntax")

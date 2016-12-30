@@ -250,6 +250,55 @@ I think this is a lot better. The `__repr__` method returned a good
 description of the widget. It's brief, but a lot more helpful than a
 memory address.
 
+## Developing BananaGUI
+
+### Where is everything?
+
+BananaGUI consists of the public API and the `bananagui.wrappers`
+submodule. The wrappers submodule contains a bunch of modules that each
+"wrap" a GUI toolkit and provide a way to use it. The `bananagui.load()`
+function simply imports one of these wrapper modules and sets it to
+`bananagui._wrapper`, and rest of BananaGUI finds it there. Most of the
+public API uses `bananagui._get_wrapper()` to access the currently
+loaded wrapper.
+
+### Tests
+
+BananaGUI uses three kinds of tests:
+- Unit tests in [the tests directory](tests/).
+- Doctests in files.
+- [GUI tests](guitests/) are small programs written using BananaGUI.
+
+The BananaGUI bases are meant to be tested entirely with GUI tests
+because it's an easy way to make sure that everything works.
+
+    $ yourpython -m guitests some_wrapper
+
+Of course, replace `yourpython` with a working Python program and
+`some_wrapper` with a valid argument to `bananagui.load()`. See
+`help('bananagui.load')`.
+
+You need to [install pytest](https://pytest.readthedocs.io/en/latest/getting-started.html#installation)
+to run the unit tests and doctests:
+
+    $ yourpython -m pytest
+
+If you're interested in the coverage you can [install
+coverage.py](https://coverage.readthedocs.io/en/coverage-4.3.1/install.html#install)
+and run pytest with it:
+
+    $ yourpython -m coverage run -m pytest
+    $ yourpython -m coverage report --include='bananagui/*'
+
+Or you can generate a nice HTML report:
+
+    $ yourpython -m coverage html --include='bananagui/*'
+    $ yourpython -m webbrowser htmlcov/index.html
+
+Keep in mind that the coverage of `bananagui.widgets` looks worse than
+it really is because a lot of the testing is taken care of by the
+guitests.
+
 ## Thanks
 
 I want to thank these people for helping me write BananaGUI:

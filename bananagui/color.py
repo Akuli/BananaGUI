@@ -158,8 +158,3 @@ def brightness(hexcolor):
     0.2
     """
     return sum(hex2rgb(hexcolor)) / 3 / 255
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())

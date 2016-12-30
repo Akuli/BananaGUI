@@ -119,8 +119,3 @@ def get_families():
     fonts = {'Monospace'}
     fonts.update(bananagui._get_wrapper('font:get_families')())
     return frozenset(fonts)
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())
