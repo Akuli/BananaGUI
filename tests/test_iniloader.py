@@ -11,16 +11,10 @@ from bananagui import iniloader
 
 @pytest.fixture(scope='module')
 def dummywrapper():
-    if bananagui._wrapper is None:
-        bananagui.load('tests.dummywrapper')
-    elif bananagui._wrapper != 'tests.dummywrapper':
-        raise RuntimeError(
-            "bananagui.load() was called with %r, it should have "
-            "been called with 'tests.dummywrapper'"
-            % bananagui._wrapper)
+    bananagui.load('tests.dummywrapper')
 
 
-def test_errors():
+def test_errors(dummywrapper):
     with pytest.raises(SyntaxError):
         iniloader.load("this is invalid syntax")
 
@@ -62,7 +56,7 @@ def test_errors():
         "file '<string>'\n  'bla bla = 123'")
 
 
-def test_loading():
+def test_loading(dummywrapper):
     content = textwrap.dedent("""\
     import bananagui
     from bananagui import widgets   # comment
@@ -85,7 +79,7 @@ def test_loading():
       "multiline "
       "world")
     """)
-    # Test the seeking with different encodings.
+    # Different encodings for testing the seek.
     nonefile = io.StringIO(content)
     if nonefile.encoding is not None:
         raise ValueError
@@ -94,12 +88,9 @@ def test_loading():
     latin1bytesio = io.BytesIO(content.encode('latin-1'))
     latin1file = io.TextIOWrapper(latin1bytesio, encoding='latin-1')
 
-    widgetdict1 = iniloader.load(content)
-    widgetdict2 = iniloader.load(nonefile)
-    widgetdict3 = iniloader.load(utf8file)
-    widgetdict4 = iniloader.load(latin1file)
-    for d in (widgetdict1, widgetdict2, widgetdict3, widgetdict4):
-        assert d.keys() == {'window', 'box', 'label'}
-        assert d['window'].child is d['box']
-        assert d['box'][:] == [d['label']]
-        assert d['labe'].text == 'hello multiline world'
+    for source in (content, nonefile, utf8file, latin1file):
+        widgetdict = iniloader.load(source)
+        assert widgetdict.keys() == {'window', 'box', 'label'}
+        assert widgetdict['window'].child is widgetdict['box']
+        assert widgetdict['box'][:] == [widgetdict['label']]
+        assert widgetdict['label'].text == 'hello multiline world'
