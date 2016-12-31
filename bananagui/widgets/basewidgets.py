@@ -25,7 +25,7 @@ import bananagui
 from bananagui import images, mainloop, types
 
 
-class Widget(types.BananaObject):
+class Widget:
     """A baseclass for all widgets.
 
     Attributes:

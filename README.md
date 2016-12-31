@@ -197,7 +197,6 @@ class Checkbox(Child)
  |      Checkbox
  |      Child
  |      Widget
- |      bananagui.types.BananaObject
  |      builtins.object
  |
  |  Methods defined here:

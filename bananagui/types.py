@@ -114,62 +114,6 @@ class _Callback:
         return True
 
 
-class BananaObject:
-    """A base for classes that need something from a BananaGUI wrapper.
-
-    Subclasses of this class cannot be instantiated if a wrapper hasn't
-    been loaded with load().
-
-    This class also implements callbacks. They are lists of functions
-    that run_callbacks() runs. Most callbacks are called with the
-    object as the only argument, but it's possible to run callbacks
-    with more arguments than that.
-
-    Some BananaGUI classes aren't subclasses of this class because they
-    don't need a wrapper or callbacks.
-    """
-
-    def __init__(self):
-        if not hasattr(self, '_wrapper'):
-            # A subclass didn't override __init__ and define a _wrapper.
-            # Getting the wrapper with _get_wrapper() when bananagui.load()
-            # hasn't been called will raise an error, so we don't need
-            # to worry about that here.
-            cls = type(self)
-            raise TypeError("cannot create instances of %s.%s directly, "
-                            "instantiate a subclass instead"
-                            % (cls.__module__, cls.__name__))
-        self._blocked = set()
-
-    def __repr__(self):
-        """Provide an informative string representation.
-
-        The return value is constructed from the module and name of the
-        class and the return value of _repr_parts. This method should
-        return a list of things that will be joined with a comma to
-        create the __repr__. The default __repr__ is used if
-        _repr_parts returns an empty list.
-
-        It's recommended to do something like this in _repr_parts:
-
-            def _repr_parts(self):
-                return ['thing=stuff'] + super()._repr_parts()
-        """
-        parts = self._repr_parts()
-        if not parts:
-            return super().__repr__()
-        cls = type(self)
-        return '<%s.%s object, %s>' % (
-            cls.__module__, cls.__name__, ', '.join(parts))
-
-    def _repr_parts(self):
-        """Return an empty list to make super() usage easier.
-
-        See also __repr__.
-        """
-        return []
-
-
 # TODO: Use _prop_NAME instead of _NAME?
 def add_property(name, *, add_changed=False, allow_none=False,
                  type=object, how_many=1, minimum=None, maximum=None,
@@ -181,7 +125,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
     ...         print("wrapper sets test to", test)
     ...
     >>> @add_property('test', add_changed=True, type=str)
-    ... class Thingy(BananaObject):
+    ... class Thingy:
     ...     def __init__(self):
     ...         self._wrapper = Wrapper()
     ...         self._test = 'default test'
