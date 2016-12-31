@@ -24,40 +24,35 @@ import functools
 from bananagui import widgets
 
 
-def _on_click(dialog, button):
-    dialog.response = button.text
-    dialog.close()
-
-
 def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
+    def do_click(button):
+        nonlocal result
+        result = button.text
+        dialog.close()
+
+    result = None
     dialog = widgets.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
-    mainbox = widgets.Box.vertical(dialog)
-    dialog.child = mainbox
+    mainbox = widgets.Box.vertical()
+    dialog.add(mainbox)
 
-    label = widgets.Label(mainbox, text=message)
-    buttonbox = widgets.Box.horizontal(mainbox, expand=(True, False))
-    mainbox.extend([label, buttonbox])
+    mainbox.append(widgets.Label(text=message))
+    buttonbox = widgets.Box.horizontal(expand=(True, False))
+    mainbox.append(buttonbox)
 
     focus_this = None
     for buttontext in buttons:
-        button = widgets.Button(buttonbox, text=buttontext)
-        callback = functools.partial(_on_click, dialog)
-        button.on_click.append(callback)
-
-        # Adding a dummy on both sides will give us more space between
-        # the buttons than between the buttons and the window border.
-        buttonbox.extend([
-            widgets.Dummy(buttonbox), button, widgets.Dummy(buttonbox)])
+        button = widgets.Button(text=buttontext)
+        button.on_click.append(do_click)
+        buttonbox.extend([widgets.Dummy(), button, widgets.Dummy()])
         if buttontext == defaultbutton:
             focus_this = button
 
     if focus_this is not None:
         focus_this.focus()
 
-    dialog.response = None  # This is not special for BananaGUI in any way.
     dialog.wait()
-    return dialog.response
+    return result
 
 
 # TODO: support icons?
