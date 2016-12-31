@@ -110,47 +110,48 @@ class BananaObject:
                 callback(self, *extra_args)
 
 
+# TODO: Use _prop_NAME instead of _NAME?
 def add_property(name, *, add_changed=False, allow_none=False,
                  type=object, how_many=1, minimum=None, maximum=None,
                  choices=None, extra_setter=None):
     """A handy way to add a property to a class.
 
-        >>> class Wrapper:
-        ...     def set_test(self, test):
-        ...         print("wrapper sets test to", test)
-        ...
-        >>> @add_property('test', add_changed=True, type=str)
-        ... class Thingy(BananaObject):
-        ...     def __init__(self):
-        ...         self._wrapper = Wrapper()
-        ...         self._test = 'default test'
-        ...         super().__init__()
-        ...     def __repr__(self):
-        ...         return '<the thingy object>'
-        ...
-        >>> Thingy.test     # doctest: +ELLIPSIS
-        <property object at 0x...>
-        >>> thing = Thingy()
-        >>> thing
-        <the thingy object>
-        >>> thing.test
-        'default test'
-        >>> thing.test = 'new test'
-        wrapper sets test to new test
-        >>> thing.test = 'new test'  # does nothing
-        >>> thing.test = 123
-        Traceback (most recent call last):
-          ...
-        TypeError: expected a value of type str, got 123
-        >>>
-        >>> def user_callback(arg):
-        ...     print("callback called with arg", arg)
-        ...
-        >>> thing.on_test_changed.append(user_callback)
-        >>> thing.test = 'even newer test'
-        wrapper sets test to even newer test
-        callback called with arg <the thingy object>
-        >>>
+    >>> class Wrapper:
+    ...     def set_test(self, test):
+    ...         print("wrapper sets test to", test)
+    ...
+    >>> @add_property('test', add_changed=True, type=str)
+    ... class Thingy(BananaObject):
+    ...     def __init__(self):
+    ...         self._wrapper = Wrapper()
+    ...         self._test = 'default test'
+    ...         super().__init__()
+    ...     def __repr__(self):
+    ...         return '<the thingy object>'
+    ...
+    >>> Thingy.test     # doctest: +ELLIPSIS
+    <property object at 0x...>
+    >>> thing = Thingy()
+    >>> thing
+    <the thingy object>
+    >>> thing.test
+    'default test'
+    >>> thing.test = 'new test'
+    wrapper sets test to new test
+    >>> thing.test = 'new test'  # does nothing
+    >>> thing.test = 123
+    Traceback (most recent call last):
+      ...
+    TypeError: expected a value of type str, got 123
+    >>>
+    >>> def user_callback(arg):
+    ...     print("callback called with arg", arg)
+    ...
+    >>> thing.on_test_changed.append(user_callback)
+    >>> thing.test = 'even newer test'
+    wrapper sets test to even newer test
+    callback called with arg <the thingy object>
+    >>>
 
     If the new value is equal to the old value, setting the property
     sets the _NAME attribute to the new value and doesn't do anything
@@ -168,57 +169,57 @@ def add_property(name, *, add_changed=False, allow_none=False,
     A _wrapper.set_NAME method will be called with the new value as an
     argument after checking the value.
     """
-    def inner(cls):
-        def getter(self):
-            return getattr(self, '_' + name)
+    def getter(self):
+        return getattr(self, '_' + name)
 
-        def setter(self, new_value):
-            if getattr(self, '_' + name) == new_value:
-                # Skip a bunch of things.
-                setattr(self, '_' + name, new_value)
-                return
-
-            # This needs to be before the setattr() to make sure that
-            # invalid values doesn't get setattr()ed.
-            if how_many == 1:
-                values2check = [new_value]
-            else:
-                # We don't want to allow iterators because the values
-                # need to be iterated over multiple times. That's why a
-                # len() check is good.
-                if len(new_value) != how_many:
-                    raise TypeError("expected a sequence of length %d, got %r"
-                                    % (how_many, new_value))
-                values2check = new_value
-            for value in values2check:
-                if value is None:
-                    if not allow_none:
-                        raise ValueError("None is not allowed")
-                else:
-                    if not isinstance(value, type):
-                        raise TypeError("expected a value of type %s, got %r"
-                                        % (type.__name__, value))
-                    if choices is not None and value not in choices:
-                        raise ValueError("invalid value %r, not in %r"
-                                         % (value, choices))
-                    if minimum is not None and value < minimum:
-                        raise ValueError("%r is too small, needs to be >= %r"
-                                         % (value, minimum))
-                    if maximum is not None and value > maximum:
-                        raise ValueError("%r is too big, needs to be <= %r"
-                                         % (value, maximum))
-            if extra_setter is not None:
-                extra_setter(self, new_value)
-
-            # The setter can run this again, so we need to just
-            # return and do nothing if it happens. That's why the
-            # setattr is here first.
+    def setter(self, new_value):
+        if getattr(self, '_' + name) == new_value:
+            # Skip a bunch of things.
             setattr(self, '_' + name, new_value)
-            getattr(self._wrapper, 'set_' + name)(new_value)
+            return
 
-            if add_changed:
-                self.run_callbacks('on_%s_changed' % name)
+        # This needs to be before the setattr() to make sure that
+        # invalid values doesn't get setattr()ed.
+        if how_many == 1:
+            values2check = [new_value]
+        else:
+            # We don't want to allow iterators because the values
+            # need to be iterated over multiple times. That's why a
+            # len() check is good.
+            if len(new_value) != how_many:
+                raise TypeError("expected a sequence of length %d, got %r"
+                                % (how_many, new_value))
+            values2check = new_value
+        for value in values2check:
+            if value is None:
+                if not allow_none:
+                    raise ValueError("None is not allowed")
+            else:
+                if not isinstance(value, type):
+                    raise TypeError("expected a value of type %s, got %r"
+                                    % (type.__name__, value))
+                if choices is not None and value not in choices:
+                    raise ValueError("invalid value %r, not in %r"
+                                     % (value, choices))
+                if minimum is not None and value < minimum:
+                    raise ValueError("%r is too small, needs to be >= %r"
+                                     % (value, minimum))
+                if maximum is not None and value > maximum:
+                    raise ValueError("%r is too big, needs to be <= %r"
+                                     % (value, maximum))
+        if extra_setter is not None:
+            extra_setter(self, new_value)
 
+        # The setter can run this again, so we need to just
+        # return and do nothing if it happens. That's why the
+        # setattr is here first.
+        setattr(self, '_' + name, new_value)
+        getattr(self._wrapper, 'set_' + name)(new_value)
+
+        if add_changed:
+            self.run_callbacks('on_%s_changed' % name)
+
+    def inner(cls):
         setattr(cls, name, property(getter, setter))
 
         if add_changed:
