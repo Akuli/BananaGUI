@@ -23,7 +23,14 @@
 
 import contextlib
 import itertools
+import sys
 import traceback
+
+try:
+    import collections.abc as abcoll
+except ImportError:
+    # Python 3.2, no separate collections.abc.
+    import collections as abcoll
 
 
 class _Callback:
@@ -94,9 +101,9 @@ class _Callback:
         """Run the connected functions as described in connect().
 
         This does nothing if code under a `with this_callback.blocked():`
-        is currently running. Return True if everything succeeded and no
-        exceptions were raised, and False if an exception was raised
-        (and handled).
+        is currently running. No exceptions are raised. If a callback
+        raises an exception, this method handles it and prints the
+        traceback to sys.stderr.
         """
         if self._blocklevel != 0:
             # It's blocked.
@@ -186,13 +193,17 @@ def add_property(name, *, add_changed=False, allow_none=False,
         if how_many == 1:
             values2check = [new_value]
         else:
-            # We don't want to allow iterators because the values
-            # need to be iterated over multiple times. That's why a
-            # len() check is good.
+            # We don't want to allow iterators or sets because the
+            # values need to be iterated over multiple times and they
+            # need to be consistent.
+            if isinstance(new_value, abcoll.Set):
+                raise TypeError("%s value needs to be a sequence, not %r"
+                                % (name, new_value))
             if len(new_value) != how_many:
-                raise TypeError("expected a sequence of length %d, got %r"
-                                % (how_many, new_value))
+                raise ValueError("%s value needs to be of length %d, got %r"
+                                 % (name, how_many, new_value))
             values2check = new_value
+
         for value in values2check:
             if value is None:
                 if not allow_none:
