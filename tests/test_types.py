@@ -27,36 +27,48 @@ def test_callback_repr():
 
 
 def test_callback_connecting():
-    def func(the_widget):
-        assert False, "the callback function wasn't supposed to run yet"
+    def func(*args):
+        assert args == (1, 2, 3)
+        nonlocal it_ran
+        it_ran = True
 
+    it_ran = False
     dummy = CallbackDummy()
     assert not dummy.on_stuff.is_connected(func)
+
     dummy.on_stuff.connect(func)
     assert dummy.on_stuff.is_connected(func)
     dummy.on_stuff.disconnect(func)
     assert not dummy.on_stuff.is_connected(func)
+
+    dummy.on_stuff.connect(func, 1, 2, 3)
+    assert dummy.on_stuff.is_connected(func)
+    assert not it_ran
+    dummy.on_stuff.run()
+    assert it_ran
+    dummy.on_stuff.disconnect(func)
+    assert not dummy.on_stuff.is_connected(func)
+
     with pytest.raises(ValueError):
         dummy.on_stuff.disconnect(func)
 
 
 def test_connect_args():
-    def func(arg1, arg2, arg3):
+    def func(*args):
+        assert args == (1, 2, 3)
         nonlocal it_ran
-        assert arg1 is dummy
-        assert arg2 == 'hello'
-        assert arg3 == 'there'
         it_ran = True
 
     it_ran = False
     dummy = CallbackDummy()
-    dummy.on_stuff.connect(func, 'hello', 'there')
+    dummy.on_stuff.connect(func, 1, 2, 3)
+    assert dummy.on_stuff.is_connected(func)
     dummy.on_stuff.run()
     assert it_ran
 
 
 def test_callback_blocked():
-    def dummy_func(dummy):
+    def dummy_func():
         nonlocal it_ran
         it_ran = True
 
@@ -79,8 +91,7 @@ def test_callback_blocked():
 
 
 def test_callback_exc(capsys):
-    def broken_callback(arg):
-        assert arg is dummy
+    def broken_callback():
         raise Exception("oops!")
 
     dummy = CallbackDummy()

@@ -22,16 +22,25 @@
 from bananagui import clipboard, mainloop, widgets
 
 
-class ClipboardTestWindow(widgets.Window):
+def copy_from_entry(entry):
+    clipboard.set_text(entry.text)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
+def paste_to_entry(entry):
+    text = clipboard.get_text()
+    if text is None:
+        print("there's no text on the clipboard")
+    else:
+        entry.text += text
+
+
+def main():
+    with widgets.Window("Clipboard test") as window:
         mainbox = widgets.Box.vertical()
-        self.add(mainbox)
+        window.add(mainbox)
 
-        self.entry = widgets.Entry(expand=(True, False))
-        mainbox.append(self.entry)
+        entry = widgets.Entry(expand=(True, False))
+        mainbox.append(entry)
 
         mainbox.append(widgets.Dummy())
 
@@ -39,26 +48,13 @@ class ClipboardTestWindow(widgets.Window):
         mainbox.append(buttonbox)
 
         copybutton = widgets.Button("Copy everything")
-        copybutton.on_click.connect(self.copy)
+        copybutton.on_click.connect(copy_from_entry, entry)
         buttonbox.append(copybutton)
 
         pastebutton = widgets.Button("Paste to the end")
-        pastebutton.on_click.connect(self.paste)
+        pastebutton.on_click.connect(paste_to_entry, entry)
         buttonbox.append(pastebutton)
 
-    def copy(self, copybutton):
-        clipboard.set_text(self.entry.text)
-
-    def paste(self, pastebutton):
-        text = clipboard.get_text()
-        if text is None:
-            print("there's no text on the clipboard")
-        else:
-            self.entry.text += text
-
-
-def main():
-    with ClipboardTestWindow("Clipboard test") as window:
         window.on_close.connect(mainloop.quit)
         mainloop.run()
 

@@ -60,12 +60,11 @@ class _Callback:
         return '<BananaGUI callback %r of %s>' % (self._name, objrepr)
 
     def connect(self, func, *args):
-        """Schedule a function to be called when the callback is ran.
+        """Schedule func(*args) to be called when the callback is ran.
 
-        The function will get the object this callback belongs to as
-        its first argument, and *extra_args as other arguments. This is
-        a handy way to pass information to the callbacks, there's no
-        need to use lambda or functools.partial().
+        Passing arguments to this function is a handy way to pass
+        information to the callback function. There's no need to use
+        lambda or functools.partial().
         """
         stack_info = traceback.format_stack()[-2]  # The connect() call.
         self._callbacks.append((func, args, stack_info))
@@ -73,14 +72,25 @@ class _Callback:
     def is_connected(self, func):
         """Check if connect() has been called with func as an argument."""
         for infotuple in self._callbacks:
-            if infotuple[0] is func:
+            # It's important NOT to use is here because.. well...
+            #   >>> class Thing:
+            #   ...     def stuff(self):
+            #   ...         pass
+            #   ...
+            #   >>> t = Thing()
+            #   >>> t.stuff is t.stuff
+            #   False
+            #   >>> t.stuff == t.stuff
+            #   True
+            #   >>>
+            if infotuple[0] == func:
                 return True
         return False
 
     def disconnect(self, func):
         """Undo a connect() call."""
         for index, infotuple in enumerate(self._callbacks):
-            if infotuple[0] is func:
+            if infotuple[0] == func:
                 del self._callbacks[index]
                 return
         raise ValueError("function is not connected")
@@ -107,18 +117,16 @@ class _Callback:
         """
         if self._blocklevel != 0:
             # It's blocked.
-            return True
+            return
         for func, args, stack_info in self._callbacks:
             try:
-                func(self._object, *args)
+                func(*args)
             except Exception as e:
                 # We can magically show where this callback was connected.
                 lines = traceback.format_exception(
                     type(e), e, e.__traceback__)
                 lines.insert(1, stack_info)  # After 'Traceback (bla bla):'.
                 sys.stderr.writelines(lines)
-                return False
-        return True
 
 
 # TODO: Use _prop_NAME instead of _NAME?
@@ -155,13 +163,13 @@ def add_property(name, *, add_changed=False, allow_none=False,
       ...
     TypeError: test needs a value of type str, not 123
     >>>
-    >>> def user_callback(arg):
-    ...     print("callback called with arg", arg)
+    >>> def user_callback():
+    ...     print("user callback runs")
     ...
     >>> thing.on_test_changed.connect(user_callback)
     >>> thing.test = 'even newer test'
     wrapper sets test to even newer test
-    callback called with arg <the thingy object>
+    user callback runs
     >>>
 
     If the new value is equal to the old value, setting the property
@@ -172,12 +180,13 @@ def add_property(name, *, add_changed=False, allow_none=False,
     It will be ran when the value is set to a new value that is not
     equal to the old value.
 
-    The property's docstring will be doc. Other arguments will be used
-    for checking the value, and the extra_setter will be called after
-    the checking. It may raise an exception if the value is invalid.
+    Other arguments will be used for checking the value, and the
+    extra_setter will be called with the instance and new value as
+    arguments after the checking. It may raise an exception if the
+    value is invalid.
 
     A _wrapper.set_NAME method will be called with the new value as an
-    argument after checking the value.
+    argument after checking the value and possibly calling extra_setter.
     """
     def getter(self):
         return getattr(self, '_' + name)
@@ -251,19 +260,12 @@ def add_callback(name):
 
     >>> @add_callback('on_stuff')
     ... class Thing:
-    ...     def __repr__(self):
-    ...         return '<the Thing object>'
-    ... 
+    ...     pass
+    ...
     >>> t = Thing()
-    >>> t
-    <the Thing object>
-    >>> t.on_stuff
-    <BananaGUI callback 'on_stuff' of the Thing object>
     >>> t.on_stuff.connect(print, "arg1", "arg2", "arg3")
-    >>> success = t.on_stuff.run()
-    <the Thing object> arg1 arg2 arg3
-    >>> success
-    True
+    >>> t.on_stuff.run()
+    arg1 arg2 arg3
     >>>
     """
     def getter(self):

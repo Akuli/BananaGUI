@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -58,11 +58,10 @@ def run():
         _initialized = False
 
 
-def quit(*args):
+def quit():
     """Make run() return.
 
-    Quitting when the main loop is not running does nothing. Positional
-    arguments are ignored.
+    Quitting when the main loop is not running does nothing.
     """
     if _running:
         bananagui._get_wrapper('mainloop:quit')()

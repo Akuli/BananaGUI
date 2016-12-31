@@ -26,7 +26,7 @@ import functools
 from bananagui import mainloop, widgets
 
 
-def on_click(other_button, this_button):
+def on_click(other_button):
     other_button.focus()
 
 
@@ -43,8 +43,8 @@ def main():
 
         button1 = widgets.Button("Focus the button below")
         button2 = widgets.Button("Focus the button above")
-        button1.on_click.connect(functools.partial(on_click, button2))
-        button2.on_click.connect(functools.partial(on_click, button1))
+        button1.on_click.connect(on_click, button2)
+        button2.on_click.connect(on_click, button1)
         box.extend([button1, button2])
 
         window.on_close.connect(mainloop.quit)

@@ -49,7 +49,7 @@ def main():
         label = widgets.Label('hidden')
         box.append(label)
         button = widgets.Button("Show instructions")
-        button.on_click.connect(functools.partial(on_click, label))
+        button.on_click.connect(on_click, label, button)
         box.append(button)
 
         window.on_close.connect(mainloop.quit)

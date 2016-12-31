@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -24,50 +24,46 @@
 from bananagui import mainloop, widgets
 
 
-class TextEditWindow(widgets.Window):
+def text_changed(textedit):
+    print("text changed to", repr(textedit.text))
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
+def clear(textview):
+    textview.text = ''
+
+
+def add_text(textedit):
+    textedit.text += " Click!"
+
+
+def main():
+    with widgets.Window("TextEdit test", minimum_size=(300, 200)) as window:
         bigbox = widgets.Box.vertical()
-        self.add(bigbox)
+        window.add(bigbox)
 
-        self.textedit = widgets.TextEdit("Enter something...")
-        self.textedit.on_text_changed.connect(self.text_changed)
-        bigbox.append(self.textedit)
+        textedit = widgets.TextEdit("Enter something...")
+        textedit.on_text_changed.connect(text_changed, textedit)
+        bigbox.append(textedit)
 
         buttonbox = widgets.Box.horizontal(expand=(True, False))
         bigbox.append(buttonbox)
 
         addbutton = widgets.Button("Add text")
-        addbutton.on_click.connect(self.add_text)
+        addbutton.on_click.connect(add_text, textedit)
         buttonbox.append(addbutton)
 
         clearbutton = widgets.Button("Clear")
-        clearbutton.on_click.connect(self.clear)
+        clearbutton.on_click.connect(clear, textedit)
         buttonbox.append(clearbutton)
 
         selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.connect(self.select_all)
+        selectallbutton.on_click.connect(textedit.select_all)
         buttonbox.append(selectallbutton)
 
-    def text_changed(self, textedit):
-        print("text changed to %r" % textedit.text)
+        focusbutton = widgets.Button("Focus")
+        focusbutton.on_click.connect(textedit.focus)
+        buttonbox.append(focusbutton)
 
-    def add_text(self, addbutton):
-        self.textedit.text += " Click!"
-
-    def select_all(self, selectallbutton):
-        self.textedit.select_all()
-        self.textedit.focus()
-
-    def clear(self, clearbutton):
-        self.textedit.text = ''
-
-
-def main():
-    with TextEditWindow("TextEdit test",
-                        minimum_size=(300, 200)) as window:
         window.on_close.connect(mainloop.quit)
         mainloop.run()
 

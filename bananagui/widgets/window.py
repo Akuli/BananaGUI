@@ -41,10 +41,6 @@ def _sizecheck(window, size):
                          % (size, window.minimum_size))
 
 
-def default_closer(window):
-    window.close()
-
-
 @types.add_property('title', type=str, extra_setter=_closecheck)
 @types.add_property('resizable', type=bool, extra_setter=_closecheck)
 @types.add_property('size', type=int, how_many=2, extra_setter=_sizecheck,
@@ -89,11 +85,10 @@ class BaseWindow(Bin):
                         needs to be displayed multiple times.
       on_close          A callback that runs when the user tries to
                         close the window.
-                        This is connected to default_closer by default.
-                        You can disconnect it if you don't want to
-                        handle the window closing yourself.
-                        Note that this callback doesn't run when
-                        close() is called.
+                        This is connected to thewindow.close by default.
+                        You can disconnect it if you want to handle the
+                        window closing yourself. Note that this callback
+                        doesn't run when close() is called.
       closed            True if close() has been called.
     """
     # Most things check that the window is closed. Things that come
@@ -111,7 +106,7 @@ class BaseWindow(Bin):
         self._size = (200, 200)
         self._minimum_size = (0, 0)
         self._hidden = False
-        self.on_close.connect(default_closer)
+        self.on_close.connect(self.close)
         self.closed = False
         super().__init__(child, **kwargs)
         self.resizable = resizable

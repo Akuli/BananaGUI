@@ -22,54 +22,41 @@
 from bananagui import color, mainloop, msgbox, widgets
 
 
-class DialogTest(widgets.Window):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        box = widgets.Box.vertical()
-        self.add(box)
-
-        texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
-        methods = [self.info, self.warning, self.error, self.question,
-                   self.choose_color]
-        for text, method in zip(texts, methods):
-            button = widgets.Button(text)
-            button.on_click.connect(method)
-            box.append(button)
-
-    def info(self, infobutton):
-        result = msgbox.info(self, "Information!")
-        print(repr(result))
-
-    def warning(self, warningbutton):
-        result = msgbox.warning(
-            self, "Warning!", title="Be warned!",
-            buttons=["What's going to happen next?"])
-        print(repr(result))
-
-    def error(self, errorbutton):
-        result = msgbox.error(
-            self, "Error!", title="Oh no!",
-            buttons=["I'm screwed!", "I'm not screwed"],
-            defaultbutton="I'm screwed!")
-        print(repr(result))
-
-    def question(self, questionbutton):
-        result = msgbox.question(
-            self, "Do you like BananaGUI?",
-            buttons=["Yes", "No"], defaultbutton="Yes")
-        print(repr(result))
-
-    def choose_color(self, colorbutton):
-        result = msgbox.colordialog(self, defaultcolor=color.RED,
-                                    title="Choose a color")
-        print(repr(result))
-
-    # TODO: font dialog
+def info(window):
+    result = msgbox.info(window, "Information!")
+    print(repr(result))
 
 
-def close_callback(window):
+def warning(window):
+    result = msgbox.warning(
+        window, "Warning!", title="Be warned!",
+        buttons=["What's going to happen next?"])
+    print(repr(result))
+
+
+def error(window):
+    result = msgbox.error(
+        window, "Error!", title="Oh no!",
+        buttons=["I'm screwed!", "I'm not screwed"],
+        defaultbutton="I'm screwed!")
+    print(repr(result))
+
+
+def question(window):
+    result = msgbox.question(
+        window, "Do you like BananaGUI?",
+        buttons=["Yes", "No"], defaultbutton="Yes")
+    print(repr(result))
+
+
+def choose_color(window):
+    result = msgbox.colordialog(
+        window, defaultcolor=color.RED,
+        title="Choose a color")
+    print(repr(result))
+
+
+def do_close(window):
     result = msgbox.question(
         window, "Do you really want to quit?", title="Quit?",
         buttons=["Yes", "No"], defaultbutton="Yes")
@@ -79,9 +66,19 @@ def close_callback(window):
 
 
 def main():
-    with DialogTest("Dialog test") as window:
-        del window.on_close[0]     # The default handler.
-        window.on_close.connect(close_callback)
+    with widgets.Window("Dialog test") as window:
+        box = widgets.Box.vertical()
+        window.add(box)
+
+        texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
+        functions = [info, warning, error, question, choose_color]
+        for text, function in zip(texts, functions):
+            button = widgets.Button(text)
+            button.on_click.connect(function, window)
+            box.append(button)
+
+        window.on_close.disconnect(window.close)
+        window.on_close.connect(do_close, window)
         mainloop.run()
 
 

@@ -23,37 +23,33 @@ import bananagui
 from bananagui import mainloop, widgets
 
 
-class SliderBox(widgets.Box):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-        values = range(0, 51, 5)
-
-        hslider = widgets.Slider.horizontal(values)
-        hslider.on_value_changed.connect(self.value_changed)
-        self.append(hslider)
-
-        vslider = widgets.Slider.vertical(values)
-        vslider.on_value_changed.connect(self.value_changed)
-        self.append(vslider)
-
-        spinbox = widgets.Spinbox(values, expand=(True, False))
-        spinbox.on_value_changed.connect(self.value_changed)
-        self.append(spinbox)
-
-    def value_changed(self, called_widget):
-        widgets = list(self)
-        widgets.remove(called_widget)
-        for widget in widgets:
-            # This doesn't recurse too much because callbacks don't run
-            # if the old and new value are equal.
+def value_changed(called_widget, box):
+    for widget in box:
+        if widget is not called_widget:
+            # This doesn't recurse too much because changed callbacks
+            # don't run if the old and new value are equal.
             widget.value = called_widget.value
 
 
 def main():
     with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
-        window.add(SliderBox.horizontal())
+        box = widgets.Box.horizontal()
+        window.add(box)
+
+        values = range(0, 51, 5)
+
+        hslider = widgets.Slider.horizontal(values)
+        hslider.on_value_changed.connect(value_changed, hslider, box)
+        box.append(hslider)
+
+        vslider = widgets.Slider.vertical(values)
+        vslider.on_value_changed.connect(value_changed, vslider, box)
+        box.append(vslider)
+
+        spinbox = widgets.Spinbox(values, expand=(True, False))
+        spinbox.on_value_changed.connect(value_changed, spinbox, box)
+        box.append(spinbox)
+
         window.on_close.connect(mainloop.quit)
         mainloop.run()
 

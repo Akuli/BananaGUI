@@ -24,17 +24,10 @@
 from bananagui import mainloop, widgets
 
 
-def resize(window):
-    print("window resized to", window.size)
-
-
 def main():
     with widgets.Window("Hello World!") as window:
-        window.on_size_changed.connect(resize)
-        label = widgets.Label("Hello World!")
-        window.add(label)
+        window.add(widgets.Label("Hello World!"))
         window.on_close.connect(mainloop.quit)
-        print(window)
         mainloop.run()
 
 

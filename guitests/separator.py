@@ -30,23 +30,17 @@ def main():
 
     toplabel = widgets.Label("Top")
     bigbox.append(toplabel)
-
     hsep = widgets.Separator.horizontal()
     bigbox.append(hsep)
     print(hsep)
-
     bottombox = widgets.Box.horizontal()
     bigbox.append(bottombox)
 
-    bottomleftlabel = widgets.Label("Bottom left")
-    bottombox.append(bottomleftlabel)
-
+    bottombox.append(widgets.Label("Bottom left"))
     vsep = widgets.Separator.vertical()
     bottombox.append(vsep)
     print(vsep)
-
-    bottomrightlabel = widgets.Label("Bottom right")
-    bottombox.append(bottomrightlabel)
+    bottombox.append(widgets.Label("Bottom right"))
 
     window.on_close.connect(mainloop.quit)
     mainloop.run()

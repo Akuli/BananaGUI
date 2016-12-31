@@ -25,73 +25,52 @@ import bananagui
 from bananagui import mainloop, widgets
 
 
-class EntryBox(widgets.Box):
+def set_grayed_out(entry, checkbox):
+    entry.grayed_out = checkbox.checked
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
-        # This is attached to self because we need it in other methods.
-        self.entry = widgets.Entry(expand=(True, False))
-        self.entry.on_text_changed.connect(self.text_changed)
-        self.append(self.entry)
+def set_secret(entry, checkbox):
+    entry.secret = checkbox.checked
 
-        self.append(widgets.Dummy())
-
-        buttonbox = widgets.Box.horizontal(expand=(True, False))
-        self.append(buttonbox)
-
-        resetbutton = widgets.Button("Reset")
-        resetbutton.on_click.connect(self.reset)
-        buttonbox.append(resetbutton)
-
-        selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.connect(self.select_all)
-        buttonbox.append(selectallbutton)
-
-        focusbutton = widgets.Button("Focus")
-        focusbutton.on_click.connect(self.get_focus)
-        buttonbox.append(focusbutton)
-
-        grayedcheckbox = widgets.Checkbox("Grayed out")
-        grayedcheckbox.on_checked_changed.connect(
-            self.grayed_out_toggled)
-        buttonbox.append(grayedcheckbox)
-
-        secretcheckbox = widgets.Checkbox("Secret")
-        secretcheckbox.on_checked_changed.connect(self.secret_toggled)
-        buttonbox.append(secretcheckbox)
-
-        self.reset()
-
-    def reset(self, resetbutton=None):
-        self.entry.text = "Enter something..."
-
-    def text_changed(self, entry):
-        print(entry)
-
-    def select_all(self, selectallbutton):
-        self.entry.select_all()
-
-    # This is get_focus instead of focus. If this was focus, it would
-    # be difficult to give focus to this widget when needed, except
-    # that it wouldn't really matter because BananaGUI boxes aren't
-    # focusable anyway.
-    def get_focus(self, focusbutton):
-        self.entry.focus()
-
-    def grayed_out_toggled(self, checkbox):
-        self.entry.grayed_out = checkbox.checked
-
-    def secret_toggled(self, checkbox):
-        self.entry.secret = checkbox.checked
+    
+def reset_text(entry):
+    entry.text = "Enter something..."
 
 
 def main():
     with widgets.Window("Entry test") as window:
-        # EntryBox.vertical() does the same thing as
-        # EntryBox(orientation=bananagui.VERTICAL), so taking keyword
-        # arguments in __init__ is enough.
-        window.add(EntryBox.vertical())
+        entrybox = widgets.Box.vertical()
+        window.add(entrybox)
+
+        entry = widgets.Entry("Enter something...", expand=(True, False))
+        entry.on_text_changed.connect(print, entry)
+        entrybox.append(entry)
+
+        entrybox.append(widgets.Dummy())
+
+        buttonbox = widgets.Box.horizontal(expand=(True, False))
+        entrybox.append(buttonbox)
+
+        resetbutton = widgets.Button("Reset")
+        resetbutton.on_click.connect(reset_text, entry)
+        buttonbox.append(resetbutton)
+
+        selectallbutton = widgets.Button("Select all")
+        selectallbutton.on_click.connect(entry.select_all)
+        buttonbox.append(selectallbutton)
+
+        focusbutton = widgets.Button("Focus")
+        focusbutton.on_click.connect(entry.focus)
+        buttonbox.append(focusbutton)
+
+        grayed = widgets.Checkbox("Grayed out")
+        grayed.on_checked_changed.connect(set_grayed_out, entry, grayed)
+        buttonbox.append(grayed)
+
+        secret = widgets.Checkbox("Secret")
+        secret.on_checked_changed.connect(set_secret, entry, secret)
+        buttonbox.append(secret)
+
         window.on_close.connect(mainloop.quit)
         mainloop.run()
 

@@ -24,39 +24,35 @@
 from bananagui import mainloop, widgets
 
 
-class SpinnerWindow(widgets.Window):
+def start(spinner):
+    spinner.spinning = True
+    print(spinner)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
+def stop(spinner):
+    spinner.spinning = False
+    print(spinner)
+
+
+def main():
+    with widgets.Window("Spinner window") as window:
         mainbox = widgets.Box.vertical()
-        self.add(mainbox)
+        window.add(mainbox)
 
-        self.spinner = widgets.Spinner()
-        mainbox.append(self.spinner)
+        spinner = widgets.Spinner()
+        mainbox.append(spinner)
 
         buttonbox = widgets.Box.horizontal(expand=(True, False))
         mainbox.append(buttonbox)
 
         startbutton = widgets.Button("Start")
-        startbutton.on_click.connect(self.start)
+        startbutton.on_click.connect(start, spinner)
         buttonbox.append(startbutton)
 
         stopbutton = widgets.Button("Stop")
-        stopbutton.on_click.connect(self.stop)
+        stopbutton.on_click.connect(stop, spinner)
         buttonbox.append(stopbutton)
 
-    def start(self, startbutton):
-        self.spinner.spinning = True
-        print(self.spinner)
-
-    def stop(self, stopbutton):
-        self.spinner.spinning = False
-        print(self.spinner)
-
-
-def main():
-    with SpinnerWindow("Spinner window") as window:
         window.on_close.connect(mainloop.quit)
         mainloop.run()
 

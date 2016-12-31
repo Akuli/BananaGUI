@@ -19,8 +19,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import functools
-
 from bananagui import mainloop, widgets
 
 
@@ -29,7 +27,7 @@ def set_progress(progressbar, spinbox):
     print(progressbar)
 
 
-def toggle_bouncing(bouncingbar, checkbox):
+def set_bouncing(bouncingbar, checkbox):
     bouncingbar.bouncing = checkbox.checked
     print(bouncingbar)
 
@@ -39,24 +37,21 @@ def main():
         box = widgets.Box.vertical()
         window.add(box)
 
-        # A regular progress bar.
         progressbar = widgets.Progressbar(expand=(True, False))
         box.append(progressbar)
 
         spinbox = widgets.Spinbox(valuerange=range(101), expand=(True, False))
-        spin_callback = functools.partial(set_progress, progressbar)
-        spinbox.on_value_changed.connect(spin_callback)
+        spinbox.on_value_changed.connect(set_progress, progressbar, spinbox)
         box.append(spinbox)
 
         box.append(widgets.Dummy())
 
-        # A bouncing progress bar.
         bouncingbar = widgets.BouncingProgressbar(expand=(True, False))
         box.append(bouncingbar)
 
         checkbox = widgets.Checkbox("Bouncing", expand=(True, False))
-        check_callback = functools.partial(toggle_bouncing, bouncingbar)
-        checkbox.on_checked_changed.connect(check_callback)
+        checkbox.on_checked_changed.connect(
+            set_bouncing, bouncingbar, checkbox)
         box.append(checkbox)
 
         window.on_close.connect(mainloop.quit)

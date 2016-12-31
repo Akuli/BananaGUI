@@ -25,9 +25,9 @@ from bananagui import widgets
 
 
 def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
-    def do_click(button):
+    def do_click(text):
         nonlocal result
-        result = button.text
+        result = text
         dialog.close()
 
     result = None
@@ -43,7 +43,7 @@ def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
     focus_this = None
     for buttontext in buttons:
         button = widgets.Button(text=buttontext)
-        button.on_click.append(do_click)
+        button.on_click.connect(do_click, buttontext)
         buttonbox.extend([widgets.Dummy(), button, widgets.Dummy()])
         if buttontext == defaultbutton:
             focus_this = button
