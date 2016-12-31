@@ -269,7 +269,7 @@ BananaGUI uses three kinds of tests:
 - Doctests in files.
 - [GUI tests](guitests/) are small programs written using BananaGUI.
 
-The BananaGUI bases are meant to be tested entirely with GUI tests
+The BananaGUI wrappers are meant to be tested entirely with GUI tests
 because it's an easy way to make sure that everything works.
 
     $ yourpython -m guitests some_wrapper
