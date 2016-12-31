@@ -23,6 +23,95 @@
 
 import contextlib
 import itertools
+import traceback
+
+
+class Callback:
+    """An object like signals in Qt GTK+ and bindings in tkinter.
+
+    You can connect functions to callbacks with the connect() method,
+    and they will be called when BananaGUI runs the callback.
+    """
+
+    def __init__(self, obj, name):
+        self._object = obj
+        self._name = name
+        self._blocklevel = 0
+        # This could be an ordered dictionary to speed up is_connected()
+        # and disconnect(), but speed isn't really an issue because
+        # there's usually not many functions connected to a callback at
+        # the same time. A dictionary would also add more limitations,
+        # like requiring hashable callback functions and having each
+        # function connected at most once. Simple is better than
+        # complex.
+        self._callbacks = []
+
+    def __repr__(self):
+        objrepr = repr(self._object)
+        if objrepr.startswith('<') and objrepr.endswith('>'):
+            objrepr = objrepr[1:-1]
+        return '<BananaGUI callback %r of %s>' % (self._name, objrepr)
+
+    def connect(self, func, *args):
+        """Schedule a function to be called when the callback is ran.
+
+        The function will get the object this callback belongs to as
+        its first argument, and *extra_args as other arguments. This is
+        a handy way to pass information to the callbacks, there's no
+        need to use lambda or functools.partial().
+        """
+        stack_info = traceback.format_stack()[-2]  # The connect() call.
+        self._callbacks.append((func, args, stack_info))
+
+    def is_connected(self, func):
+        """Check if connect() has been called with func as an argument."""
+        for infotuple in self._callbacks:
+            if infotuple[0] is func:
+                return True
+        return False
+
+    def disconnect(self, func):
+        """Undo a connect() call."""
+        for index, infotuple in enumerate(self._callbacks):
+            if infotuple[0] is func:
+                del self._callbacks[index]
+                return
+        raise ValueError("function is not connected")
+
+    @contextlib.contextmanager
+    def blocked(self):
+        """Block this callback from running temporarily.
+
+        Use this as a context manager.
+        """
+        self._blocklevel += 1
+        try:
+            yield
+        finally:
+            self._blocklevel -= 1
+
+    def run(self):
+        """Run the connected functions as described in connect().
+
+        This does nothing if code under a `with this_callback.blocked():`
+        is currently running. Return True if everything succeeded and no
+        exceptions were raised, and False if an exception was raised
+        (and handled).
+        """
+        if self._blocklevel != 0:
+            # It's blocked.
+            return True
+        for func, args, stack_info in self._callbacks:
+            try:
+                func(self._object, *args)
+            except Exception as e:
+                # We can magically show where this callback was connected.
+                lines = traceback.format_exception(
+                    type(e), e, e.__traceback__)
+                lines.insert(1, stack_info)  # After 'Traceback (bla bla):'.
+                sys.stderr.writelines(lines)
+                return False
+        return True
 
 
 class BananaObject:
@@ -142,7 +231,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
     >>> thing.test = 123
     Traceback (most recent call last):
       ...
-    TypeError: expected a value of type str, got 123
+    TypeError: test needs a value of type str, not 123
     >>>
     >>> def user_callback(arg):
     ...     print("callback called with arg", arg)
@@ -237,6 +326,42 @@ def add_property(name, *, add_changed=False, allow_none=False,
                 "when the value of %r changes." % name)
             setattr(cls, 'on_%s_changed' % name, property(changed_getter))
 
+        return cls
+
+    return inner
+
+
+def add_callback(name):
+    """Add a callback to a class easily.
+
+    Use this as a decorator.
+
+    >>> @add_callback('on_stuff')
+    ... class Thing:
+    ...     def __repr__(self):
+    ...         return '<the Thing object>'
+    ... 
+    >>> t = Thing()
+    >>> t
+    <the Thing object>
+    >>> t.on_stuff
+    <BananaGUI callback 'on_stuff' of the Thing object>
+    >>> t.on_stuff.connect(print, "arg1", "arg2", "arg3")
+    >>> success = t.on_stuff.run()
+    <the Thing object> arg1 arg2 arg3
+    >>> success
+    True
+    >>>
+    """
+    def getter(self):
+        try:
+            return getattr(self, '__callback_' + name)
+        except AttributeError:
+            setattr(self, '__callback_' + name, Callback(self, name))
+            return getattr(self, '__callback_' + name)
+
+    def inner(cls):
+        setattr(cls, name, property(getter))
         return cls
 
     return inner
