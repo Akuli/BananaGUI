@@ -2,7 +2,6 @@ import threading
 
 import pytest
 
-import bananagui
 from bananagui import mainloop
 
 

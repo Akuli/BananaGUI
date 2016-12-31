@@ -1,11 +1,8 @@
-import contextlib
 import io
 import textwrap
-import unittest
 
 import pytest
 
-import bananagui
 from bananagui import iniloader
 
 

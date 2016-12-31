@@ -22,8 +22,6 @@
 import threading
 import time
 
-import bananagui
-
 _running = False
 
 
