@@ -196,17 +196,19 @@ def add_property(name, *, add_changed=False, allow_none=False,
                     raise ValueError("None is not allowed")
             else:
                 if not isinstance(value, type):
-                    raise TypeError("expected a value of type %s, got %r"
-                                    % (type.__name__, value))
+                    raise TypeError("%s needs a value of type %s, not %r"
+                                    % (name, type.__name__, value))
                 if choices is not None and value not in choices:
-                    raise ValueError("invalid value %r, not in %r"
-                                     % (value, choices))
+                    raise ValueError("invalid %s value %r, not in %r"
+                                     % (name, value, choices))
                 if minimum is not None and value < minimum:
-                    raise ValueError("%r is too small, needs to be >= %r"
-                                     % (value, minimum))
+                    raise ValueError(
+                        "%s value %r is too small, needs to be >= %r"
+                        % (name, value, minimum))
                 if maximum is not None and value > maximum:
-                    raise ValueError("%r is too big, needs to be <= %r"
-                                     % (value, maximum))
+                    raise ValueError(
+                        "%s value %r is too big, needs to be <= %r"
+                        % (name, value, maximum))
         if extra_setter is not None:
             extra_setter(self, new_value)
 
