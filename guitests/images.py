@@ -37,10 +37,10 @@ def main():
         box.append(label)
 
         button = widgets.ImageButton(image)
-        button.on_click.append(print)
+        button.on_click.connect(print)
         box.append(button)
 
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

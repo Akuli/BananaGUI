@@ -41,7 +41,7 @@ class _Ranged:
       value             The widget's current value.
                         This needs to be in valuerange and it's the
                         smallest value of valuerange by default.
-      on_value_changed  List of callbacks that are ran when value changes.
+      on_value_changed  A callback that runs when value changes.
     """
     # Subclasses should get a valuerange argument on initialization,
     # set the valuerange attribute to it and set the _value attribute

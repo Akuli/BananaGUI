@@ -35,9 +35,9 @@ def on_check(checkbox):
 def main():
     with widgets.Window("Checkbox test") as window:
         checkbox = widgets.Checkbox("Check me!")
-        checkbox.on_checked_changed.append(on_check)
+        checkbox.on_checked_changed.connect(on_check)
         window.add(checkbox)
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

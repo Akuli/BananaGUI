@@ -31,15 +31,15 @@ class SliderBox(widgets.Box):
         values = range(0, 51, 5)
 
         hslider = widgets.Slider.horizontal(values)
-        hslider.on_value_changed.append(self.value_changed)
+        hslider.on_value_changed.connect(self.value_changed)
         self.append(hslider)
 
         vslider = widgets.Slider.vertical(values)
-        vslider.on_value_changed.append(self.value_changed)
+        vslider.on_value_changed.connect(self.value_changed)
         self.append(vslider)
 
         spinbox = widgets.Spinbox(values, expand=(True, False))
-        spinbox.on_value_changed.append(self.value_changed)
+        spinbox.on_value_changed.connect(self.value_changed)
         self.append(spinbox)
 
     def value_changed(self, called_widget):
@@ -54,7 +54,7 @@ class SliderBox(widgets.Box):
 def main():
     with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
         window.add(SliderBox.horizontal())
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

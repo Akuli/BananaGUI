@@ -32,7 +32,7 @@ class Button(Child):
         super().__init__(bananawidget)
 
     def _do_click(self, button):
-        self.bananawidget.run_callbacks('on_click')
+        self.bananawidget.on_click.run()
 
     def set_text(self, text):
         self.real_widget.set_label(text)

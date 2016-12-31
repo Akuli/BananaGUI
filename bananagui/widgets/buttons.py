@@ -27,6 +27,7 @@ from .basewidgets import Child
 
 
 @types.add_property('text', type=str)
+@types.add_callback('on_click')
 class Button(Child):
     r"""A button that displays text in it.
 
@@ -38,15 +39,13 @@ class Button(Child):
     Attributes:
       text      The text in the button.
                 An empty string by default.
-      on_click  List of callbacks that are ran when the button is
-                clicked.
+      on_click  A callback that runs when the button is clicked.
     """
 
     can_focus = True
 
     def __init__(self, text='', **kwargs):
         self._text = ''
-        self.on_click = []
         wrapperclass = bananagui._get_wrapper('widgets.buttons:Button')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
@@ -57,6 +56,7 @@ class Button(Child):
 
 
 @types.add_property('image', type=images.Image, allow_none=True)
+@types.add_callback('on_click')
 class ImageButton(Child):
     r"""A button that displays an image.
 
@@ -71,17 +71,15 @@ class ImageButton(Child):
         `---------------'
 
     Attributes:
-      image         The image displayed in the button or None.
-                    Setting this copies the image.
-      on_click      List of callbacks that are ran when the button is
-                    clicked.
+      image     The image displayed in the button or None.
+                Setting this copies the image.
+      on_click  A callback that runs when the button is clicked.
     """
 
     can_focus = True
 
     def __init__(self, image=None, **kwargs):
         self._image = None
-        self.on_click = []
         wrapperclass = bananagui._get_wrapper('widgets.buttons:ImageButton')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)

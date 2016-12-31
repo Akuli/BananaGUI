@@ -35,7 +35,7 @@ def main():
     print(toplabel)
     print(bottomlabel)
 
-    window.on_close.append(mainloop.quit)
+    window.on_close.connect(mainloop.quit)
     mainloop.run()
 
 

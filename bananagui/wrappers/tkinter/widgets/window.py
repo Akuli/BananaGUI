@@ -57,7 +57,7 @@ class _BaseWindow(Bin):
             self.set_minimum_size(self.bananawidget.minimum_size)
 
     def _do_delete(self):
-        self.bananawidget.run_callbacks('on_close')
+        self.bananawidget.on_close.run()
 
     def set_title(self, title):
         self.real_widget.title(title)

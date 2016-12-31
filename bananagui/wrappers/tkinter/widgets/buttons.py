@@ -32,7 +32,7 @@ class Button(Child):
         return widget
 
     def _do_click(self, event=None):
-        self.bananawidget.run_callbacks('on_click')
+        self.bananawidget.on_click.run()
 
     @run_when_ready
     def set_text(self, text):

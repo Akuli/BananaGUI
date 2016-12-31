@@ -33,22 +33,22 @@ class TextEditWindow(widgets.Window):
         self.add(bigbox)
 
         self.textedit = widgets.TextEdit("Enter something...")
-        self.textedit.on_text_changed.append(self.text_changed)
+        self.textedit.on_text_changed.connect(self.text_changed)
         bigbox.append(self.textedit)
 
         buttonbox = widgets.Box.horizontal(expand=(True, False))
         bigbox.append(buttonbox)
 
         addbutton = widgets.Button("Add text")
-        addbutton.on_click.append(self.add_text)
+        addbutton.on_click.connect(self.add_text)
         buttonbox.append(addbutton)
 
         clearbutton = widgets.Button("Clear")
-        clearbutton.on_click.append(self.clear)
+        clearbutton.on_click.connect(self.clear)
         buttonbox.append(clearbutton)
 
         selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.append(self.select_all)
+        selectallbutton.on_click.connect(self.select_all)
         buttonbox.append(selectallbutton)
 
     def text_changed(self, textedit):
@@ -68,7 +68,7 @@ class TextEditWindow(widgets.Window):
 def main():
     with TextEditWindow("TextEdit test",
                         minimum_size=(300, 200)) as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

@@ -26,7 +26,7 @@ import itertools
 import traceback
 
 
-class Callback:
+class _Callback:
     """An object like signals in Qt GTK+ and bindings in tkinter.
 
     You can connect functions to callbacks with the connect() method,
@@ -169,35 +169,6 @@ class BananaObject:
         """
         return []
 
-    @contextlib.contextmanager
-    def block(self, callback_attribute):
-        """Prevent callbacks from running temporarily.
-
-        Blocking is instance-specific.
-        """
-        if not isinstance(callback_attribute, str):
-            raise TypeError("invalid attribute name %r"
-                            % (callback_attribute,))
-        if callback_attribute in self._blocked:
-            raise RuntimeError("cannot block %r twice"
-                               % (callback_attribute,))
-
-        self._blocked.add(callback_attribute)
-        try:
-            yield
-        finally:
-            self._blocked.remove(callback_attribute)
-
-    def run_callbacks(self, callback_attribute, *extra_args):
-        """Run each callback in self.CALLBACK_ATTRIBUTE.
-
-        This does nothing if the callback is blocked. The callbacks are
-        ran with the widget and extra_args as arguments.
-        """
-        if callback_attribute not in self._blocked:
-            for callback in getattr(self, callback_attribute):
-                callback(self, *extra_args)
-
 
 # TODO: Use _prop_NAME instead of _NAME?
 def add_property(name, *, add_changed=False, allow_none=False,
@@ -236,7 +207,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
     >>> def user_callback(arg):
     ...     print("callback called with arg", arg)
     ...
-    >>> thing.on_test_changed.append(user_callback)
+    >>> thing.on_test_changed.connect(user_callback)
     >>> thing.test = 'even newer test'
     wrapper sets test to even newer test
     callback called with arg <the thingy object>
@@ -246,10 +217,9 @@ def add_property(name, *, add_changed=False, allow_none=False,
     sets the _NAME attribute to the new value and doesn't do anything
     else.
 
-    If add_changed is True, an on_NAME_changed list will be created and
-    everything in it will be called when the value is set to a new
-    value that is not equal to the old value. The callbacks will get
-    the instance as an argument.
+    If add_changed is True, an on_NAME_changed callback will be added.
+    It will be ran when the value is set to a new value that is not
+    equal to the old value.
 
     The property's docstring will be doc. Other arguments will be used
     for checking the value, and the extra_setter will be called after
@@ -308,24 +278,12 @@ def add_property(name, *, add_changed=False, allow_none=False,
         getattr(self._wrapper, 'set_' + name)(new_value)
 
         if add_changed:
-            self.run_callbacks('on_%s_changed' % name)
+            getattr(self, 'on_%s_changed' % name).run()
 
     def inner(cls):
         setattr(cls, name, property(getter, setter))
-
         if add_changed:
-            def changed_getter(self):
-                try:
-                    return getattr(self, '__on_%s_changed' % name)
-                except AttributeError:
-                    setattr(self, '__on_%s_changed' % name, [])
-                    return getattr(self, '__on_%s_changed' % name)
-
-            changed_getter.__doc__ = (
-                "List of callbacks that are ran "
-                "when the value of %r changes." % name)
-            setattr(cls, 'on_%s_changed' % name, property(changed_getter))
-
+            add_callback('on_%s_changed' % name)(cls)
         return cls
 
     return inner
@@ -357,7 +315,7 @@ def add_callback(name):
         try:
             return getattr(self, '__callback_' + name)
         except AttributeError:
-            setattr(self, '__callback_' + name, Callback(self, name))
+            setattr(self, '__callback_' + name, _Callback(self, name))
             return getattr(self, '__callback_' + name)
 
     def inner(cls):

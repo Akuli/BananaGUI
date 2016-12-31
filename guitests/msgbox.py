@@ -35,7 +35,7 @@ class DialogTest(widgets.Window):
                    self.choose_color]
         for text, method in zip(texts, methods):
             button = widgets.Button(text)
-            button.on_click.append(method)
+            button.on_click.connect(method)
             box.append(button)
 
     def info(self, infobutton):
@@ -81,7 +81,7 @@ def close_callback(window):
 def main():
     with DialogTest("Dialog test") as window:
         del window.on_close[0]     # The default handler.
-        window.on_close.append(close_callback)
+        window.on_close.connect(close_callback)
         mainloop.run()
 
 

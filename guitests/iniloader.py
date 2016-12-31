@@ -12,9 +12,9 @@ def main():
     with open(os.path.join('guitests', 'testgui.ini'), 'r') as f:
         widgetdict = iniloader.load(f)
     pprint.pprint(widgetdict)
-    widgetdict['button'].on_click.append(click)
+    widgetdict['button'].on_click.connect(click)
     with widgetdict['window'] as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

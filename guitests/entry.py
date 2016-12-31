@@ -32,7 +32,7 @@ class EntryBox(widgets.Box):
 
         # This is attached to self because we need it in other methods.
         self.entry = widgets.Entry(expand=(True, False))
-        self.entry.on_text_changed.append(self.text_changed)
+        self.entry.on_text_changed.connect(self.text_changed)
         self.append(self.entry)
 
         self.append(widgets.Dummy())
@@ -41,24 +41,24 @@ class EntryBox(widgets.Box):
         self.append(buttonbox)
 
         resetbutton = widgets.Button("Reset")
-        resetbutton.on_click.append(self.reset)
+        resetbutton.on_click.connect(self.reset)
         buttonbox.append(resetbutton)
 
         selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.append(self.select_all)
+        selectallbutton.on_click.connect(self.select_all)
         buttonbox.append(selectallbutton)
 
         focusbutton = widgets.Button("Focus")
-        focusbutton.on_click.append(self.get_focus)
+        focusbutton.on_click.connect(self.get_focus)
         buttonbox.append(focusbutton)
 
         grayedcheckbox = widgets.Checkbox("Grayed out")
-        grayedcheckbox.on_checked_changed.append(
+        grayedcheckbox.on_checked_changed.connect(
             self.grayed_out_toggled)
         buttonbox.append(grayedcheckbox)
 
         secretcheckbox = widgets.Checkbox("Secret")
-        secretcheckbox.on_checked_changed.append(self.secret_toggled)
+        secretcheckbox.on_checked_changed.connect(self.secret_toggled)
         buttonbox.append(secretcheckbox)
 
         self.reset()
@@ -92,7 +92,7 @@ def main():
         # EntryBox(orientation=bananagui.VERTICAL), so taking keyword
         # arguments in __init__ is enough.
         window.add(EntryBox.vertical())
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

@@ -44,6 +44,38 @@ class Widget(types.BananaObject):
                              "the main loop")
         return super(Widget, cls).__new__(cls)
 
+    def __init__(self):
+        if not hasattr(self, '_wrapper'):
+            # A subclass didn't override this and define a _wrapper.
+            cls = type(self)
+            raise TypeError("cannot create instances of %s.%s directly, "
+                            "instantiate a subclass instead"
+                            % (cls.__module__, cls.__name__))
+
+    def __repr__(self):
+        parts = self._repr_parts()
+        if not parts:
+            return super().__repr__()
+        cls = type(self)
+        return '<%s.%s object, %s>' % (
+            cls.__module__, cls.__name__, ', '.join(parts))
+
+    def _repr_parts(self):
+        """Return an empty list to make super() usage easier.
+
+        The __repr__ value is constructed from the module and name of
+        the class, and the return value of _repr_parts. This method
+        should return a list of things that will be joined with a comma
+        to create the __repr__. The default __repr__ is used if
+        _repr_parts returns an empty list.
+
+        It's recommended to do something like this in _repr_parts:
+
+            def _repr_parts(self):
+                return ['thing=stuff'] + super()._repr_parts()
+        """
+        return []
+
     @property
     def real_widget(self):
         return self._wrapper.real_widget

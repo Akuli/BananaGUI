@@ -48,7 +48,7 @@ class Checkbox(Child):
       text                  The text next to the checkbox.
       checked               True if the checkbox is checked currently.
                             False by default.
-      on_checked_changed    List of callbacks that are called on (un)check.
+      on_checked_changed    A callback that runs on (un)check.
     """
 
     can_focus = True

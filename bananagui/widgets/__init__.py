@@ -42,6 +42,6 @@ from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, TextEdit
 #from .trayicon import TrayIcon
-from .window import BaseWindow, Window, Dialog
+from .window import BaseWindow, Window, Dialog, default_closer
 
 _fix_modules(set(dir()) - _old_dir - {'_old_dir'})

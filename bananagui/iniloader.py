@@ -91,7 +91,7 @@ another file, and load it from a Python file like this:
 
     # Now widgetdict is the namespace dictionary.
     with widgetdict['window'] as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 Section names and the keys in the sections must be valid variable
@@ -378,7 +378,7 @@ def _preview():
             mainloop.quit()
 
     for window in windows:
-        window.on_close.append(do_close)
+        window.on_close.connect(do_close)
 
     # There's no need to worry about closing the windows because
     # mainloop.quit() is not called until they are all closed.

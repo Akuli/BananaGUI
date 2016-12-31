@@ -36,7 +36,7 @@ def main():
         label = widgets.Label("this is aligned to\n" + name, align=align)
         box.append(label)
 
-    window.on_close.append(mainloop.quit)
+    window.on_close.connect(mainloop.quit)
     mainloop.run()
 
 

@@ -34,7 +34,7 @@ class TextBase(Child):
 
     Attributes:
       text              The text in the widget.
-      on_text_changed   List of callbacks that run when the text changes.
+      on_text_changed   A callback that runs when the text changes.
     """
     # TODO: Add fonts and colors.
 

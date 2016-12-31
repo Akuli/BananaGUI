@@ -15,7 +15,7 @@ from bananagui import mainloop, widgets
 bananagui.load('.tkinter')  # if you have it installed, try '.gtk3' also :)
 with widgets.Window("Hello World") as window:
     window.add(widgets.Label("Hello World!"))
-    window.on_close.append(mainloop.quit)
+    window.on_close.connect(mainloop.quit)
     mainloop.run()
 ```
 
@@ -46,7 +46,7 @@ def main():
     widgetdict = iniloader.load_ini(INI)
     # Now widgetdict is a dictionary.
     with widgetdict['window'] as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 if __name__ == '__main__':
@@ -191,7 +191,7 @@ class Checkbox(Child)
  |    text                  The text next to the checkbox.
  |    checked               True if the checkbox is checked currently.
  |                          False by default.
- |    on_checked_changed    List of callbacks that are called on (un)check.
+ |    on_checked_changed    A callback that runs on (un)check.
  |
  |  Method resolution order:
  |      Checkbox
@@ -202,7 +202,7 @@ class Checkbox(Child)
  |
  |  Methods defined here:
  |
- |  __init__(self, parent, text='', *, checked=False, **kwargs)
+ |  __init__(self, text='', *, checked=False, **kwargs)
 ...
 ```
 

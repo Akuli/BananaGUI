@@ -46,8 +46,8 @@ class _BaseWindow(Bin):
             self.bananawidget.size = (width, height)
 
     def _do_delete_event(self, widget, event):
-        self.bananawidget.run_callbacks('on_close')
-        return True  # Block GTK's delete-event handling.
+        self.bananawidget.on_close.run()
+        return True     # Block GTK's event handling.
 
     def set_title(self, title):
         self.real_widget.set_title(title)

@@ -41,6 +41,10 @@ def _sizecheck(window, size):
                          % (size, window.minimum_size))
 
 
+def default_closer(window):
+    window.close()
+
+
 @types.add_property('title', type=str, extra_setter=_closecheck)
 @types.add_property('resizable', type=bool, extra_setter=_closecheck)
 @types.add_property('size', type=int, how_many=2, extra_setter=_sizecheck,
@@ -48,6 +52,7 @@ def _sizecheck(window, size):
 @types.add_property('minimum_size', type=int, minimum=0, how_many=2,
                     add_changed=True, extra_setter=_closecheck)
 @types.add_property('hidden', type=bool, extra_setter=_closecheck)
+@types.add_callback('on_close')
 class BaseWindow(Bin):
     """A window baseclass.
 
@@ -72,7 +77,7 @@ class BaseWindow(Bin):
                         integers. Adding widgets to the window may
                         change this, so setting this on initialization
                         is not supported.
-      on_size_changed   List of callbacks that are ran when size changes.
+      on_size_changed   A callback that runs when size changes.
       minimum_size      Two-tuple of smallest allowed width and height.
                         If the content of the window take up more space
                         than this, this is ignored. This is (0, 0) by
@@ -82,12 +87,13 @@ class BaseWindow(Bin):
                         Hiding the window is easier than creating a new
                         window when a window with the same content
                         needs to be displayed multiple times.
-      on_close          List of callbacks that run when the user tries to
+      on_close          A callback that runs when the user tries to
                         close the window.
-                        This contains a callback that calls close() by
-                        default. You can remove it or replace it with
-                        something else. This doesn't run when close()
-                        is called.
+                        This is connected to default_closer by default.
+                        You can disconnect it if you don't want to
+                        handle the window closing yourself.
+                        Note that this callback doesn't run when
+                        close() is called.
       closed            True if close() has been called.
     """
     # Most things check that the window is closed. Things that come
@@ -105,7 +111,7 @@ class BaseWindow(Bin):
         self._size = (200, 200)
         self._minimum_size = (0, 0)
         self._hidden = False
-        self.on_close = [lambda w: w.close()]
+        self.on_close.connect(default_closer)
         self.closed = False
         super().__init__(child, **kwargs)
         self.resizable = resizable

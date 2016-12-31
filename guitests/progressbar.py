@@ -45,7 +45,7 @@ def main():
 
         spinbox = widgets.Spinbox(valuerange=range(101), expand=(True, False))
         spin_callback = functools.partial(set_progress, progressbar)
-        spinbox.on_value_changed.append(spin_callback)
+        spinbox.on_value_changed.connect(spin_callback)
         box.append(spinbox)
 
         box.append(widgets.Dummy())
@@ -56,10 +56,10 @@ def main():
 
         checkbox = widgets.Checkbox("Bouncing", expand=(True, False))
         check_callback = functools.partial(toggle_bouncing, bouncingbar)
-        checkbox.on_checked_changed.append(check_callback)
+        checkbox.on_checked_changed.connect(check_callback)
         box.append(checkbox)
 
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

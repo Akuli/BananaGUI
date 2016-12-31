@@ -39,11 +39,11 @@ class SpinnerWindow(widgets.Window):
         mainbox.append(buttonbox)
 
         startbutton = widgets.Button("Start")
-        startbutton.on_click.append(self.start)
+        startbutton.on_click.connect(self.start)
         buttonbox.append(startbutton)
 
         stopbutton = widgets.Button("Stop")
-        stopbutton.on_click.append(self.stop)
+        stopbutton.on_click.connect(self.stop)
         buttonbox.append(stopbutton)
 
     def start(self, startbutton):
@@ -57,7 +57,7 @@ class SpinnerWindow(widgets.Window):
 
 def main():
     with SpinnerWindow("Spinner window") as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

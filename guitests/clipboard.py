@@ -39,11 +39,11 @@ class ClipboardTestWindow(widgets.Window):
         mainbox.append(buttonbox)
 
         copybutton = widgets.Button("Copy everything")
-        copybutton.on_click.append(self.copy)
+        copybutton.on_click.connect(self.copy)
         buttonbox.append(copybutton)
 
         pastebutton = widgets.Button("Paste to the end")
-        pastebutton.on_click.append(self.paste)
+        pastebutton.on_click.connect(self.paste)
         buttonbox.append(pastebutton)
 
     def copy(self, copybutton):
@@ -59,7 +59,7 @@ class ClipboardTestWindow(widgets.Window):
 
 def main():
     with ClipboardTestWindow("Clipboard test") as window:
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

@@ -14,7 +14,7 @@ def main():
         window.add(widgets.Scroller(label))
         print(window.child)
 
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         mainloop.run()
 
 

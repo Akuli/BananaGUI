@@ -30,10 +30,10 @@ def resize(window):
 
 def main():
     with widgets.Window("Hello World!") as window:
-        window.on_size_changed.append(resize)
+        window.on_size_changed.connect(resize)
         label = widgets.Label("Hello World!")
         window.add(label)
-        window.on_close.append(mainloop.quit)
+        window.on_close.connect(mainloop.quit)
         print(window)
         mainloop.run()
 
