@@ -115,8 +115,3 @@ class Image:
         imagetype = _guess_imagetype(path, imagetype)
         self._wrapper.save(path, imagetype)
         self._path = path
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())

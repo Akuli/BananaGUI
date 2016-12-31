@@ -237,8 +237,3 @@ def add_property(name, *, add_changed=False, allow_none=False,
         return cls
 
     return inner
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())

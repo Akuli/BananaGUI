@@ -150,8 +150,3 @@ except AttributeError:
             current.append(part)
             importlib.import_module('.'.join(current))
         return importlib.import_module(modulename)
-
-
-if __name__ == '__main__':
-    import doctest
-    print(doctest.testmod())
