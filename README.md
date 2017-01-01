@@ -232,7 +232,7 @@ have this.
 ```
 
 So we know that it's a `tkinter.Checkbutton` and we know its memory
-address. But if we have multiple checkboxes, that isn't really useful
+address. But if we have more than one checkbox, that isn't really useful
 for distinguishing them from each other.
 
 Let's do the same thing with BananaGUI:
