@@ -1,3 +1,24 @@
+# Copyright (c) 2016-2017 Akuli
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 """Classes for using images with BananaGUI."""
 
 import os
@@ -11,7 +32,7 @@ _imagetypes = ('gif', 'png')
 
 
 def _guess_imagetype(path, default):
-    """Type-check the arguments and extract the imagetype from filename.
+    """Extract the imagetype from filename.
 
     >>> _guess_imagetype('a/b/c/coolpic.PNg', None)
     'png'
@@ -22,10 +43,6 @@ def _guess_imagetype(path, default):
       ...
     ValueError: cannot guess imagetype from 'whatever'
     """
-    if not isinstance(path, str):
-        raise TypeError("path should be a string, not %r" % (path,))
-    if not (default is None or isinstance(default, str)):
-        raise TypeError("imagetypes should be strings, not %r" % (path,))
     if default is None:
         filename = os.path.basename(path)
         if '.' not in filename:
@@ -51,11 +68,32 @@ class Image:
     def __init__(self, path, imagetype=None):
         """Load an Image from a file.
 
-        See the class documentation for more information about filetypes.
+        See bananagui.images.Image documentation for more information about
+        filetypes.
         """
+        if not isinstance(path, str):
+            raise TypeError("path should be a string, not %r" % (path,))
+        if not (imagetype is None or isinstance(imagetype, str)):
+            raise TypeError("imagetype should be a string, not %r"
+                            % (imagetype,))
         imagetype = _guess_imagetype(path, imagetype)
         wrapperclass = bananagui._get_wrapper('images:Image')
         self._wrapper, self._size = wrapperclass.from_file(path, imagetype)
+        self._path = path
+
+    def save(self, path, imagetype=None):
+        """Save the image to a file.
+
+        See bananagui.images.Image documentation for more information about
+        filetypes.
+        """
+        if not isinstance(path, str):
+            raise TypeError("path should be a string, not %r" % (path,))
+        if not (imagetype is None or isinstance(imagetype, str)):
+            raise TypeError("imagetype should be a string, not %r"
+                            % (imagetype,))
+        imagetype = _guess_imagetype(path, imagetype)
+        self._wrapper.save(path, imagetype)
         self._path = path
 
     @classmethod
@@ -63,9 +101,10 @@ class Image:
         """Create a new, fully transparent Image from width and height."""
         for value in (width, height):
             if not isinstance(value, int):
-                raise TypeError("expected an integer, got %r" % (value,))
+                raise TypeError("width and height must be integers, not %r"
+                                % (value,))
             if value < 0:
-                raise ValueError("%r is negative" % (value,))
+                raise ValueError("negative width/height %r" % (value,))
         wrapperclass = bananagui._get_wrapper('images:Image')
         self = cls.__new__(cls)     # Don't run __init__.
         self._wrapper = wrapperclass.from_size(width, height)
@@ -106,12 +145,3 @@ class Image:
         copy._size = self._size
         copy._path = self._path
         return copy
-
-    def save(self, path, imagetype=None):
-        """Save the image to a file.
-
-        See the class documentation for more information about filetypes.
-        """
-        imagetype = _guess_imagetype(path, imagetype)
-        self._wrapper.save(path, imagetype)
-        self._path = path
