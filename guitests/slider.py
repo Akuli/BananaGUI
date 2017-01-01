@@ -38,9 +38,12 @@ def main():
         window.add(mainbox)
 
         left_side = widgets.Box()
-        hslider = widgets.Slider(values)
+        hslider = widgets.Slider(values, expand=(True, False))
         spinbox = widgets.Spinbox(values, expand=(True, False))
-        left_side.extend([hslider, spinbox])
+        left_side.extend([
+            widgets.Dummy(), hslider,
+            widgets.Dummy(), spinbox,
+            widgets.Dummy()])
         mainbox.append(left_side)
 
         vslider = widgets.Slider(values, bananagui.VERTICAL)

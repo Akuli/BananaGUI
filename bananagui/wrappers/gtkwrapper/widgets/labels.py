@@ -28,7 +28,7 @@ from .basewidgets import Child
 haligns_and_justifys = {
     bananagui.LEFT: (Gtk.Align.START, Gtk.Justification.LEFT),
     bananagui.CENTER: (Gtk.Align.CENTER, Gtk.Justification.FILL),
-    bananagui.RIGHT: (Gtk.Aligh.END, Gtk.Justification.RIGHT),
+    bananagui.RIGHT: (Gtk.Align.END, Gtk.Justification.RIGHT),
 }
 
 

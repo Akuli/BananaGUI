@@ -124,14 +124,11 @@ def _get_wrapper(name):
         return getattr(wrappermodule, attribute)
     except (ImportError, AttributeError):
         # Use a default, if any.
-        pass
-
-    try:
-        defaultmodule = utils.import_module(
-            'bananagui.wrappers.defaults.' + modulename)
-        return getattr(defaultmodule, attribute)
-    except (ImportError, AttributeError):
-        # We don't have a default :(
-        pass
-
-    raise NotImplementedError("cannot find a wrapper for %s" % name)
+        try:
+            defaultmodule = utils.import_module(
+                'bananagui.wrappers.defaults.' + modulename)
+            return getattr(defaultmodule, attribute)
+        except (ImportError, AttributeError) as e:
+            # We don't have a default :(
+            msg = "cannot find a wrapper for %s" % name
+            raise NotImplementedError(msg) from e
