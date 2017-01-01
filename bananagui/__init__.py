@@ -32,18 +32,9 @@ from bananagui import mainloop, utils
 
 
 __author__ = 'Akuli'
-__copyright__ = 'Copyright (c) 2016 Akuli'
+__copyright__ = 'Copyright (c) 2016-2017 Akuli'
 __license__ = 'MIT'
 __version__ = '0.1-dev'
-__all__ = [
-    # Submodules.
-    'color', 'font', 'iniloader', 'mainloop', 'msgbox', 'widgets',
-
-    # Things defined here.
-    'HORIZONTAL', 'VERTICAL', 'LEFT', 'CENTER', 'RIGHT', 'RUN_AGAIN',
-    'load',
-]
-
 
 # These constants can be used with these variables or with their values
 # directly.
