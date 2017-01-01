@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,9 +25,6 @@ import bananagui
 from .basewidgets import Child, run_when_ready
 
 
-justifys = {bananagui.LEFT: 'left',
-            bananagui.RIGHT: 'right',
-            bananagui.CENTER: 'center'}
 anchors = {bananagui.LEFT: 'w',
            bananagui.CENTER: 'center',
            bananagui.RIGHT: 'e'}
@@ -44,7 +41,7 @@ class Label(Child):
 
     @run_when_ready
     def set_align(self, align):
-        self.real_widget['justify'] = justifys[align]
+        self.real_widget['justify'] = align.name.lower()
         self.real_widget['anchor'] = anchors[align]
 
     @run_when_ready

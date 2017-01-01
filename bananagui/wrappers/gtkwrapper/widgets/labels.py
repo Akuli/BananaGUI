@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,12 +25,11 @@ import bananagui
 from .basewidgets import Child
 
 
-justifys = {bananagui.LEFT: Gtk.Justification.LEFT,
-            bananagui.CENTER: Gtk.Justification.CENTER,
-            bananagui.RIGHT: Gtk.Justification.RIGHT}
-aligns = {bananagui.LEFT: Gtk.Align.START,
-          bananagui.CENTER: Gtk.Align.FILL,
-          bananagui.RIGHT: Gtk.Align.END}
+haligns_and_justifys = {
+    bananagui.LEFT: (Gtk.Align.START, Gtk.Justification.LEFT),
+    bananagui.CENTER: (Gtk.Align.CENTER, Gtk.Justification.FILL),
+    bananagui.RIGHT: (Gtk.Aligh.END, Gtk.Justification.RIGHT),
+}
 
 
 class Label(Child):
@@ -43,7 +42,8 @@ class Label(Child):
         self.real_widget.set_text(text)
 
     def set_align(self, align):
-        self.real_widget.set_halign(aligns[align])
-        self.real_widget.set_justify(justifys[align])
+        halign, justify = haligns_and_justifys[align]
+        self.real_widget.set_halign(halign)
+        self.real_widget.set_justify(justify)
 
     # TODO: implement set_image.

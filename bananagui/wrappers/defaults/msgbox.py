@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -21,6 +21,7 @@
 
 import functools
 
+import bananagui
 from bananagui import widgets
 
 
@@ -33,11 +34,11 @@ def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
     result = None
     dialog = widgets.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
-    mainbox = widgets.Box.vertical()
+    mainbox = widgets.Box()
     dialog.add(mainbox)
 
     mainbox.append(widgets.Label(text=message))
-    buttonbox = widgets.Box.horizontal(expand=(True, False))
+    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
     mainbox.append(buttonbox)
 
     focus_this = None

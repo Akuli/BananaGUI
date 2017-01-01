@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,17 +22,16 @@
 import tkinter as tk
 
 from bananagui import utils
-from . import tkinter_orients
 from .basewidgets import Child, run_when_ready
 
 
 class Slider(Child):
 
-    def __init__(self, bananawidget, orientation, valuerange):
+    def __init__(self, bananawidget, orient, valuerange):
         self._minimum = min(valuerange)
         self._maximum = max(valuerange)
         self._step = utils.rangestep(valuerange)
-        self._orient = tkinter_orients[orientation]
+        self._orient = orient.name.lower()
         super().__init__(bananawidget)
 
     def create_widget(self, parent):

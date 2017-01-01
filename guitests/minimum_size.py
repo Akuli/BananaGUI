@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -43,7 +43,7 @@ def main():
     # a difference (it shouldn't).
     with widgets.Window("Minimum size test",
                         minimum_size=(1, 1)) as window:
-        box = widgets.Box.vertical()
+        box = widgets.Box()
         window.add(box)
 
         label = widgets.Label('hidden')

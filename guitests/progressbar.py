@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -34,7 +34,7 @@ def set_bouncing(bouncingbar, checkbox):
 
 def main():
     with widgets.Window("Progress bar test") as window:
-        box = widgets.Box.vertical()
+        box = widgets.Box()
         window.add(box)
 
         progressbar = widgets.Progressbar(expand=(True, False))

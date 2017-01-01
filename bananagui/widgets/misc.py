@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,7 +23,7 @@
 
 import bananagui
 from bananagui import types
-from .basewidgets import _Oriented, Child
+from .basewidgets import Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
 # TODO: move Checkbox, Radiostuff and stuff like that to a checkboxes.py?
@@ -85,7 +85,7 @@ class Dummy(Child):
         super().__init__(**kwargs)
 
 
-class Separator(_Oriented, Child):
+class Separator(Child):
     """A horizontal or vertical line.
 
                         ||
@@ -96,15 +96,27 @@ class Separator(_Oriented, Child):
 
     Usually there's no need to add separators between widgets, but they
     are sometimes useful.
+
+    Attributes:
+      orient    The orient set on initialization, converted to a
+                bananagui.Orient.
     """
 
-    def __init__(self, *, orientation, **kwargs):
+    def __init__(self, orient=bananagui.HORIZONTAL, **kwargs):
+        self.__orient = bananagui.Orient(orient)
         # Make the separator expand correctly by default.
-        if orientation == bananagui.HORIZONTAL:
+        if self.__orient == bananagui.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
-        if orientation == bananagui.VERTICAL:
+        if self.__orient == bananagui.VERTICAL:
             kwargs.setdefault('expand', (False, True))
         wrapperclass = bananagui._get_wrapper('widgets.misc:Separator')
-        self._wrapper = wrapperclass(self, orientation)
-        self.orientation = orientation
+        self._wrapper = wrapperclass(self, self.__orient)
         super().__init__(**kwargs)
+
+    def _repr_parts(self):
+        return (['orient=bananagui.%s' % self.orient.name]
+                + super()._repr_parts())
+
+    @property
+    def orient(self):
+        return self.__orient

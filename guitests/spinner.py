@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -36,13 +36,13 @@ def stop(spinner):
 
 def main():
     with widgets.Window("Spinner window") as window:
-        mainbox = widgets.Box.vertical()
+        mainbox = widgets.Box()
         window.add(mainbox)
 
         spinner = widgets.Spinner()
         mainbox.append(spinner)
 
-        buttonbox = widgets.Box.horizontal(expand=(True, False))
+        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
         mainbox.append(buttonbox)
 
         startbutton = widgets.Button("Start")

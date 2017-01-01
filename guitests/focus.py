@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -35,7 +35,7 @@ def main():
                "should move to the other button.")
 
     with widgets.Window("Focus test", minimum_size=(250, 150)) as window:
-        box = widgets.Box.vertical()
+        box = widgets.Box()
         window.add(box)
 
         label = widgets.Label(message)

@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,25 +19,26 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import bananagui
 from bananagui import mainloop, widgets
 
 
 def main():
     window = widgets.Window("Separator test")
 
-    bigbox = widgets.Box.vertical()
+    bigbox = widgets.Box()
     window.add(bigbox)
 
     toplabel = widgets.Label("Top")
     bigbox.append(toplabel)
-    hsep = widgets.Separator.horizontal()
+    hsep = widgets.Separator()
     bigbox.append(hsep)
     print(hsep)
-    bottombox = widgets.Box.horizontal()
+    bottombox = widgets.Box(bananagui.HORIZONTAL)
     bigbox.append(bottombox)
 
     bottombox.append(widgets.Label("Bottom left"))
-    vsep = widgets.Separator.vertical()
+    vsep = widgets.Separator(bananagui.VERTICAL)
     bottombox.append(vsep)
     print(vsep)
     bottombox.append(widgets.Label("Bottom right"))

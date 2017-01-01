@@ -25,7 +25,7 @@ from bananagui import mainloop, widgets
 def main():
     window = widgets.Window("Tooltip test")
 
-    box = widgets.Box.vertical()
+    box = widgets.Box()
     window.add(box)
 
     toplabel = widgets.Label("Top label!", tooltip="Top label tooltip!")

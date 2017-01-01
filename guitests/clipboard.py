@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,6 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import bananagui
 from bananagui import clipboard, mainloop, widgets
 
 
@@ -36,7 +37,7 @@ def paste_to_entry(entry):
 
 def main():
     with widgets.Window("Clipboard test") as window:
-        mainbox = widgets.Box.vertical()
+        mainbox = widgets.Box()
         window.add(mainbox)
 
         entry = widgets.Entry(expand=(True, False))
@@ -44,7 +45,7 @@ def main():
 
         mainbox.append(widgets.Dummy())
 
-        buttonbox = widgets.Box.horizontal(expand=(True, False))
+        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
         mainbox.append(buttonbox)
 
         copybutton = widgets.Button("Copy everything")

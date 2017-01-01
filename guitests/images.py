@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,6 +23,7 @@
 
 import os
 
+import bananagui
 from bananagui import images, mainloop, widgets
 
 
@@ -30,7 +31,7 @@ def main():
     with widgets.Window("Image test") as window:
         image = images.Image(os.path.join('guitests', 'banana.png'))
 
-        box = widgets.Box.horizontal()
+        box = widgets.Box(bananagui.HORIZONTAL)
         window.add(box)
 
         label = widgets.ImageLabel(image)

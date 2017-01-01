@@ -124,3 +124,16 @@ except AttributeError:
             current.append(part)
             importlib.import_module('.'.join(current))
         return importlib.import_module(modulename)
+
+
+def global_members(modulename):
+    """A decorator that exposes Enum members as global variables."""
+    module = import_module(modulename)
+
+    def inner(the_enum):
+        # Iterating over the enum doesn't include aliases.
+        for name, member in the_enum.__members__.items():
+            setattr(module, name, member)
+        return the_enum
+
+    return inner

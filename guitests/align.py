@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@ from bananagui import mainloop, widgets
 
 def main():
     window = widgets.Window("Label align test")
-    box = widgets.Box.vertical()
+    box = widgets.Box()
     window.add(box)
 
     names = ['left', 'center', 'right']

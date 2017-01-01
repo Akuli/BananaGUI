@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -31,7 +31,7 @@ except ImportError:
 
 import bananagui
 from bananagui import utils
-from .basewidgets import Parent, Child, _Oriented
+from .basewidgets import Parent, Child
 
 
 _wrong_parent_msg = (
@@ -103,7 +103,7 @@ class Bin(Parent):
         # child._parent is left as is here.
 
 
-class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
+class Box(abcoll.MutableSequence, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
         ,----------.
@@ -131,22 +131,36 @@ class Box(abcoll.MutableSequence, _Oriented, Parent, Child):
         children = box[:]
         random.shuffle(children)
         box[:] = children
+
+    Attributes:
+      orient    The orient set on initialization, converted to a
+                bananagui.Orient member.
     """
     # The wrapper should define append and remove methods.
 
-    def __init__(self, *, orientation, **kwargs):
+    def __init__(self, orient=bananagui.VERTICAL, **kwargs):
+        """Initialize the Box."""
+        self.__orient = bananagui.Orient(orient)
         self.__children = []
         wrapperclass = bananagui._get_wrapper('widgets.containers:Box')
-        self._wrapper = wrapperclass(self, orientation)
-        self.orientation = orientation
+        self._wrapper = wrapperclass(self, self.__orient)
         super().__init__(**kwargs)
 
+    @property
+    def orient(self):
+        return self.__orient
+
     def _repr_parts(self):
-        end = "one child" if len(self) == 1 else "%d children" % len(self)
-        return super()._repr_parts() + ["contains " + end]
+        parts = super()._repr_parts()
+        parts.append('orient=bananagui.%s' % self.orient.name)
+        if len(self) == 1:
+            parts.append("contains one child")
+        else:
+            parts.append("contains %d children" % len(self))
+        return parts
 
     def _get_children(self):
-        return self
+        return self     # self is iterable.
 
     def __set_children(self, new):
         assert len(new) == len(set(new)), "cannot add same child twice"

@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,8 +27,7 @@ from .basewidgets import Child
 
 
 @types.add_property('text', type=str)
-@types.add_property('align', choices={bananagui.LEFT, bananagui.CENTER,
-                                      bananagui.RIGHT})
+@types.add_property('align', type=bananagui.Align)
 class Label(Child):
     """A widget that displays text.
 
@@ -38,6 +37,8 @@ class Label(Child):
 
     Attributes:
       text      The text in the label.
+      align     A bananagui.HAlign member that describes how the text
+                is aligned.
     """
     # TODO: Add fonts and colors?
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -194,42 +194,3 @@ class Child(Widget):
         if self.grayed_out:
             parts.append('grayed_out=True')
         return parts
-
-
-_orientation_names = {bananagui.HORIZONTAL: 'horizontal',
-                      bananagui.VERTICAL: 'vertical'}
-
-
-class _Oriented:
-    """Implement an orientation attribute and handy class methods.
-
-    There are many ways to create instances of _Oriented subclasses. For
-    example, all of these do the same thing:
-
-        SomeWidget(..., orientation=bananagui.HORIZONTAL)
-        SomeWidget(..., orientation='h')
-        SomeWidget.horizontal(...)
-
-    Attributes:
-      orientation       The orientation set on initialization.
-    """
-
-    # Subclasses should define self.orientation from a keyword-only
-    # orientation argument.
-    def __init__(self, *args, **kwargs):
-        assert self.orientation in {bananagui.HORIZONTAL, bananagui.VERTICAL}
-        super().__init__(*args, **kwargs)
-
-    def _repr_parts(self):
-        name = _orientation_names[self.orientation]
-        return [name] + super()._repr_parts()
-
-    @classmethod
-    def horizontal(cls, *args, **kwargs):
-        """Create and return a new horizontal instance."""
-        return cls(*args, orientation=bananagui.HORIZONTAL, **kwargs)
-
-    @classmethod
-    def vertical(cls, *args, **kwargs):
-        """Create and return a new vertical instance"""
-        return cls(*args, orientation=bananagui.VERTICAL, **kwargs)

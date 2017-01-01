@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -39,7 +39,7 @@ def reset_text(entry):
 
 def main():
     with widgets.Window("Entry test") as window:
-        entrybox = widgets.Box.vertical()
+        entrybox = widgets.Box()
         window.add(entrybox)
 
         entry = widgets.Entry("Enter something...", expand=(True, False))
@@ -48,7 +48,7 @@ def main():
 
         entrybox.append(widgets.Dummy())
 
-        buttonbox = widgets.Box.horizontal(expand=(True, False))
+        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
         entrybox.append(buttonbox)
 
         resetbutton = widgets.Button("Reset")

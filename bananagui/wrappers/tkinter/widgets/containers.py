@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -56,8 +56,8 @@ _appendsides = {
 
 class Box(Parent, Child):
 
-    def __init__(self, bananawidget, orientation):
-        self.orientation = orientation
+    def __init__(self, bananawidget, orient):
+        self.orient = orient
         super().__init__(bananawidget)
 
     def create_widget(self, parent):
@@ -67,7 +67,7 @@ class Box(Parent, Child):
     def append(self, child):
         self._prepare_add(child)
         child.real_widget.pack(
-            side=_appendsides[self.bananawidget.orientation],
+            side=_appendsides[self.bananawidget.orient],
             fill=tkinter_fills[child.bananawidget.expand],
         )
         # Make pack expand it correctly.
@@ -75,5 +75,5 @@ class Box(Parent, Child):
 
     @run_when_ready
     def remove(self, child):
-        child.real_widget.pack_forget()
         self._prepare_remove(child)
+        child.real_widget.pack_forget()

@@ -21,6 +21,7 @@
 
 """BananaGUI TextEdit test."""
 
+import bananagui
 from bananagui import mainloop, widgets
 
 
@@ -38,14 +39,14 @@ def add_text(textedit):
 
 def main():
     with widgets.Window("TextEdit test", minimum_size=(300, 200)) as window:
-        bigbox = widgets.Box.vertical()
+        bigbox = widgets.Box()
         window.add(bigbox)
 
         textedit = widgets.TextEdit("Enter something...")
         textedit.on_text_changed.connect(text_changed, textedit)
         bigbox.append(textedit)
 
-        buttonbox = widgets.Box.horizontal(expand=(True, False))
+        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
         bigbox.append(buttonbox)
 
         addbutton = widgets.Button("Add text")

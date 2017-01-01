@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,7 +23,7 @@
 
 import bananagui
 from bananagui import types, utils
-from .basewidgets import Child, _Oriented
+from .basewidgets import Child
 
 
 def _valuecheck(widget, value):
@@ -90,7 +90,7 @@ class Spinbox(_Ranged, Child):
             self.value = value
 
 
-class Slider(_Oriented, _Ranged, Child):
+class Slider(_Ranged, Child):
     """A slider for selecting a number.
 
         |
@@ -103,13 +103,21 @@ class Slider(_Oriented, _Ranged, Child):
     me know and I'll implement it.
     """
 
-    def __init__(self, valuerange, *, orientation,
+    def __init__(self, valuerange, orient=bananagui.HORIZONTAL, *,
                  value=None, **kwargs):
-        self.orientation = orientation
+        self.__orient = bananagui.Orient(orient)
         self.valuerange = valuerange
         self._value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Slider')
-        self._wrapper = wrapperclass(self, orientation, valuerange)
+        self._wrapper = wrapperclass(self, self.__orient, valuerange)
         super().__init__(**kwargs)
         if value is not None:
             self.value = value
+
+    @property
+    def orient(self):
+        return self.__orient
+
+    def _repr_parts(self):
+        return (['orient=bananagui.%s' % self.orient.name]
+                + super()._repr_parts())

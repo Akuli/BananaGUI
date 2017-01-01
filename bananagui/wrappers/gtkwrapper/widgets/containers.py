@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -52,14 +52,14 @@ _expand_indexes = {
 
 class Box(Child):
 
-    def __init__(self, bananawidget, orientation):
-        self.real_widget = Gtk.Box(orientation=orientations[orientation])
+    def __init__(self, bananawidget, orient):
+        self.real_widget = Gtk.Box(orientation=orientations[orient])
         super().__init__(bananawidget)
 
     def append(self, child):
         # TODO: What if the widget is added and then its expandiness is
         # changed?
-        expandindex = _expand_indexes[self.bananawidget.orientation]
+        expandindex = _expand_indexes[self.bananawidget.orient]
         expand = child.bananawidget.expand[expandindex]
         self.real_widget.pack_start(child.real_widget, expand, expand, 0)
         child.real_widget.show()

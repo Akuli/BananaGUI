@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,32 +23,34 @@ import bananagui
 from bananagui import mainloop, widgets
 
 
-def value_changed(called_widget, box):
-    for widget in box:
-        if widget is not called_widget:
-            # This doesn't recurse too much because changed callbacks
-            # don't run if the old and new value are equal.
-            widget.value = called_widget.value
+def value_changed(called_widget, *other_widgets):
+    for widget in other_widgets:
+        # This doesn't recurse too much because changed callbacks
+        # don't run if the old and new value are equal.
+        widget.value = called_widget.value
 
 
 def main():
     with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
-        box = widgets.Box.horizontal()
-        window.add(box)
-
         values = range(0, 51, 5)
 
-        hslider = widgets.Slider.horizontal(values)
-        hslider.on_value_changed.connect(value_changed, hslider, box)
-        box.append(hslider)
+        mainbox = widgets.Box(bananagui.HORIZONTAL)
+        window.add(mainbox)
 
-        vslider = widgets.Slider.vertical(values)
-        vslider.on_value_changed.connect(value_changed, vslider, box)
-        box.append(vslider)
-
+        left_side = widgets.Box()
+        hslider = widgets.Slider(values)
         spinbox = widgets.Spinbox(values, expand=(True, False))
-        spinbox.on_value_changed.connect(value_changed, spinbox, box)
-        box.append(spinbox)
+        left_side.extend([hslider, spinbox])
+        mainbox.append(left_side)
+
+        vslider = widgets.Slider(values, bananagui.VERTICAL)
+        mainbox.append(vslider)
+
+        # Python's sets are awesome.
+        all_widgets = {hslider, vslider, spinbox}
+        for this in all_widgets:
+            others = all_widgets - {this}
+            this.on_value_changed.connect(value_changed, this, *others)
 
         window.on_close.connect(mainloop.quit)
         mainloop.run()
