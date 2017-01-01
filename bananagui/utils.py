@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -60,32 +60,6 @@ def common_beginning(*iterables):
     except StopIteration:
         pass
     return result
-
-
-# TODO: do we need this?
-def find_attribute(attribute, *objects):
-    """Get an attribute from any of objects.
-
-    >>> class Thing:
-    ...     pass
-    ...
-    >>> a = Thing()
-    >>> b = Thing()
-    >>> a.stuff = 'a stuff'
-    >>> b.stuff = 'b stuff'
-    >>> b.stuff2 = 'b stuff 2'
-    >>> find_attribute('stuff', a, b)
-    'a stuff'
-    >>> find_attribute('stuff2', a, b)
-    'b stuff 2'
-    """
-    for obj in objects:
-        try:
-            return getattr(obj, attribute)
-        except AttributeError:
-            pass
-    raise AttributeError("none of the objects have an attribute %r"
-                         % attribute)
 
 
 def rangestep(range_object):
