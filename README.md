@@ -218,7 +218,7 @@ accessed like `some_bananagui_widget.real_widget`.
 When writing BananaGUI, I try to create informative error messages and
 representations to make debugging easier. For example, let's create a
 checkbox with tkinter and then have a look at it on the interactive
-`>>>` prompt. This problem isn't tkinter-specific, GTK+ and PyQt5 also
+`>>>` prompt. This problem isn't tkinter-specific, GTK+ and PyQt also
 have this.
 
 ```py
