@@ -127,8 +127,8 @@ class BaseWindow(Bin):
         """Close the window and set the closed attribute to True.
 
         This method can be called multiple times and it will do nothing
-        after the first call. It's not recommended to override this, add
-        a callback to the on_close list instead.
+        after the first call. It's not recommended to override this,
+        connect a function to the on_close callback instead.
         """
         if not self.closed:
             self._wrapper.close()
