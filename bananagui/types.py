@@ -34,7 +34,7 @@ except ImportError:
 
 
 class _Callback:
-    """An object like signals in Qt GTK+ and bindings in tkinter.
+    """An object like bindings in tkinter or signals in Qt and GTK+.
 
     You can connect functions to callbacks with the connect() method,
     and they will be called when BananaGUI runs the callback.
