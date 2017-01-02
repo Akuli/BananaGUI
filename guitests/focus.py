@@ -21,8 +21,6 @@
 
 """Focusing GUI test."""
 
-import functools
-
 from bananagui import mainloop, widgets
 
 

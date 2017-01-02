@@ -24,7 +24,6 @@
 import os
 
 import bananagui
-from bananagui import utils
 
 
 # Other imagetypes may be supported, but these are guaranteed to work.

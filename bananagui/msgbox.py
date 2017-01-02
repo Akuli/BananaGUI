@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,7 +22,6 @@
 """Simple message box functions."""
 
 from gettext import gettext as _
-
 try:
     import collections.abc as abcoll
 except ImportError:
@@ -62,7 +61,8 @@ def _msgfunc(name, doc):
             raise ValueError("default button %r not in buttons"
                              % (defaultbutton,))
         wrapperfunc = bananagui._get_wrapper('msgbox:%s' % name)
-        return wrapperfunc(parentwindow, message, title, buttons, defaultbutton)
+        return wrapperfunc(parentwindow, message, title,
+                           buttons, defaultbutton)
 
     # __qualname__ doesn't do anything on Python 3.2, but having it
     # doesn't matter.

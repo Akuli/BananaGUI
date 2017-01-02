@@ -21,8 +21,7 @@
 
 """Base classes for various widgets."""
 
-import bananagui
-from bananagui import images, mainloop, types
+from bananagui import mainloop, types
 
 
 class Widget:

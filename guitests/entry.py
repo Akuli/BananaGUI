@@ -32,7 +32,7 @@ def set_grayed_out(entry, checkbox):
 def set_secret(entry, checkbox):
     entry.secret = checkbox.checked
 
-    
+
 def reset_text(entry):
     entry.text = "Enter something..."
 

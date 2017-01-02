@@ -22,10 +22,8 @@
 """Things that BananaGUI uses internally."""
 
 import contextlib
-import itertools
 import sys
 import traceback
-
 try:
     import collections.abc as abcoll
 except ImportError:

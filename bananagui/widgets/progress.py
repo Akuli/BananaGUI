@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -70,7 +70,8 @@ class BouncingProgressbar(Child):
 
     def __init__(self, *, bouncing=False, **kwargs):
         self._bouncing = False
-        wrapperclass = bananagui._get_wrapper('widgets.progress:BouncingProgressbar')
+        wrapperclass = bananagui._get_wrapper(
+            'widgets.progress:BouncingProgressbar')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.bouncing = bouncing

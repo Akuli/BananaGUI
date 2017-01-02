@@ -21,8 +21,6 @@
 
 """BananaGUI size test."""
 
-import functools
-
 from bananagui import mainloop, widgets
 
 instructions = ("The window should always fully show\n"

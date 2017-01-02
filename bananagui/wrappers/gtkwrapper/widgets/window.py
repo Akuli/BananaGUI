@@ -19,11 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import functools
-
 from gi.repository import Gdk, GLib, Gtk
 
-import bananagui.color
 from .. import GTK_VERSION
 from .parents import Bin
 
