@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -33,11 +33,11 @@ def _fix_modules(names):
 
 _old_dir = set(dir())
 
-from .basewidgets import Widget, Parent, Child
+from .basewidgets import Widget, Child
 from .buttons import Button, ImageButton
-from .containers import Bin, Box, Scroller
 from .labels import Label, ImageLabel
 from .misc import Checkbox, Dummy, Separator
+from .parents import Parent, Bin, Box, Scroller
 from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, TextEdit

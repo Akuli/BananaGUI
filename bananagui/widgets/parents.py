@@ -20,9 +20,9 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """Parent subclasses."""
-
 # TODO: Add a grid widget.
 
+import abc
 try:
     import collections.abc as abcoll
 except ImportError:
@@ -31,16 +31,45 @@ except ImportError:
 
 import bananagui
 from bananagui import utils
-from .basewidgets import Parent, Child
+from .basewidgets import Child, Widget
 
 
-_wrong_parent_msg = (
-    "the child widget has already been in another widget, "
-    "it can't be added to this widget anymore. See "
-    "help('bananagui.widgets.Child').")
+# This and Bin aren't based on Child because Window is based on Bin.
+class Parent(Widget, metaclass=abc.ABCMeta):
+    """A base class for widgets that contain other widgets."""
+
+    def _prepare_add(self, child):
+        """Make sure child can be added to self and make it ready for it."""
+        if not isinstance(child, Child):
+            raise TypeError("expected a Child widget, got %r" % (child,))
+        if child._parent is None:
+            child._parent = self
+        elif child._parent is not self:
+            raise RuntimeError(
+                "the child widget has already been in another widget, "
+                "it can't be added to this widget anymore. See "
+                "help('bananagui.widgets.Child').")
+
+    def iter_children(self, *, recursive=False):
+        """Yield all children of this Parent widget.
+
+        If recursive is True, also yield all of the childrens'
+        children. This is consistent and works the same way with
+        different kinds of Parent widgets.
+        """
+        # Subclasses should provide _get_children().
+        for child in self._get_children():
+            yield child
+            if recursive and isinstance(child, Parent):
+                # yield from is new in Python 3.3.
+                for subchild in child.iter_children(recursive=True):
+                    yield subchild
+
+    @abc.abstractmethod
+    def _get_children(self):
+        """Return an iterable of all child widgets this widget has."""
 
 
-# This is not a Child because Window is based on this.
 class Bin(Parent):
     """A widget that may contain one child widget.
 
@@ -78,12 +107,7 @@ class Bin(Parent):
         """
         if self.child is not None:
             raise RuntimeError("there's already a child, cannot add()")
-        if not isinstance(child, Child):
-            raise TypeError("expected a Child widget, got %r" % (child,))
-        if child._parent is None:
-            child._parent = self
-        elif child._parent is not self:
-            raise RuntimeError(_wrong_parent_msg)
+        self._prepare_add(child)
         self._wrapper.add(child._wrapper)
         self.__child = child
 
@@ -142,7 +166,7 @@ class Box(abcoll.MutableSequence, Parent, Child):
         """Initialize the Box."""
         self.__orient = bananagui.Orient(orient)
         self.__children = []
-        wrapperclass = bananagui._get_wrapper('widgets.containers:Box')
+        wrapperclass = bananagui._get_wrapper('widgets.parents:Box')
         self._wrapper = wrapperclass(self, self.__orient)
         super().__init__(**kwargs)
 
@@ -167,18 +191,13 @@ class Box(abcoll.MutableSequence, Parent, Child):
         old = self[:]
 
         # TODO: Maybe old and new have something else in common than the
-        # beginning? Optimize this.
+        #       beginning? Optimize this.
         common = utils.common_beginning(old, new)
         for child in old[common:]:
             self._wrapper.remove(child._wrapper)
         for child in new[common:]:
-            assert isinstance(child, Child)
-            if child._parent is None:
-                child._parent = self
-            elif child._parent is not self:
-                raise RuntimeError(_wrong_parent_msg)
+            self._prepare_add(child)
             self._wrapper.append(child._wrapper)
-
         self.__children = new
 
     def __setitem__(self, item, value):
@@ -228,6 +247,6 @@ class Scroller(Bin, Child):
     """
 
     def __init__(self, *args, **kwargs):
-        wrapperclass = bananagui._get_wrapper('widgets.containers:Scroller')
+        wrapperclass = bananagui._get_wrapper('widgets.parents:Scroller')
         self._wrapper = wrapperclass(self)
         super().__init__(*args, **kwargs)

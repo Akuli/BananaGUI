@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -23,7 +23,7 @@
 
 import bananagui
 from bananagui import types
-from .containers import Bin
+from .parents import Bin
 
 
 def _closecheck(window, junk=None):

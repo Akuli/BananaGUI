@@ -23,7 +23,37 @@ import tkinter as tk
 
 import bananagui
 from . import tkinter_fills
-from .basewidgets import Child, Parent, run_when_ready
+from .basewidgets import Child, Widget, run_when_ready
+
+
+class Parent(Widget):
+
+    def __init__(self, bananawidget):
+        # This is for compatibility with run_when_ready().
+        if not hasattr(self, 'parent'):
+            self.parent = None
+        super().__init__(bananawidget)
+
+    def create(self, parent):
+        # self can be a Child, and there's no guarantees about which
+        # order Parent and Child appear in the mro. Window and Dialog
+        # objects also have this method, but it's never called.
+        if hasattr(super(), 'create'):
+            # It's a Child, not a Window or Dialog.
+            assert parent is not None
+            super().create(parent)
+        for child in self.bananawidget.iter_children():
+            child._wrapper.create(self)
+
+    def _prepare_add(self, child):
+        """Prepare a child for being added to this widget."""
+        child._packed = True
+        if child.real_widget is None:
+            child.create(self)
+
+    def _prepare_remove(self, child):
+        """Prepare a child for being removed from this widget."""
+        child._packed = False
 
 
 class Bin(Parent):

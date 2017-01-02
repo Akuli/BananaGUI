@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -92,12 +92,6 @@ class _Tooltip:
             label.pack()
 
 
-_expand_indexes = {
-    bananagui.HORIZONTAL: 0,
-    bananagui.VERTICAL: 1,
-}
-
-
 def run_when_ready(method):
     @functools.wraps(method)
     def inner(self, *args, **kwargs):
@@ -122,35 +116,10 @@ class Widget:
         self.real_widget.focus()
 
 
-class Parent(Widget):
-
-    def __init__(self, bananawidget):
-        # This is for compatibility with run_when_ready().
-        if not hasattr(self, 'parent'):
-            self.parent = None
-        super().__init__(bananawidget)
-
-    def create(self, parent):
-        # self can be a subclass of Child, and there's no guarantees
-        # about which order Parent and Child appear in the mro. Window
-        # and Dialog objects also have this method, but it's never
-        # called.
-        if hasattr(super(), 'create'):
-            # It's a Child, not a Window or Dialog.
-            assert parent is not None
-            super().create(parent)
-        for child in self.bananawidget.iter_children():
-            child._wrapper.create(self)
-
-    def _prepare_add(self, child):
-        """Prepare a child for being added to this widget."""
-        child._packed = True
-        if child.real_widget is None:
-            child.create(self)
-
-    def _prepare_remove(self, child):
-        """Prepare a child for being removed from this widget."""
-        child._packed = False
+_expand_indexes = {
+    bananagui.HORIZONTAL: 0,
+    bananagui.VERTICAL: 1,
+}
 
 
 class Child(Widget):
@@ -166,7 +135,7 @@ class Child(Widget):
     def __init__(self, bananawidget):
         self.todo = []
         self.parent = None
-        self._packed = False  # See also containers.py.
+        self._packed = False  # See also parents.py.
         self.real_widget = None
         super().__init__(bananawidget)
 

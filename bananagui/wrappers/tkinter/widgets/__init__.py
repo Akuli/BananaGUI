@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,14 +19,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# flake8: noqa
-
-import bananagui
-
-tkinter_orients = {
-    bananagui.HORIZONTAL: 'horizontal',
-    bananagui.VERTICAL: 'vertical',
-}
 tkinter_fills = {
     # {BananaGUI expand: tkinter's fill option, ...}
     (True, True): 'both',

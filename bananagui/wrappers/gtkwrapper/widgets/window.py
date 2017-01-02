@@ -25,7 +25,7 @@ from gi.repository import Gdk, GLib, Gtk
 
 import bananagui.color
 from .. import GTK_VERSION
-from .containers import Bin
+from .parents import Bin
 
 
 class _BaseWindow(Bin):
