@@ -52,13 +52,6 @@ def _sizecheck(window, size):
 class BaseWindow(Bin):
     """A window baseclass.
 
-    BananaGUI windows have a close() method, and it should be called
-    when you don't need the window anymore. The windows can also be used
-    as context managers, and the closing will be done automatically:
-
-        with widgets.Window("Test window") as the_window:
-            ...
-
     There's no maximum_size attribute because X doesn't support maximum
     sizes that well. Tkinter implements a maximum size on X, but it
     does that by moving the window to the upper left corner when it's

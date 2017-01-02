@@ -90,9 +90,8 @@ another file, and load it from a Python file like this:
         widgetdict = iniloader.load(f)
 
     # Now widgetdict is the namespace dictionary.
-    with widgetdict['window'] as window:
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    widgetdict['window'].on_close.connect(mainloop.quit)
+    mainloop.run()
 
 Section names and the keys in the sections must be valid variable
 names, except the class key that specifies the constructor.
