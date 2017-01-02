@@ -45,6 +45,8 @@ def test_init_run_quit(dummywrapper):
     with pytest.raises(RuntimeError):
         mainloop.run()  # needs to be initialized
 
+    mainloop.init()  # for other tests
+
 
 def broken_callback(*args):
     assert args == (1, 2, 3)
