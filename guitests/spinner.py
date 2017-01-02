@@ -21,6 +21,7 @@
 
 """BananaGUI spinner test."""
 
+import bananagui
 from bananagui import mainloop, widgets
 
 
