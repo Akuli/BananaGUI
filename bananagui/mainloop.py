@@ -21,6 +21,8 @@
 
 """The BananaGUI main loop."""
 
+import sys
+import traceback
 import warnings
 
 import bananagui
@@ -67,8 +69,8 @@ def quit():
         bananagui._get_wrapper('mainloop:quit')()
 
 
-def add_timeout(milliseconds, callback, *args, **kwargs):
-    """Run callback(*args, **kwargs) after waiting.
+def add_timeout(milliseconds, callback, *args):
+    """Run callback(*args) after waiting.
 
     If the function returns bananagui.RUN_AGAIN it will be called again
     after waiting again. Depending on the GUI toolkit, this may or may
@@ -83,8 +85,17 @@ def add_timeout(milliseconds, callback, *args, **kwargs):
     if milliseconds <= 0:
         raise ValueError("non-positive timeout %d" % milliseconds)
 
+    add_timeout_call = traceback.format_stack()[-2]
+
     def real_callback():
-        result = callback(*args, **kwargs)
+        try:
+            result = callback(*args)
+        except Exception as e:
+            # We can magically show where add_timeout() was called.
+            lines = traceback.format_exception(type(e), e, e.__traceback__)
+            lines.insert(1, add_timeout_call)
+            sys.stderr.writelines(lines)
+            return None     # Don't run again.
         if result not in {None, bananagui.RUN_AGAIN}:
             warnings.warn("BananaGUI callback %r returned %r, expected "
                           "None or RUN_AGAIN" % (callback, result),
