@@ -93,7 +93,7 @@ def add_timeout(milliseconds, callback, *args):
         except Exception as e:
             # We can magically show where add_timeout() was called.
             lines = traceback.format_exception(type(e), e, e.__traceback__)
-            lines.insert(1, add_timeout_call)
+            lines.insert(1, add_timeout_call)  # After 'Traceback (bla bla):'.
             sys.stderr.writelines(lines)
             return None     # Don't run again.
         if result not in {None, bananagui.RUN_AGAIN}:
