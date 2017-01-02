@@ -170,7 +170,7 @@ class Window(BaseWindow):
     windows like this.
     """
 
-    def __init__(self, title='', **kwargs):
+    def __init__(self, title="BananaGUI Window", **kwargs):
         if not isinstance(title, str):
             raise TypeError("window title needs to be a string, not %r"
                             % (title,))
