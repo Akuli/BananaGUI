@@ -104,10 +104,10 @@ class Child(Widget):
     removed from the parent widget and added into it again, but it
     cannot be added to other parent widgets. Example:
 
-        box1 = widgets.Box.horizontal()
-        box2 = widgets.Box.horizontal()
+        box1 = widgets.Box()
+        box2 = widgets.Box()
         label = widgets.Label()     # label doesn't have a parent
-        box1.append(label)          # label's parent is box1
+        box1.append(label)          # label's parent is now box1
         box1.remove(label)          # label's parent is still box1
         box2.append(label)          # this raises an exception!
 
