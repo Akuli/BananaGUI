@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,10 +19,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from .basewidgets import Child, Parent
+from .basewidgets import Child, Widget
 
 
-class Bin(Parent):
+class Bin(Widget):
 
     def add(self, child):
         pass
@@ -31,7 +31,7 @@ class Bin(Parent):
         pass
 
 
-class Box(Parent, Child):
+class Box(Child):
 
     def __init__(self, bananawidget, orientation):
         self.orientation = orientation

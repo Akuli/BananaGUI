@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -28,10 +28,6 @@ class Widget:
 
     def focus(self):
         pass
-
-
-class Parent(Widget):
-    pass
 
 
 class Child(Widget):
