@@ -36,26 +36,27 @@ def stop(spinner):
 
 
 def main():
-    with widgets.Window("Spinner window") as window:
-        mainbox = widgets.Box()
-        window.add(mainbox)
+    window = widgets.Window("Spinner window")
 
-        spinner = widgets.Spinner()
-        mainbox.append(spinner)
+    mainbox = widgets.Box()
+    window.add(mainbox)
 
-        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
-        mainbox.append(buttonbox)
+    spinner = widgets.Spinner()
+    mainbox.append(spinner)
 
-        startbutton = widgets.Button("Start")
-        startbutton.on_click.connect(start, spinner)
-        buttonbox.append(startbutton)
+    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    mainbox.append(buttonbox)
 
-        stopbutton = widgets.Button("Stop")
-        stopbutton.on_click.connect(stop, spinner)
-        buttonbox.append(stopbutton)
+    startbutton = widgets.Button("Start")
+    startbutton.on_click.connect(start, spinner)
+    buttonbox.append(startbutton)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    stopbutton = widgets.Button("Stop")
+    stopbutton.on_click.connect(stop, spinner)
+    buttonbox.append(stopbutton)
+
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

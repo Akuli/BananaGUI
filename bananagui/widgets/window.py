@@ -139,13 +139,6 @@ class BaseWindow(Bin):
         _closecheck(self)
         self._wrapper.wait()
 
-    def __enter__(self):
-        _closecheck(self)
-        return self
-
-    def __exit__(self, *error):
-        self.close()
-
 
 class Window(BaseWindow):
     """A window that can have child windows.

@@ -36,28 +36,28 @@ def paste_to_entry(entry):
 
 
 def main():
-    with widgets.Window("Clipboard test") as window:
-        mainbox = widgets.Box()
-        window.add(mainbox)
+    window = widgets.Window("Clipboard test")
+    mainbox = widgets.Box()
+    window.add(mainbox)
 
-        entry = widgets.Entry(expand=(True, False))
-        mainbox.append(entry)
+    entry = widgets.Entry(expand=(True, False))
+    mainbox.append(entry)
 
-        mainbox.append(widgets.Dummy())
+    mainbox.append(widgets.Dummy())
 
-        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
-        mainbox.append(buttonbox)
+    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    mainbox.append(buttonbox)
 
-        copybutton = widgets.Button("Copy everything")
-        copybutton.on_click.connect(copy_from_entry, entry)
-        buttonbox.append(copybutton)
+    copybutton = widgets.Button("Copy everything")
+    copybutton.on_click.connect(copy_from_entry, entry)
+    buttonbox.append(copybutton)
 
-        pastebutton = widgets.Button("Paste to the end")
-        pastebutton.on_click.connect(paste_to_entry, entry)
-        buttonbox.append(pastebutton)
+    pastebutton = widgets.Button("Paste to the end")
+    pastebutton.on_click.connect(paste_to_entry, entry)
+    buttonbox.append(pastebutton)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

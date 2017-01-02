@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -33,12 +33,12 @@ def do_check(checkbox):
 
 
 def main():
-    with widgets.Window("Checkbox test") as window:
-        checkbox = widgets.Checkbox("Check me!")
-        checkbox.on_checked_changed.connect(do_check, checkbox)
-        window.add(checkbox)
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window = widgets.Window("Checkbox test")
+    checkbox = widgets.Checkbox("Check me!")
+    checkbox.on_checked_changed.connect(do_check, checkbox)
+    window.add(checkbox)
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

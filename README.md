@@ -13,10 +13,10 @@ import bananagui
 from bananagui import mainloop, widgets
 
 bananagui.load('.tkinter')  # if you have it installed, try '.gtk3' also :)
-with widgets.Window("Hello World") as window:
-    window.add(widgets.Label("Hello World!"))
-    window.on_close.connect(mainloop.quit)
-    mainloop.run()
+window = widgets.Window("Hello World")
+window.add(widgets.Label("Hello World!"))
+window.on_close.connect(mainloop.quit)
+mainloop.run()
 ```
 
 You can also write your GUI using the .ini format and then load it with
@@ -45,9 +45,8 @@ def main():
     bananagui.load('.tkinter')
     widgetdict = iniloader.load_ini(INI)
     # Now widgetdict is a dictionary.
-    with widgetdict['window'] as window:
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    widgetdict['window'].on_close.connect(mainloop.quit)
+    mainloop.run()
 
 if __name__ == '__main__':
     main()

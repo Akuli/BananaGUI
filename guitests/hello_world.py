@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -25,10 +25,10 @@ from bananagui import mainloop, widgets
 
 
 def main():
-    with widgets.Window("Hello World!") as window:
-        window.add(widgets.Label("Hello World!"))
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window = widgets.Window("Hello World!")
+    window.add(widgets.Label("Hello World!"))
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

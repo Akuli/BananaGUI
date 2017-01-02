@@ -31,32 +31,32 @@ def value_changed(called_widget, *other_widgets):
 
 
 def main():
-    with widgets.Window("Slider test", minimum_size=(300, 200)) as window:
-        values = range(0, 51, 5)
+    values = range(0, 51, 5)
 
-        mainbox = widgets.Box(bananagui.HORIZONTAL)
-        window.add(mainbox)
+    window = widgets.Window("Slider test", minimum_size=(300, 200))
+    mainbox = widgets.Box(bananagui.HORIZONTAL)
+    window.add(mainbox)
 
-        left_side = widgets.Box()
-        hslider = widgets.Slider(values, expand=(True, False))
-        spinbox = widgets.Spinbox(values, expand=(True, False))
-        left_side.extend([
-            widgets.Dummy(), hslider,
-            widgets.Dummy(), spinbox,
-            widgets.Dummy()])
-        mainbox.append(left_side)
+    left_side = widgets.Box()
+    hslider = widgets.Slider(values, expand=(True, False))
+    spinbox = widgets.Spinbox(values, expand=(True, False))
+    left_side.extend([
+        widgets.Dummy(), hslider,
+        widgets.Dummy(), spinbox,
+        widgets.Dummy()])
+    mainbox.append(left_side)
 
-        vslider = widgets.Slider(values, bananagui.VERTICAL)
-        mainbox.append(vslider)
+    vslider = widgets.Slider(values, bananagui.VERTICAL)
+    mainbox.append(vslider)
 
-        # Python's sets are awesome.
-        all_widgets = {hslider, vslider, spinbox}
-        for this in all_widgets:
-            others = all_widgets - {this}
-            this.on_value_changed.connect(value_changed, this, *others)
+    # Python's sets are awesome.
+    all_widgets = {hslider, vslider, spinbox}
+    for this in all_widgets:
+        others = all_widgets - {this}
+        this.on_value_changed.connect(value_changed, this, *others)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

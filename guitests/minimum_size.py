@@ -39,19 +39,18 @@ def on_click(label, button):
 def main():
     # minimum_size=(1, 1) tests if setting it on initialization makes
     # a difference (it shouldn't).
-    with widgets.Window("Minimum size test",
-                        minimum_size=(1, 1)) as window:
-        box = widgets.Box()
-        window.add(box)
+    window = widgets.Window("Minimum size test", minimum_size=(1, 1))
+    box = widgets.Box()
+    window.add(box)
 
-        label = widgets.Label('hidden')
-        box.append(label)
-        button = widgets.Button("Show instructions")
-        button.on_click.connect(on_click, label, button)
-        box.append(button)
+    label = widgets.Label('hidden')
+    box.append(label)
+    button = widgets.Button("Show instructions")
+    button.on_click.connect(on_click, label, button)
+    box.append(button)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

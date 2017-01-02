@@ -38,35 +38,36 @@ def add_text(textedit):
 
 
 def main():
-    with widgets.Window("TextEdit test", minimum_size=(300, 200)) as window:
-        bigbox = widgets.Box()
-        window.add(bigbox)
+    window = widgets.Window("TextEdit test", minimum_size=(300, 200))
 
-        textedit = widgets.TextEdit("Enter something...")
-        textedit.on_text_changed.connect(text_changed, textedit)
-        bigbox.append(textedit)
+    bigbox = widgets.Box()
+    window.add(bigbox)
 
-        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
-        bigbox.append(buttonbox)
+    textedit = widgets.TextEdit("Enter something...")
+    textedit.on_text_changed.connect(text_changed, textedit)
+    bigbox.append(textedit)
 
-        addbutton = widgets.Button("Add text")
-        addbutton.on_click.connect(add_text, textedit)
-        buttonbox.append(addbutton)
+    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    bigbox.append(buttonbox)
 
-        clearbutton = widgets.Button("Clear")
-        clearbutton.on_click.connect(clear, textedit)
-        buttonbox.append(clearbutton)
+    addbutton = widgets.Button("Add text")
+    addbutton.on_click.connect(add_text, textedit)
+    buttonbox.append(addbutton)
 
-        selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.connect(textedit.select_all)
-        buttonbox.append(selectallbutton)
+    clearbutton = widgets.Button("Clear")
+    clearbutton.on_click.connect(clear, textedit)
+    buttonbox.append(clearbutton)
 
-        focusbutton = widgets.Button("Focus")
-        focusbutton.on_click.connect(textedit.focus)
-        buttonbox.append(focusbutton)
+    selectallbutton = widgets.Button("Select all")
+    selectallbutton.on_click.connect(textedit.select_all)
+    buttonbox.append(selectallbutton)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    focusbutton = widgets.Button("Focus")
+    focusbutton.on_click.connect(textedit.focus)
+    buttonbox.append(focusbutton)
+
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

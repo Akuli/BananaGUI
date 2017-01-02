@@ -28,21 +28,21 @@ from bananagui import images, mainloop, widgets
 
 
 def main():
-    with widgets.Window("Image test") as window:
-        image = images.Image(os.path.join('guitests', 'banana.png'))
+    window = widgets.Window("Image test")
+    image = images.Image(os.path.join('guitests', 'banana.png'))
 
-        box = widgets.Box(bananagui.HORIZONTAL)
-        window.add(box)
+    box = widgets.Box(bananagui.HORIZONTAL)
+    window.add(box)
 
-        label = widgets.ImageLabel(image)
-        box.append(label)
+    label = widgets.ImageLabel(image)
+    box.append(label)
 
-        button = widgets.ImageButton(image)
-        button.on_click.connect(print, button)
-        box.append(button)
+    button = widgets.ImageButton(image)
+    button.on_click.connect(print, button)
+    box.append(button)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':

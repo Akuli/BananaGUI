@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -22,13 +22,6 @@
 import os
 import subprocess
 import sys
-
-try:
-    import faulthandler
-    faulthandler.enable()
-except ImportError:
-    # I think faulthandler is new in... maybe 3.4? I don't know.
-    pass
 
 
 here = os.path.dirname(os.path.abspath(__file__))

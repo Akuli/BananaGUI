@@ -66,20 +66,20 @@ def do_close(window):
 
 
 def main():
-    with widgets.Window("Dialog test") as window:
-        box = widgets.Box()
-        window.add(box)
+    window = widgets.Window("Dialog test")
+    box = widgets.Box()
+    window.add(box)
 
-        texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
-        functions = [info, warning, error, question, choose_color]
-        for text, function in zip(texts, functions):
-            button = widgets.Button(text)
-            button.on_click.connect(function, window)
-            box.append(button)
+    texts = ["Info", "Warning", "Error", "Question", "Choose a color"]
+    functions = [info, warning, error, question, choose_color]
+    for text, function in zip(texts, functions):
+        button = widgets.Button(text)
+        button.on_click.connect(function, window)
+        box.append(button)
 
-        window.on_close.disconnect(window.close)
-        window.on_close.connect(do_close, window)
-        mainloop.run()
+    window.on_close.disconnect(window.close)
+    window.on_close.connect(do_close, window)
+    mainloop.run()
 
 
 if __name__ == '__main__':

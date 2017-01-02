@@ -38,41 +38,42 @@ def reset_text(entry):
 
 
 def main():
-    with widgets.Window("Entry test") as window:
-        entrybox = widgets.Box()
-        window.add(entrybox)
+    window = widgets.Window("Entry test")
 
-        entry = widgets.Entry("Enter something...", expand=(True, False))
-        entry.on_text_changed.connect(print, entry)
-        entrybox.append(entry)
+    entrybox = widgets.Box()
+    window.add(entrybox)
 
-        entrybox.append(widgets.Dummy())
+    entry = widgets.Entry("Enter something...", expand=(True, False))
+    entry.on_text_changed.connect(print, entry)
+    entrybox.append(entry)
 
-        buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
-        entrybox.append(buttonbox)
+    entrybox.append(widgets.Dummy())
 
-        resetbutton = widgets.Button("Reset")
-        resetbutton.on_click.connect(reset_text, entry)
-        buttonbox.append(resetbutton)
+    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    entrybox.append(buttonbox)
 
-        selectallbutton = widgets.Button("Select all")
-        selectallbutton.on_click.connect(entry.select_all)
-        buttonbox.append(selectallbutton)
+    resetbutton = widgets.Button("Reset")
+    resetbutton.on_click.connect(reset_text, entry)
+    buttonbox.append(resetbutton)
 
-        focusbutton = widgets.Button("Focus")
-        focusbutton.on_click.connect(entry.focus)
-        buttonbox.append(focusbutton)
+    selectallbutton = widgets.Button("Select all")
+    selectallbutton.on_click.connect(entry.select_all)
+    buttonbox.append(selectallbutton)
 
-        grayed = widgets.Checkbox("Grayed out")
-        grayed.on_checked_changed.connect(set_grayed_out, entry, grayed)
-        buttonbox.append(grayed)
+    focusbutton = widgets.Button("Focus")
+    focusbutton.on_click.connect(entry.focus)
+    buttonbox.append(focusbutton)
 
-        secret = widgets.Checkbox("Secret")
-        secret.on_checked_changed.connect(set_secret, entry, secret)
-        buttonbox.append(secret)
+    grayed = widgets.Checkbox("Grayed out")
+    grayed.on_checked_changed.connect(set_grayed_out, entry, grayed)
+    buttonbox.append(grayed)
 
-        window.on_close.connect(mainloop.quit)
-        mainloop.run()
+    secret = widgets.Checkbox("Secret")
+    secret.on_checked_changed.connect(set_secret, entry, secret)
+    buttonbox.append(secret)
+
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
 if __name__ == '__main__':
