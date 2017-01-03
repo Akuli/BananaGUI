@@ -78,9 +78,9 @@ class Bin(Parent):
                 This can be None and this is None by default.
     """
 
-    def __init__(self, child=None):
+    def __init__(self, child=None, **kwargs):
         self.__child = None
-        super().__init__()
+        super().__init__(**kwargs)
         if child is not None:
             self.add(child)
 
