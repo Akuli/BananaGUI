@@ -107,3 +107,13 @@ class Box(Parent, Child):
     def remove(self, child):
         self._prepare_remove(child)
         child.real_widget.pack_forget()
+
+
+class Group(Bin, Child):
+
+    def create_widget(self, parent):
+        return tk.LabelFrame(parent.real_widget)
+
+    @run_when_ready
+    def set_text(self, text):
+        self.real_widget['text'] = text

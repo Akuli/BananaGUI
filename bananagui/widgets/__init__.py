@@ -37,7 +37,7 @@ from .basewidgets import Widget, Child
 from .buttons import Button, ImageButton
 from .labels import Label, ImageLabel
 from .misc import Checkbox, Dummy, Separator
-from .parents import Parent, Bin, Box, Scroller
+from .parents import Parent, Bin, Box, Scroller, Group
 from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, TextEdit

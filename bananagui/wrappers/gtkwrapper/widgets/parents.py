@@ -68,8 +68,18 @@ class Box(Child):
         self.real_widget.remove(child.real_widget)
 
 
-class Scroller(Child, Bin):
+class Scroller(Bin, Child):
 
     def __init__(self, bananawidget):
         self.real_widget = Gtk.ScrolledWindow()
         super().__init__(bananawidget)
+
+
+class Group(Bin, Child):
+
+    def __init__(self, bananawidget):
+        self.real_widget = Gtk.Frame()
+        super().__init__(bananawidget)
+
+    def set_text(self, text):
+        self.real_widget.set_label(text)

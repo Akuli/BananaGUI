@@ -30,7 +30,7 @@ except ImportError:
     import collections as abcoll
 
 import bananagui
-from bananagui import utils
+from bananagui import types, utils
 from .basewidgets import Child, Widget
 
 
@@ -75,7 +75,9 @@ class Bin(Parent):
 
     Attributes:
       child     The child in the widget.
-                This can be None and this is None by default.
+                This can be None and this is None by default. Use add()
+                and remove() or an initialization keyword argument to
+                set this.
     """
 
     def __init__(self, child=None, **kwargs):
@@ -246,7 +248,31 @@ class Scroller(Bin, Child):
     automatically when needed.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, child=None, **kwargs):
         wrapperclass = bananagui._get_wrapper('widgets.parents:Scroller')
         self._wrapper = wrapperclass(self)
-        super().__init__(*args, **kwargs)
+        super().__init__(child, **kwargs)
+
+
+@types.add_property('text', type=str)
+class Group(Bin, Child):
+    """A widget for grouping other related widgets together.
+
+    ,- Group -----------.
+    |                   |
+    |                   |
+    |    child widget   |
+    |                   |
+    |                   |
+    `-------------------'
+    """
+
+    def __init__(self, text='', child=None, **kwargs):
+        wrapperclass = bananagui._get_wrapper('widgets.parents:Group')
+        self._wrapper = wrapperclass(self)
+        self._text = ''
+        super().__init__(child, **kwargs)
+        self.text = text
+
+    def _repr_parts(self):
+        return ['text=%r' % self.text] + super()._repr_parts()

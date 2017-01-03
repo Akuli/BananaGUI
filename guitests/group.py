@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2017 Akuli
+# Copyright (c) 2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,36 +19,27 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from .basewidgets import Child, Widget
+"""BananaGUI Group widget test."""
+
+import pprint
+
+from bananagui import mainloop, widgets
 
 
-class Bin(Widget):
+def main():
+    window = widgets.Window("Group test")
 
-    def add(self, child):
-        pass
+    box = widgets.Box()
+    window.add(box)
 
-    def remove(self, child):
-        pass
+    for number in (1, 2):
+        label = widgets.Label("This label is in Group %d!" % number)
+        box.append(widgets.Group("Group %d" % number, label))
+    pprint.pprint(box[:])
 
-
-class Box(Child):
-
-    def __init__(self, bananawidget, orientation):
-        self.orientation = orientation
-        super().__init__(bananawidget)
-
-    def append(self, child):
-        pass
-
-    def remove(self, child):
-        pass
+    window.on_close.connect(mainloop.quit)
+    mainloop.run()
 
 
-class Scroller(Bin, Child):
-    pass
-
-
-class Group(Bin, Child):
-
-    def set_text(self, text):
-        pass
+if __name__ == '__main__':
+    main()
