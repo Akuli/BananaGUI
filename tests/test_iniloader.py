@@ -62,6 +62,15 @@ def test_errors(dummywrapper):
         "headers can contain one or three words, not 4\n"
         "file '<string>'\n  '[bla bla bla bla]'")
 
+    headers = ["[123abc]", "[def]", "[abc in 123abc]"]
+    varnames = ["123abc", "def", "123abc"]
+    for header, varname in zip(headers, varnames):
+        with pytest.raises(iniloader.ParsingError) as got:
+            iniloader.load(header + '\n')
+        assert str(got.value) == (
+            "invalid variable name %r\n"
+            "file '<string>'\n  %r" % (varname, header))
+
     with pytest.raises(iniloader.ParsingError) as got:
         iniloader.load("[test]\nbla bla = 123\n")
     assert str(got.value) == (

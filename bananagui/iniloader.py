@@ -143,11 +143,6 @@ class ParsingError(Exception):
         return result
 
 
-def _valid_varname(s):
-    """Check if a string is a valid variable name."""
-    return s.isidentifier() and not keyword.iskeyword(s)
-
-
 _NOT_SET = object()
 
 
@@ -240,10 +235,27 @@ class _Parser:
         for header in parser.sections():
             self._parse_section(header, parser[header])
 
+    def _check_varname(self, name, *args, must_exist=True, **kwargs):
+        """Check if a variable name is valid.
+
+        Raise ParsingError if the name is not valid. If must_exist is
+        True, also make sure the name is in the namespace. Other
+        arguments are passed to ParsingError.
+        """
+        if keyword.iskeyword(name) or not name.isidentifier():
+            raise ParsingError("invalid variable name %r" % name,
+                               self._filename, *args, **kwargs)
+        if must_exist and name not in self.namespace:
+            raise ParsingError("undefined variable %r" % name,
+                               self._filename, *args, **kwargs)
+
     def _parse_section(self, header, section):
+        real_header = '[%s]' % header
         parts = header.split()
         if len(parts) == 1:
             widgetname = header.strip()
+            self._check_varname(widgetname, line=real_header,
+                                must_exist=False)
             parentname = None
             parent = None
         elif len(parts) == 3:
@@ -251,47 +263,31 @@ class _Parser:
             if in_ != 'in':
                 raise ParsingError(
                     "the second word of 3-word headers must be 'in'",
-                    self._filename, None, '[%s]' % header)
-            parent = self.namespace.get(parentname, _NOT_SET)
-            if parent is _NOT_SET:
-                raise ParsingError(
-                    "undefined variable %r" % parentname,
-                    self._filename, None, '[%s]' % header)
+                    self._filename, line=real_header)
+            self._check_varname(widgetname, line=real_header,
+                                must_exist=False)
+            self._check_varname(parentname, line=real_header)
+            parent = self.namespace[parentname]
         else:
             raise ParsingError(
                 "headers can contain one or three words, not %d" % len(parts),
-                self._filename, None, '[%s]' % header)
-
-        problem = None
-        if not _valid_varname(widgetname):
-            problem = widgetname
-        elif parentname is not None and not _valid_varname(parentname):
-            problem = parentname
-        if problem is not None:
-            raise ParsingError(
-                "widget names need to be valid Python variable "
-                "names, not %r" % problem,
-                self._filename, None, "[%s]\n" % header)
+                self._filename, line=real_header)
 
         kwargs = {}
-        for unstripped_key, valuesource in section.items():
-            key = unstripped_key.strip()
-            if key == 'class':
-                pass
-            elif _valid_varname(key):
-                kwargs[key] = eval(valuesource.lstrip(), self.namespace)
-            else:
-                sourceline = valuesource.partition('\n')[0]
-                raise ParsingError(
-                    "invalid variable name %r" % key, self._filename,
-                    None, unstripped_key + " = " + sourceline)
+        for key, valuesource in section.items():
+            if key.strip() == 'class':
+                continue
+            sourceline = valuesource.split('\n')[0]
+            self._check_varname(key.strip(), line=key + " = " + sourceline,
+                                must_exist=False)
+            kwargs[key.strip()] = eval(valuesource.lstrip(), self.namespace)
 
-        constsrc = section.get('class', None)
-        if constsrc is None:
+        class_source = section.get('class', None)
+        if class_source is None:
             raise ParsingError(
-                "the [%s] section doesn't define a class" % header,
+                "the %s section doesn't define a class" % real_header,
                 self._filename)
-        constructor = eval(constsrc.lstrip(), self.namespace)
+        constructor = eval(class_source.lstrip(), self.namespace)
         widget = constructor(**kwargs)
         if parent is None:
             pass
