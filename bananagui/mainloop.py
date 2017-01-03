@@ -90,17 +90,15 @@ def add_timeout(milliseconds, callback, *args):
     def real_callback():
         try:
             result = callback(*args)
+            if result not in {None, bananagui.RUN_AGAIN}:
+                raise ValueError("callback returned %r, expected None "
+                                 "or bananagui.RUN_AGAIN" % (result,))
         except Exception as e:
             # We can magically show where add_timeout() was called.
             lines = traceback.format_exception(type(e), e, e.__traceback__)
             lines.insert(1, add_timeout_call)  # After 'Traceback (bla bla):'.
             sys.stderr.writelines(lines)
             return None     # Don't run again.
-        if result not in {None, bananagui.RUN_AGAIN}:
-            warnings.warn("BananaGUI callback %r returned %r, expected "
-                          "None or RUN_AGAIN" % (callback, result),
-                          RuntimeWarning)
-            result = None
         return result
 
     wrapperfunc = bananagui._get_wrapper('mainloop:add_timeout')

@@ -48,9 +48,19 @@ def test_init_run_quit(dummywrapper):
     mainloop.init()  # for other tests
 
 
+def good_callback(*args):
+    assert args == (1, 2, 3)
+    return None
+
+
 def broken_callback(*args):
     assert args == (1, 2, 3)
     raise ValueError("oh shit")
+
+
+def broken_callback_2(*args):
+    assert args == (1, 2, 3)
+    return 123
 
 
 def test_add_timeout(dummywrapper, capsys):
@@ -61,13 +71,19 @@ def test_add_timeout(dummywrapper, capsys):
     with pytest.raises(ValueError):
         mainloop.add_timeout(-1, print)
 
-    # The dummywrapper uses threads to implement the timeouts, so we
-    # don't need to call mainloop.run().
-    mainloop.add_timeout(1, broken_callback, 1, 2, 3)
-    time.sleep(0.002)    # wait for it to run
+    callbacks = [good_callback, broken_callback, broken_callback_2]
+    brokens = [False, True, True]
+    for callback, broken in zip(callbacks, brokens):
+        # The dummywrapper uses threads to implement the timeouts, so
+        # we don't need to call mainloop.run().
+        mainloop.add_timeout(1, callback, 1, 2, 3)
+        time.sleep(0.002)    # wait for it to run
 
-    # add_timeout should magically show the connect line in the
-    # traceback.
-    output, errors = capsys.readouterr()
-    assert not output
-    assert 'mainloop.add_timeout(1, broken_callback, 1, 2, 3)' in errors
+        output, errors = capsys.readouterr()
+        assert not output
+        if broken:
+            # add_timeout should magically show the connect line in the
+            # traceback.
+            assert 'mainloop.add_timeout(1, callback, 1, 2, 3)' in errors
+        else:
+            assert not errors
