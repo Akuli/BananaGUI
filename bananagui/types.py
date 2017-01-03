@@ -26,7 +26,7 @@ import sys
 import traceback
 try:
     import collections.abc as abcoll
-except ImportError:
+except ImportError:     # pragma: no cover
     # Python 3.2, no separate collections.abc.
     import collections as abcoll
 

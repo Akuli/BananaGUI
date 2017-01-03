@@ -76,7 +76,7 @@ def rangestep(range_object):
     """
     try:
         return range_object.step
-    except AttributeError:
+    except AttributeError:  # pragma: no cover
         if len(range_object) >= 2:
             # The range has enough items for calculating the step.
             return range_object[1] - range_object[0]
@@ -92,7 +92,7 @@ def rangestep(range_object):
 try:
     resolve_modulename = importlib.util.resolve_name
     import_module = importlib.import_module
-except AttributeError:
+except AttributeError:  # pragma: no cover
     # Python 3.2, there is no importlib.util.resolve_name and
     # importlib.import_module doesn't import parent packages
     # automatically. This doctest also runs with 3.2 only.
