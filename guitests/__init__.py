@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -19,6 +19,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# flake8: noqa
+
 """BananaGUI tests.
 
 This file sets up a BananaGUI wrapper. If you use the -m option to run
@@ -34,5 +36,11 @@ except ImportError:
     pass
 
 import bananagui
-load_args = sys.argv[1:] or ['.tkinter']
-bananagui.load(*load_args)
+
+# We need to ignore everything except the last argument because there
+# are coverage's arguments in sys.argv when this is running under
+# coverage.
+if len(sys.argv) < 2:
+    print("Usage: yourpython -m guitests LOAD_ARG", file=sys.stderr)
+    sys.exit(1)
+bananagui.load(sys.argv[-1])
