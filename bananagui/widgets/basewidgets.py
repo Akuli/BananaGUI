@@ -52,12 +52,12 @@ class Widget:
                             % (cls.__module__, cls.__name__))
 
     def __repr__(self):
-        parts = self._repr_parts()
-        if not parts:
-            return super().__repr__()
         cls = type(self)
-        return '<%s.%s object, %s>' % (
-            cls.__module__, cls.__name__, ', '.join(parts))
+        result = '%s.%s object' % (cls.__module__, cls.__name__)
+        for part in self._repr_parts():
+            result += ', '
+            result += part
+        return '<' + result + '>'
 
     def _repr_parts(self):
         """Return an empty list to make super() usage easier.
@@ -166,11 +166,3 @@ class Child(Widget):
         self.tooltip = tooltip
         self.grayed_out = grayed_out
         self.expand = expand
-
-    def _repr_parts(self):
-        parts = super()._repr_parts()
-        if self.tooltip is not None:
-            parts.append('tooltip=%r' % self.tooltip)
-        if self.grayed_out:
-            parts.append('grayed_out=True')
-        return parts

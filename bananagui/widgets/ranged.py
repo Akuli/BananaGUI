@@ -119,5 +119,8 @@ class Slider(_Ranged, Child):
         return self.__orient
 
     def _repr_parts(self):
-        return (['orient=bananagui.%s' % self.orient.name]
-                + super()._repr_parts())
+        parts = super()._repr_parts()
+        if self.orient == bananagui.VERTICAL:
+            # Not the default
+            parts.insert(0, 'orient=bananagui.VERTICAL')
+        return parts

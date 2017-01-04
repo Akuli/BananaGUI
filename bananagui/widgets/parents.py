@@ -69,6 +69,19 @@ class Parent(Widget, metaclass=abc.ABCMeta):
     def _get_children(self):
         """Return an iterable of all child widgets this widget has."""
 
+    def _repr_parts(self):
+        parts = super()._repr_parts()
+        childcount = 0
+        for child in self.iter_children():
+            childcount += 1
+        if childcount == 0:
+            parts.append('empty')
+        elif childcount == 1:
+            parts.append('contains a child')
+        else:
+            parts.append('contains %d children' % childcount)
+        return parts
+
 
 class Bin(Parent):
     """A widget that may contain one child widget.
@@ -89,13 +102,6 @@ class Bin(Parent):
     @property
     def child(self):
         return self.__child
-
-    def _repr_parts(self):
-        if self.child is None:
-            part = "contains nothing"
-        else:
-            part = "contains a child"
-        return super()._repr_parts() + [part]
 
     def _get_children(self):
         if self.child is not None:
@@ -178,11 +184,9 @@ class Box(abcoll.MutableSequence, Parent, Child):
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        parts.append('orient=bananagui.%s' % self.orient.name)
-        if len(self) == 1:
-            parts.append("contains one child")
-        else:
-            parts.append("contains %d children" % len(self))
+        if self.orient == bananagui.HORIZONTAL:
+            # Not the default.
+            parts.append('orient=bananagui.HORIZONTAL')
         return parts
 
     def _get_children(self):
