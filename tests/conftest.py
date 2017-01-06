@@ -4,7 +4,7 @@ import bananagui
 
 
 @pytest.fixture(scope='session')
-def.dummy():
+def dummywrapper():
     # The load() method can't be called twice, so setting up the dummy
     # wrapper and testing load() need to be combined.
     bananagui.load('invalid module', 'this is lol', '.dummy')
