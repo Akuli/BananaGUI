@@ -338,12 +338,14 @@ def _preview():
     """Simple way to preview BananaGUI ini files."""
     # When running with -m, sys.argv[0] is '__main__' and argparse uses
     # it as the default prog. That's obviously not what we want.
-    parser = argparse.ArgumentParser(prog='bananagui-iniloader')
+    parser = argparse.ArgumentParser(
+        prog='bananagui-iniloader',
+        description="Preview a BananaGUI ini file.")
     # Previewing stdin is not supported because the stream needs to be
     # seeked.
     parser.add_argument(
         'inifile', type=argparse.FileType('r'),
-        help="path to the ini file that will be loaded, defaults to stdin")
+        help="path to the ini file that will be loaded")
     parser.add_argument(
         '--load-args', default='.tkinter',
         help="comma-separated list of arguments for bananagui.load()")
