@@ -19,4 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""A BananaGUI wrapper that does nothing for testing."""
+"""A BananaGUI wrapper that does nothing.
+
+This is useful for testing and things like bananagui.widgettree.
+"""
