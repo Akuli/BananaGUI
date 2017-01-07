@@ -130,7 +130,7 @@ class ParsingError(Exception):
         self.filename = filename
         self.lineno = lineno
         if line is not None and add_repr:
-            line = repr(line)
+            line = repr(line.strip())
         self.line = line
 
     def __str__(self):
@@ -140,7 +140,7 @@ class ParsingError(Exception):
             if self.lineno is not None:
                 result += ", line %d" % self.lineno
         if self.line is not None:
-            result += "\n  %s" % self.line.strip()
+            result += "\n  %s" % self.line
         return result
 
 
