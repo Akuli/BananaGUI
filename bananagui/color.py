@@ -99,7 +99,8 @@ def rgb2hex(rgb):
     """
     r, g, b = rgb     # Allow anything iterable of length 3.
     for value in (r, g, b):
-        assert value in range(256), "invalid R/G/B value %r" % (value,)
+        if value not in range(256):
+            raise ValueError("invalid R/G/B value %r" % (value,))
     return '#%02x%02x%02x' % (r, g, b)
 
 

@@ -30,6 +30,8 @@ from bananagui import mainloop, types
 # The wrapper doesn't need to provide anything for this, it just needs to
 # use this with widgets that have a font attribute.
 
+# TODO: update this and use this in rest of BananaGUI.
+
 @types.add_property('family')
 @types.add_property('size')
 @types.add_property('bold')

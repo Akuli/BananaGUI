@@ -199,7 +199,9 @@ class Dialog(BaseWindow):
     """
 
     def __init__(self, parentwindow, title=None, **kwargs):
-        assert isinstance(parentwindow, Window)
+        if not isinstance(parentwindow, Window):
+            raise TypeError("parentwindow should be a Window, not %r"
+                            % (parentwindow,))
         if title is None:
             title = parentwindow.title
         elif not isinstance(title, str):
@@ -207,5 +209,9 @@ class Dialog(BaseWindow):
                             % (title,))
         wrapperclass = bananagui._get_wrapper('widgets.window:Dialog')
         self._wrapper = wrapperclass(self, parentwindow._wrapper, title)
-        self.parentwindow = parentwindow
+        self.__parentwindow = parentwindow
         super().__init__(title, **kwargs)
+
+    @property
+    def parentwindow(self):
+        return self.__parentwindow

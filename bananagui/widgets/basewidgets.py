@@ -65,8 +65,7 @@ class Widget:
         The __repr__ value is constructed from the module and name of
         the class, and the return value of _repr_parts. This method
         should return a list of things that will be joined with a comma
-        to create the __repr__. The default __repr__ is used if
-        _repr_parts returns an empty list.
+        to create the __repr__.
 
         It's recommended to do something like this in _repr_parts:
 
@@ -88,7 +87,9 @@ class Widget:
         with all GUI toolkits.
         """
         cls = type(self)
-        assert cls.can_focus, "cannot focus %r widgets" % cls.__name__
+        if not cls.can_focus:
+            raise TypeError("cannot focus %s.%s widgets"
+                            % (cls.__module__, cls.__name__))
         self._wrapper.focus()
 
 

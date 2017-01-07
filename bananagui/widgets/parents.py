@@ -193,7 +193,8 @@ class Box(abcoll.MutableSequence, Parent, Child):
         return self     # self is iterable.
 
     def __set_children(self, new):
-        assert len(new) == len(set(new)), "cannot add same child twice"
+        if len(new) != len(set(new)):
+            raise ValueError("cannot add same child twice")
         old = self[:]
 
         # TODO: Maybe old and new have something else in common than the

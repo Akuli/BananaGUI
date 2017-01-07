@@ -51,7 +51,7 @@ def common_beginning(*iterables):
     >>> common_beginning([2, 1, 3, 4], [1, 2, 3, 4])
     0
     """
-    assert len(iterables) >= 2, "two iterables are needed for comparing"
+    assert len(iterables) >= 2
     result = 0
     rows = iter(zip(*iterables))
     try:

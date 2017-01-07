@@ -79,7 +79,8 @@ def load(*args, init_mainloop=True):
     For convenience, bananagui.mainloop.init() will be called if
     init_mainloop is True.
     """
-    assert args, "specify at least one module"
+    if not args:
+        raise TypeError("no modules were specified")
 
     global _wrapper
     if _wrapper is not None:
