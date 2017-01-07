@@ -19,9 +19,33 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Print a tree of a widget and its child widgets."""
+"""Print a tree of a widget and its child widgets.
 
-import argparse
+Example:
+
+    >>> window = widgets.Window()
+    >>> box = widgets.Box()
+    >>> window.add(box)
+    >>> for i in range(5):
+    ...     box.append(widgets.Label("label %d" % i))
+    ...
+    >>> widgettree.dump(window)
+    bananagui.widgets.Window object, title='BananaGUI Window', contains a child
+    └── bananagui.widgets.Box object, contains 5 children
+        ├── bananagui.widgets.Label object, text='label 0'
+        ├── bananagui.widgets.Label object, text='label 1'
+        ├── bananagui.widgets.Label object, text='label 2'
+        ├── bananagui.widgets.Label object, text='label 3'
+        └── bananagui.widgets.Label object, text='label 4'
+
+If you would like to print a tree of widgets in a BananaGUI ini file,
+you can use bananagui.iniloader:
+
+    $ yourpython -m bananagui.iniloader tree thefile.ini
+"""
+# Unfortunately there isn't a good way to require pytest fixtures from
+# doctests, so the docstring isn't tested.
+
 import io
 import sys
 
@@ -84,25 +108,3 @@ def dumps(widget, **kwargs):
     fakefile = io.StringIO()
     dump(widget, file=fakefile, **kwargs)
     return fakefile.getvalue()
-
-
-def _main():
-    """Simple command-line interface."""
-    parser = argparse.ArgumentParser(
-        prog='bananagui-widgettree',
-        description="Print a tree of widgets in a BananaGUI ini file.")
-    parser.add_argument(
-        'inifile', type=argparse.FileType('r'),
-        help="path to the ini file")
-    args = parser.parse_args()
-
-    bananagui.load('.dummy')
-    with args.inifile as f:
-        widgetdict = iniloader.load(f)
-    for widget in widgetdict.values():
-        if isinstance(widget, widgets.Window):
-            dump(widget)
-
-
-if __name__ == '__main__':
-    _main()

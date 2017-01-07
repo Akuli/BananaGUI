@@ -109,6 +109,7 @@ import configparser
 import io
 import keyword
 import re
+import shutil
 import sys
 
 import bananagui
@@ -143,10 +144,7 @@ class ParsingError(Exception):
         return result
 
 
-_NOT_SET = object()
-
-
-class _Parser:
+class _IniParser:
 
     def __init__(self, file, filename):
         self._file = file
@@ -169,15 +167,22 @@ class _Parser:
                 # many bytes the lines we read are in the file's
                 # encoding. Relative seeking with a negative value
                 # doesn't seem to work for some reason.
-                encoding = self._file.encoding
-                if encoding is None:
+                if self._file.encoding is None:
                     # e.g. StringIO
                     seekcount = len(''.join(lines))
                 else:
-                    seekcount = len(''.join(lines).encode(encoding))
-                self._file.seek(seekcount)
+                    seekcount = len(''.join(lines).encode(self._file.encoding))
+                try:
+                    self._file.seek(seekcount)
+                except io.UnsupportedOperation:
+                    # We can't seek the file, it's probably sys.stdin.
+                    # We need to turn the whole thing into a StringIO.
+                    fakefile = io.StringIO()
+                    fakefile.write(line)
+                    shutil.copyfileobj(self._file, fakefile)
+                    fakefile.seek(0)
+                    self._file = fakefile
                 break
-            # More imports.
             lines.append(line)
 
         # Now we can parse the imports with ast.
@@ -323,7 +328,7 @@ def load(source) -> dict:
     else:
         raise TypeError("don't know how to parse %r" % (source,))
 
-    parser = _Parser(file, filename)
+    parser = _IniParser(file, filename)
     lineno = parser.parse_imports()
     # Copy of keys, '__builtins__' is one of these.
     imported_vars = list(parser.namespace)
@@ -334,53 +339,77 @@ def load(source) -> dict:
     return parser.namespace
 
 
-def _preview():
-    """Simple way to preview BananaGUI ini files."""
-    # When running with -m, sys.argv[0] is '__main__' and argparse uses
-    # it as the default prog. That's obviously not what we want.
+# This command-line interface is an interface humans, so it's best
+# tested by humans.
+
+def main():     # pragma: no cover
+    """Preview or print a tree of a BananaGUI ini file."""
     parser = argparse.ArgumentParser(
-        prog='bananagui-iniloader',
-        description="Preview a BananaGUI ini file.")
-    # Previewing stdin is not supported because the stream needs to be
-    # seeked.
-    parser.add_argument(
-        'inifile', type=argparse.FileType('r'),
-        help="path to the ini file that will be loaded")
-    parser.add_argument(
-        '--load-args', default='.tkinter',
-        help="comma-separated list of arguments for bananagui.load()")
+        description=main.__doc__, prog='bananagui.iniloader')
+
+    subparsers = parser.add_subparsers(
+        dest='action', help="choose what to do")
+
+    previewparser = subparsers.add_parser(
+        'preview', help="preview the content of the ini file",
+        description="Load a GUI from an ini file and run it.")
+    previewparser.add_argument(
+        '-w', '--wrapper', default='.tkinter',
+        help="the argument that will be passed to bananagui.load()")
+
+    treeparser = subparsers.add_parser(
+        'tree', help="print a tree of widgets in an ini file",
+        description=("Dump a tree of widgets in a BananaGUI ini file "
+                     "using bananagui.widgettree."))
+    treeparser.add_argument(
+        '-o', '--outfile', type=argparse.FileType('w'), default=sys.stdout,
+        help="the file to dump to, defaults to stdout")
+    treeparser.add_argument(
+        '-a', '--ascii-only', action='store_true',
+        help="use ASCII characters only")
+
+    for subparser in (previewparser, treeparser):
+        subparser.add_argument(
+            'inifile', type=argparse.FileType('r'),
+            nargs=argparse.OPTIONAL, default=sys.stdin,
+            help="path to the ini file")
+
     args = parser.parse_args()
+    if args.action is None:
+        # Python 3.3 and newer don't require an action by default.
+        parser.error("missing arguments")
 
-    load_args = map(str.strip, args.load_args.split(','))
-    bananagui.load(*load_args)
-
-    # We can be sure that args.inifile has a name attribute because
-    # it's an io.TextIOWrapper returned by argparse.FileType.
-    print("Previewing", args.inifile.name, "...")
+    bananagui.load('.dummy' if args.action == 'tree' else args.wrapper)
     with args.inifile as f:
-        widgetdict = load(f)
-
-    windows = {widget for widget in widgetdict.values()
-               if isinstance(widget, widgets.Window)}
+        windows = {widget for widget in load(f).values()
+                   if isinstance(widget, widgets.Window)}
     if not windows:
         # It's important not to say "this needs windows" to avoid
         # confusion with Windows the operating system.
-        print("bananagui.iniloader: no Window objects were found",
-              file=sys.stderr)
+        print("bananagui.iniloader: no Window objects were found in %s"
+              % args.inifile.name, file=sys.stderr)
         sys.exit(1)
 
-    def do_close(window):
-        windows.remove(window)
-        if not windows:
-            mainloop.quit()
+    if args.action == 'preview':
+        def do_close(window):
+            windows.remove(window)
+            if not windows:
+                mainloop.quit()
 
-    for window in windows:
-        window.on_close.connect(do_close)
+        for window in windows:
+            window.on_close.connect(do_close, window)
+        print("Previewing from", args.inifile.name, "...")
+        mainloop.run()
 
-    # There's no need to worry about closing the windows because
-    # mainloop.quit() is not called until they are all closed.
-    mainloop.run()
+    if args.action == 'tree':
+        # I think a local import makes sense here because this way the
+        # iniloader can be used even if widgettree doesn't work for
+        # some reason.
+        from bananagui import widgettree
+        with args.outfile as f:
+            for window in windows:
+                widgettree.dump(window, file=f, ascii_only=args.ascii_only)
 
 
-if __name__ == '__main__':
-    _preview()
+if __name__ == '__main__':  # pragma: no cover
+    main()

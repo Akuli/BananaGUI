@@ -78,6 +78,10 @@ def test_errors(dummywrapper):
         "file '<string>'\n  'bla bla = 123'")
 
 
+def cannot_seek(*args):
+    raise io.UnsupportedOperation
+
+
 def test_loading(dummywrapper):
     content = textwrap.dedent("""\
     import bananagui
@@ -101,17 +105,28 @@ def test_loading(dummywrapper):
       "multiline "
       "world")
     """)
-    # Different encodings for testing the seek.
+    sources = [content]
+
     nonefile = io.StringIO(content)
     if nonefile.encoding is not None:
         raise ValueError
-    utf8bytesio = io.BytesIO(content.encode())
-    utf8file = io.TextIOWrapper(utf8bytesio)
-    latin1bytesio = io.BytesIO(content.encode('latin-1'))
-    latin1file = io.TextIOWrapper(latin1bytesio, encoding='latin-1')
+    sources.append(nonefile)
 
-    for source in (content, nonefile, utf8file, latin1file):
+    # Test the seek-avoiding workaround.
+    nonseekablefile = io.StringIO(content)
+    nonseekablefile.seek = cannot_seek
+    sources.append(nonseekablefile)
+
+    # Test seeking with different encodings.
+    for encoding in ('latin-1', 'utf-8'):
+        bytefile = io.BytesIO(content.encode(encoding))
+        file = io.TextIOWrapper(bytefile, encoding=encoding)
+        sources.append(file)
+
+    for source in sources:
         widgetdict = iniloader.load(source)
+        if not isinstance(source, str):
+            source.close()
         assert widgetdict.keys() == {'window', 'box', 'label'}
         assert widgetdict['window'].child is widgetdict['box']
         assert widgetdict['box'][:] == [widgetdict['label']]
