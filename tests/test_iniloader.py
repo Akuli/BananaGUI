@@ -29,10 +29,10 @@ from bananagui import iniloader
 
 def test_errors(dummywrapper):
     with pytest.raises(SyntaxError):
-        iniloader.load("this is invalid syntax")
+        iniloader.loads("this is invalid syntax")
 
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("print('hello')")
+        iniloader.loads("print('hello')")
     assert str(got.value) == (
         "the top of the ini file can only contain imports\n"
         "file '<string>', line 1\n  \"print('hello')\"")
@@ -40,24 +40,24 @@ def test_errors(dummywrapper):
     # The newlines in the beginning shift the line numbers. The
     # iniloader should fix them.
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("\n\n\n[test]\nblah blah blah\n")
+        iniloader.loads("\n\n\n[test]\nblah blah blah\n")
     assert str(got.value) == (
         "invalid ini syntax\n"
         "file '<string>', line 5\n  'blah blah blah\\n'")
 
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("[banana and gui]\n")
+        iniloader.loads("[banana and gui]\n")
     assert str(got.value) == (
         "the second word of 3-word headers must be 'in'\n"
         "file '<string>'\n  '[banana and gui]'")
 
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("[banana in lol]\n")
+        iniloader.loads("[banana in lol]\n")
     assert str(got.value) == (
         "undefined variable 'lol'\nfile '<string>'\n  '[banana in lol]'")
 
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("[bla bla bla bla]\n")
+        iniloader.loads("[bla bla bla bla]\n")
     assert str(got.value) == (
         "headers can contain one or three words, not 4\n"
         "file '<string>'\n  '[bla bla bla bla]'")
@@ -66,13 +66,13 @@ def test_errors(dummywrapper):
     varnames = ["123abc", "def", "123abc"]
     for header, varname in zip(headers, varnames):
         with pytest.raises(iniloader.ParsingError) as got:
-            iniloader.load(header + '\n')
+            iniloader.loads(header + '\n')
         assert str(got.value) == (
             "invalid variable name %r\n"
             "file '<string>'\n  %r" % (varname, header))
 
     with pytest.raises(iniloader.ParsingError) as got:
-        iniloader.load("[test]\nbla bla = 123\n")
+        iniloader.loads("[test]\nbla bla = 123\n")
     assert str(got.value) == (
         "invalid variable name 'bla bla'\n"
         "file '<string>'\n  'bla bla = 123'")
@@ -105,7 +105,7 @@ def test_loading(dummywrapper):
       "multiline "
       "world")
     """)
-    sources = [content]
+    sources = []
 
     nonefile = io.StringIO(content)
     if nonefile.encoding is not None:

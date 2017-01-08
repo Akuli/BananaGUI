@@ -163,9 +163,9 @@ class ParsingError(Exception):
 
 class _IniParser:
 
-    def __init__(self, file, filename):
+    def __init__(self, file):
         self._file = file
-        self._filename = filename
+        self._filename = getattr(file, 'name', '<unknown>')
         self.namespace = {}
 
     def parse_imports(self):
@@ -325,28 +325,17 @@ class _IniParser:
         self.namespace[widgetname] = widget
 
 
-def load(source) -> dict:
-    """Load a GUI from a file object or a string.
-
-    This raises a ParsingError if the source has syntax problems, but
-    other errors may also be raised if something goes wrong with
-    importing, creating the widgets or something else.
+def load(file) -> dict:
+    """Load a GUI from a file object.
 
     See help('bananagui.iniloader') for information about BananaGUI's
     ini format and an important security notice.
-    """
-    if isinstance(source, io.TextIOBase):
-        # It's already a file object.
-        file = source
-        filename = getattr(source, 'name', '<unknown>')
-    elif isinstance(source, str):
-        # We need a StringIO object with a name attribute.
-        file = io.StringIO(source)
-        filename = '<string>'
-    else:
-        raise TypeError("don't know how to parse %r" % (source,))
 
-    parser = _IniParser(file, filename)
+    This raises a ParsingError if the file has syntax problems, but
+    other errors may also be raised if something goes wrong with
+    importing, creating the widgets or something else.
+    """
+    parser = _IniParser(file)
     lineno = parser.parse_imports()
     # Copy of keys, '__builtins__' is one of these.
     imported_vars = list(parser.namespace)
@@ -355,6 +344,13 @@ def load(source) -> dict:
         if name in parser.namespace:
             del parser.namespace[name]
     return parser.namespace
+
+
+def loads(string) -> dict:
+    """Like load(), but for strings."""
+    fakefile = io.StringIO(string)
+    fakefile.name = '<string>'  # for error messages
+    return load(fakefile)
 
 
 # Simple command-line interface.

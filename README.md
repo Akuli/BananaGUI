@@ -43,8 +43,7 @@ text = "Hello World!"
 
 def main():
     bananagui.load('.tkinter')
-    widgetdict = iniloader.load_ini(INI)
-    # Now widgetdict is a dictionary.
+    widgetdict = iniloader.loads(INI)
     widgetdict['window'].on_close.connect(mainloop.quit)
     mainloop.run()
 
