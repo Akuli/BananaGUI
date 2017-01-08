@@ -41,7 +41,7 @@ Example:
 If you would like to print a tree of widgets in a BananaGUI ini file,
 you can use bananagui.iniloader:
 
-    $ yourpython -m bananagui.iniloader tree thefile.ini
+    $ iniloader tree thefile.ini
 """
 # Unfortunately there isn't a good way to require pytest fixtures from
 # doctests, so the docstring isn't tested.
