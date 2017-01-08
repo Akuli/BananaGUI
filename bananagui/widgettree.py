@@ -49,8 +49,7 @@ you can use bananagui.iniloader:
 import io
 import sys
 
-import bananagui
-from bananagui import iniloader, widgets
+from bananagui import widgets
 
 
 def _clean_repr(obj, ascii_only):
