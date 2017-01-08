@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -46,41 +46,48 @@ useful using this example GUI file:
 
 You can preview this file without loading it in Python manually:
 
-    $ yourpython -m bananagui.iniloader the-gui-file.ini
+    $ iniloader preview the-gui-file.ini
 
-See `yourpython -m bananagui.iniloader --help` for more options, like
-using something else instead of tkinter.
+Or you can print a tree of the widgets you just created:
 
-When this file is loaded, this module performs these steps:
+    $ iniloader tree the-gui-file.ini
+
+See 'iniloader --help' for more info. You can also use
+'yourpython -m bananagui.iniloader' if the iniloader command doesn't
+work for some reason.
+
+The file is loaded like this:
 1. A new namespace dictionary is created for the module.
-2. The import at the top are executed in this namespace. These imports
-   need to be at the top, and everything before the first section must
-   be imports. From imports are fully supported.
+2. The imports at the top are executed in this namespace. They need to
+   be at the top, and everything before the first section must be
+   imports. All import statements are fully supported.
 3. Each section starts with [a header] and ends to the next header or
-   end of file, and the content of sections consists of key=value
-   pairs. Now it's time to parse the [window] section. It creates a
-   variable called window and sets it to the variable. The value of
-   class will be used as constructor and other arguments will be given
-   to it as keyword arguments.
+   end of file, and the content of sections consists of key=value pairs.
+   Next the window section is parsed. It creates a widgets.Window object
+   and sets it to a variable called window. The value of class will be
+   used as constructor and other arguments will be given to it as
+   keyword arguments.
 4. The next section is otherwise similar, but the header is like
-   "child in parent". When the child widget has been created, this
-   calls parent.add(child) or parent.append(child) depending on the
-   type of the parent. In this case, the parent is a Window so add()
-   is called.
+   "child in parent". When the child widget has been created,
+   parent.add(child) or parent.append(child) will be called depending on
+   the type of the parent. In this case, the parent is a Window so
+   window.add(label) is called.
+5. Imported modules are deleted from the namespace.
 
 In other words, the GUI file above does roughly the same thing as this
 Python code:
 
     from bananagui import widgets
 
-    window = widgets.Window(title="Hello")
-    label = widgets.Label(text="Hello World!")
-    window.add(label)
+    namespace = {}
+    namespace['window'] = widgets.Window(title="Hello")
+    namespace['label'] = widgets.Label(text="Hello World!")
+    namespace['window'].add(namespace['label'])
 
-The Python code is shorter than the GUI file above, so it doesn't
-really make sense to use the guiloader for small GUI's like this. It's
-more useful for big projects when it makes sense to separate the GUI to
-another file, and load it from a Python file like this:
+The Python code is shorter than the GUI file above, so it doesn't really
+make sense to use the iniloader for small GUI's like this. It's more
+useful for big projects, because then the GUI can be in a separate file
+that is loaded from Python like this:
 
     import bananagui
     from bananagui import iniloader, mainloop
@@ -98,9 +105,19 @@ names, except the class key that specifies the constructor.
 
 The values of the sections can be any Python expressions, including
 comments, function calls, list comprehensions and so on. Other
-statements (like function and class definitions) are not supported
-because the GUI files are meant to be a faster way to write GUI's than
-writing Python, not a replacement for Python.
+statements like function and class definitions are not supported because
+the GUI files are meant to be a faster way to write GUI's than writing
+Python, not a replacement for Python.
+
+It's also possible to use multiline values by indenting everything
+except the first line:
+
+    [multiline_label]
+    class = widgets.Label
+    text = (
+      "Hello "
+      "multiline "
+      "world!")
 """
 
 import argparse
@@ -119,9 +136,9 @@ from bananagui import mainloop, widgets
 class ParsingError(Exception):
     """An error occurred while parsing.
 
-    Note that this is not the only error that can be raised while
-    parsing. This error is typically raised if the non-Python syntax of
-    the file is invalid.
+    This is not the only error that can be raised while parsing. This
+    error is typically raised if the non-Python syntax of the file is
+    invalid.
     """
 
     def __init__(self, message, filename=None, lineno=None,
@@ -154,19 +171,20 @@ class _IniParser:
     def parse_imports(self):
         """Parse import statements in the beginning of a file-like object.
 
-        The file's current seek position is left at the end of the import
-        statements. The imported modules are added to namespace and the
-        number of lines read is returned.
+        The file's current seek position is left at the end of the
+        import statements. The imported modules are added to namespace
+        and the number of lines read is returned.
         """
         lines = []
         for line in self._file:
             if re.search(r'^\[.*\]\s*(#.*)?$', line.rstrip('\n')) is not None:
                 # Oops, we went a bit too far. Let's seek back.
+
                 # The problem with seeking text files is that we need
-                # the position in bytes, so we need to find out how
-                # many bytes the lines we read are in the file's
-                # encoding. Relative seeking with a negative value
-                # doesn't seem to work for some reason.
+                # the position in bytes, so we need to find out how many
+                # bytes the lines we read are in the file's encoding.
+                # Relative seeking with a negative value doesn't seem to
+                # work for some reason.
                 if self._file.encoding is None:
                     # e.g. StringIO
                     seekcount = len(''.join(lines))
@@ -339,58 +357,73 @@ def load(source) -> dict:
     return parser.namespace
 
 
-# This command-line interface is an interface humans, so it's best
-# tested by humans.
+# Simple command-line interface.
 
 def main():     # pragma: no cover
-    """Preview or print a tree of a BananaGUI ini file."""
-    parser = argparse.ArgumentParser(
-        description=main.__doc__, prog='bananagui.iniloader')
+    parser = argparse.ArgumentParser(add_help=False)
 
-    subparsers = parser.add_subparsers(
-        dest='action', help="choose what to do")
+    generalgroup = parser.add_argument_group("General options")
+    generalgroup.add_argument(
+        '-h', '--help', action='help',
+        help="Display this help message and exit.")
+    generalgroup.add_argument(
+        'action', choices=['tree', 'preview'],
+        help=("Choose what to do. 'tree' dumps a tree of widgets in "
+              "INIFILE using bananagui.widgettree, and 'preview' loads "
+              "and runs INIFILE."))
+    generalgroup.add_argument(
+        'inifile', metavar='INIFILE', type=argparse.FileType('r'),
+        help="Path to the BananaGUI ini file or - for stdin.")
 
-    previewparser = subparsers.add_parser(
-        'preview', help="preview the content of the ini file",
-        description="Load a GUI from an ini file and run it.")
-    previewparser.add_argument(
-        '-w', '--wrapper', default='.tkinter',
-        help="the argument that will be passed to bananagui.load()")
-
-    treeparser = subparsers.add_parser(
-        'tree', help="print a tree of widgets in an ini file",
-        description=("Dump a tree of widgets in a BananaGUI ini file "
-                     "using bananagui.widgettree."))
-    treeparser.add_argument(
-        '-o', '--outfile', type=argparse.FileType('w'), default=sys.stdout,
-        help="the file to dump to, defaults to stdout")
-    treeparser.add_argument(
+    treegroup = parser.add_argument_group("Tree options")
+    treegroup.add_argument(
         '-a', '--ascii-only', action='store_true',
-        help="use ASCII characters only")
+        help="Use ASCII characters only.")
+    treegroup.add_argument(
+        '-o', '--outfile', type=argparse.FileType('w'), default=sys.stdout,
+        help="Dump to this file instead of stdout.")
 
-    for subparser in (previewparser, treeparser):
-        subparser.add_argument(
-            'inifile', type=argparse.FileType('r'),
-            nargs=argparse.OPTIONAL, default=sys.stdin,
-            help="path to the ini file")
+    previewgroup = parser.add_argument_group("Preview options")
+    previewgroup.add_argument(
+        '-w', '--wrapper', default='.tkinter',
+        help="The argument for bananagui.init(). Defaults to %(default)r.")
 
+    # This isn't using subparsers because I want to display general options,
+    # tree options and preview options all in the same --help.
     args = parser.parse_args()
-    if args.action is None:
-        # Python 3.3 and newer don't require an action by default.
-        parser.error("missing arguments")
+    if args.action == 'tree':
+        if args.wrapper != '.tkinter':
+            parser.error("cannot use -w/--wrapper with tree")
 
-    bananagui.load('.dummy' if args.action == 'tree' else args.wrapper)
-    with args.inifile as f:
-        windows = {widget for widget in load(f).values()
-                   if isinstance(widget, widgets.Window)}
-    if not windows:
-        # It's important not to say "this needs windows" to avoid
-        # confusion with Windows the operating system.
-        print("bananagui.iniloader: no Window objects were found in %s"
-              % args.inifile.name, file=sys.stderr)
-        sys.exit(1)
+        # I think a local import makes sense here because this way the
+        # iniloader can be used even if widgettree doesn't work for some
+        # reason.
+        from bananagui import widgettree
+        bananagui.load('.dummy')
+        with args.inifile as f:
+            windows = {widget for widget in load(f).values()
+                       if isinstance(widget, widgets.Window)}
+        with args.outfile as f:
+            for window in windows:
+                widgettree.dump(window, file=f, ascii_only=args.ascii_only)
 
     if args.action == 'preview':
+        if args.ascii_only:
+            parser.error("cannot use -a/--ascii-only with preview")
+        if args.outfile is not sys.stdout:
+            parser.error("cannot use -o/--outfile with preview")
+
+        bananagui.load(args.wrapper)
+        with args.inifile as f:
+            windows = {widget for widget in load(f).values()
+                       if isinstance(widget, widgets.Window)}
+        if not windows:
+            # It's important not to say "this needs windows" to avoid
+            # confusion with Windows the operating system.
+            print("iniloader: no Window objects were found in %s"
+                  % args.inifile.name, file=sys.stderr)
+            sys.exit(1)
+
         def do_close(window):
             windows.remove(window)
             if not windows:
@@ -398,17 +431,7 @@ def main():     # pragma: no cover
 
         for window in windows:
             window.on_close.connect(do_close, window)
-        print("Previewing from", args.inifile.name, "...")
         mainloop.run()
-
-    if args.action == 'tree':
-        # I think a local import makes sense here because this way the
-        # iniloader can be used even if widgettree doesn't work for
-        # some reason.
-        from bananagui import widgettree
-        with args.outfile as f:
-            for window in windows:
-                widgettree.dump(window, file=f, ascii_only=args.ascii_only)
 
 
 if __name__ == '__main__':  # pragma: no cover
