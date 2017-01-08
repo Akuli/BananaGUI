@@ -61,7 +61,7 @@ Many Python beginners have had a conversation like this:
 
     <beginner>      I want to make a simple GUI program with Python.
                     Which GUI toolkit should I use?
-    <qtfan>         Use PyQt, it's cross-platform.
+    <qtfanboy>      Use PyQt, it's cross-platform.
     <windowsuser>   I hate PyQt. It's a huge library with more than
                     enough features, installing the Windows version is
                     a real pain and their licensing solution sucks. Use
