@@ -41,14 +41,46 @@ def _sizecheck(window, size):
                          % (size, window.minimum_size))
 
 
-@types.add_property('title', type=str, extra_setter=_closecheck)
-@types.add_property('resizable', type=bool, extra_setter=_closecheck)
-@types.add_property('size', type=int, how_many=2, extra_setter=_sizecheck,
-                    add_changed=True)
-@types.add_property('minimum_size', type=int, minimum=0, how_many=2,
-                    add_changed=True, extra_setter=_closecheck)
-@types.add_property('hidden', type=bool, extra_setter=_closecheck)
-@types.add_callback('on_close')
+@types.add_property(
+    'title', type=str, extra_setter=_closecheck,
+    doc="The text in the top bar.")
+@types.add_property(
+    'resizable', type=bool, extra_setter=_closecheck,
+    doc="True if the user can resize the window.")
+@types.add_property(
+    'size', type=int, how_many=2, extra_setter=_sizecheck,
+    add_changed=True, doc="""The current window size.
+
+    Like most other sizes, this is a two-tuple of integers. Adding
+    widgets to the window may change this, so setting this on
+    initialization is not supported.
+    """)
+@types.add_property(
+    'minimum_size', type=int, minimum=0, how_many=2,
+    extra_setter=_closecheck,
+    doc="""Two-tuple of smallest allowed width and height.
+
+    If the content of the window take up more space than this, this is
+    ignored. This is (0, 0) by default, so the window is always large
+    enough for its content.
+    """)
+@types.add_property(
+    'hidden', type=bool, extra_setter=_closecheck,
+    doc="""True if the window is not showing.
+
+    Hiding the window is easier than creating a new window when a
+    window with the same content needs to be displayed multiple times.
+    """)
+@types.add_callback(
+    'on_close',
+    doc="""A callback that runs when the user tries to close the window.
+
+    This is connected to thewindow.close by default. You can disconnect
+    it if you want to handle the window closing yourself.
+
+    In other words, this callback doesn't run when close() is called
+    but (by default) close() is called when this callback runs.
+    """)
 class BaseWindow(Bin):
     """A window baseclass.
 
@@ -56,33 +88,6 @@ class BaseWindow(Bin):
     sizes that well. Tkinter implements a maximum size on X, but it
     does that by moving the window to the upper left corner when it's
     maximized.
-
-    Attributes:
-      title             The text in the top bar.
-                        This defaults to an empty string.
-      resizable         True if the user can resize the window.
-      size              The current window size.
-                        Like most other sizes, this is a two-tuple of
-                        integers. Adding widgets to the window may
-                        change this, so setting this on initialization
-                        is not supported.
-      on_size_changed   A callback that runs when size changes.
-      minimum_size      Two-tuple of smallest allowed width and height.
-                        If the content of the window take up more space
-                        than this, this is ignored. This is (0, 0) by
-                        default, so the window is always large enough
-                        for its content.
-      hidden            True if the window is not showing.
-                        Hiding the window is easier than creating a new
-                        window when a window with the same content
-                        needs to be displayed multiple times.
-      on_close          A callback that runs when the user tries to
-                        close the window.
-                        This is connected to thewindow.close by default.
-                        You can disconnect it if you want to handle the
-                        window closing yourself. Note that this callback
-                        doesn't run when close() is called.
-      closed            True if close() has been called.
     """
     # Most things check that the window is closed. Things that come
     # from Bin don't, but I don't think that's worth overriding
@@ -100,11 +105,16 @@ class BaseWindow(Bin):
         self._minimum_size = (0, 0)
         self._hidden = False
         self.on_close.connect(self.close)
-        self.closed = False
+        self.__closed = False
         super().__init__(child, **kwargs)
         self.resizable = resizable
         self.minimum_size = minimum_size
         self.hidden = hidden
+
+    @property
+    def closed(self):
+        """True if close() has been called."""
+        return self.__closed
 
     def _repr_parts(self):
         # The title is first because it's easiest to identify the
@@ -120,12 +130,12 @@ class BaseWindow(Bin):
         """Close the window and set the closed attribute to True.
 
         This method can be called multiple times and it will do nothing
-        after the first call. It's not recommended to override this,
-        connect a function to the on_close callback instead.
+        after the first call. It's not recommended to override this in
+        a subclass, use the on_close callback instead.
         """
         if not self.closed:
             self._wrapper.close()
-            self.closed = True
+            self.__closed = True
 
     def wait(self):
         """Wait until the window is closed."""
@@ -158,7 +168,7 @@ class Window(BaseWindow):
 
     def __init__(self, title="BananaGUI Window", **kwargs):
         if not isinstance(title, str):
-            raise TypeError("window title needs to be a string, not %r"
+            raise TypeError("Window title needs to be a string, not %r"
                             % (title,))
         wrapperclass = bananagui._get_wrapper('widgets.window:Window')
         self._wrapper = wrapperclass(self, title)
@@ -193,9 +203,6 @@ class Dialog(BaseWindow):
     real GUI toolkit supports.
 
     The title of a Dialog defaults to the parent window's title.
-
-    Attributes:
-      parentwindow      The parent window set on initialization.
     """
 
     def __init__(self, parentwindow, title=None, **kwargs):
@@ -214,4 +221,5 @@ class Dialog(BaseWindow):
 
     @property
     def parentwindow(self):
+        """The parent window set on initialization."""
         return self.__parentwindow

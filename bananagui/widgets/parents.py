@@ -84,14 +84,7 @@ class Parent(Widget, metaclass=abc.ABCMeta):
 
 
 class Bin(Parent):
-    """A widget that may contain one child widget.
-
-    Attributes:
-      child     The child in the widget.
-                This can be None and this is None by default. Use add()
-                and remove() or an initialization keyword argument to
-                set this.
-    """
+    """A widget that may contain one child widget."""
 
     def __init__(self, child=None, **kwargs):
         self.__child = None
@@ -101,6 +94,11 @@ class Bin(Parent):
 
     @property
     def child(self):
+        """The child in the widget.
+
+        This can be None and this is None by default. Use add() and
+        remove() or an initialization argument to set this.
+        """
         return self.__child
 
     def _get_children(self):
@@ -163,10 +161,6 @@ class Box(abcoll.MutableSequence, Parent, Child):
         children = box[:]
         random.shuffle(children)
         box[:] = children
-
-    Attributes:
-      orient    The orient set on initialization, converted to a
-                bananagui.Orient member.
     """
     # The wrapper should define append and remove methods.
 
@@ -180,6 +174,10 @@ class Box(abcoll.MutableSequence, Parent, Child):
 
     @property
     def orient(self):
+        """The orient set on initialization.
+
+        This is always a bananagui.Orient member.
+        """
         return self.__orient
 
     def _repr_parts(self):
@@ -259,7 +257,8 @@ class Scroller(Bin, Child):
         super().__init__(child, **kwargs)
 
 
-@types.add_property('text', type=str)
+@types.add_property('text', type=str,
+                    doc="The text at the top of the group.")
 class Group(Bin, Child):
     """A widget for grouping other related widgets together.
 

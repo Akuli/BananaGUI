@@ -130,7 +130,7 @@ class _Callback:
 # TODO: Use _prop_NAME instead of _NAME?
 def add_property(name, *, add_changed=False, allow_none=False,
                  type=object, how_many=1, minimum=None, maximum=None,
-                 choices=None, extra_setter=None):
+                 choices=None, extra_setter=None, doc=None):
     """A handy way to add a property to a class.
 
     >>> class Wrapper:
@@ -142,15 +142,8 @@ def add_property(name, *, add_changed=False, allow_none=False,
     ...     def __init__(self):
     ...         self._wrapper = Wrapper()
     ...         self._test = 'default test'
-    ...         super().__init__()
-    ...     def __repr__(self):
-    ...         return '<the thingy object>'
     ...
-    >>> Thingy.test     # doctest: +ELLIPSIS
-    <property object at 0x...>
     >>> thing = Thingy()
-    >>> thing
-    <the thingy object>
     >>> thing.test
     'default test'
     >>> thing.test = 'new test'
@@ -243,15 +236,16 @@ def add_property(name, *, add_changed=False, allow_none=False,
             getattr(self, 'on_%s_changed' % name).run()
 
     def inner(cls):
-        setattr(cls, name, property(getter, setter))
+        setattr(cls, name, property(getter, setter, doc=doc))
         if add_changed:
-            add_callback('on_%s_changed' % name)(cls)
+            callbackdoc = "This is ran when %s changes." % name
+            add_callback('on_%s_changed' % name, doc=callbackdoc)(cls)
         return cls
 
     return inner
 
 
-def add_callback(name):
+def add_callback(name, *, doc=None):
     """Add a callback to a class easily.
 
     Use this as a decorator.
@@ -274,7 +268,7 @@ def add_callback(name):
             return getattr(self, '__callback_' + name)
 
     def inner(cls):
-        setattr(cls, name, property(getter))
+        setattr(cls, name, property(getter, doc=doc))
         return cls
 
     return inner

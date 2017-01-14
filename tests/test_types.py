@@ -27,10 +27,10 @@ from bananagui import types
 # @add_callback
 # ~~~~~~~~~~~~~
 
-@types.add_callback('on_stuff')
+@types.add_callback('on_stuff', doc="on_stuff doc")
 class CallbackDummy:
 
-    def __init__(self, the_repr='<the dummy>'):
+    def __init__(self, the_repr='<the WrapperDummy>'):
         self._repr = the_repr
 
     def __repr__(self):
@@ -42,7 +42,7 @@ def test_callback_repr():
     dummy1 = CallbackDummy()
     dummy2 = CallbackDummy('Dummy(1, 2, 3)')
     assert (repr(dummy1.on_stuff) == str(dummy1.on_stuff)
-            == "<BananaGUI callback 'on_stuff' of the dummy>")
+            == "<BananaGUI callback 'on_stuff' of the WrapperDummy>")
     assert (repr(dummy2.on_stuff) == str(dummy2.on_stuff)
             == "<BananaGUI callback 'on_stuff' of Dummy(1, 2, 3)>")
 
@@ -145,10 +145,11 @@ class DummyWrapper:
 
 
 @types.add_property('intpair', allow_none=True, how_many=2,
-                    minimum=0, maximum=10)
-@types.add_property('string', add_changed=True, type=str)
-@types.add_property('thingy', choices=(1, 2), extra_setter=print)
-class Dummy:
+                    minimum=0, maximum=10, doc="intpair doc")
+@types.add_property('string', add_changed=True, type=str, doc="string doc")
+@types.add_property('thingy', choices=(1, 2), extra_setter=print,
+                    doc="thingy doc")
+class WrapperDummy:
 
     def __init__(self):
         self._wrapper = DummyWrapper(self)
@@ -157,11 +158,11 @@ class Dummy:
         self._thingy = 1
 
     def __repr__(self):
-        return '<the dummy>'
+        return '<the WrapperDummy>'
 
 
 def test_add_property_errors():
-    d = Dummy()
+    d = WrapperDummy()
     with pytest.raises(TypeError):
         d.intpair = iter([1, 2])    # needs to be a sequence
     with pytest.raises(TypeError):
@@ -188,11 +189,30 @@ def test_add_property_errors():
 
 
 def test_wrapper_set(capsys):
-    d = Dummy()
+    d = WrapperDummy()
     d.thingy = 2
     output, errors = capsys.readouterr()
     assert not errors
     assert output == (
-        '<the dummy> 2\n'        # from extra_setter=print
+        '<the WrapperDummy> 2\n'        # from extra_setter=print
         'setting thingy to 2\n'  # from DummyWrapper.set_thingy
     )
+
+
+# Misc stuff
+# ~~~~~~~~~~
+
+def test_docs(capsys):
+    pairs = [
+        # (descriptor, doc), ...
+        (CallbackDummy.on_stuff, "on_stuff doc"),
+        (WrapperDummy.intpair, "intpair doc"),
+        (WrapperDummy.string, "string doc"),
+        (WrapperDummy.thingy, "thingy doc"),
+    ]
+    for descriptor, doc in pairs:
+        assert descriptor.__doc__ == doc
+        help(descriptor)
+        output, errors = capsys.readouterr()
+        assert doc in output
+        assert not errors

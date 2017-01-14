@@ -26,8 +26,13 @@ from bananagui import images, types
 from .basewidgets import Child
 
 
-@types.add_property('text', type=str)
-@types.add_callback('on_click')
+@types.add_callback(
+    'on_click', doc="A callback that runs when the button is clicked.")
+@types.add_property(
+    'text', type=str, doc="""The text in the button.
+
+    An empty string by default.
+    """)
 class Button(Child):
     r"""A button that displays text in it.
 
@@ -35,11 +40,6 @@ class Button(Child):
         |,--------------\
         ||   Click me!  |
         `---------------'
-
-    Attributes:
-      text      The text in the button.
-                An empty string by default.
-      on_click  A callback that runs when the button is clicked.
     """
 
     can_focus = True
@@ -55,8 +55,11 @@ class Button(Child):
         return ['text=' + repr(self.text)] + super()._repr_parts()
 
 
-@types.add_property('image', type=images.Image, allow_none=True)
-@types.add_callback('on_click')
+@types.add_callback(
+    'on_click', doc="A callback that runs when the button is clicked.")
+@types.add_property(
+    'image', type=images.Image, allow_none=True,
+    doc="The image displayed in the button or None.")
 class ImageButton(Child):
     r"""A button that displays an image.
 
@@ -69,11 +72,6 @@ class ImageButton(Child):
         ||  |  |  \     |
         ||  |_/         |
         `---------------'
-
-    Attributes:
-      image     The image displayed in the button or None.
-                Setting this copies the image.
-      on_click  A callback that runs when the button is clicked.
     """
 
     can_focus = True

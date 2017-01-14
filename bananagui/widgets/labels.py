@@ -26,19 +26,16 @@ from bananagui import images, types
 from .basewidgets import Child
 
 
-@types.add_property('text', type=str)
-@types.add_property('align', type=bananagui.Align)
+@types.add_property('text', type=str, doc="The text in the label.")
+@types.add_property(
+    'align', type=bananagui.Align,
+    doc="A bananagui.Align member that describes how the text is aligned.")
 class Label(Child):
     """A widget that displays text.
 
         ,---------------.
         |  Hello World! |
         `---------------'
-
-    Attributes:
-      text      The text in the label.
-      align     A bananagui.HAlign member that describes how the text
-                is aligned.
     """
     # TODO: Add fonts and colors?
 
@@ -55,7 +52,9 @@ class Label(Child):
         return ['text=' + repr(self.text)] + super()._repr_parts()
 
 
-@types.add_property('image', type=images.Image, allow_none=True)
+@types.add_property(
+    'image', type=images.Image, allow_none=True,
+    doc="The image displayed in the button or None.")
 class ImageLabel(Child):
     r"""A widget that displays an image.
 
@@ -67,10 +66,6 @@ class ImageLabel(Child):
         |   |  |  \     |
         |   |_/         |
         `---------------'
-
-    Attributes:
-      image     The bananagui.images.Image in the widget or None.
-                Setting this copies the image.
     """
 
     def __init__(self, image=None, **kwargs):

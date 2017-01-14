@@ -27,11 +27,8 @@ from bananagui import mainloop, types
 class Widget:
     """A baseclass for all widgets.
 
-    Attributes:
-      real_widget   The real GUI toolkit widget that BananaGUI uses.
-      can_focus     True if focus() can be called.
-                    Unlike most other attributes in BananaGUI, this
-                    is a class attribute.
+    Widget and subclasses of it have a can_focus class attribute. The
+    focus() method can't be called if it's False.
     """
 
     can_focus = False
@@ -76,12 +73,16 @@ class Widget:
 
     @property
     def real_widget(self):
+        """The real GUI toolkit widget that BananaGUI uses."""
         return self._wrapper.real_widget
 
     def focus(self):
         """Give the keyboard focus to this widget.
 
-        Focusing a window also brings it in front of other windows.
+        Widget classes have a can_focus attribute, and this method
+        cannot be called if it's False. Focusing a Window or a Dialog
+        brings it in front of all other windows.
+
         It's recommended to first create the widgets and then focus
         one of them to make sure that the widget gets focused correctly
         with all GUI toolkits.
@@ -93,9 +94,22 @@ class Widget:
         self._wrapper.focus()
 
 
-@types.add_property('tooltip', type=str, allow_none=True)
-@types.add_property('grayed_out', type=bool)
-@types.add_property('expand', type=bool, how_many=2)
+@types.add_property(
+    'tooltip', type=str, allow_none=True,
+    doc="""The widget's tooltip text or None for no tooltip.
+
+    None by default.
+    """)
+@types.add_property(
+    'grayed_out', type=bool,
+    doc="""True if the widget looks like it's disabled.
+
+    This can be used to tell the user that the widget can't be used for
+    some reason.
+    """)
+@types.add_property(
+    'expand', type=bool, how_many=2,
+    doc="Two-tuple of horizontal and vertical expanding.")
 class Child(Widget):
     """A base class for widgets that can be added to Parent widgets.
 
@@ -141,14 +155,6 @@ class Child(Widget):
         |expanding |expanding |       Dummy widget       |
         |  widget  |  widget  |                          |
         `------------------------------------------------'
-
-    Attributes:
-      tooltip       The widget's tooltip text, or None for no tooltip.
-                    None by default.
-      grayed_out    True if the widget looks like it's disabled.
-                    This can be used to tell the user that the widget
-                    can't be used for some reason.
-      expand        Two-tuple of horizontal and vertical expanding.
     """
 
     # TODO: cycle handling

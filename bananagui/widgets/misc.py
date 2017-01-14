@@ -29,8 +29,9 @@ from .basewidgets import Child
 # TODO: move Checkbox, Radiostuff and stuff like that to a checkboxes.py?
 
 
-@types.add_property('text', type=str)
-@types.add_property('checked', type=bool, add_changed=True)
+@types.add_property('text', type=str, doc="The text next to the checkmark.")
+@types.add_property('checked', type=bool, add_changed=True,
+                    doc="True if the checkbox is currently checked.")
 class Checkbox(Child):
     """A widget that can be checked.
 
@@ -43,12 +44,6 @@ class Checkbox(Child):
         `-------------------'
 
     The Checkbox widget has nothing to do with the Box widget.
-
-    Attributes:
-      text                  The text next to the checkbox.
-      checked               True if the checkbox is checked currently.
-                            False by default.
-      on_checked_changed    A callback that runs on (un)check.
     """
 
     can_focus = True

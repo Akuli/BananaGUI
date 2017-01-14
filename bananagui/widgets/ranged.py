@@ -32,22 +32,20 @@ def _valuecheck(widget, value):
                          % (value, widget.valuerange))
 
 
-@types.add_property('value', extra_setter=_valuecheck, add_changed=True)
-class _Ranged:
-    """Implement valuerange and value BananaGUI properties.
+@types.add_property(
+    'value', extra_setter=_valuecheck, add_changed=True,
+    doc="""The widget's current value.
 
-    Attributes:
-      valuerange        The value range set on initialization.
-      value             The widget's current value.
-                        This needs to be in valuerange and it's the
-                        smallest value of valuerange by default.
-      on_value_changed  A callback that runs when value changes.
-    """
+    This needs to be in the valuerange and it's the smallest value of
+    valuerange by default.
+    """)
+class _Ranged:
+    """Implement valuerange and value BananaGUI properties."""
     # Subclasses should get a valuerange argument on initialization,
-    # set the valuerange attribute to it and set the _value attribute
+    # set the _valuerange attribute to it and set the _value attribute
     # to min() of that range.
 
-    def __init__(self, *args, value=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         if not isinstance(self.valuerange, range):
             raise TypeError("valuerange needs to be a range object, not %r"
                             % (self.valuerange,))
@@ -58,6 +56,11 @@ class _Ranged:
         if utils.rangestep(self.valuerange) < 0:
             raise ValueError("valuerange has negative step")
         super().__init__(*args, **kwargs)
+
+    @property
+    def valuerange(self):
+        """The range of allowed values set on initialization."""
+        return self._valuerange
 
     def _repr_parts(self):
         return [
@@ -81,7 +84,7 @@ class Spinbox(_Ranged, Child):
     can_focus = True
 
     def __init__(self, valuerange, *, value=None, **kwargs):
-        self.valuerange = valuerange
+        self._valuerange = valuerange
         self._value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Spinbox')
         self._wrapper = wrapperclass(self, valuerange)
@@ -106,7 +109,7 @@ class Slider(_Ranged, Child):
     def __init__(self, valuerange, orient=bananagui.HORIZONTAL, *,
                  value=None, **kwargs):
         self.__orient = bananagui.Orient(orient)
-        self.valuerange = valuerange
+        self._valuerange = valuerange
         self._value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Slider')
         self._wrapper = wrapperclass(self, self.__orient, valuerange)
@@ -116,6 +119,7 @@ class Slider(_Ranged, Child):
 
     @property
     def orient(self):
+        """The orientation of the slider."""
         return self.__orient
 
     def _repr_parts(self):

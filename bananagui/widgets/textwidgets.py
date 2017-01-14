@@ -26,15 +26,13 @@ from bananagui import types
 from .basewidgets import Child
 
 
-@types.add_property('text', type=str, add_changed=True)
+# TODO: separate grayed_out and editable
+@types.add_property('text', type=str, add_changed=True,
+                    doc="The text in the widget.")
 class TextBase(Child):
     """A base class for text editing widgets.
 
     Setting grayed_out to True means that the user can't edit the text.
-
-    Attributes:
-      text              The text in the widget.
-      on_text_changed   A callback that runs when the text changes.
     """
     # TODO: Add fonts and colors.
 
@@ -50,18 +48,19 @@ class TextBase(Child):
         self._wrapper.select_all()
 
 
-@types.add_property('secret', type=bool)
+@types.add_property(
+    'secret', type=bool,
+    doc="""True if the text is hidden with stars or balls.
+
+    It's also impossible to copy-paste from a secret entry. This is
+    useful for asking a password.
+    """)
 class Entry(TextBase):
     """A one-line text widget.
 
         ,-----------------------.
         | Enter something...    |
         `-----------------------'
-
-    Attributes:
-      secret    True if the text is hidden with stars or balls.
-                It's also impossible to copy-paste content from a
-                secret entry. This is useful for asking passwords.
     """
 
     def __init__(self, text='', *, secret=False, **kwargs):
@@ -81,7 +80,8 @@ class Entry(TextBase):
 # TODO: text wrapping.
 # TODO: text alignment?
 # TODO: make this behave like a list of lines.
-@types.add_property('tab', type=str)
+@types.add_property(
+    'tab', type=str, doc="The character that pressing tab inserts.")
 class TextEdit(TextBase):
     """A multiline text widget.
 
@@ -92,9 +92,6 @@ class TextEdit(TextBase):
         | Line 3    |
         |           |
         `-----------'
-
-    Attributes:
-      tab       The character that pressing tab inserts.
     """
 
     def __init__(self, text='', *, tab='\t', **kwargs):
