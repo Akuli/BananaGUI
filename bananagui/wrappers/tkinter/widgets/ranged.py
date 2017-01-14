@@ -64,7 +64,7 @@ class Spinbox(Child):
 
     def __init__(self, bananawidget, valuerange):
         self._valuerange = valuerange
-        self._var = tk.StringVar()
+        self._var = tk.StringVar(value=str(min(valuerange)))
         self._var.trace('w', self._var_changed)
         super().__init__(bananawidget)
 
