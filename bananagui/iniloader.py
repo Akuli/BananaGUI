@@ -89,10 +89,9 @@ make sense to use the iniloader for small GUI's like this. It's more
 useful for big projects, because then the GUI can be in a separate file
 that is loaded from Python like this:
 
-    import bananagui
-    from bananagui import iniloader, mainloop
+    from bananagui import iniloader, load_wrapper, mainloop
 
-    bananagui.load('your-favorite-toolkit')
+    load_wrapper('whatever you want')
     with open('the-gui-file.ini', 'r') as f:
         widgetdict = iniloader.load(f)
 
@@ -129,8 +128,9 @@ import re
 import shutil
 import sys
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import load_wrapper, mainloop, widgets
+
+__all__ = ['ParsingError', 'load', 'loads', 'main']
 
 
 class ParsingError(Exception):
@@ -143,9 +143,12 @@ class ParsingError(Exception):
 
     def __init__(self, message, filename=None, lineno=None,
                  line=None, *, add_repr=True):
+        # Calling super().__init__() creates an args attribute that we
+        # don't need, so we don't call that. This is documented
+        # behavior, not a random implementation detail.
         self.message = message
         self.filename = filename
-        self.lineno = lineno
+        self.lineno =  lineno
         if line is not None and add_repr:
             line = repr(line.strip())
         self.line = line
@@ -356,6 +359,10 @@ def loads(string) -> dict:
 # Simple command-line interface.
 
 def main():     # pragma: no cover
+    """Run the command-line interface.
+
+    This uses sys.argv and may use sys.exit().
+    """
     parser = argparse.ArgumentParser(add_help=False)
 
     generalgroup = parser.add_argument_group("General options")
@@ -382,7 +389,8 @@ def main():     # pragma: no cover
     previewgroup = parser.add_argument_group("Preview options")
     previewgroup.add_argument(
         '-w', '--wrapper', default='.tkinter',
-        help="The argument for bananagui.init(). Defaults to %(default)r.")
+        help=("The argument for bananagui.load_wrapper(). "
+              "Defaults to %(default)r."))
 
     # This isn't using subparsers because I want to display general options,
     # tree options and preview options all in the same --help.
@@ -395,7 +403,7 @@ def main():     # pragma: no cover
         # iniloader can be used even if widgettree doesn't work for some
         # reason.
         from bananagui import widgettree
-        bananagui.load('.dummy')
+        load_wrapper('.dummy')
         with args.inifile as f:
             windows = {widget for widget in load(f).values()
                        if isinstance(widget, widgets.Window)}
@@ -409,7 +417,7 @@ def main():     # pragma: no cover
         if args.outfile is not sys.stdout:
             parser.error("cannot use -o/--outfile with preview")
 
-        bananagui.load(args.wrapper)
+        load_wrapper(args.wrapper)
         with args.inifile as f:
             windows = {widget for widget in load(f).values()
                        if isinstance(widget, widgets.Window)}
