@@ -39,7 +39,7 @@ class TextBase(Child):
     can_focus = True
 
     def __init__(self, text='', **kwargs):
-        self._text = ''
+        self._prop_text = ''
         super().__init__(**kwargs)
         self.text = text
 
@@ -64,7 +64,7 @@ class Entry(TextBase):
     """
 
     def __init__(self, text='', *, secret=False, **kwargs):
-        self._secret = False
+        self._prop_secret = False
         wrapperclass = bananagui._get_wrapper('widgets.textwidgets:Entry')
         self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)
@@ -95,7 +95,7 @@ class TextEdit(TextBase):
     """
 
     def __init__(self, text='', *, tab='\t', **kwargs):
-        self._tab = '\t'
+        self._prop_tab = '\t'
         wrapperclass = bananagui._get_wrapper('widgets.textwidgets:TextEdit')
         self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)

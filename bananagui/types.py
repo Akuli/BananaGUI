@@ -141,7 +141,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
     ... class Thingy:
     ...     def __init__(self):
     ...         self._wrapper = Wrapper()
-    ...         self._test = 'default test'
+    ...         self._prop_test = 'default test'
     ...
     >>> thing = Thingy()
     >>> thing.test
@@ -180,12 +180,12 @@ def add_property(name, *, add_changed=False, allow_none=False,
     argument after checking the value and possibly calling extra_setter.
     """
     def getter(self):
-        return getattr(self, '_' + name)
+        return getattr(self, '_prop_' + name)
 
     def setter(self, new_value):
-        if getattr(self, '_' + name) == new_value:
+        if getattr(self, '_prop_' + name) == new_value:
             # Skip a bunch of things.
-            setattr(self, '_' + name, new_value)
+            setattr(self, '_prop_' + name, new_value)
             return
 
         # This needs to be before the setattr() to make sure that
@@ -229,7 +229,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
         # The setter can run this again, so we need to just
         # return and do nothing if it happens. That's why the
         # setattr is here first.
-        setattr(self, '_' + name, new_value)
+        setattr(self, '_prop_' + name, new_value)
         getattr(self._wrapper, 'set_' + name)(new_value)
 
         if add_changed:

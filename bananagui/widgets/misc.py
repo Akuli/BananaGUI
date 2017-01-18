@@ -49,8 +49,8 @@ class Checkbox(Child):
     can_focus = True
 
     def __init__(self, text='', *, checked=False, **kwargs):
-        self._text = ''
-        self._checked = False
+        self._prop_text = ''
+        self._prop_checked = False
         wrapperclass = bananagui._get_wrapper('widgets.misc:Checkbox')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)

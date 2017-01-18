@@ -99,11 +99,11 @@ class BaseWindow(Bin):
 
     def __init__(self, title, *, child=None, resizable=True,
                  minimum_size=(0, 0), hidden=False, **kwargs):
-        self._title = title
-        self._resizable = True
-        self._size = (200, 200)
-        self._minimum_size = (0, 0)
-        self._hidden = False
+        self._prop_title = title
+        self._prop_resizable = True
+        self._prop_size = (200, 200)
+        self._prop_minimum_size = (0, 0)
+        self._prop_hidden = False
         self.on_close.connect(self.close)
         self.__closed = False
         super().__init__(child, **kwargs)

@@ -274,9 +274,9 @@ class Group(Bin, Child):
     def __init__(self, text='', child=None, **kwargs):
         wrapperclass = bananagui._get_wrapper('widgets.parents:Group')
         self._wrapper = wrapperclass(self)
-        self._text = ''
+        self._prop_text = ''
         super().__init__(child, **kwargs)
         self.text = text
 
     def _repr_parts(self):
-        return ['text=%r' % self.text] + super()._repr_parts()
+        return ['text=%r' % self._prop_text] + super()._repr_parts()

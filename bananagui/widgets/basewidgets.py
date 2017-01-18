@@ -166,9 +166,9 @@ class Child(Widget):
     def __init__(self, *, tooltip=None, grayed_out=False,
                  expand=(True, True)):
         self._parent = None     # Other files rely on this also.
-        self._tooltip = None
-        self._grayed_out = False
-        self._expand = (True, True)
+        self._prop_tooltip = None
+        self._prop_grayed_out = False
+        self._prop_expand = (True, True)
         super().__init__()
         self.tooltip = tooltip
         self.grayed_out = grayed_out

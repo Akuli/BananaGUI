@@ -60,7 +60,7 @@ class _Ranged:
     @property
     def valuerange(self):
         """The range of allowed values set on initialization."""
-        return self._valuerange
+        return self._prop_valuerange
 
     def _repr_parts(self):
         return [
@@ -84,8 +84,8 @@ class Spinbox(_Ranged, Child):
     can_focus = True
 
     def __init__(self, valuerange, *, value=None, **kwargs):
-        self._valuerange = valuerange
-        self._value = min(valuerange)
+        self._prop_valuerange = valuerange
+        self._prop_value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Spinbox')
         self._wrapper = wrapperclass(self, valuerange)
         super().__init__(**kwargs)
@@ -109,8 +109,8 @@ class Slider(_Ranged, Child):
     def __init__(self, valuerange, orient=bananagui.HORIZONTAL, *,
                  value=None, **kwargs):
         self.__orient = bananagui.Orient(orient)
-        self._valuerange = valuerange
-        self._value = min(valuerange)
+        self._prop_valuerange = valuerange
+        self._prop_value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Slider')
         self._wrapper = wrapperclass(self, self.__orient, valuerange)
         super().__init__(**kwargs)

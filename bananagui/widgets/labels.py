@@ -40,8 +40,8 @@ class Label(Child):
     # TODO: Add fonts and colors?
 
     def __init__(self, text='', *, align=bananagui.CENTER, **kwargs):
-        self._text = ''
-        self._align = bananagui.CENTER
+        self._prop_text = ''
+        self._prop_align = bananagui.CENTER
         wrapperclass = bananagui._get_wrapper('widgets.labels:Label')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
@@ -69,7 +69,7 @@ class ImageLabel(Child):
     """
 
     def __init__(self, image=None, **kwargs):
-        self._image = None
+        self._prop_image = None
         wrapperclass = bananagui._get_wrapper('widgets.labels:ImageLabel')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)

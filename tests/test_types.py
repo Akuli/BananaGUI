@@ -135,10 +135,10 @@ class DummyWrapper:
 
     def set_string(self, string):
         # It should already be set.
-        assert self._dummy._string == self._dummy.string == string
+        assert self._dummy._prop_string == self._dummy.string == string
 
     def set_intpair(self, intpair):
-        assert self._dummy._intpair == self._dummy.intpair == intpair
+        assert self._dummy._prop_intpair == self._dummy.intpair == intpair
 
     def set_thingy(self, thingy):
         print("setting thingy to", thingy)
@@ -153,9 +153,9 @@ class WrapperDummy:
 
     def __init__(self):
         self._wrapper = DummyWrapper(self)
-        self._string = 'a'
-        self._intpair = (1, 2)
-        self._thingy = 1
+        self._prop_string = 'a'
+        self._prop_intpair = (1, 2)
+        self._prop_thingy = 1
 
     def __repr__(self):
         return '<the WrapperDummy>'
