@@ -87,7 +87,7 @@ def _dump_tree(widget, file, ascii_only, prefix=''):
             _dump_tree(child, file, ascii_only, new_prefix)
 
 
-def dump(widget, *, file=None, ascii_only=False):
+def dump(widget, file=None, *, ascii_only=False):
     """Print a tree of a parent widget and its child widgets.
 
     The file defaults to sys.stdout. If ascii_only is true, no
@@ -105,5 +105,5 @@ def dump(widget, *, file=None, ascii_only=False):
 def dumps(widget, **kwargs):
     """Like dump(), but return a string instead of printing to a file."""
     fakefile = io.StringIO()
-    dump(widget, file=fakefile, **kwargs)
+    dump(widget, fakefile, **kwargs)
     return fakefile.getvalue()
