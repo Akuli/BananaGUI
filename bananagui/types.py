@@ -127,7 +127,6 @@ class _Callback:
                 sys.stderr.writelines(lines)
 
 
-# TODO: Use _prop_NAME instead of _NAME?
 def add_property(name, *, add_changed=False, allow_none=False,
                  type=object, how_many=1, minimum=None, maximum=None,
                  choices=None, extra_setter=None, doc=None):
