@@ -9,10 +9,9 @@ these toolkits. BananaGUI may feature PyQt5 support later.
 A minimal Hello World program in BananaGUI looks like this:
 
 ```py
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import load_wrapper, mainloop, widgets
 
-bananagui.load('.tkinter')  # if you have it installed, try '.gtk3' also :)
+load_wrapper('.tkinter')
 window = widgets.Window("Hello World")
 window.add(widgets.Label("Hello World!"))
 window.on_close.connect(mainloop.quit)
@@ -23,8 +22,7 @@ You can also write your GUI using the .ini format and then load it with
 `bananagui.iniloader`:
 
 ```py
-import bananagui
-from bananagui import iniloader, mainloop
+from bananagui import iniloader, load_wrapper, mainloop
 
 
 # Usually this would be in another file.
@@ -42,7 +40,7 @@ text = "Hello World!"
 
 
 def main():
-    bananagui.load('.tkinter')
+    load_wrapper('.tkinter')
     widgetdict = iniloader.loads(INI)
     widgetdict['window'].on_close.connect(mainloop.quit)
     mainloop.run()
@@ -253,11 +251,11 @@ memory address.
 
 BananaGUI consists of the public API and the `bananagui.wrappers`
 submodule. The wrappers submodule contains a bunch of modules that each
-"wrap" a GUI toolkit and provide a way to use it. The `bananagui.load()`
-function simply imports one of these wrapper modules and sets it to
-`bananagui._wrapper`, and rest of BananaGUI finds it there. Most of the
-public API uses `bananagui._get_wrapper()` to access the currently
-loaded wrapper.
+"wrap" a GUI toolkit and provide a way to use it. The
+`bananagui.load_wrapper()` function simply imports one of these wrapper
+modules and sets its name to `bananagui._wrapper`, and rest of BananaGUI
+finds it there. Most of the public API uses `bananagui._get_wrapper()`
+to access the currently loaded wrapper.
 
 ### Tests
 
@@ -272,8 +270,8 @@ because it's an easy way to make sure that everything works.
     $ yourpython -m guitests some_wrapper
 
 Of course, replace `yourpython` with a working Python program and
-`some_wrapper` with a valid argument to `bananagui.load()`. See
-`help('bananagui.load')`.
+`some_wrapper` with a valid argument to `bananagui.load_wrapper()`. See
+`help('bananagui.load_wrapper')`.
 
 You need to [install pytest](https://pytest.readthedocs.io/en/latest/getting-started.html#installation)
 to run the unit tests and doctests:

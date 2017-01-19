@@ -65,8 +65,8 @@ RUN_AGAIN = -1
 _wrapper = None
 
 
-def load(*args, init_mainloop=True):
-    """Load a BananaGUI wrapper module.
+def load_wrapper(*args, init_mainloop=True):
+    """Import a BananaGUI wrapper module.
 
     The arguments should be Python module names. If they are relative,
     they will be treated as relative to bananagui.wrappers. For example,
@@ -84,7 +84,7 @@ def load(*args, init_mainloop=True):
 
     global _wrapper
     if _wrapper is not None:
-        raise RuntimeError("don't call bananagui.load() twice")
+        raise RuntimeError("don't call bananagui.load_wrapper() twice")
 
     if len(args) == 1:
         # Make sure the wrapper can be imported and THEN set _wrapper to it.
@@ -97,7 +97,7 @@ def load(*args, init_mainloop=True):
         # Attempt to load each wrapper.
         for arg in args:
             try:
-                load(arg)
+                load_wrapper(arg)
                 return
             # I have no idea what different toolkits can raise.
             except Exception:
@@ -105,19 +105,17 @@ def load(*args, init_mainloop=True):
         raise ImportError("cannot load any of the requested wrapper modules")
 
 
-# This is a bit hacky because different things can come from the wrapper
-# or an alternative default wrapper.
 @functools.lru_cache()
 def _get_wrapper(name):
     """Get an object from the wrapper module.
 
-    For example, if bananagui.load has been called with '.tkinter',
+    For example, if bananagui.load_wrapper() has been called with '.tkinter',
     _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and
-    returns its c attribute. An exception is raised if load() hasn't
-    been called.
+    returns its c attribute. An exception is raised if
+    bananagui.load_wrapper() hasn't been called.
     """
     if _wrapper is None:
-        raise RuntimeError("bananagui.load() wasn't called")
+        raise RuntimeError("bananagui.load_wrapper() wasn't called")
 
     modulename, attribute = name.split(':')
     try:
@@ -131,5 +129,5 @@ def _get_wrapper(name):
             return getattr(defaultmodule, attribute)
         except (ImportError, AttributeError) as e:
             # We don't have a default :(
-            msg = "cannot find a wrapper for %s" % name
-            raise NotImplementedError(msg) from e
+            raise NotImplementedError(
+                "cannot find a wrapper for %s" % name) from e

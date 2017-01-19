@@ -41,8 +41,8 @@ import bananagui
 # are coverage's arguments in sys.argv when this is running under
 # coverage.
 if len(sys.argv) < 2:
-    print("Usage: yourpython -m guitests LOAD_ARG",
-          "       yourpython -m guitests.SUBMODULE LOAD_ARG",
+    print("Usage: yourpython -m guitests WRAPPERMODULE",
+          "       yourpython -m guitests.SUBMODULE WRAPPERMODULE",
           sep='\n', file=sys.stderr)
     sys.exit(1)
-bananagui.load(sys.argv[-1])
+bananagui.load_wrapper(sys.argv[-1])
