@@ -60,7 +60,8 @@ The file is loaded like this:
 1. A new namespace dictionary is created for the module.
 2. The imports at the top are executed in this namespace. They need to
    be at the top, and everything before the first section must be
-   imports. All import statements are fully supported.
+   imports. All import statements are fully supported, and the import
+   section ends to the first line starting with '['.
 3. Each section starts with [a header] and ends to the next header or
    end of file, and the content of sections consists of key=value pairs.
    Next the window section is parsed. It creates a widgets.Window object
@@ -177,9 +178,8 @@ class _IniParser:
         """
         lines = []
         for line in self._file:
-            if re.search(r'^\[.*\]\s*(#.*)?$', line.rstrip('\n')) is not None:
+            if line.startswith('['):
                 # Oops, we went a bit too far. Let's seek back.
-
                 # The problem with seeking text files is that we need
                 # the position in bytes, so we need to find out how many
                 # bytes the lines we read are in the file's encoding.
