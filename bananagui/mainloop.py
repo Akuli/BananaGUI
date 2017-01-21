@@ -27,6 +27,8 @@ import warnings
 
 import bananagui
 
+__all__ = ['init', 'run', 'quit', 'add_timeout']
+
 _initialized = False
 _running = False
 

@@ -51,6 +51,8 @@ import sys
 
 from bananagui import widgets
 
+__all__ = ['dump', 'dumps']
+
 
 def _clean_repr(obj, ascii_only):
     if ascii_only:

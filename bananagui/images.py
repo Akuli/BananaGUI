@@ -25,6 +25,8 @@ import os
 
 import bananagui
 
+__all__ = ['Image']
+
 
 # Other imagetypes may be supported, but these are guaranteed to work.
 _imagetypes = ('gif', 'png')

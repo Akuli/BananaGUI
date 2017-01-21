@@ -24,6 +24,8 @@
 import bananagui
 from bananagui import mainloop
 
+__all__ = ['set_text', 'get_text']
+
 
 def _initcheck():
     if not mainloop._initialized:

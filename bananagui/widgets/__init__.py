@@ -24,14 +24,18 @@
 # flake8: noqa
 
 
-def _fix_modules(names):
-    """Make classes and functions seem like they come from here."""
-    for name in names:
-        class_or_func = globals()[name]
-        class_or_func.__module__ = __name__
+def _fix_modulenames():
+    """Make classes and functions seem like they come from here.
 
+    Return an __all__ list.
+    """
+    result = []
+    for name, value in globals().items():
+        if callable(value) and not name.startswith('_'):
+            # public class or function
+            result.append(name)
+    return result
 
-_old_dir = set(dir())
 
 from .basewidgets import Widget, Child
 from .buttons import Button, ImageButton
@@ -44,4 +48,4 @@ from .textwidgets import TextBase, Entry, TextEdit
 #from .trayicon import TrayIcon
 from .window import BaseWindow, Window, Dialog
 
-_fix_modules(set(dir()) - _old_dir - {'_old_dir'})
+__all__ = _fix_modulenames()

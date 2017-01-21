@@ -30,6 +30,8 @@ except ImportError:
 import bananagui
 from bananagui import color, widgets
 
+__all__ = ['info', 'warning', 'error', 'question', 'colordialog']
+
 
 def _check(parentwindow, title):
     if not isinstance(parentwindow, (widgets.Window, widgets.Dialog)):

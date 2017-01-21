@@ -30,6 +30,8 @@ except ImportError:     # pragma: no cover
     # Python 3.2, no separate collections.abc.
     import collections as abcoll
 
+__all__ = ['add_property', 'add_callback']
+
 
 class _Callback:
     """An object like bindings in tkinter or signals in Qt and GTK+.
