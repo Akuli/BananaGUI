@@ -30,7 +30,7 @@ from bananagui import types
 @types.add_callback('on_stuff', doc="on_stuff doc")
 class CallbackDummy:
 
-    def __init__(self, the_repr='<the WrapperDummy>'):
+    def __init__(self, the_repr='<the CallbackDummy>'):
         self._repr = the_repr
 
     def __repr__(self):
@@ -42,7 +42,7 @@ def test_callback_repr():
     dummy1 = CallbackDummy()
     dummy2 = CallbackDummy('Dummy(1, 2, 3)')
     assert (repr(dummy1.on_stuff) == str(dummy1.on_stuff)
-            == "<BananaGUI callback 'on_stuff' of the WrapperDummy>")
+            == "<BananaGUI callback 'on_stuff' of the CallbackDummy>")
     assert (repr(dummy2.on_stuff) == str(dummy2.on_stuff)
             == "<BananaGUI callback 'on_stuff' of Dummy(1, 2, 3)>")
 
