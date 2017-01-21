@@ -29,22 +29,14 @@ from bananagui import types
 
 @types.add_callback('on_stuff', doc="on_stuff doc")
 class CallbackDummy:
-
-    def __init__(self, the_repr='<the CallbackDummy>'):
-        self._repr = the_repr
-
-    def __repr__(self):
-        return self._repr
+    pass
 
 
 def test_callback_repr():
-    # must be compatible with both of these common repr styles
-    dummy1 = CallbackDummy()
-    dummy2 = CallbackDummy('Dummy(1, 2, 3)')
-    assert (repr(dummy1.on_stuff) == str(dummy1.on_stuff)
-            == "<BananaGUI callback 'on_stuff' of the CallbackDummy>")
-    assert (repr(dummy2.on_stuff) == str(dummy2.on_stuff)
-            == "<BananaGUI callback 'on_stuff' of Dummy(1, 2, 3)>")
+    dummy = CallbackDummy()
+    should_be = ("<BananaGUI callback 'on_stuff' of %s.CallbackDummy object>"
+                 % __name__)
+    assert repr(dummy.on_stuff) == str(dummy.on_stuff) == should_be
 
 
 def test_callback_connecting():

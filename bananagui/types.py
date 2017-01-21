@@ -54,10 +54,9 @@ class _Callback:
         self._callbacks = []
 
     def __repr__(self):
-        objrepr = repr(self._object)
-        if objrepr.startswith('<') and objrepr.endswith('>'):
-            objrepr = objrepr[1:-1]
-        return '<BananaGUI callback %r of %s>' % (self._name, objrepr)
+        cls = type(self._object)
+        return '<BananaGUI callback %r of %s.%s object>' % (
+            self._name, cls.__module__, cls.__name__)
 
     def connect(self, func, *args):
         """Schedule func(*args) to be called when the callback is ran.
