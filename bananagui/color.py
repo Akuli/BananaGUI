@@ -65,7 +65,7 @@ def _is_valid_color(hexcolor):
 def hex2rgb(hexcolor):
     """Convert a hexadecimal color to an RGB tuple.
 
-    The returned values are always integers in range(255).
+    The returned values are always integers in range(256).
 
     >>> hex2rgb('#00ffff')
     (0, 255, 255)
