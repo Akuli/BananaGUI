@@ -19,7 +19,44 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""The BananaGUI main loop."""
+r"""The BananaGUI main loop.
+
+The mainloop can be in three different states:
+
+- Not initialized: The mainloop is doing nothing, and it's not ready to
+  run. This is the current state when bananagui.mainloop is imported for
+  the first time.
+- Initialized: Now the mainloop is ready to run, but it's not running
+  yet. Widgets can be created and timeouts can be added, but the
+  timeouts aren't guaranteed to run and the widgets aren't guaranteed to
+  be visible yet. Typically the mainloop is in this state for a short
+  time while the widgets are being created.
+- Running: Now the mainloop is running. Widgets are visible and
+  timeouts run. New widgets can be still made and new timeouts can be
+  added. Applications are in this state most of the time.
+
+Different functions in this module can be used for going from one state
+to another:
+
+    ,-----------------.  init()  ,-------------.
+    | not initialized | -------> | initialized |
+    `-----------------'          `-------------'
+            /|\                         |
+             |               quit()     | call run()
+             |                  \       V
+             |                   \ ,---------.
+             `-------------------- | running |
+                                   `---------'
+                                   \____ ____/
+                                        V
+                                    the run()
+                                    function
+                                   is running
+
+Note that bananagui.load_wrapper() will call init() by default and most
+applications don't run the mainloop more than once, so usually you don't
+need to worry about the "Not initialized" state.
+"""
 
 import sys
 import traceback
