@@ -30,6 +30,8 @@ import bananagui
 def dummywrapper():
     # The load() method can't be called twice, so setting up the dummy
     # wrapper and testing load() need to be combined.
-    bananagui.load_wrapper('invalid module', 'this is lol', '.dummy')
+    bananagui.WRAPPERS.add('invalid module')
+    bananagui.load_wrapper('invalid module', 'dummy')
+    bananagui.WRAPPERS.remove('invalid module')
     with pytest.raises(RuntimeError):
-        bananagui.load_wrapper('.dummy')    # cannot call it twice
+        bananagui.load_wrapper('dummy')    # cannot call it twice

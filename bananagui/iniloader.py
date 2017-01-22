@@ -388,7 +388,7 @@ def main():     # pragma: no cover
 
     previewgroup = parser.add_argument_group("Preview options")
     previewgroup.add_argument(
-        '-w', '--wrapper', default='.tkinter',
+        '-w', '--wrapper', default='tkinter',
         help=("The argument for bananagui.load_wrapper(). "
               "Defaults to %(default)r."))
 
@@ -396,14 +396,14 @@ def main():     # pragma: no cover
     # tree options and preview options all in the same --help.
     args = parser.parse_args()
     if args.action == 'tree':
-        if args.wrapper != '.tkinter':
+        if args.wrapper != 'tkinter':
             parser.error("cannot use -w/--wrapper with tree")
 
         # I think a local import makes sense here because this way the
         # iniloader can be used even if widgettree doesn't work for some
         # reason.
         from bananagui import widgettree
-        load_wrapper('.dummy')
+        load_wrapper('dummy')
         with args.inifile as f:
             windows = {widget for widget in load(f).values()
                        if isinstance(widget, widgets.Window)}

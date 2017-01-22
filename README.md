@@ -11,7 +11,7 @@ A minimal Hello World program in BananaGUI looks like this:
 ```py
 from bananagui import load_wrapper, mainloop, widgets
 
-load_wrapper('.tkinter')
+load_wrapper('tkinter')
 window = widgets.Window("Hello World")
 window.add(widgets.Label("Hello World!"))
 window.on_close.connect(mainloop.quit)
@@ -40,7 +40,7 @@ text = "Hello World!"
 
 
 def main():
-    load_wrapper('.tkinter')
+    load_wrapper('tkinter')
     widgetdict = iniloader.loads(INI)
     widgetdict['window'].on_close.connect(mainloop.quit)
     mainloop.run()
@@ -239,7 +239,7 @@ Let's do the same thing with BananaGUI:
 
 ```py
 >>> from bananagui import load, widgets
->>> load('.tkinter')
+>>> load('tkinter')
 >>> checkbox = widgets.Checkbox("Check me!")
 >>> checkbox
 <bananagui.widgets.Checkbox object, text='Check me!', checked=False>

@@ -21,7 +21,7 @@
 
 """BananaGUI's utility functions and other things."""
 
-import importlib.util
+import importlib
 import re
 
 
@@ -90,32 +90,10 @@ def rangestep(range_object):
 
 
 try:
-    resolve_modulename = importlib.util.resolve_name
     import_module = importlib.import_module
 except AttributeError:  # pragma: no cover
-    # Python 3.2, there is no importlib.util.resolve_name and
-    # importlib.import_module doesn't import parent packages
-    # automatically. This doctest also runs with 3.2 only.
-    def resolve_modulename(modulename, package=None):
-        """Like importlib.util.resolve_modulename, but for Python 3.2.
-
-        >>> resolve_modulename('bananagui.wrappers.tkinter', 'whatever')
-        'bananagui.wrappers.tkinter'
-        >>> resolve_modulename('.tkinter', 'bananagui.wrappers')
-        'bananagui.wrappers.tkinter'
-        """
-        if modulename.startswith('.'):
-            if package is None:
-                raise ValueError("a package is needed for %r" % (modulename,))
-            while modulename.startswith('..'):
-                # We need to go up one level and remove the dot that
-                # represents it.
-                package, junk = package.rsplit('.', 1)
-                modulename = modulename[1:]
-            # At this point there's still one dot left in modulename.
-            modulename = package + modulename
-        return modulename
-
+    # Python 3.2, importlib.import_module doesn't import parent packages
+    # automatically.
     def import_module(modulename):
         """Import a module and its parent modules as needed."""
         current = []
