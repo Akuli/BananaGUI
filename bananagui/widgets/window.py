@@ -167,6 +167,7 @@ class Window(BaseWindow):
     """
 
     def __init__(self, title="BananaGUI Window", **kwargs):
+        """Initialize the window."""
         if not isinstance(title, str):
             raise TypeError("Window title needs to be a string, not %r"
                             % (title,))
@@ -201,11 +202,13 @@ class Dialog(BaseWindow):
     The parent window must be an instance of Window and this window may
     be centered over the parent window, it may be modal or whatever the
     real GUI toolkit supports.
-
-    The title of a Dialog defaults to the parent window's title.
     """
 
     def __init__(self, parentwindow, title=None, **kwargs):
+        """Initialize the dialog.
+
+        The title defaults to parentwindow's title.
+        """
         if not isinstance(parentwindow, Window):
             raise TypeError("parentwindow should be a Window, not %r"
                             % (parentwindow,))

@@ -129,6 +129,7 @@ class Bin(Parent):
     _child_view_class = _BinChildView
 
     def __init__(self, child=None, **kwargs):
+        """Initialize the widget and add the child if it's given."""
         self.__child = None
         super().__init__(**kwargs)
         if child is not None:
@@ -218,7 +219,10 @@ class Box(abcoll.MutableSequence, Parent, Child):
     _child_view_class = _BoxChildView
 
     def __init__(self, orient=bananagui.VERTICAL, **kwargs):
-        """Initialize the Box."""
+        """Initialize the Box.
+
+        The orient will be converted to a bananagui.Orient member.
+        """
         self.__orient = bananagui.Orient(orient)
         self.__children = []
         wrapperclass = bananagui._get_wrapper('widgets.parents:Box')
@@ -300,6 +304,7 @@ class Scroller(Bin, Child):
     """
 
     def __init__(self, child=None, **kwargs):
+        """Initialize the scroller."""
         wrapperclass = bananagui._get_wrapper('widgets.parents:Scroller')
         self._wrapper = wrapperclass(self)
         super().__init__(child, **kwargs)
@@ -319,6 +324,7 @@ class Group(Bin, Child):
     """
 
     def __init__(self, text='', child=None, **kwargs):
+        """Initialize the Group widget."""
         wrapperclass = bananagui._get_wrapper('widgets.parents:Group')
         self._wrapper = wrapperclass(self)
         self._prop_text = ''

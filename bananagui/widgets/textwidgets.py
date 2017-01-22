@@ -64,6 +64,7 @@ class Entry(TextBase):
     """
 
     def __init__(self, text='', *, secret=False, **kwargs):
+        """Initialize the entry."""
         self._prop_secret = False
         wrapperclass = bananagui._get_wrapper('widgets.textwidgets:Entry')
         self._wrapper = wrapperclass(self)
@@ -95,6 +96,7 @@ class TextEdit(TextBase):
     """
 
     def __init__(self, text='', *, tab='\t', **kwargs):
+        """Initialize the TextEdit."""
         self._prop_tab = '\t'
         wrapperclass = bananagui._get_wrapper('widgets.textwidgets:TextEdit')
         self._wrapper = wrapperclass(self)

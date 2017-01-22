@@ -84,6 +84,7 @@ class Spinbox(_Ranged, Child):
     can_focus = True
 
     def __init__(self, valuerange, *, value=None, **kwargs):
+        """Initialize the spinbox."""
         self._prop_valuerange = valuerange
         self._prop_value = min(valuerange)
         wrapperclass = bananagui._get_wrapper('widgets.ranged:Spinbox')
@@ -108,6 +109,10 @@ class Slider(_Ranged, Child):
 
     def __init__(self, valuerange, orient=bananagui.HORIZONTAL, *,
                  value=None, **kwargs):
+        """Initialize the slider.
+
+        The orient will be converted to a bananagui.Orient member.
+        """
         self.__orient = bananagui.Orient(orient)
         self._prop_valuerange = valuerange
         self._prop_value = min(valuerange)

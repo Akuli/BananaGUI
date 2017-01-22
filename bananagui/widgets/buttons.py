@@ -45,6 +45,7 @@ class Button(Child):
     can_focus = True
 
     def __init__(self, text='', **kwargs):
+        """Initialize the button and set arguments as attributes."""
         self._prop_text = ''
         wrapperclass = bananagui._get_wrapper('widgets.buttons:Button')
         self._wrapper = wrapperclass(self)
@@ -77,6 +78,7 @@ class ImageButton(Child):
     can_focus = True
 
     def __init__(self, image=None, **kwargs):
+        """Initialize the button and set arguments as attributes."""
         self._prop_image = None
         wrapperclass = bananagui._get_wrapper('widgets.buttons:ImageButton')
         self._wrapper = wrapperclass(self)

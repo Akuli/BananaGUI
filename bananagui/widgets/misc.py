@@ -49,6 +49,7 @@ class Checkbox(Child):
     can_focus = True
 
     def __init__(self, text='', *, checked=False, **kwargs):
+        """Initialize the checkbox and set arguments as attributes."""
         self._prop_text = ''
         self._prop_checked = False
         wrapperclass = bananagui._get_wrapper('widgets.misc:Checkbox')
@@ -75,6 +76,7 @@ class Dummy(Child):
     """
 
     def __init__(self, **kwargs):
+        """Set up the dummy."""
         wrapperclass = bananagui._get_wrapper('widgets.misc:Dummy')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
@@ -98,6 +100,10 @@ class Separator(Child):
     """
 
     def __init__(self, orient=bananagui.HORIZONTAL, **kwargs):
+        """Initialize the separator.
+
+        The orient will be converted to a bananagui.Orient member.
+        """
         self.__orient = bananagui.Orient(orient)
         # Make the separator expand correctly by default.
         if self.__orient == bananagui.HORIZONTAL:

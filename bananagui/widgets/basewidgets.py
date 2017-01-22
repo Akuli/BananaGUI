@@ -41,6 +41,7 @@ class Widget:
         return super(Widget, cls).__new__(cls)
 
     def __init__(self):
+        """Initialize the widget."""
         if not hasattr(self, '_wrapper'):
             # A subclass didn't override this and define a _wrapper.
             cls = type(self)
@@ -165,6 +166,7 @@ class Child(Widget):
 
     def __init__(self, *, tooltip=None, grayed_out=False,
                  expand=(True, True)):
+        """Set arguments as attributes."""
         self._parent = None     # Other files rely on this also.
         self._prop_tooltip = None
         self._prop_grayed_out = False

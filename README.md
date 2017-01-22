@@ -161,16 +161,16 @@ that we are not interested in and a ton of methods that we don't use
 99% of the time. Tkinter is a little bit better when it comes to this,
 but it's not perfect either.
 
-I try my best to add docstrings everywhere in BananaGUI to make
+I try my best to add good docstrings everywhere in BananaGUI to make
 `help()` as informative as possible. Here's the same thing in
 BananaGUI:
 
 ```
 >>> from bananagui import widgets
 >>> help(widgets.Checkbox)
-Help on class Checkbox in module bananagui.widgets:
+Help on class Checkbox in bananagui.widgets:
 
-class Checkbox(Child)
+bananagui.widgets.Checkbox = class Checkbox(Child)
  |  A widget that can be checked.
  |
  |      ,-------------------.
@@ -183,12 +183,6 @@ class Checkbox(Child)
  |
  |  The Checkbox widget has nothing to do with the Box widget.
  |
- |  Attributes:
- |    text                  The text next to the checkbox.
- |    checked               True if the checkbox is checked currently.
- |                          False by default.
- |    on_checked_changed    A callback that runs on (un)check.
- |
  |  Method resolution order:
  |      Checkbox
  |      Child
@@ -198,11 +192,21 @@ class Checkbox(Child)
  |  Methods defined here:
  |
  |  __init__(self, text='', *, checked=False, **kwargs)
+ |      Initialize the checkbox and set arguments as attributes.
+ |
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |
+ |  checked
+ |      True if the checkbox is currently checked.
+ |
+ |  on_checked_changed
+ |      This callback is ran when checked changes.
 ...
 ```
 
 I think this is a lot better. We can get a good idea of what the
-Checkbox is and how it works with just `help()`. There are no useless
+Checkbox is and how it works with just `help()`. There are less useless
 implementation details showing up, and we even have ascii art pictures
 of the widget.
 
