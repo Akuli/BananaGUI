@@ -22,7 +22,6 @@
 """Parent subclasses."""
 # TODO: Add a grid widget.
 
-import abc
 try:
     import collections.abc as abcoll
 except ImportError:
@@ -34,14 +33,58 @@ from bananagui import types, utils
 from .basewidgets import Child, Widget
 
 
+class _ChildView(abcoll.Set):
+    """A view of this widget's children.
+
+    Dictionaries have a keys() method that returns a set-like view of
+    the keys. The children property is similar, but it's a view of the
+    widget's children.
+
+    Parent widgets provide different kinds of ways to access the
+    children, but all Parent widgets have a children attribute that
+    works consistently.
+    """
+
+    def __init__(self, widget):
+        self._widget = widget
+
+    def __repr__(self):
+        cls = type(self._widget)
+        prefix = 'an' if cls.__module__[0] in 'aeiouy' else 'a'
+        return "<children of %s %s.%s>" % (
+            prefix, cls.__module__, cls.__name__)
+
+    # This method is here because the views behave like this without it:
+    #   >>> w = widgets.Window()
+    #   >>> w.children
+    #   <children of a bananagui.widgets.window.Window>
+    #   >>> w.children | {'hello'}
+    #   <children of a builtins.generator>
+    #   >>>
+    # Mapping views in collections.abc define a _from_iterable method
+    # like this one to solve this same problem. The _from_iterable
+    # method is not an implementation detail, see
+    # help(collections.abc.Set._from_iterable).
+    @classmethod
+    def _from_iterable(cls, iterable):
+        return set(iterable)
+
+
 # This and Bin aren't based on Child because Window is based on Bin.
-class Parent(Widget, metaclass=abc.ABCMeta):
+class Parent(Widget):
     """A base class for widgets that contain other widgets."""
+
+    def children(self):
+        return type(self)._child_view_class(self)
+
+    children = property(children, doc=_ChildView.__doc__)
 
     def _prepare_add(self, child):
         """Make sure child can be added to self and make it ready for it."""
         if not isinstance(child, Child):
             raise TypeError("expected a Child widget, got %r" % (child,))
+        if child in self.children:
+            raise ValueError("cannot add the same child twice")
         if child._parent is None:
             child._parent = self
         elif child._parent is not self:
@@ -50,41 +93,40 @@ class Parent(Widget, metaclass=abc.ABCMeta):
                 "it can't be added to this widget anymore. See "
                 "help('bananagui.widgets.Child').")
 
-    def iter_children(self, *, recursive=False):
-        """Yield all children of this Parent widget.
-
-        If recursive is True, also yield all of the childrens'
-        children. This is consistent and works the same way with
-        different kinds of Parent widgets.
-        """
-        # Subclasses should provide _get_children().
-        for child in self._get_children():
-            yield child
-            if recursive and isinstance(child, Parent):
-                # yield from is new in Python 3.3.
-                for subchild in child.iter_children(recursive=True):
-                    yield subchild
-
-    @abc.abstractmethod
-    def _get_children(self):
-        """Return an iterable of all child widgets this widget has."""
+    def _prepare_remove(self, child):
+        """Make sure that a child can be removed from self."""
+        if child not in self.children:
+            raise ValueError("cannot remove %r, hasn't been added" % (child,))
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        childcount = 0
-        for child in self.iter_children():
-            childcount += 1
-        if childcount == 0:
+        if not self.children:
             parts.append('empty')
-        elif childcount == 1:
+        elif len(self.children) == 1:
             parts.append('contains a child')
         else:
-            parts.append('contains %d children' % childcount)
+            parts.append('contains %d children' % len(self.children))
         return parts
+
+
+class _BinChildView(_ChildView):
+    __doc__ = _ChildView.__doc__
+
+    def __len__(self):
+        return 0 if self._widget.child is None else 1
+
+    def __iter__(self):
+        if self._widget.child is not None:
+            yield self._widget.child
+
+    def __contains__(self, child):
+        return child is not None and child is self._widget.child
 
 
 class Bin(Parent):
     """A widget that may contain one child widget."""
+
+    _child_view_class = _BinChildView
 
     def __init__(self, child=None, **kwargs):
         self.__child = None
@@ -101,10 +143,6 @@ class Bin(Parent):
         """
         return self.__child
 
-    def _get_children(self):
-        if self.child is not None:
-            yield self.child
-
     def add(self, child):
         """Add the child widget into this widget.
 
@@ -112,25 +150,38 @@ class Bin(Parent):
         child property will be set to the new child.
         """
         if self.child is not None:
-            raise RuntimeError("there's already a child, cannot add()")
+            raise ValueError("there's already a child, cannot add()")
         self._prepare_add(child)
         self._wrapper.add(child._wrapper)
         self.__child = child
 
     def remove(self, child):
-        """Remove the child from the widget
+        """Remove the child from the widget.
 
-        The child attribute is set to None. The argument must be a
+        The child attribute is set to None. The argument must be the
         Child widget that is currently in this widget.
         """
-        if child is None:
-            raise ValueError("cannot remove None")
-        if child is not self.__child:
-            raise ValueError("cannot remove a child that is not in "
-                             "the widget")
+        self._prepare_remove(child)
+        # Now we are sure that child is self.__child.
         self.__child = None
         self._wrapper.remove(child._wrapper)
         # child._parent is left as is here.
+
+
+# Box objects behave just like this view of them does. We still need
+# this view because the view needs to be an abcoll.Set but the Box
+# object is not a Set.
+class _BoxChildView(_ChildView):
+    __doc__ = _ChildView.__doc__
+
+    def __len__(self):
+        return len(self._widget)
+
+    def __iter__(self):
+        return iter(self._widget)
+
+    def __contains__(self, child):
+        return child in self._widget
 
 
 class Box(abcoll.MutableSequence, Parent, Child):
@@ -164,6 +215,8 @@ class Box(abcoll.MutableSequence, Parent, Child):
     """
     # The wrapper should define append and remove methods.
 
+    _child_view_class = _BoxChildView
+
     def __init__(self, orient=bananagui.VERTICAL, **kwargs):
         """Initialize the Box."""
         self.__orient = bananagui.Orient(orient)
@@ -184,26 +237,21 @@ class Box(abcoll.MutableSequence, Parent, Child):
         parts = super()._repr_parts()
         if self.orient == bananagui.HORIZONTAL:
             # Not the default.
-            parts.append('orient=bananagui.HORIZONTAL')
+            parts.insert(0, 'orient=bananagui.HORIZONTAL')
         return parts
 
-    def _get_children(self):
-        return self     # self is iterable.
-
     def __set_children(self, new):
-        if len(new) != len(set(new)):
-            raise ValueError("cannot add same child twice")
-        old = self[:]
-
-        # TODO: Maybe old and new have something else in common than the
-        #       beginning? Optimize this.
-        common = utils.common_beginning(old, new)
-        for child in old[common:]:
+        # TODO: Maybe the old and new children have something else in
+        # common than the beginning? Optimize this.
+        common = utils.common_beginning(self.__children, new)
+        for child in self.__children[common:]:
+            self._prepare_remove(child)
             self._wrapper.remove(child._wrapper)
+        del self.__children[common:]
         for child in new[common:]:
             self._prepare_add(child)
             self._wrapper.append(child._wrapper)
-        self.__children = new
+            self.__children.append(child)
 
     def __setitem__(self, item, value):
         children = self[:]
@@ -226,7 +274,7 @@ class Box(abcoll.MutableSequence, Parent, Child):
     # to get the doc because then abc will think that our insert is
     # an abstract method that needs to be overrided.
     def insert(self, index, value):
-        """Insert an item to the box, before the index."""
+        """Insert an item to the box at the index."""
         self[index:index] = [value]
 
 
@@ -257,8 +305,7 @@ class Scroller(Bin, Child):
         super().__init__(child, **kwargs)
 
 
-@types.add_property('text', type=str,
-                    doc="The text at the top of the group.")
+@types.add_property('text', type=str, doc="The text at the top of the group.")
 class Group(Bin, Child):
     """A widget for grouping other related widgets together.
 

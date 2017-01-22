@@ -65,7 +65,7 @@ def _clean_repr(obj, ascii_only):
 
 
 def _dump_tree(widget, file, ascii_only, prefix=''):
-    children = list(widget.iter_children())
+    children = list(widget.children)
     for index, child in enumerate(children):
         for character in prefix:
             print(character, end=' '*3, file=file)
