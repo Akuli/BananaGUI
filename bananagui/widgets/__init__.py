@@ -19,9 +19,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""The actual BananaGUI widgets."""
-
 # flake8: noqa
+
+"""The actual BananaGUI widgets."""
 
 
 def _fix_modulenames():
@@ -32,7 +32,7 @@ def _fix_modulenames():
     result = []
     for name, value in globals().items():
         if callable(value) and not name.startswith('_'):
-            # public class or function
+            value.__module__ = __name__
             result.append(name)
     return result
 
