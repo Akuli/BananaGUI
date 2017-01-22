@@ -49,7 +49,8 @@ if __name__ == '__main__':
     main()
 ```
 
-See [the guitests directory](guitests) for more examples.
+See [the guitests directory](guitests) for more examples or read [the 
+documentation](docs/README.md).
 
 ## Why BananaGUI?
 
