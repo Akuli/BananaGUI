@@ -23,7 +23,8 @@ import bananagui
 from bananagui import widgets
 
 
-def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
+def message(icon, parentwindow, message, title, buttons, defaultbutton):
+    # TODO: do something with the icon?
     def do_click(text):
         nonlocal result
         result = text
@@ -52,10 +53,6 @@ def _messagedialog(parentwindow, message, title, buttons, defaultbutton):
 
     dialog.wait()
     return result
-
-
-# TODO: support icons?
-info = warning = error = question = _messagedialog
 
 
 # TODO: font dialog.

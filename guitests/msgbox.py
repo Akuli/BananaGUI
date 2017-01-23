@@ -56,15 +56,6 @@ def choose_color(window):
     print(repr(result))
 
 
-def do_close(window):
-    result = msgbox.question(
-        window, "Do you really want to quit?", title="Quit?",
-        buttons=["Yes", "No"], defaultbutton="Yes")
-    print(repr(result))
-    if result == "Yes":
-        mainloop.quit()
-
-
 def main():
     window = widgets.Window("Dialog test")
     box = widgets.Box()
@@ -77,8 +68,7 @@ def main():
         button.on_click.connect(function, window)
         box.append(button)
 
-    window.on_close.disconnect(window.close)
-    window.on_close.connect(do_close, window)
+    window.on_close.connect(mainloop.quit)
     mainloop.run()
 
 

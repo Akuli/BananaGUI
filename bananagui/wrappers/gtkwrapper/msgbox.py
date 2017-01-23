@@ -27,8 +27,14 @@ from bananagui import color
 from . import GTK_VERSION
 
 
-def _message(icon, parentwindow, message, title,
-             buttons, defaultbutton):
+icons = {'info': Gtk.MessageType.INFO,
+         'warning': Gtk.MessageType.WARNING,
+         'error': Gtk.MessageType.ERROR,
+         'question': Gtk.MessageType.QUESTION}
+
+
+def message(iconname, parentwindow, message, title,
+            buttons, defaultbutton):
     # The start=100 avoids confusing this with Gtk's ResponseTypes.
     texts_and_ids = []
     for the_id, text in enumerate(buttons, start=100):
@@ -36,8 +42,8 @@ def _message(icon, parentwindow, message, title,
         texts_and_ids.append(the_id)
 
     dialog = Gtk.MessageDialog(
-        parentwindow.real_widget, Gtk.DialogFlags.MODAL, icon,
-        tuple(texts_and_ids), message, title=title)
+        parentwindow.real_widget, Gtk.DialogFlags.MODAL,
+        icons[iconname], tuple(texts_and_ids), message, title=title)
     response = dialog.run()
     dialog.destroy()
 
@@ -46,12 +52,6 @@ def _message(icon, parentwindow, message, title,
     except IndexError:
         # The window was probably closed.
         return None
-
-
-info = functools.partial(_message, Gtk.MessageType.INFO)
-warning = functools.partial(_message, Gtk.MessageType.WARNING)
-error = functools.partial(_message, Gtk.MessageType.ERROR)
-question = functools.partial(_message, Gtk.MessageType.QUESTION)
 
 
 def colordialog(parentwindow, defaultcolor, title):
