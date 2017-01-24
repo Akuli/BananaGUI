@@ -163,15 +163,15 @@ class Window(BaseWindow):
     windows like this.
     """
 
-    def __init__(self, title="BananaGUI Window", **kwargs):
+    def __init__(self, title="BananaGUI Window", *,
+                 resizable=True, **kwargs):
         """Initialize the window."""
         if not isinstance(title, str):
             raise TypeError("Window title needs to be a string, not %r"
                             % (title,))
         wrapperclass = bananagui._get_wrapper('widgets.window:Window')
         self._wrapper = wrapperclass(self, title)
-        super().__init__(title, **kwargs)
-
+        super().__init__(title, resizable=resizable, **kwargs)
 
 class Dialog(BaseWindow):
     """A window that has a parent window.
@@ -201,7 +201,8 @@ class Dialog(BaseWindow):
     real GUI toolkit supports.
     """
 
-    def __init__(self, parentwindow, title=None, **kwargs):
+    def __init__(self, parentwindow, title=None, *,
+                 resizable=False, **kwargs):
         """Initialize the dialog.
 
         The title defaults to parentwindow's title.
@@ -217,7 +218,7 @@ class Dialog(BaseWindow):
         wrapperclass = bananagui._get_wrapper('widgets.window:Dialog')
         self._wrapper = wrapperclass(self, parentwindow._wrapper, title)
         self.__parentwindow = parentwindow
-        super().__init__(title, **kwargs)
+        super().__init__(title, resizable=resizable, **kwargs)
 
     @property
     def parentwindow(self):
