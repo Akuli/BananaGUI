@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -38,7 +38,7 @@ class Entry(Child):
     def create_widget(self, parent):
         self._var = tk.StringVar()
         self._var.trace('w', self._var_changed)
-        widget = tk.Entry(parent.real_widget, textvariable=self._var)
+        widget = tk.Entry(parent.widget, textvariable=self._var)
         _setup_bindings(self.bananawidget, widget)
         return widget
 
@@ -52,15 +52,15 @@ class Entry(Child):
     # This overrides the set_grayed_out defined in basewidgets.py.
     @run_when_ready
     def set_grayed_out(self, grayed_out):
-        self.real_widget['state'] = 'readonly' if grayed_out else 'normal'
+        self.widget['state'] = 'readonly' if grayed_out else 'normal'
 
     @run_when_ready
     def set_secret(self, secret):
-        self.real_widget['show'] = '*' if secret else ''
+        self.widget['show'] = '*' if secret else ''
 
     @run_when_ready
     def select_all(self):
-        self.real_widget.selection_range(0, 'end')
+        self.widget.selection_range(0, 'end')
 
 
 class TextEdit(Child):
@@ -68,7 +68,7 @@ class TextEdit(Child):
     def create_widget(self, parent):
         # A larger width or height would prevent the widget from
         # shrinking when needed.
-        widget = tk.Text(parent.real_widget, width=1, height=1)
+        widget = tk.Text(parent.widget, width=1, height=1)
         widget.bind('<<Modified>>', self._on_modified)
         _setup_bindings(self.bananawidget, widget)
         return widget
@@ -84,18 +84,18 @@ class TextEdit(Child):
     @run_when_ready
     def set_text(self, text):
         print('setting text')
-        self.real_widget.unbind('<<Modified>>')
-        self.real_widget.delete(0.0, 'end-1c')
-        self.real_widget.edit_modified(False)
-        self.real_widget.bind('<<Modified>>', self._on_modified)
-        self.real_widget.insert(0.0, text)
+        self.widget.unbind('<<Modified>>')
+        self.widget.delete(0.0, 'end-1c')
+        self.widget.edit_modified(False)
+        self.widget.bind('<<Modified>>', self._on_modified)
+        self.widget.insert(0.0, text)
 
     @run_when_ready
     def set_grayed_out(self, grayed_out):
-        self.real_widget['state'] = 'disable' if grayed_out else 'normal'
+        self.widget['state'] = 'disable' if grayed_out else 'normal'
 
     @run_when_ready
     def select_all(self):
         # The end-1c doesn't get what tkinter thinks of as the last
         # character, which is a hidden newline.
-        self.real_widget.tag_add('sel', 0.0, 'end-1c')
+        self.widget.tag_add('sel', 0.0, 'end-1c')

@@ -75,7 +75,7 @@ class Widget:
     @property
     def real_widget(self):
         """The real GUI toolkit widget that BananaGUI uses."""
-        return self._wrapper.real_widget
+        return self._wrapper.widget
 
     def focus(self):
         """Give the keyboard focus to this widget.

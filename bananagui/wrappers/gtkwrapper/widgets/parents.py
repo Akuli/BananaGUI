@@ -29,19 +29,19 @@ from .basewidgets import Child, Widget
 class Bin(Widget):
 
     def add(self, child):
-        self.real_widget.add(child.real_widget)
+        self.widget.add(child.widget)
         # If this is a GtkScrolledWindow and child doesn't support
         # scrolling, adding the child creates a GtkViewPort and adds it
-        # to this widget instead. We can't use child.real_widget.show
+        # to this widget instead. We can't use child.widget.show
         # here because that wouldn't show the viewport. We also can't
-        # do self.real_widget.show_all() because that would unhide
+        # do self.widget.show_all() because that would unhide
         # Window and Dialog widgets.
-        self.real_widget.get_child().show_all()
+        self.widget.get_child().show_all()
 
     def remove(self, child):
         # The child isn't necessary the widget in this widget as
         # explained above.
-        self.real_widget.remove(self.real_widget.get_child())
+        self.widget.remove(self.widget.get_child())
 
 
 _expand_indexes = {
@@ -53,7 +53,7 @@ _expand_indexes = {
 class Box(Child):
 
     def __init__(self, bananawidget, orient):
-        self.real_widget = Gtk.Box(orientation=orientations[orient])
+        self.widget = Gtk.Box(orientation=orientations[orient])
         super().__init__(bananawidget)
 
     def append(self, child):
@@ -61,25 +61,25 @@ class Box(Child):
         # changed?
         expandindex = _expand_indexes[self.bananawidget.orient]
         expand = child.bananawidget.expand[expandindex]
-        self.real_widget.pack_start(child.real_widget, expand, expand, 0)
-        child.real_widget.show()
+        self.widget.pack_start(child.widget, expand, expand, 0)
+        child.widget.show()
 
     def remove(self, child):
-        self.real_widget.remove(child.real_widget)
+        self.widget.remove(child.widget)
 
 
 class Scroller(Bin, Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.ScrolledWindow()
+        self.widget = Gtk.ScrolledWindow()
         super().__init__(bananawidget)
 
 
 class Group(Bin, Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.Frame()
+        self.widget = Gtk.Frame()
         super().__init__(bananawidget)
 
     def set_text(self, text):
-        self.real_widget.set_label(text)
+        self.widget.set_label(text)

@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -31,13 +31,13 @@ class Slider(Child):
     def __init__(self, bananawidget, orientation, valuerange):
         range_args = (min(valuerange), max(valuerange),
                       utils.rangestep(valuerange))
-        self.real_widget = Gtk.Scale.new_with_range(
+        self.widget = Gtk.Scale.new_with_range(
             orientations[orientation], *range_args)
-        self.real_widget.connect('value-changed', self._do_value_changed)
+        self.widget.connect('value-changed', self._do_value_changed)
         super().__init__(bananawidget)
 
-    def _do_value_changed(self, real_widget):
-        value = int(real_widget.get_value())
+    def _do_value_changed(self, widget):
+        value = int(widget.get_value())
         if value in self.bananawidget.valuerange:
             self.bananawidget.value = value
             return
@@ -48,7 +48,7 @@ class Slider(Child):
         if abs(difference) < step/2:
             # Keeping the value where it is now is probably closest
             # to what the user wants.
-            real_widget.set_value(self.bananawidget.value)
+            widget.set_value(self.bananawidget.value)
         else:
             # Time to move the widget.
             if difference > 0:
@@ -59,7 +59,7 @@ class Slider(Child):
                 self.bananawidget.value -= step
 
     def set_value(self, value):
-        self.real_widget.set_value(value)
+        self.widget.set_value(value)
 
 
 class Spinbox(Child):
@@ -67,12 +67,12 @@ class Spinbox(Child):
     def __init__(self, bananawidget, valuerange):
         range_args = (min(valuerange), max(valuerange),
                       utils.rangestep(valuerange))
-        self.real_widget = Gtk.SpinButton.new_with_range(*range_args)
-        self.real_widget.connect('notify::value', self._do_value_changed)
+        self.widget = Gtk.SpinButton.new_with_range(*range_args)
+        self.widget.connect('notify::value', self._do_value_changed)
         super().__init__(bananawidget)
 
-    def _do_value_changed(self, real_widget, gparam):
-        self.bananawidget.value = real_widget.get_value_as_int()
+    def _do_value_changed(self, widget, gparam):
+        self.bananawidget.value = widget.get_value_as_int()
 
     def set_value(self, value):
-        self.real_widget.set_value(value)
+        self.widget.set_value(value)

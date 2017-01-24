@@ -28,10 +28,10 @@ from .parents import Bin
 class _BaseWindow(Bin):
 
     def __init__(self, bananawidget):
-        self.real_widget.set_border_width(5)  # Looks nicer.
-        self.real_widget.connect('configure-event', self._do_configure_event)
-        self.real_widget.connect('delete-event', self._do_delete_event)
-        self.real_widget.show()
+        self.widget.set_border_width(5)  # Looks nicer.
+        self.widget.connect('configure-event', self._do_configure_event)
+        self.widget.connect('delete-event', self._do_delete_event)
+        self.widget.show()
         super().__init__(bananawidget)
 
     def _do_configure_event(self, widget, event):
@@ -47,15 +47,15 @@ class _BaseWindow(Bin):
         return True     # Block GTK's event handling.
 
     def set_title(self, title):
-        self.real_widget.set_title(title)
+        self.widget.set_title(title)
 
     # TODO: resizable and size don't work correctly if resizable is
     # False but size is set.
     def set_resizable(self, resizable):
-        self.real_widget.set_resizable(resizable)
+        self.widget.set_resizable(resizable)
 
     def set_size(self, size):
-        self.real_widget.resize(*size)
+        self.widget.resize(*size)
 
     def set_minimum_size(self, size):
         width, height = size
@@ -63,32 +63,32 @@ class _BaseWindow(Bin):
             width = -1
         if height == 0:
             height = -1
-        self.real_widget.set_size_request(width, height)
+        self.widget.set_size_request(width, height)
 
     def set_hidden(self, hidden):
         if hidden:
-            self.real_widget.hide()
+            self.widget.hide()
         else:
-            self.real_widget.show()
+            self.widget.show()
 
     def close(self):
-        self.real_widget.destroy()
+        self.widget.destroy()
 
     def focus(self):
-        self.real_widget.present()
+        self.widget.present()
 
 
 class Window(_BaseWindow):
 
     def __init__(self, bananawidget, title):
-        self.real_widget = Gtk.Window(title=title)
+        self.widget = Gtk.Window(title=title)
         self._waitloop = None
         super().__init__(bananawidget)
 
     def close(self):
         if self._waitloop is not None:
             self._waitloop.quit()
-        self.real_widget.destroy()
+        self.widget.destroy()
 
     def wait(self):
         # This is based on gtk_dialog_run in the GtkDialog C source
@@ -105,26 +105,26 @@ class Window(_BaseWindow):
 class Dialog(_BaseWindow):
 
     def __init__(self, bananawidget, parentwindow, title):
-        self.real_widget = Gtk.Dialog(
-            title=title, transient_for=parentwindow.real_widget)
+        self.widget = Gtk.Dialog(
+            title=title, transient_for=parentwindow.widget)
 
         # Gtk's dialogs have an action area for buttons that we don't
         # need. Let's set its border width to zero to make it invisible
         # if direct access to it isn't deprecated.
         if GTK_VERSION < (3, 12):
-            self.real_widget.get_action_area().set_border_width(0)
+            self.widget.get_action_area().set_border_width(0)
 
         super().__init__(bananawidget)
 
     # The content area needs to contain the child.
     def set_child(self, child):
-        content = self.real_widget.get_content_area()
+        content = self.widget.get_content_area()
         if self.child is not None:
-            content.remove(self.child.real_widget)
+            content.remove(self.child.widget)
         if child is not None:
             # The content area is a vertical box.
-            content.pack_start(child.real_widget, True, True, 0)
-            child.real_widget.show()
+            content.pack_start(child.widget, True, True, 0)
+            child.widget.show()
 
     def wait(self):
-        self.real_widget.run()
+        self.widget.run()

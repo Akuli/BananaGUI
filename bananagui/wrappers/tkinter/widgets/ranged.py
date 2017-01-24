@@ -37,7 +37,7 @@ class Slider(Child):
     def create_widget(self, parent):
         # The command is way better than binding anything manually. I
         # found it from the scale(3tk) man page.
-        return tk.Scale(parent.real_widget, from_=self._minimum,
+        return tk.Scale(parent.widget, from_=self._minimum,
                         to=self._maximum, resolution=self._step,
                         orient=self._orient, command=self._do_changed)
 
@@ -46,7 +46,7 @@ class Slider(Child):
 
     @run_when_ready
     def set_value(self, value):
-        self.real_widget.set(value)
+        self.widget.set(value)
 
 
 def _select_all(event):
@@ -69,9 +69,10 @@ class Spinbox(Child):
         super().__init__(bananawidget)
 
     def create_widget(self, parent):
-        widget = tk.Spinbox(parent.real_widget,
-                            # Tkinter doesn't know how to handle ranges.
-                            values=tuple(self._valuerange))
+        widget = tk.Spinbox(
+            parent.widget,
+            # Tkinter doesn't know how to handle ranges.
+            values=tuple(self._valuerange))
         widget.bind('<Control-A>', _select_all)
         widget.bind('<Control-a>', _select_all)
         widget['textvariable'] = self._var

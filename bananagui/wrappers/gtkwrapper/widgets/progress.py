@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,23 +27,23 @@ from .basewidgets import Child
 class Progressbar(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.ProgressBar()
+        self.widget = Gtk.ProgressBar()
         super().__init__(bananawidget)
 
     def set_progress(self, progress):
-        self.real_widget.set_fraction(progress)
+        self.widget.set_fraction(progress)
 
 
 class BouncingProgressbar(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.ProgressBar()
+        self.widget = Gtk.ProgressBar()
         super().__init__(bananawidget)
 
     def _on_timeout(self):
         if not self._bouncing:
             return False  # Stop this.
-        self.real_widget.pulse()
+        self.widget.pulse()
         return True     # Run this again.
 
     def set_bouncing(self, bouncing):
@@ -53,17 +53,17 @@ class BouncingProgressbar(Child):
         else:
             # The _on_timeout method knows when to stop, but we need to
             # move the progressbar back to the beginning now.
-            self.real_widget.set_fraction(0)
+            self.widget.set_fraction(0)
 
 
 class Spinner(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.Spinner()
+        self.widget = Gtk.Spinner()
         super().__init__(bananawidget)
 
     def set_spinning(self, spinning):
         if spinning:
-            self.real_widget.start()
+            self.widget.start()
         else:
-            self.real_widget.stop()
+            self.widget.stop()

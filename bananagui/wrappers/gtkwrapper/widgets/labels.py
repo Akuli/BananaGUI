@@ -35,15 +35,15 @@ haligns_and_justifys = {
 class Label(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.Label(justify=Gtk.Justification.CENTER)
+        self.widget = Gtk.Label(justify=Gtk.Justification.CENTER)
         super().__init__(bananawidget)
 
     def set_text(self, text):
-        self.real_widget.set_text(text)
+        self.widget.set_text(text)
 
     def set_align(self, align):
         halign, justify = haligns_and_justifys[align]
-        self.real_widget.set_halign(halign)
-        self.real_widget.set_justify(justify)
+        self.widget.set_halign(halign)
+        self.widget.set_justify(justify)
 
     # TODO: implement set_image.

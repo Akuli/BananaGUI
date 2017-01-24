@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,15 +27,15 @@ from .basewidgets import Child
 class Button(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.Button()
-        self.real_widget.connect('clicked', self._do_click)
+        self.widget = Gtk.Button()
+        self.widget.connect('clicked', self._do_click)
         super().__init__(bananawidget)
 
     def _do_click(self, button):
         self.bananawidget.on_click.run()
 
     def set_text(self, text):
-        self.real_widget.set_label(text)
+        self.widget.set_label(text)
 
     # TODO: set_imagepath.
 

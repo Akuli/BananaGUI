@@ -33,23 +33,23 @@ anchors = {bananagui.LEFT: 'w',
 class Label(Child):
 
     def create_widget(self, parent):
-        return tk.Label(parent.real_widget)
+        return tk.Label(parent.widget)
 
     @run_when_ready
     def set_text(self, text):
-        self.real_widget['text'] = text
+        self.widget['text'] = text
 
     @run_when_ready
     def set_align(self, align):
-        self.real_widget['justify'] = align.name.lower()
-        self.real_widget['anchor'] = anchors[align]
+        self.widget['justify'] = align.name.lower()
+        self.widget['anchor'] = anchors[align]
 
     @run_when_ready
     def set_image(self, image):
         if image is None:
-            self.real_widget['image'] = ''
+            self.widget['image'] = ''
         else:
-            self.real_widget['image'] = image.real_image
+            self.widget['image'] = image.real_image
 
 
 ImageLabel = Label

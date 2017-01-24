@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -36,7 +36,7 @@ class Checkbox(Child):
         super().__init__(bananawidget)
 
     def create_widget(self, parent):
-        widget = tk.Checkbutton(parent.real_widget, variable=self._var)
+        widget = tk.Checkbutton(parent.widget, variable=self._var)
 
         # The checkboxes have white foreground on a white background by
         # default with my dark GTK+ theme.
@@ -68,7 +68,7 @@ class Checkbox(Child):
 
     @run_when_ready
     def set_text(self, text):
-        self.real_widget['text'] = text
+        self.widget['text'] = text
 
     # The variable was created in __init__, so we don't need
     # @run_when_ready.
@@ -79,7 +79,7 @@ class Checkbox(Child):
 class Dummy(Child):
 
     def create_widget(self, parent):
-        return tk.Label(parent.real_widget)
+        return tk.Label(parent.widget)
 
 
 class Separator(Child):
@@ -89,7 +89,7 @@ class Separator(Child):
         super().__init__(bananawidget)
 
     def create_widget(self, parent):
-        widget = tk.Frame(parent.real_widget, border=1, relief='sunken')
+        widget = tk.Frame(parent.widget, border=1, relief='sunken')
         if self.orientation == bananagui.HORIZONTAL:
             widget['height'] = 3
         if self.orientation == bananagui.VERTICAL:

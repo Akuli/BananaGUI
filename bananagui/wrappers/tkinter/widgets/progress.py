@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,28 +27,28 @@ from .basewidgets import Child, run_when_ready
 class Progressbar(Child):
 
     def create_widget(self, parent):
-        return ttk.Progressbar(parent.real_widget)
+        return ttk.Progressbar(parent.widget)
 
     @run_when_ready
     def set_bouncing(self, bouncing):
         if bouncing:
-            self.real_widget['mode'] = 'indeterminate'
-            self.real_widget.start(20)  # Move every 20 milliseconds.
+            self.widget['mode'] = 'indeterminate'
+            self.widget.start(20)  # Move every 20 milliseconds.
         else:
             # Unfortunately there's no better way to hide the moving
             # part of the bar when we don't want it to bounce.
-            self.real_widget['mode'] = 'determinate'
-            self.real_widget.stop()
+            self.widget['mode'] = 'determinate'
+            self.widget.stop()
 
     @run_when_ready
     def set_progress(self, progress):
-        self.real_widget.stop()  # Reset it.
+        self.widget.stop()  # Reset it.
         step = progress * 100
         if step > 99.99:
             # The widget would go back to zero if we stepped it this
             # much.
             step = 99.99
-        self.real_widget.step(step)
+        self.widget.step(step)
 
 
 BouncingProgressbar = Progressbar

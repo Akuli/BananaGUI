@@ -48,7 +48,7 @@ class Parent(Widget):
     def _prepare_add(self, child):
         """Prepare a child for being added to this widget."""
         child._packed = True
-        if child.real_widget is None:
+        if child.widget is None:
             child.create(self)
 
     def _prepare_remove(self, child):
@@ -61,7 +61,7 @@ class Bin(Parent):
     # The _real_add is used in window.py.
     def _real_add(self, child):
         self._prepare_add(child)
-        child.real_widget.pack()
+        child.widget.pack()
         child.set_expand(child.bananawidget.expand)  # Update the packing.
 
     add = run_when_ready(_real_add)
@@ -69,7 +69,7 @@ class Bin(Parent):
     @run_when_ready
     def remove(self, child):
         self._prepare_remove(child)
-        child.real_widget.pack_forget()
+        child.widget.pack_forget()
 
 
 # TODO: Scroller.
@@ -91,12 +91,12 @@ class Box(Parent, Child):
         super().__init__(bananawidget)
 
     def create_widget(self, parent):
-        return tk.Frame(parent.real_widget)
+        return tk.Frame(parent.widget)
 
     @run_when_ready
     def append(self, child):
         self._prepare_add(child)
-        child.real_widget.pack(
+        child.widget.pack(
             side=_appendsides[self.bananawidget.orient],
             fill=tkinter_fills[child.bananawidget.expand],
         )
@@ -106,14 +106,14 @@ class Box(Parent, Child):
     @run_when_ready
     def remove(self, child):
         self._prepare_remove(child)
-        child.real_widget.pack_forget()
+        child.widget.pack_forget()
 
 
 class Group(Bin, Child):
 
     def create_widget(self, parent):
-        return tk.LabelFrame(parent.real_widget)
+        return tk.LabelFrame(parent.widget)
 
     @run_when_ready
     def set_text(self, text):
-        self.real_widget['text'] = text
+        self.widget['text'] = text

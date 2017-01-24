@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@ from .basewidgets import Child, run_when_ready
 class Button(Child):
 
     def create_widget(self, parent):
-        widget = tk.Button(parent.real_widget, command=self._do_click)
+        widget = tk.Button(parent.widget, command=self._do_click)
         widget.bind('<Return>', self._do_click)
         return widget
 
@@ -36,14 +36,14 @@ class Button(Child):
 
     @run_when_ready
     def set_text(self, text):
-        self.real_widget['text'] = text
+        self.widget['text'] = text
 
     @run_when_ready
     def set_image(self, image):
         if image is None:
-            self.real_widget['image'] = ''
+            self.widget['image'] = ''
         else:
-            self.real_widget['image'] = image.real_image
+            self.widget['image'] = image.real_image
 
 
 ImageButton = Button

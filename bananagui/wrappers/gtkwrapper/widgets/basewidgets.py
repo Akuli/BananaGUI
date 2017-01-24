@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -54,18 +54,18 @@ class Widget:
         self.bananawidget = bananawidget
 
     def focus(self):
-        self.real_widget.grab_focus()
+        self.widget.grab_focus()
 
 
 class Child(Widget):
 
     def set_expand(self, expand):
         h, v = expand
-        self.real_widget.set_hexpand(h)
-        self.real_widget.set_vexpand(v)
+        self.widget.set_hexpand(h)
+        self.widget.set_vexpand(v)
 
     def set_tooltip(self, tooltip):
-        self.real_widget.set_tooltip_text(tooltip)
+        self.widget.set_tooltip_text(tooltip)
 
     def set_grayed_out(self, grayed_out):
-        self.real_widget.set_sensitive(not grayed_out)
+        self.widget.set_sensitive(not grayed_out)

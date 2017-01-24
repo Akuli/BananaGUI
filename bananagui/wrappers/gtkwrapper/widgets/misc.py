@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -28,24 +28,24 @@ from .basewidgets import Child
 class Checkbox(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.CheckButton()
-        self.real_widget.connect('notify::active', self._do_check)
+        self.widget = Gtk.CheckButton()
+        self.widget.connect('notify::active', self._do_check)
         super().__init__(bananawidget)
 
-    def _do_check(self, real_widget, gparam):
-        self.bananawidget.checked = real_widget.get_active()
+    def _do_check(self, widget, gparam):
+        self.bananawidget.checked = widget.get_active()
 
     def set_text(self, text):
-        self.real_widget.set_label(text)
+        self.widget.set_label(text)
 
     def set_checked(self, checked):
-        self.real_widget.set_active(checked)
+        self.widget.set_active(checked)
 
 
 class Dummy(Child):
 
     def __init__(self, bananawidget):
-        self.real_widget = Gtk.Label()
+        self.widget = Gtk.Label()
         super().__init__(bananawidget)
 
 
@@ -53,5 +53,5 @@ class Separator(Child):
 
     def __init__(self, bananawidget, orientation):
         gtk_orientation = orientations[orientation]
-        self.real_widget = Gtk.Separator(orientation=gtk_orientation)
+        self.widget = Gtk.Separator(orientation=gtk_orientation)
         super().__init__(bananawidget)

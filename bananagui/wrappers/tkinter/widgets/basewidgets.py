@@ -113,7 +113,7 @@ class Widget:
         self.bananawidget = bananawidget
 
     def focus(self):
-        self.real_widget.focus()
+        self.widget.focus()
 
 
 _expand_indexes = {
@@ -136,7 +136,7 @@ class Child(Widget):
         self.todo = []
         self.parent = None
         self._packed = False  # See also parents.py.
-        self.real_widget = None
+        self.widget = None
         super().__init__(bananawidget)
 
     def create(self, parent):
@@ -145,8 +145,8 @@ class Child(Widget):
             # It has been created already.
             return
         self.parent = parent
-        self.real_widget = self.create_widget(self.parent)
-        self._tooltip = _Tooltip(self.real_widget)
+        self.widget = self.create_widget(self.parent)
+        self._tooltip = _Tooltip(self.widget)
         for thing in self.todo:
             thing()
         self.todo = None
@@ -168,7 +168,7 @@ class Child(Widget):
             except AttributeError:
                 # It's not a box. We need a default value.
                 pack_kwargs['expand'] = (expand == (True, True))
-            self.real_widget.pack(**pack_kwargs)
+            self.widget.pack(**pack_kwargs)
 
     @run_when_ready
     def set_tooltip(self, tooltip):
@@ -176,4 +176,6 @@ class Child(Widget):
 
     @run_when_ready
     def set_grayed_out(self, grayed_out):
-        self.real_widget['state'] = 'disable' if grayed_out else 'normal'
+        self.widget['state'] = 'disable' if grayed_out else 'normal'
+
+    focus = run_when_ready(Widget.focus)
