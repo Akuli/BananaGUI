@@ -75,11 +75,10 @@ def _sizecheck(window, size):
     'on_close',
     doc="""A callback that runs when the user tries to close the window.
 
-    This is connected to thewindow.close by default. You can disconnect
-    it if you want to handle the window closing yourself.
-
-    In other words, this callback doesn't run when close() is called
-    but (by default) close() is called when this callback runs.
+    This callback doesn't actually run when close() is called. The 
+    close() method closes the window, but this runs when the *user* 
+    tries to close the window. Usually you should connect this to 
+    bananagui.mainloop.quit.
     """)
 class BaseWindow(Bin):
     """A window baseclass.
@@ -104,7 +103,6 @@ class BaseWindow(Bin):
         self._prop_size = (200, 200)
         self._prop_minimum_size = (0, 0)
         self._prop_hidden = False
-        self.on_close.connect(self.close)
         self.__closed = False
         super().__init__(child, **kwargs)
         self.resizable = resizable
@@ -130,8 +128,7 @@ class BaseWindow(Bin):
         """Close the window and set the closed attribute to True.
 
         This method can be called multiple times and it will do nothing
-        after the first call. It's not recommended to override this in
-        a subclass, use the on_close callback instead.
+        after the first call.
         """
         if not self.closed:
             self._wrapper.close()
