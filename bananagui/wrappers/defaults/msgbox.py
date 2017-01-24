@@ -25,12 +25,11 @@ from bananagui import widgets
 
 def message(icon, parentwindow, message, title, buttons, defaultbutton):
     # TODO: do something with the icon?
-    def do_click(text):
+    def done(text):
         nonlocal result
         result = text
         dialog.close()
 
-    result = None
     dialog = widgets.Dialog(parentwindow, title=title, minimum_size=(350, 150))
 
     mainbox = widgets.Box()
@@ -43,16 +42,16 @@ def message(icon, parentwindow, message, title, buttons, defaultbutton):
     focus_this = None
     for buttontext in buttons:
         button = widgets.Button(text=buttontext)
-        button.on_click.connect(do_click, buttontext)
+        button.on_click.connect(done, buttontext)
         buttonbox.extend([widgets.Dummy(), button, widgets.Dummy()])
         if buttontext == defaultbutton:
             focus_this = button
-
     if focus_this is not None:
         focus_this.focus()
 
+    dialog.on_close.connect(done, None)
     dialog.wait()
-    return result
+    return result   # noqa
 
 
 # TODO: font dialog.
