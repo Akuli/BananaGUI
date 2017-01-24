@@ -23,29 +23,28 @@ from bananagui import color, mainloop, msgbox, widgets
 
 
 def info(window):
-    result = msgbox.info(window, "Information!")
+    result = msgbox.info(window, "Information!", ["Got it"])
     print(repr(result))
 
 
 def warning(window):
     result = msgbox.warning(
-        window, "Warning!", title="Be warned!",
-        buttons=["What's going to happen next?"])
+        window, "Be careful!", ["What's going to happen if I'm not?"],
+        title="Warning")
     print(repr(result))
 
 
 def error(window):
     result = msgbox.error(
-        window, "Error!", title="Oh no!",
-        buttons=["I'm screwed!", "I'm not screwed"],
-        defaultbutton="I'm screwed!")
+        window, "Oh no!", ["I'm screwed!", "I'm not screwed"],
+        defaultbutton="I'm screwed!", title="Error")
     print(repr(result))
 
 
 def question(window):
     result = msgbox.question(
-        window, "Do you like BananaGUI?",
-        buttons=["Yes", "No"], defaultbutton="Yes")
+        window, "Do you like BananaGUI?", ["Yes", "No"],
+        defaultbutton="Yes")
     print(repr(result))
 
 
@@ -57,7 +56,7 @@ def choose_color(window):
 
 
 def main():
-    window = widgets.Window("Dialog test")
+    window = widgets.Window("Message box test")
     box = widgets.Box()
     window.add(box)
 

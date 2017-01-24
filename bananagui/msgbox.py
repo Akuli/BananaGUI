@@ -32,8 +32,7 @@ The info(), warning(), error() and question() functions also take these
 arguments:
 
 - *buttons:* This should be a sequence of button texts that will be
-  added to the dialog. It defaults to "OK" translated with
-  gettext.gettext in a list.
+  added to the dialog.
 - *defaultbutton:* This should be a string in the buttons list, and this
   button will have keyboard focus by default. If the defaultbutton is
   not given and there's one button, it will be used. Otherwise there
@@ -90,28 +89,28 @@ def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
                        defaultbutton)
 
 
-def info(parentwindow, message, *, title=None, buttons=None,
+def info(parentwindow, message, buttons, *, title=None,
          defaultbutton=None):
     """Display an info message."""
     return _message('info', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def warning(parentwindow, message, *, title=None, buttons=None,
+def warning(parentwindow, message, buttons, *, title=None,
             defaultbutton=None):
     """Display a warning message."""
     return _message('warning', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def error(parentwindow, message, *, title=None, buttons=None,
+def error(parentwindow, message, buttons, *, title=None,
           defaultbutton=None):
     """Display an error message."""
     return _message('error', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def question(parentwindow, message, *, title=None, buttons=None,
+def question(parentwindow, message, buttons, *, title=None,
              defaultbutton=None):
     """Display a question message."""
     return _message('question', parentwindow, message, title, buttons,
