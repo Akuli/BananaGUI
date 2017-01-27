@@ -50,7 +50,7 @@ if __name__ == '__main__':
 ```
 
 See [the guitests directory](guitests) for more examples or read [the 
-documentation](docs/README.md).
+tutorial](https://github.com/Akuli/BananaGUI/wiki/Tutorial).
 
 ## Why BananaGUI?
 
