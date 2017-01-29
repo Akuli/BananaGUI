@@ -25,11 +25,5 @@ from bananagui import images
 
 
 def test_image_errors():
-    with pytest.raises(TypeError):
-        images.Image(123)
-    with pytest.raises(TypeError):
-        images.Image('some path', 123)
-    with pytest.raises(TypeError):
-        images.Image.from_size('hello', 'there')
     with pytest.raises(ValueError):
         images.Image.from_size(-1, -1)

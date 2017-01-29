@@ -62,10 +62,6 @@ def test_add_and_remove(dummywrapper):
     window1 = widgets.Window("Window 1")
     window2 = widgets.Window("Window 2")
     assert window1.child is window2.child is None
-    with pytest.raises(TypeError):
-        window1.add('hello')
-    with pytest.raises(TypeError):
-        window1.add(window2)
     label = widgets.Label("Label")
     with pytest.raises(ValueError):
         window1.remove(label)  # not added

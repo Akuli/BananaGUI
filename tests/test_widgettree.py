@@ -24,13 +24,6 @@ import pytest
 from bananagui import widgets, widgettree
 
 
-def test_errors(dummywrapper):
-    with pytest.raises(TypeError):
-        widgettree.dump(123)
-    with pytest.raises(TypeError):
-        widgettree.dump(widgets.Label())  # needs to be a Parent
-
-
 asciitemplate = """\
 {window}
 `-- {bigbox}

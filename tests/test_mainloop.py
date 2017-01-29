@@ -64,10 +64,6 @@ def broken_callback_2(*args):
 
 
 def test_add_timeout(dummywrapper, capsys):
-    with pytest.raises(TypeError):
-        mainloop.add_timeout('hello', print)
-    with pytest.raises(TypeError):
-        mainloop.add_timeout(1.0, print)    # must be integer
     with pytest.raises(ValueError):
         mainloop.add_timeout(-1, print)
 
