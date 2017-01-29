@@ -31,12 +31,11 @@ All public functions in this module take these arguments:
 The info(), warning(), error() and question() functions also take these
 arguments:
 
-- *buttons:* This should be a sequence of button texts that will be
-  added to the dialog.
-- *defaultbutton:* This should be a string in the buttons list, and this
-  button will have keyboard focus by default. If the defaultbutton is
-  not given and there's one button, it will be used. Otherwise there
-  will be no default button.
+- *buttons:* This should be an iterable of button texts that will be
+  added to the dialog. BananaGUI needs to iterate over this multiple
+  times, so I don't recommend using an iterator for this.
+- *defaultbutton:* This should be a string in *buttons*. The default
+  button will have keyboard focus by default.
 - *text:* This is the text that will be shown in the dialog.
 - *title:* The title of the dialog, defaults to the parentwindow's title.
 
@@ -57,29 +56,10 @@ from bananagui import color, widgets
 __all__ = ['info', 'warning', 'error', 'question', 'colordialog']
 
 
-def _check(parentwindow, title):
-    if not isinstance(parentwindow, widgets.Window):
-        raise TypeError("expected a Window widget, got %r" % (parentwindow,))
+def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
     if title is None:
         title = parentwindow.title
-    if not isinstance(title, str):
-        raise TypeError("title should be a string, not %r" % (title,))
-    return title
-
-
-def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
-    title = _check(parentwindow, title)
-    if buttons is None:
-        buttons = [_("OK")]
-    elif not isinstance(buttons, abcoll.Sequence):
-        # Anything iterable can't be allowed because we need to for
-        # loop over this multiple times and len() this.
-        raise TypeError("expected a sequence, got %r" % (buttons,))
-
-    if defaultbutton is None:
-        if len(buttons) == 1:
-            defaultbutton = buttons[0]
-    elif defaultbutton not in buttons:
+    if defaultbutton is not None and defaultbutton not in buttons:
         raise ValueError("default button %r not in buttons"
                          % (defaultbutton,))
     # The wrapper functions can't import the MessageKind enum from this
@@ -89,40 +69,42 @@ def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
                        defaultbutton)
 
 
-def info(parentwindow, message, buttons, *, title=None,
-         defaultbutton=None):
+def info(parentwindow: widgets.Window, message: str, buttons, *,
+         title: str = None, defaultbutton: str = None):
     """Display an info message."""
     return _message('info', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def warning(parentwindow, message, buttons, *, title=None,
-            defaultbutton=None):
+def warning(parentwindow: widgets.Window, message: str, buttons, *,
+            title: str = None, defaultbutton: str = None):
     """Display a warning message."""
     return _message('warning', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def error(parentwindow, message, buttons, *, title=None,
-          defaultbutton=None):
+def error(parentwindow: widgets.Window, message: str, buttons, *,
+          title: str = None, defaultbutton: str = None):
     """Display an error message."""
     return _message('error', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def question(parentwindow, message, buttons, *, title=None,
-             defaultbutton=None):
+def question(parentwindow: widgets.Window, message: str, buttons, *,
+             title: str = None, defaultbutton: str = None):
     """Display a question message."""
     return _message('question', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
+def colordialog(parentwindow: widgets.Window, *, title: str = None,
+                defaultcolor: str = color.BLACK):
     """Ask a color from the user.
 
     This returns the new color, or None if the user canceled the dialog.
     """
-    title = _check(parentwindow, title)
+    if title is None:
+        title = parentwindow.title
     if not color._is_valid_color(defaultcolor):
         raise ValueError(
             "%r is not a valid '#RRGGBB' color, use "

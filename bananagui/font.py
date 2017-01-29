@@ -112,7 +112,7 @@ class Font:
 
 
 @functools.lru_cache()
-def get_families():
+def get_families() -> frozenset:
     """Return a frozenset of all avaliable font families."""
     if not mainloop._initialized:
         raise RuntimeError("the mainloop wasn't initialized")

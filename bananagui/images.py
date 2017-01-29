@@ -66,46 +66,32 @@ class Image:
     user.
     """ % (', '.join(_imagetypes[:-1]), _imagetypes[-1])
 
-    def __init__(self, path, imagetype=None):
+    def __init__(self, path: str, imagetype: str = None):
         """Load an Image from a file.
 
         See bananagui.images.Image documentation for more information about
         filetypes.
         """
-        if not isinstance(path, str):
-            raise TypeError("path should be a string, not %r" % (path,))
-        if not (imagetype is None or isinstance(imagetype, str)):
-            raise TypeError("imagetype should be a string, not %r"
-                            % (imagetype,))
         imagetype = _guess_imagetype(path, imagetype)
         wrapperclass = bananagui._get_wrapper('images:Image')
         self._wrapper, self._size = wrapperclass.from_file(path, imagetype)
         self._path = path
 
-    def save(self, path, imagetype=None):
+    def save(self, path: str, imagetype: str = None):
         """Save the image to a file.
 
         See bananagui.images.Image documentation for more information about
         filetypes.
         """
-        if not isinstance(path, str):
-            raise TypeError("path should be a string, not %r" % (path,))
-        if not (imagetype is None or isinstance(imagetype, str)):
-            raise TypeError("imagetype should be a string, not %r"
-                            % (imagetype,))
         imagetype = _guess_imagetype(path, imagetype)
         self._wrapper.save(path, imagetype)
         self._path = path
 
     @classmethod
-    def from_size(cls, width, height):
+    def from_size(cls, width: int, height: int):
         """Create a new, fully transparent Image from width and height."""
-        for value in (width, height):
-            if not isinstance(value, int):
-                raise TypeError("width and height must be integers, not %r"
-                                % (value,))
-            if value < 0:
-                raise ValueError("negative width/height %r" % (value,))
+        if width < 0 or height < 0:
+            raise ValueError("negative width or height")
         wrapperclass = bananagui._get_wrapper('images:Image')
         self = cls.__new__(cls)     # Don't run __init__.
         self._wrapper = wrapperclass.from_size(width, height)

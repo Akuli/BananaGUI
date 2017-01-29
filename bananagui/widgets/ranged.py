@@ -46,9 +46,6 @@ class _Ranged:
     # to min() of that range.
 
     def __init__(self, *args, **kwargs):
-        if not isinstance(self.valuerange, range):
-            raise TypeError("valuerange needs to be a range object, not %r"
-                            % (self.valuerange,))
         if len(self.valuerange) < 2:
             raise ValueError("valuerange %r contains too little values"
                              % (self.valuerange,))
@@ -83,7 +80,7 @@ class Spinbox(_Ranged, Child):
 
     can_focus = True
 
-    def __init__(self, valuerange, *, value=None, **kwargs):
+    def __init__(self, valuerange: range, *, value=None, **kwargs):
         """Initialize the spinbox."""
         self._prop_valuerange = valuerange
         self._prop_value = min(valuerange)
@@ -107,7 +104,7 @@ class Slider(_Ranged, Child):
     me know and I'll implement it.
     """
 
-    def __init__(self, valuerange, orient=bananagui.HORIZONTAL, *,
+    def __init__(self, valuerange: range, orient=bananagui.HORIZONTAL, *,
                  value=None, **kwargs):
         """Initialize the slider.
 

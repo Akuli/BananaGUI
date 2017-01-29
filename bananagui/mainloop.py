@@ -108,7 +108,7 @@ def quit():
         bananagui._get_wrapper('mainloop:quit')()
 
 
-def add_timeout(milliseconds, callback, *args):
+def add_timeout(milliseconds: int, callback, *args):
     """Run callback(*args) after waiting.
 
     If the function returns bananagui.RUN_AGAIN it will be called again
@@ -119,8 +119,6 @@ def add_timeout(milliseconds, callback, *args):
     for most purposes. Use something like time.time() if you need to
     measure time in the callback function.
     """
-    if not isinstance(milliseconds, int):
-        raise TypeError("expected an integer, got %r" % (milliseconds,))
     if milliseconds <= 0:
         raise ValueError("non-positive timeout %d" % milliseconds)
 

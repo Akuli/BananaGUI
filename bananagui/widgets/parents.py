@@ -81,8 +81,6 @@ class Parent(Widget):
 
     def _prepare_add(self, child):
         """Make sure child can be added to self and make it ready for it."""
-        if not isinstance(child, Child):
-            raise TypeError("expected a Child widget, got %r" % (child,))
         if child in self.children:
             raise ValueError("cannot add the same child twice")
         if child._parent is None:
@@ -144,7 +142,7 @@ class Bin(Parent):
         """
         return self.__child
 
-    def add(self, child):
+    def add(self, child: Child):
         """Add the child widget into this widget.
 
         This widget must not contain another child. The value of the
@@ -156,7 +154,7 @@ class Bin(Parent):
         self._wrapper.add(child._wrapper)
         self.__child = child
 
-    def remove(self, child):
+    def remove(self, child: Child):
         """Remove the child from the widget.
 
         The child attribute is set to None. The argument must be the

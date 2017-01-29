@@ -62,7 +62,7 @@ def _is_valid_color(hexcolor):
     return re.search(r'^#[0-9A-Fa-f]{6}$', hexcolor) is not None
 
 
-def hex2rgb(hexcolor):
+def hex2rgb(hexcolor: str) -> tuple:
     """Convert a hexadecimal color to an RGB tuple.
 
     The returned values are always integers in range(256).
@@ -89,7 +89,7 @@ def hex2rgb(hexcolor):
     return tuple(rgb)
 
 
-def rgb2hex(rgb):
+def rgb2hex(rgb) -> str:
     """Convert an RGB sequence to a hexadecimal color.
 
     The values need to be in range(256).
@@ -97,14 +97,10 @@ def rgb2hex(rgb):
     >>> rgb2hex([0, 255, 255])
     '#00ffff'
     """
-    r, g, b = rgb     # Allow anything iterable of length 3.
-    for value in (r, g, b):
-        if value not in range(256):
-            raise ValueError("invalid R/G/B value %r" % (value,))
-    return '#%02x%02x%02x' % (r, g, b)
+    return '#%02x%02x%02x' % tuple(rgb)
 
 
-def hex2rgbstring(hexcolor):
+def hex2rgbstring(hexcolor: str) -> str:
     """Convert a hexadecimal color string to a CSS compatible color string.
 
     >>> hex2rgbstring('#ffff00')
@@ -120,7 +116,7 @@ _rgbstring_patterns = [
 ]
 
 
-def rgbstring2hex(rgbstring):
+def rgbstring2hex(rgbstring: str) -> str:
     """Convert a CSS compatible color string to a hexadecimal color string.
 
     This supports percents.
@@ -148,7 +144,7 @@ def rgbstring2hex(rgbstring):
     raise ValueError("invalid RGB color string %r" % (rgbstring,))
 
 
-def brightness(hexcolor):
+def brightness(hexcolor: str) -> float:
     """Return the brightness of the color between 0 and 1.
 
     >>> brightness('#000000')

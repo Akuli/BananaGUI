@@ -349,7 +349,7 @@ def load(file) -> dict:
     return parser.namespace
 
 
-def loads(string) -> dict:
+def loads(string: str) -> dict:
     """Like load(), but for strings."""
     fakefile = io.StringIO(string)
     fakefile.name = '<string>'  # for error messages

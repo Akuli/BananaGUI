@@ -89,14 +89,12 @@ def _dump_tree(widget, file, ascii_only, prefix=''):
             _dump_tree(child, file, ascii_only, new_prefix)
 
 
-def dump(widget, file=None, *, ascii_only=False):
+def dump(widget: widgets.Parent, file=None, *, ascii_only=False):
     """Print a tree of a parent widget and its child widgets.
 
     The file defaults to sys.stdout. If ascii_only is true, no
-    non-ascii characters will be used.
+    non-ASCII characters will be used.
     """
-    if not isinstance(widget, widgets.Parent):
-        raise TypeError("expected a Parent widget, got %r" % (widget,))
     # This allows monkeypatching sys.stdout.
     if file is None:
         file = sys.stdout
@@ -104,7 +102,7 @@ def dump(widget, file=None, *, ascii_only=False):
     _dump_tree(widget, file, ascii_only)
 
 
-def dumps(widget, **kwargs):
+def dumps(widget: widgets.Parent, **kwargs):
     """Like dump(), but return a string instead of printing to a file."""
     fakefile = io.StringIO()
     dump(widget, fakefile, **kwargs)

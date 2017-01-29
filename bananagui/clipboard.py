@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Akuli
+# Copyright (c) 2016-2017 Akuli
 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -33,11 +33,9 @@ def _initcheck():
                            "the clipboard")
 
 
-def set_text(text):
+def set_text(text: str):
     """Set text to the clipboard."""
     _initcheck()
-    if not isinstance(text, str):
-        raise TypeError("expected a string, got %r" % (text,))
     bananagui._get_wrapper('clipboard:set_text')(text)
 
 
