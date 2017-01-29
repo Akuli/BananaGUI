@@ -93,10 +93,6 @@ class Separator(Child):
 
     Usually there's no need to add separators between widgets, but they
     are sometimes useful.
-
-    Attributes:
-      orient    The orient set on initialization, converted to a
-                bananagui.Orient.
     """
 
     def __init__(self, orient=bananagui.HORIZONTAL, **kwargs):
@@ -123,4 +119,5 @@ class Separator(Child):
 
     @property
     def orient(self):
+        """The orient set on initialization as a bananagui.Orient."""
         return self.__orient
