@@ -8,7 +8,7 @@ these toolkits. BananaGUI may feature PyQt5 support later.
 
 A minimal Hello World program in BananaGUI looks like this:
 
-```py
+```python
 from bananagui import load_wrapper, mainloop, widgets
 
 load_wrapper('tkinter')
@@ -21,7 +21,7 @@ mainloop.run()
 You can also write your GUI using the .ini format and then load it with
 `bananagui.iniloader`:
 
-```py
+```python
 from bananagui import iniloader, load_wrapper, mainloop
 
 
@@ -223,7 +223,7 @@ checkbox with tkinter and then have a look at it on the interactive
 `>>>` prompt. This problem isn't tkinter-specific, GTK+ and PyQt also
 have this.
 
-```py
+```python
 >>> import tkinter as tk
 >>> root = tk.Tk()
 >>> checkbox = tk.Checkbutton(root, text="Check me!")
@@ -238,7 +238,7 @@ for distinguishing them from each other.
 
 Let's do the same thing with BananaGUI:
 
-```py
+```python
 >>> from bananagui import load, widgets
 >>> load('tkinter')
 >>> checkbox = widgets.Checkbox("Check me!")
