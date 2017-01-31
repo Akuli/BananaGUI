@@ -78,19 +78,19 @@ def _load_wrapper(name):
 def load_wrapper(*args, init_mainloop=True):
     """Import a BananaGUI wrapper module.
 
-    This function must be exactly once before using most things in 
-    BananaGUI. Submodules may be imported without calling this, but 
+    This function must be exactly once before using most things in
+    BananaGUI. Submodules may be imported without calling this, but
     that's about it. See help('bananagui.mainloop') for more info.
 
-    The arguments for this function should be valid BananaGUI wrapper 
-    modules. For example, load_wrapper('tkinter') tells BananaGUI to use 
-    tkinter as its GUI toolkit. The WRAPPERS variable contains a full 
+    The arguments for this function should be valid BananaGUI wrapper
+    modules. For example, load_wrapper('tkinter') tells BananaGUI to use
+    tkinter as its GUI toolkit. The WRAPPERS variable contains a full
     list of valid arguments for this function.
 
-    If multiple wrapper modules are given, this function attempt to load 
+    If multiple wrapper modules are given, this function attempt to load
     each wrapper module until loading one of them succeeds.
 
-    For convenience, bananagui.mainloop.init() will be called if 
+    For convenience, bananagui.mainloop.init() will be called if
     init_mainloop is True.
     """
     if not args:
@@ -123,9 +123,9 @@ def load_wrapper(*args, init_mainloop=True):
 def _get_wrapper(name):
     """Get an object from the wrapper module.
 
-    For example, if bananagui.load_wrapper('tkinter') has been ran, 
-    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and 
-    returns its c attribute. An exception is raised if 
+    For example, if bananagui.load_wrapper('tkinter') has been ran,
+    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and
+    returns its c attribute. An exception is raised if
     bananagui.load_wrapper() has not been called.
     """
     if _wrapper is None:

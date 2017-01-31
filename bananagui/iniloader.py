@@ -125,7 +125,6 @@ import ast
 import configparser
 import io
 import keyword
-import re
 import shutil
 import sys
 
@@ -149,7 +148,7 @@ class ParsingError(Exception):
         # behavior, not a random implementation detail.
         self.message = message
         self.filename = filename
-        self.lineno =  lineno
+        self.lineno = lineno
         if line is not None and add_repr:
             line = repr(line.strip())
         self.line = line

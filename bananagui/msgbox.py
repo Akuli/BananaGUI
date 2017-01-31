@@ -44,12 +44,6 @@ closed. For example, info(), warning(), error() and question() return
 the text of the clicked button or None.
 """
 
-from gettext import gettext as _
-try:
-    import collections.abc as abcoll
-except ImportError:
-    import collections as abcoll
-
 import bananagui
 from bananagui import color, widgets
 

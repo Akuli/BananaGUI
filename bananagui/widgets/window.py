@@ -75,9 +75,9 @@ def _sizecheck(window, size):
     'on_close',
     doc="""A callback that runs when the user tries to close the window.
 
-    This callback doesn't actually run when close() is called. The 
-    close() method closes the window, but this runs when the *user* 
-    tries to close the window. Usually you should connect this to 
+    This callback doesn't actually run when close() is called. The
+    close() method closes the window, but this runs when the *user*
+    tries to close the window. Usually you should connect this to
     bananagui.mainloop.quit.
     """)
 class BaseWindow(Bin):
@@ -169,6 +169,7 @@ class Window(BaseWindow):
         wrapperclass = bananagui._get_wrapper('widgets.window:Window')
         self._wrapper = wrapperclass(self, title)
         super().__init__(title, resizable=resizable, **kwargs)
+
 
 class Dialog(BaseWindow):
     """A window that has a parent window.

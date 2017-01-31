@@ -61,7 +61,6 @@ need to worry about the "Not initialized" state.
 import math
 import sys
 import traceback
-import warnings
 
 import bananagui
 
