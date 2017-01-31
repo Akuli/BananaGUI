@@ -65,6 +65,8 @@ def broken_callback_2(*args):
 
 def test_add_timeout(dummywrapper, capsys):
     with pytest.raises(ValueError):
+        mainloop.add_timeout(0, print)
+    with pytest.raises(ValueError):
         mainloop.add_timeout(-1, print)
 
     callbacks = [good_callback, broken_callback, broken_callback_2]
@@ -72,7 +74,7 @@ def test_add_timeout(dummywrapper, capsys):
     for callback, broken in zip(callbacks, brokens):
         # The dummywrapper uses threads to implement the timeouts, so
         # we don't need to call mainloop.run().
-        mainloop.add_timeout(1, callback, 1, 2, 3)
+        mainloop.add_timeout(0.001, callback, 1, 2, 3)
         time.sleep(0.002)    # wait for it to run
 
         output, errors = capsys.readouterr()
@@ -80,6 +82,6 @@ def test_add_timeout(dummywrapper, capsys):
         if broken:
             # add_timeout should magically show the connect line in the
             # traceback.
-            assert 'mainloop.add_timeout(1, callback, 1, 2, 3)' in errors
+            assert 'mainloop.add_timeout(0.001, callback, 1, 2, 3)' in errors
         else:
             assert not errors
