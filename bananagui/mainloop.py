@@ -19,43 +19,45 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-r"""The BananaGUI main loop.
+r"""This module provides access to the GUI toolkit's mainloop.
 
 The mainloop can be in three different states:
 
-- Not initialized: The mainloop is doing nothing, and it's not ready to
-  run. This is the current state when bananagui.mainloop is imported for
-  the first time.
-- Initialized: Now the mainloop is ready to run, but it's not running
-  yet. Widgets can be created and timeouts can be added, but the
-  timeouts aren't guaranteed to run and the widgets aren't guaranteed to
-  be visible yet. Typically the mainloop is in this state for a short
+* **Not initialized:** The mainloop is doing nothing, and it's not ready 
+  to run. This is the current state when this module has just been 
+  imported for the first time.
+* **Initialized:** Now the mainloop is ready to run, but it's not running
+  yet. Widgets can be created and timeouts can be added, but the 
+  timeouts aren't guaranteed to run and the widgets aren't guaranteed to 
+  be visible yet. Typically the mainloop is in this state for a short 
   time while the widgets are being created.
-- Running: Now the mainloop is running. Widgets are visible and
+* **Running:** Now the mainloop is running. Widgets are visible and
   timeouts run. New widgets can be still made and new timeouts can be
   added. Applications are in this state most of the time.
 
 Different functions in this module can be used for going from one state
 to another:
 
-    ,-----------------.  init()  ,-------------.
-    | not initialized | -------> | initialized |
-    `-----------------'          `-------------'
-            /|\                         |
-             |               quit()     | call run()
-             |                  \       V
-             |                   \ ,---------.
-             `-------------------- | running |
-                                   `---------'
-                                   \____ ____/
-                                        V
-                                    the run()
-                                    function
-                                   is running
+.. code-block:: none
 
-Note that bananagui.load_wrapper() will call init() by default and most
-applications don't run the mainloop more than once, so usually you don't
-need to worry about the "Not initialized" state.
+   ,-----------------.  init()  ,-------------.
+   | not initialized | -------> | initialized |
+   `-----------------'          `-------------'
+           /|\                         |
+            |               quit()     | call run()
+            |                  \       V
+            |                   \ ,---------.
+            `-------------------- | running |
+                                  `---------'
+                                  \____ ____/
+                                       V
+                                   the run()
+                                   function
+                                  is running
+
+Note that :func:`bananagui.load_wrapper` will call :func:`~init` by 
+default and most applications don't run the mainloop more than once, so 
+usually you don't need to worry about the "Not initialized" state.
 """
 
 import math
@@ -71,9 +73,9 @@ _running = False
 
 
 def init():
-    """Initialize the mainloop again after running it.
+    """Set up the mainloop.
 
-    You need this only if you want to run the mainloop multiple times.
+    Note that :func:`bananagui.load_wrapper` runs this by default.
     """
     global _initialized
     if _initialized:
@@ -83,7 +85,7 @@ def init():
 
 
 def run():
-    """Run the main loop until quit() is called."""
+    """Run the mainloop until :func:`~quit` is called."""
     global _initialized
     global _running
     if not _initialized:
@@ -100,7 +102,7 @@ def run():
 
 
 def quit():
-    """Make run() return.
+    """Make :func:`~run` return.
 
     Quitting when the main loop is not running does nothing.
     """
@@ -109,15 +111,15 @@ def quit():
 
 
 def add_timeout(seconds, callback, *args):
-    """Run callback(*args) after waiting.
+    """Run ``callback(*args)`` after waiting.
 
-    If the function returns bananagui.RUN_AGAIN it will be called again
-    after waiting again. Depending on the GUI toolkit, this may or may
-    not work when the main loop is not running.
+    If the function returns :data:`bananagui.RUN_AGAIN` it will be 
+    called again after waiting again. Depending on the GUI toolkit, this 
+    may or may not work when the main loop is not running.
 
-    The waiting time is not guaranteed to be exact, but it's good enough
-    for most purposes. Use something like time.time() if you need to
-    measure time in the callback function.
+    The waiting time is not guaranteed to be exact, but it's good enough 
+    for most purposes. Use something like :func:`time.time` if you need 
+    to measure time in the callback function.
     """
     if seconds <= 0:
         raise ValueError("non-positive timeout %s" % (seconds,))

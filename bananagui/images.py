@@ -23,31 +23,27 @@
 
 import os
 
-import bananagui
+from bananagui import _get_wrapper
 
 __all__ = ['Image']
 
 
-# Other imagetypes may be supported, but these are guaranteed to work.
-_imagetypes = ('gif', 'png')
+def _guess_filetype(path, default):
+    """Extract the filetype from filename.
 
-
-def _guess_imagetype(path, default):
-    """Extract the imagetype from filename.
-
-    >>> _guess_imagetype('a/b/c/coolpic.PNg', None)
+    >>> _guess_filetype('a/b/c/coolpic.PNg', None)
     'png'
-    >>> _guess_imagetype('whatever', 'Png')
+    >>> _guess_filetype('whatever', 'Png')
     'png'
-    >>> _guess_imagetype('whatever', None)
+    >>> _guess_filetype('whatever', None)
     Traceback (most recent call last):
       ...
-    ValueError: cannot guess imagetype from 'whatever'
+    ValueError: cannot guess filetype from 'whatever'
     """
     if default is None:
         filename = os.path.basename(path)
         if '.' not in filename:
-            raise ValueError("cannot guess imagetype from %r" % path)
+            raise ValueError("cannot guess filetype from %r" % path)
         return filename.rsplit('.', 1)[1].lower()
     return default.lower()
 
@@ -55,44 +51,41 @@ def _guess_imagetype(path, default):
 # TODO: resize() and flip() methods.
 # TODO: methods for accessing pixels one by one?
 class Image:
-    __doc__ = """A mutable image.
+    """A mutable image.
 
-    The imagetype is a string that is typically also the file the file
-    extension without a dot. It's guessed from the filename if it's
-    None. Not all imagetypes work with all GUI toolkits, but support
-    for %s and %s images is guaranteed.
+    Calling the Image class constructs a new image from a path to a 
+    file. For example, ``Image('banana.png')`` creates a new image of 
+    the file ``banana.png`` in the current working directory.
 
-    The widgets.ImageLabel can be used for displaying an image to the
-    user.
-    """ % (', '.join(_imagetypes[:-1]), _imagetypes[-1])
+    The filetype is typically also the file the file extension without a 
+    dot. Not all filetypes work with all GUI toolkits, but ``'gif'`` and 
+    ``'png'`` should be valid filetype values with all GUI toolkits. The 
+    filetype must be given explicitly if it can't be guessed from the 
+    file extension, like ``Image('magic-banana', 'gif')``.
 
-    def __init__(self, path: str, imagetype: str = None):
-        """Load an Image from a file.
+    You can use :class:`bananagui.widgets.ImageLabel` for displaying an 
+    image to the user.
+    """
 
-        See bananagui.images.Image documentation for more information about
-        filetypes.
-        """
-        imagetype = _guess_imagetype(path, imagetype)
-        wrapperclass = bananagui._get_wrapper('images:Image')
-        self._wrapper, self._size = wrapperclass.from_file(path, imagetype)
+    def __init__(self, path: str, filetype: str = None):
+        """Load an Image from a file."""
+        filetype = _guess_filetype(path, filetype)
+        wrapperclass = _get_wrapper('images:Image')
+        self._wrapper, self._size = wrapperclass.from_file(path, filetype)
         self._path = path
 
-    def save(self, path: str, imagetype: str = None):
-        """Save the image to a file.
-
-        See bananagui.images.Image documentation for more information about
-        filetypes.
-        """
-        imagetype = _guess_imagetype(path, imagetype)
-        self._wrapper.save(path, imagetype)
+    def save(self, path: str, filetype: str = None):
+        """Save the image to a file."""
+        filetype = _guess_filetype(path, filetype)
+        self._wrapper.save(path, filetype)
         self._path = path
 
     @classmethod
     def from_size(cls, width: int, height: int):
-        """Create a new, fully transparent Image from width and height."""
+        """Create a new, fully transparent Image of the given size."""
         if width < 0 or height < 0:
             raise ValueError("negative width or height")
-        wrapperclass = bananagui._get_wrapper('images:Image')
+        wrapperclass = _get_wrapper('images:Image')
         self = cls.__new__(cls)     # Don't run __init__.
         self._wrapper = wrapperclass.from_size(width, height)
         self._size = (width, height)
@@ -117,7 +110,7 @@ class Image:
 
     @property
     def size(self):
-        """Two-tuple of width and height as integers."""
+        """Two-tuple of width and height in pixels."""
         return self._size
 
     def copy(self):

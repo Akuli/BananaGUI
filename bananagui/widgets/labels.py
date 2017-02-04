@@ -19,38 +19,40 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""BananaGUI labels."""
-
-import bananagui
-from bananagui import images, types
+from bananagui import _get_wrapper, Align, images, types
 from .basewidgets import Child
 
 
 @types.add_property('text', type=str, doc="The text in the label.")
 @types.add_property(
-    'align', type=bananagui.Align,
-    doc="A bananagui.Align member that describes how the text is aligned.")
+    'align', type=Align,
+    doc="""How the text is aligned.
+
+    This needs to be a :class:`bananagui.Align` member.
+    """)
 class Label(Child):
     """A widget that displays text.
 
-        ,---------------.
-        |  Hello World! |
-        `---------------'
+    .. code-block:: none
+
+       ,---------------.
+       |  Hello World! |
+       `---------------'
     """
     # TODO: Add fonts and colors?
 
-    def __init__(self, text='', *, align=bananagui.CENTER, **kwargs):
+    def __init__(self, text='', *, align=Align.CENTER, **kwargs):
         """Initialize the label.
 
-        The align will be converted to a bananagui.Align member.
+        The align will be converted to a :class:`bananagui.Align` member.
         """
         self._prop_text = ''
-        self._prop_align = bananagui.CENTER
-        wrapperclass = bananagui._get_wrapper('widgets.labels:Label')
+        self._prop_align = Align.CENTER
+        wrapperclass = _get_wrapper('widgets.labels:Label')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
-        self.align = bananagui.Align(align)
+        self.align = Align(align)
 
     def _repr_parts(self):
         return ['text=' + repr(self.text)] + super()._repr_parts()
@@ -58,24 +60,29 @@ class Label(Child):
 
 @types.add_property(
     'image', type=images.Image, allow_none=True,
-    doc="The image displayed in the button or None.")
+    doc="""The image displayed in the button.
+
+    This should be None or a :class:`bananagui.images.Image`.
+    """)
 class ImageLabel(Child):
     r"""A widget that displays an image.
 
-        ,---------------.
-        |        __     |
-        |    _  / /     |
-        |     )/ /      |
-        |    /  /_      |
-        |   |  |  \     |
-        |   |_/         |
-        `---------------'
+    .. code-block:: none
+
+       ,---------------.
+       |        __     |
+       |    _  / /     |
+       |     )/ /      |
+       |    /  /_      |
+       |   |  |  \     |
+       |   |_/         |
+       `---------------'
     """
 
     def __init__(self, image=None, **kwargs):
         """Initialize the image label."""
         self._prop_image = None
-        wrapperclass = bananagui._get_wrapper('widgets.labels:ImageLabel')
+        wrapperclass = _get_wrapper('widgets.labels:ImageLabel')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.image = image

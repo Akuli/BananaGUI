@@ -21,8 +21,7 @@
 
 """BananaGUI entry test."""
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Orient, mainloop, widgets
 
 
 def set_grayed_out(entry, checkbox):
@@ -49,7 +48,7 @@ def main():
 
     entrybox.append(widgets.Dummy())
 
-    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    buttonbox = widgets.Box(Orient.HORIZONTAL, expand=(True, False))
     entrybox.append(buttonbox)
 
     resetbutton = widgets.Button("Reset")

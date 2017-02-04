@@ -19,15 +19,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Button widgets."""
-
-import bananagui
-from bananagui import images, types
+from bananagui import _get_wrapper, images, types
 from .basewidgets import Child
 
 
 @types.add_callback(
-    'on_click', doc="A callback that runs when the button is clicked.")
+    'on_click', doc="""A callback that runs when the button is clicked.""")
 @types.add_property(
     'text', type=str, doc="""The text in the button.
 
@@ -36,18 +33,19 @@ from .basewidgets import Child
 class Button(Child):
     r"""A button that displays text in it.
 
-         _______________
-        |,--------------\
-        ||   Click me!  |
-        `---------------'
+    .. code-block:: none
+
+        _______________
+       |,--------------\
+       ||   Click me!  |
+       `---------------'
     """
 
     can_focus = True
 
     def __init__(self, text='', **kwargs):
-        """Initialize the button and set arguments as attributes."""
         self._prop_text = ''
-        wrapperclass = bananagui._get_wrapper('widgets.buttons:Button')
+        wrapperclass = _get_wrapper('widgets.buttons:Button')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
@@ -60,27 +58,31 @@ class Button(Child):
     'on_click', doc="A callback that runs when the button is clicked.")
 @types.add_property(
     'image', type=images.Image, allow_none=True,
-    doc="The image displayed in the button or None.")
+    doc="""The image displayed in the button.
+
+    This can be None or a :class:`bananagui.images.Image`.
+    """)
 class ImageButton(Child):
     r"""A button that displays an image.
 
-         _______________
-        |.--------------\
-        ||       __     |
-        ||   _  / /     |
-        ||    )/ /      |
-        ||   /  /_      |
-        ||  |  |  \     |
-        ||  |_/         |
-        `---------------'
+    .. code-block:: none
+
+        _______________
+       |.--------------\
+       ||       __     |
+       ||   _  / /     |
+       ||    )/ /      |
+       ||   /  /_      |
+       ||  |  |  \     |
+       ||  |_/         |
+       `---------------'
     """
 
     can_focus = True
 
     def __init__(self, image=None, **kwargs):
-        """Initialize the button and set arguments as attributes."""
         self._prop_image = None
-        wrapperclass = bananagui._get_wrapper('widgets.buttons:ImageButton')
+        wrapperclass = _get_wrapper('widgets.buttons:ImageButton')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.image = image

@@ -21,8 +21,7 @@
 
 """BananaGUI spinner test."""
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Orient, mainloop, widgets
 
 
 def start(spinner):
@@ -44,7 +43,7 @@ def main():
     spinner = widgets.Spinner()
     mainbox.append(spinner)
 
-    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    buttonbox = widgets.Box(Orient.HORIZONTAL, expand=(True, False))
     mainbox.append(buttonbox)
 
     startbutton = widgets.Button("Start")

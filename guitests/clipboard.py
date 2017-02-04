@@ -19,8 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
-from bananagui import clipboard, mainloop, widgets
+from bananagui import Orient, clipboard, mainloop, widgets
 
 
 def copy_from_entry(entry):
@@ -45,7 +44,7 @@ def main():
 
     mainbox.append(widgets.Dummy())
 
-    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    buttonbox = widgets.Box(Orient.HORIZONTAL, expand=(True, False))
     mainbox.append(buttonbox)
 
     copybutton = widgets.Button("Copy everything")

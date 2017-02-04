@@ -19,10 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Widgets that indicate progress."""
-
-import bananagui
-from bananagui import types
+from bananagui import _get_wrapper, types
 from .basewidgets import Child
 
 
@@ -35,9 +32,11 @@ from .basewidgets import Child
 class Progressbar(Child):
     """A progress bar widget.
 
-        ,-------------------.
-        | OOOOOOOOOOO       |
-        `-------------------'
+    .. code-block:: none
+
+       ,-------------------.
+       | OOOOOOOOOOO       |
+       `-------------------'
 
     The progress bar is always horizontal. Contact me if you need a
     vertical progress bar and I'll implement it.
@@ -46,7 +45,7 @@ class Progressbar(Child):
     def __init__(self, *, progress=0, **kwargs):
         """Initialize the progress bar."""
         self._prop_progress = 0
-        wrapperclass = bananagui._get_wrapper('widgets.progress:Progressbar')
+        wrapperclass = _get_wrapper('widgets.progress:Progressbar')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.progress = progress
@@ -58,21 +57,22 @@ class Progressbar(Child):
 @types.add_property('bouncing', type=bool,
                     doc="True if the widget actually bounces.")
 class BouncingProgressbar(Child):
-    """A Progressbar-like widget that bounces back and forth.
+    """A progressbar-like widget that bounces back and forth.
 
-        ,-------------------.
-        |           OOOO    |
-        `-------------------'
+    .. code-block:: none
 
-    The progressbar doesn't bounce by default. Set bouncing to True to
-    make it bounce.
+       ,-------------------.
+       |           OOOO    |
+       `-------------------'
+
+    The progressbar doesn't bounce by default. Set :attr:`~bouncing` to 
+    True to make it bounce.
     """
 
     def __init__(self, *, bouncing=False, **kwargs):
         """Initialize the widget."""
         self._prop_bouncing = False
-        wrapperclass = bananagui._get_wrapper(
-            'widgets.progress:BouncingProgressbar')
+        wrapperclass = _get_wrapper('widgets.progress:BouncingProgressbar')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.bouncing = bouncing
@@ -86,11 +86,13 @@ class BouncingProgressbar(Child):
 class Spinner(Child):
     r"""A waiting spinner.
 
-          .---.
-         /     \
-        | .   O |
-         \ - o /
-          `---'
+    .. code-block:: none
+
+         .---.
+        /     \
+       | .   O |
+        \ - o /
+         `---'
 
     The spinner doesn't spin by default. Set spinning to True to make
     it spin.
@@ -99,7 +101,7 @@ class Spinner(Child):
     def __init__(self, *, spinning=False, **kwargs):
         """Initialize the spinner."""
         self._prop_spinning = False
-        wrapperclass = bananagui._get_wrapper('widgets.progress:Spinner')
+        wrapperclass = _get_wrapper('widgets.progress:Spinner')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.spinning = spinning

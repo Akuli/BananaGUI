@@ -23,8 +23,9 @@
 
 import functools
 
-import bananagui
-from bananagui import mainloop, types
+from bananagui import _get_wrapper, mainloop, types
+
+__all__ = ['get_families']
 
 
 # The wrapper doesn't need to provide anything for this, it just needs to
@@ -119,5 +120,5 @@ def get_families() -> frozenset:
 
     # The wrapper function can return anything iterable.
     fonts = {'Monospace'}
-    fonts.update(bananagui._get_wrapper('font:get_families')())
+    fonts.update(_get_wrapper('font:get_families')())
     return frozenset(fonts)

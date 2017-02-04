@@ -19,10 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Widgets that have a value that needs to be in a range."""
-
-import bananagui
-from bananagui import types, utils
+from bananagui import _get_wrapper, Orient, types, utils
 from .basewidgets import Child
 
 
@@ -36,8 +33,8 @@ def _valuecheck(widget, value):
     'value', extra_setter=_valuecheck, add_changed=True,
     doc="""The widget's current value.
 
-    This needs to be in the valuerange and it's the smallest value of
-    valuerange by default.
+    This needs to be in :attr:`~valuerange` and it's the smallest value 
+    of valuerange by default.
     """)
 class _Ranged:
     """Implement valuerange and value BananaGUI properties."""
@@ -69,9 +66,11 @@ class _Ranged:
 class Spinbox(_Ranged, Child):
     """A widget for selecting an integer.
 
-        ,-----------------------.
-        | 123           | + | - |
-        `-----------------------'
+    .. code-block:: none
+
+       ,-----------------------.
+       | 123           | + | - |
+       `-----------------------'
 
     Currently spinboxes can't be used with floats because the allowed
     values are represented by a Python range object, so you need to use
@@ -84,7 +83,7 @@ class Spinbox(_Ranged, Child):
         """Initialize the spinbox."""
         self._prop_valuerange = valuerange
         self._prop_value = min(valuerange)
-        wrapperclass = bananagui._get_wrapper('widgets.ranged:Spinbox')
+        wrapperclass = _get_wrapper('widgets.ranged:Spinbox')
         self._wrapper = wrapperclass(self, valuerange)
         super().__init__(**kwargs)
         if value is not None:
@@ -94,26 +93,25 @@ class Spinbox(_Ranged, Child):
 class Slider(_Ranged, Child):
     """A slider for selecting a number.
 
-        |
-        O   -----O--------
-        |
-        |
-        |
+    .. code-block:: none
+
+       |
+       O   -----O--------
+       |
+       |
+       |
 
     Currently floats aren't supported. If you want float support, let
     me know and I'll implement it.
     """
 
-    def __init__(self, valuerange: range, orient=bananagui.HORIZONTAL, *,
+    def __init__(self, valuerange: range, orient=Orient.HORIZONTAL, *,
                  value=None, **kwargs):
-        """Initialize the slider.
-
-        The orient will be converted to a bananagui.Orient member.
-        """
-        self.__orient = bananagui.Orient(orient)
+        """Initialize the slider."""
+        self.__orient = Orient(orient)
         self._prop_valuerange = valuerange
         self._prop_value = min(valuerange)
-        wrapperclass = bananagui._get_wrapper('widgets.ranged:Slider')
+        wrapperclass = _get_wrapper('widgets.ranged:Slider')
         self._wrapper = wrapperclass(self, self.__orient, valuerange)
         super().__init__(**kwargs)
         if value is not None:
@@ -121,12 +119,15 @@ class Slider(_Ranged, Child):
 
     @property
     def orient(self):
-        """The orientation of the slider."""
+        """The orientation of the slider.
+
+        This is always a :class:`bananagui.Orient` member.
+        """
         return self.__orient
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        if self.orient == bananagui.VERTICAL:
+        if self.orient == Orient.VERTICAL:
             # Not the default
-            parts.insert(0, 'orient=bananagui.VERTICAL')
+            parts.insert(0, 'vertical')
         return parts

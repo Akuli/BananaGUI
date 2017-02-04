@@ -21,8 +21,7 @@
 
 """BananaGUI label align test."""
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Align, mainloop, widgets
 
 
 def main():
@@ -31,7 +30,7 @@ def main():
     window.add(box)
 
     names = ['left', 'center', 'right']
-    aligns = [bananagui.LEFT, bananagui.CENTER, bananagui.RIGHT]
+    aligns = [Align.LEFT, Align.CENTER, Align.RIGHT]
     for name, align in zip(names, aligns):
         label = widgets.Label("this is aligned to\n" + name, align=align)
         box.append(label)

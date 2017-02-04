@@ -21,8 +21,7 @@
 
 """BananaGUI TextEdit test."""
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Orient, mainloop, widgets
 
 
 def text_changed(textedit):
@@ -47,7 +46,7 @@ def main():
     textedit.on_text_changed.connect(text_changed, textedit)
     bigbox.append(textedit)
 
-    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    buttonbox = widgets.Box(Orient.HORIZONTAL, expand=(True, False))
     bigbox.append(buttonbox)
 
     addbutton = widgets.Button("Add text")

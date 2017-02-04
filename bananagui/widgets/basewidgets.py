@@ -19,17 +19,11 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Base classes for various widgets."""
-
 from bananagui import mainloop, types
 
 
 class Widget:
-    """A baseclass for all widgets.
-
-    Widget and subclasses of it have a can_focus class attribute. The
-    focus() method can't be called if it's False.
-    """
+    """A baseclass for all widgets."""
 
     can_focus = False
 
@@ -74,19 +68,20 @@ class Widget:
 
     @property
     def real_widget(self):
-        """The real GUI toolkit widget that BananaGUI uses."""
+        """This is the real GUI toolkit's widget that BananaGUI uses."""
         return self._wrapper.widget
 
     def focus(self):
         """Give the keyboard focus to this widget.
 
-        Widget classes have a can_focus attribute, and this method
-        cannot be called if it's False. Focusing a Window or a Dialog
-        brings it in front of all other windows.
+        Widget classes have a ``can_focus`` attribute, and this method
+        cannot be called if it's False.
 
-        It's recommended to first create the widgets and then focus
-        one of them to make sure that the widget gets focused correctly
-        with all GUI toolkits.
+        Focusing a :class:`.Window` or :class:`.Dialog` brings it in
+        front of all other windows. When focusing something else it's
+        recommended to first create the widgets and then focus one of
+        them to make sure that the widget gets focused correctly with
+        all GUI toolkits.
         """
         cls = type(self)
         if not cls.can_focus:
@@ -110,52 +105,61 @@ class Widget:
     """)
 @types.add_property(
     'expand', type=bool, how_many=2,
-    doc="Two-tuple of horizontal and vertical expanding.")
-class Child(Widget):
-    """A base class for widgets that can be added to Parent widgets.
+    doc="""Two-tuple of horizontal and vertical expanding.
 
-    Children don't take a parent argument on initialization, but
-    BananaGUI keeps track of the parent internally. When a child is
-    added to a parent widget, BananaGUI remembers it. The child can be
-    removed from the parent widget and added into it again, but it
-    cannot be added to other parent widgets. Example:
+    This is ``(True, True)`` by default, so the widget expands in both
+    directions.
 
-        box1 = widgets.Box()
-        box2 = widgets.Box()
-        label = widgets.Label()     # label doesn't have a parent
-        box1.append(label)          # label's parent is now box1
-        box1.remove(label)          # label's parent is still box1
-        box2.append(label)          # this raises an exception!
+    When multiple widgets are next to each
+    other in a container, at least one of them should expand in the
+    container's direction. Like this:
 
-    The expand attribute determines the directions that the widget
-    expands in. It's (True, True) by default, so the widget expands
-    in both directions. When multiple widgets are next to each other
-    in a container, at least one of them should expand in the
-    container's direction, like this:
-
-        ,------------------------------------------------.
-        |   non-   |                                     |
-        |expanding |           expanding widget          |
-        |  widget  |                                     |
-        `------------------------------------------------'
-
+    .. code-block:: none
+    
+       ,------------------------------------------------.
+       |   non-   |                                     |
+       |expanding |           expanding widget          |
+       |  widget  |                                     |
+       `------------------------------------------------'
+    
     Not like this:
-
-        ,------------------------------------------------.
-        |   non-   |   non-   |                          |
-        |expanding |expanding |       empty space        |
-        |  widget  |  widget  |                          |
-        `------------------------------------------------'
-
+    
+    .. code-block:: none
+    
+       ,------------------------------------------------.
+       |   non-   |   non-   |                          |
+       |expanding |expanding |       empty space        |
+       |  widget  |  widget  |                          |
+       `------------------------------------------------'
+    
     This way the children will behave consistently with all GUI
     toolkits. You can use a Dummy widget to fill the empty space if
     needed:
+ 
+    .. code-block:: none
+    
+       ,------------------------------------------------.
+       |   non-   |   non-   |                          |
+       |expanding |expanding |       Dummy widget       |
+       |  widget  |  widget  |                          |
+       `------------------------------------------------'
+    """)
+class Child(Widget):
+    """Base class for widgets that can be added to :class:`.Parent` widgets.
 
-        ,------------------------------------------------.
-        |   non-   |   non-   |                          |
-        |expanding |expanding |       Dummy widget       |
-        |  widget  |  widget  |                          |
-        `------------------------------------------------'
+    BananaGUI keeps track of the parent internally. When a child is
+    added to a parent widget, BananaGUI remembers it. The child can be
+    removed from the parent widget and added into it again, but it
+    cannot be added to other parent widgets. For example:
+
+    .. code-block:: python
+
+       box1 = widgets.Box()
+       box2 = widgets.Box()
+       label = widgets.Label()     # label doesn't have a parent
+       box1.append(label)          # label's parent is now box1
+       box1.remove(label)          # label's parent is still box1
+       box2.append(label)          # this raises an exception!
     """
 
     # TODO: cycle handling

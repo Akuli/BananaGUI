@@ -19,12 +19,20 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Handy color utilities.
+"""This module contains handy color constants and converting functions.
 
-BananaGUI uses case-insensitive 7-character hexadecimal colors, like
-'#ffffff' or '#fFfFff'. This module provides functions for processing
-hexadecimal colors and converting colors between hexadecimal colors and
-other standards.
+BananaGUI uses case-insensitive 7-character hexadecimal colors, like 
+``'#ffffff'`` or ``'#fFfFff'``. If you're not familiar with hexadecimal 
+colors you probably can't guess what ``'#ff0000'`` and ``'#00ff00'`` 
+are. This module allows you to use ``bananagui.Color.RED`` and 
+``bananagui.Color.GREEN`` instead.
+
+Here's a full list of the color constants:
+
+%(constant-table)s
+
+Rest of this module contains functions for converting colors and 
+processing hexadecimal colors.
 """
 
 import re
@@ -41,6 +49,25 @@ GREEN = '#00ff00'
 CYAN = '#00ffff'
 BLUE = '#0000ff'
 PINK = '#ff00ff'
+
+
+def _generate_table():
+    names = [name for name in globals() if name.isupper()]
+    names.sort()
+    lines = [
+        "+------------+---------------+",
+        "| Name       | Value         |",
+        "+============+===============+",
+    ]
+    for name in names:
+        value = globals()[name]
+        lines.append("| %-10s | ``'%s'`` |" % (name, value))
+        lines.append("+------------+---------------+")
+    return '\n'.join(lines)
+
+if __doc__ is not None:
+    # Not running with Python's optimizations.
+    __doc__ %= {'constant-table': _generate_table()}
 
 
 def _is_valid_color(hexcolor):
@@ -62,10 +89,21 @@ def _is_valid_color(hexcolor):
     return re.search(r'^#[0-9A-Fa-f]{6}$', hexcolor) is not None
 
 
+def rgb2hex(rgb) -> str:
+    """Convert an RGB sequence to a hexadecimal color.
+
+    The values of the sequence need to be in ``range(256)``.
+
+    >>> rgb2hex([0, 255, 255])
+    '#00ffff'
+    """
+    return '#%02x%02x%02x' % tuple(rgb)
+
+
 def hex2rgb(hexcolor: str) -> tuple:
     """Convert a hexadecimal color to an RGB tuple.
 
-    The returned values are always integers in range(256).
+    The returned values are always integers in ``range(256)``.
 
     >>> hex2rgb('#00ffff')
     (0, 255, 255)
@@ -89,30 +127,12 @@ def hex2rgb(hexcolor: str) -> tuple:
     return tuple(rgb)
 
 
-def rgb2hex(rgb) -> str:
-    """Convert an RGB sequence to a hexadecimal color.
-
-    The values need to be in range(256).
-
-    >>> rgb2hex([0, 255, 255])
-    '#00ffff'
-    """
-    return '#%02x%02x%02x' % tuple(rgb)
-
-
-def hex2rgbstring(hexcolor: str) -> str:
-    """Convert a hexadecimal color string to a CSS compatible color string.
-
-    >>> hex2rgbstring('#ffff00')
-    'rgb(255,255,0)'
-    """
-    return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
-
-
-_number = r'(\d*\.?\d*%?)'  # Integer or float as a group, may end with %.
+# The _number is an integer or float as a group, may end with % or have 
+# whitespace around it.
+_number = r'\s*(\d*\.?\d*%?)\s*'
 _rgbstring_patterns = [
-    r'^rgb\(' + ','.join([_number] * 3) + r'\)$',   # rgb(R,G,B)
-    r'^rgba\(' + ','.join([_number] * 4) + r'\)$',  # rgba(R,G,B,A)
+    r'^\s*rgb\s*\(' + ','.join([_number] * 3) + r'\)\s*$',   # rgb(R,G,B)
+    r'^\s*rgba\s*\(' + ','.join([_number] * 4) + r'\)\s*$',  # rgba(R,G,B,A)
 ]
 
 
@@ -123,25 +143,33 @@ def rgbstring2hex(rgbstring: str) -> str:
 
     >>> rgbstring2hex('rgb(255,100%,0)')
     '#ffff00'
-    >>> rgbstring2hex('rG B ( 255 , 100 % ,0) ')
+    >>> rgbstring2hex(' rgb ( 255 ,100%, 0 ) ')
     '#ffff00'
     >>> rgbstring2hex('rgba(255,100%,0,0.5)')  # alpha value is ignored
     '#ffff00'
     """
-    rgbstring = ''.join(rgbstring.split())  # Remove whitespace.
     for pattern in _rgbstring_patterns:
-        match = re.search(pattern, rgbstring, flags=re.IGNORECASE)
+        match = re.search(pattern, rgbstring)
         if match is None:
             continue
         rgb = []
         for i in (1, 2, 3):
             value = match.group(i)
             if value.endswith('%'):
-                rgb.append(int(value[:-1]) * 255 // 100)
+                rgb.append(float(value.rstrip('%')) / 100 * 255)
             else:
-                rgb.append(int(value))
-        return rgb2hex(rgb)
+                rgb.append(float(value))
+        return rgb2hex(map(int, rgb))
     raise ValueError("invalid RGB color string %r" % (rgbstring,))
+
+
+def hex2rgbstring(hexcolor: str) -> str:
+    """Convert a hexadecimal color string to a CSS compatible color string.
+
+    >>> hex2rgbstring('#ffff00')
+    'rgb(255,255,0)'
+    """
+    return 'rgb(%d,%d,%d)' % hex2rgb(hexcolor)
 
 
 def brightness(hexcolor: str) -> float:

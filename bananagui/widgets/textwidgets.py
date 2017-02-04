@@ -19,10 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Widgets that contain text."""
-
-import bananagui
-from bananagui import types
+from bananagui import _get_wrapper, types
 from .basewidgets import Child
 
 
@@ -32,7 +29,8 @@ from .basewidgets import Child
 class TextBase(Child):
     """A base class for text editing widgets.
 
-    Setting grayed_out to True means that the user can't edit the text.
+    Setting *grayed_out* to True means that the user can't edit the 
+    text.
     """
     # TODO: Add fonts and colors.
 
@@ -58,15 +56,17 @@ class TextBase(Child):
 class Entry(TextBase):
     """A one-line text widget.
 
-        ,-----------------------.
-        | Enter something...    |
-        `-----------------------'
+    .. code-block:: none
+
+       ,-----------------------.
+       | Enter something...    |
+       `-----------------------'
     """
 
     def __init__(self, text='', *, secret=False, **kwargs):
         """Initialize the entry."""
         self._prop_secret = False
-        wrapperclass = bananagui._get_wrapper('widgets.textwidgets:Entry')
+        wrapperclass = _get_wrapper('widgets.textwidgets:Entry')
         self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)
         self.secret = secret
@@ -86,19 +86,21 @@ class Entry(TextBase):
 class TextEdit(TextBase):
     """A multiline text widget.
 
-        ,-----------.
-        | Line 0    |
-        | Line 1    |
-        | Line 2    |
-        | Line 3    |
-        |           |
-        `-----------'
+    .. code-block:: none
+
+       ,-----------.
+       | Line 0    |
+       | Line 1    |
+       | Line 2    |
+       | Line 3    |
+       |           |
+       `-----------'
     """
 
     def __init__(self, text='', *, tab='\t', **kwargs):
         """Initialize the TextEdit."""
         self._prop_tab = '\t'
-        wrapperclass = bananagui._get_wrapper('widgets.textwidgets:TextEdit')
+        wrapperclass = _get_wrapper('widgets.textwidgets:TextEdit')
         self._wrapper = wrapperclass(self)
         super().__init__(text=text, **kwargs)
         self.tab = tab

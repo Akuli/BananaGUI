@@ -21,7 +21,7 @@
 
 from gi.repository import Gtk
 
-import bananagui
+from bananagui import Orient
 from . import orientations
 from .basewidgets import Child, Widget
 
@@ -45,8 +45,8 @@ class Bin(Widget):
 
 
 _expand_indexes = {
-    bananagui.HORIZONTAL: 0,
-    bananagui.VERTICAL: 1,
+    Orient.HORIZONTAL: 0,
+    Orient.VERTICAL: 1,
 }
 
 

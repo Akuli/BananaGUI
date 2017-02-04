@@ -19,10 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Miscellaneous widgets."""
-
-import bananagui
-from bananagui import types
+from bananagui import _get_wrapper, Orient, types
 from .basewidgets import Child
 
 # TODO: A RadioButton, or _RadioButton and RadioButtonManager.
@@ -35,13 +32,15 @@ from .basewidgets import Child
 class Checkbox(Child):
     """A widget that can be checked.
 
-        ,-------------------.
-        |   |   Check me!   |
-        `-------------------'
+    .. code-block:: none
 
-        ,-------------------.
-        | X |  Uncheck me!  |
-        `-------------------'
+       ,-------------------.
+       |   |   Check me!   |
+       `-------------------'
+
+       ,-------------------.
+       | X |  Uncheck me!  |
+       `-------------------'
 
     The Checkbox widget has nothing to do with the Box widget.
     """
@@ -52,7 +51,7 @@ class Checkbox(Child):
         """Initialize the checkbox and set arguments as attributes."""
         self._prop_text = ''
         self._prop_checked = False
-        wrapperclass = bananagui._get_wrapper('widgets.misc:Checkbox')
+        wrapperclass = _get_wrapper('widgets.misc:Checkbox')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
         self.text = text
@@ -66,18 +65,20 @@ class Checkbox(Child):
 class Dummy(Child):
     """An empty widget.
 
-        ,-----------.
-        |           |
-        |           |
-        `-----------'
+    .. code-block:: none
 
-    This is useful for creating layouts with empty space that must be
-    filled with something. See Child's documentation for more info.
+       ,-----------.
+       |           |
+       |           |
+       `-----------'
+
+    This is useful for creating layouts with empty space that must be 
+    filled with something. See :attr:`.Child.expand` for more info.
     """
 
     def __init__(self, **kwargs):
         """Set up the dummy."""
-        wrapperclass = bananagui._get_wrapper('widgets.misc:Dummy')
+        wrapperclass = _get_wrapper('widgets.misc:Dummy')
         self._wrapper = wrapperclass(self)
         super().__init__(**kwargs)
 
@@ -85,39 +86,44 @@ class Dummy(Child):
 class Separator(Child):
     """A horizontal or vertical line.
 
-                        ||
-            Widget 1    ||
-        ================||  Widget 3
-            Widget 2    ||
-                        ||
+    .. code-block:: none
+
+                       ||
+           Widget 1    ||
+       ================||  Widget 3
+           Widget 2    ||
+                       ||
 
     Usually there's no need to add separators between widgets, but they
     are sometimes useful.
     """
 
-    def __init__(self, orient=bananagui.HORIZONTAL, **kwargs):
+    def __init__(self, orient=Orient.HORIZONTAL, **kwargs):
         """Initialize the separator.
 
         The orient will be converted to a bananagui.Orient member.
         """
-        self.__orient = bananagui.Orient(orient)
+        self.__orient = Orient(orient)
         # Make the separator expand correctly by default.
-        if self.__orient == bananagui.HORIZONTAL:
+        if self.__orient == Orient.HORIZONTAL:
             kwargs.setdefault('expand', (True, False))
-        if self.__orient == bananagui.VERTICAL:
+        if self.__orient == Orient.VERTICAL:
             kwargs.setdefault('expand', (False, True))
-        wrapperclass = bananagui._get_wrapper('widgets.misc:Separator')
+        wrapperclass = _get_wrapper('widgets.misc:Separator')
         self._wrapper = wrapperclass(self, self.__orient)
         super().__init__(**kwargs)
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        if self.orient == bananagui.VERTICAL:
+        if self.orient == Orient.VERTICAL:
             # Not the default.
-            parts.insert(0, 'orient=bananagui.VERTICAL')
+            parts.insert(0, 'vertical')
         return parts
 
     @property
     def orient(self):
-        """The orient set on initialization as a bananagui.Orient."""
+        """The orient set on initialization.
+
+        This is always a :class:`bananagui.Orient` member.
+        """
         return self.__orient

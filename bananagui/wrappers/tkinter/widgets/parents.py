@@ -21,7 +21,7 @@
 
 import tkinter as tk
 
-import bananagui
+from bananagui import Orient
 from . import tkinter_fills
 from .basewidgets import Child, Widget, run_when_ready
 
@@ -79,8 +79,8 @@ _appendsides = {
     # Appending to a box adds a child to the beginning of the box, and
     # then the next child towards the center from the first child and
     # so on.
-    bananagui.HORIZONTAL: 'left',
-    bananagui.VERTICAL: 'top',
+    Orient.HORIZONTAL: 'left',
+    Orient.VERTICAL: 'top',
 }
 
 

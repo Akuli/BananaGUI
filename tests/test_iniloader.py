@@ -84,8 +84,7 @@ def cannot_seek(*args):
 
 def test_loading(dummywrapper):
     content = textwrap.dedent("""\
-    import bananagui
-    from bananagui import widgets   # comment
+    from bananagui import Orient, widgets   # comment
 
     # non-ascii latin-1/utf-8 compatible characters for testing the seek:
     #   å¨¿¢«æßð
@@ -96,7 +95,7 @@ def test_loading(dummywrapper):
 
     [  box  in\twindow ]
     class = widgets.Box
-    orient = getattr(bananagui, 'VERTICAL')  # test built-ins
+    orient = getattr(Orient, 'VERTICAL')  # test built-ins
 
     [label in box]
     class = widgets.Label

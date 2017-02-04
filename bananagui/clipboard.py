@@ -19,10 +19,9 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Clipboard functions."""
+"""This module contains simple functions for clipboard things."""
 
-import bananagui
-from bananagui import mainloop
+from bananagui import _get_wrapper, mainloop
 
 __all__ = ['set_text', 'get_text']
 
@@ -36,7 +35,7 @@ def _initcheck():
 def set_text(text: str):
     """Set text to the clipboard."""
     _initcheck()
-    bananagui._get_wrapper('clipboard:set_text')(text)
+    _get_wrapper('clipboard:set_text')(text)
 
 
 def get_text():
@@ -45,4 +44,4 @@ def get_text():
     This returns None if there is no text on the clipboard.
     """
     _initcheck()
-    return bananagui._get_wrapper('clipboard:get_text')()
+    return _get_wrapper('clipboard:get_text')()

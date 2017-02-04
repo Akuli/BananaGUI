@@ -19,7 +19,6 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Parent subclasses."""
 # TODO: Add a grid widget.
 
 try:
@@ -28,21 +27,20 @@ except ImportError:
     # Python 3.2, there's no separate collections.abc.
     import collections as abcoll
 
-import bananagui
-from bananagui import types, utils
+from bananagui import _get_wrapper, Orient, types, utils
 from .basewidgets import Child, Widget
 
 
 class _ChildView(abcoll.Set):
     """A view of this widget's children.
 
-    Dictionaries have a keys() method that returns a set-like view of
-    the keys. The children property is similar, but it's a view of the
-    widget's children.
+    Dictionaries have a ``keys()`` method that returns a set-like view 
+    of the keys. This is similar, but this contains child widgets 
+    instead of keys.
 
-    Parent widgets provide different kinds of ways to access the
-    children, but all Parent widgets have a children attribute that
-    works consistently.
+    Subclasses of :class:`~Parent` provide different kinds of ways to 
+    access the children, but all Parent widgets have a children 
+    attribute that works consistently.
     """
 
     def __init__(self, widget):
@@ -137,16 +135,16 @@ class Bin(Parent):
     def child(self):
         """The child in the widget.
 
-        This can be None and this is None by default. Use add() and
-        remove() or an initialization argument to set this.
+        This can be None and this is None by default. Use :meth:`~add` 
+        and :meth:`remove` or an initialization argument to set this.
         """
         return self.__child
 
     def add(self, child: Child):
-        """Add the child widget into this widget.
+        """Add a child widget into this widget.
 
-        This widget must not contain another child. The value of the
-        child property will be set to the new child.
+        This widget must not contain another child. The :attr:`~child` 
+        attribute will be set to the new child.
         """
         if self.child is not None:
             raise ValueError("there's already a child, cannot add()")
@@ -186,44 +184,47 @@ class _BoxChildView(_ChildView):
 class Box(abcoll.MutableSequence, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
-        ,----------.
-        |  box[0]  |    ,-----------------------------------.
-        |----------|    |   box[0]  |   box[1]  |   box[2]  |
-        |  box[1]  |    `-----------------------------------'
-        |----------|
-        |  box[2]  |
-        `----------'
+    .. code-block:: none
+
+       ,----------.
+       |  box[0]  |    ,-----------------------------------.
+       |----------|    |   box[0]  |   box[1]  |   box[2]  |
+       |  box[1]  |    `-----------------------------------'
+       |----------|
+       |  box[2]  |
+       `----------'
 
     To access the children just treat the Box object like a list:
 
-        box.append(child)   # add a child
-        box.remove(child)   # remove a child
-        box[0]              # get the first child
-        box[:3]             # get a list of first three children
-        del box[:3]         # remove first three children
-        box[:]              # get a list of children
-        if box: ...         # check if there are children in the box
+    .. code-block:: python
 
-    Unfortunately random.shuffle(box) doesn't work because it wants to
-    temporarily add the same children to the box twice. You need to do
-    this instead:
+       box.append(child)   # add a child
+       box.remove(child)   # remove a child
+       box[0]              # get the first child
+       box[:3]             # get a list of first three children
+       del box[:3]         # remove first three children
+       box[:]              # get a list of children
+       if box: ...         # check if there are children in the box
 
-        children = box[:]
-        random.shuffle(children)
-        box[:] = children
+    Unfortunately ``random.shuffle(box)`` doesn't work because it wants
+    to temporarily add the same children to the box twice. You need to
+    do this instead:
+
+    .. code-block:: python
+
+       children = box[:]
+       random.shuffle(children)
+       box[:] = children
     """
     # The wrapper should define append and remove methods.
 
     _child_view_class = _BoxChildView
 
-    def __init__(self, orient=bananagui.VERTICAL, **kwargs):
-        """Initialize the Box.
-
-        The orient will be converted to a bananagui.Orient member.
-        """
-        self.__orient = bananagui.Orient(orient)
+    def __init__(self, orient=Orient.VERTICAL, **kwargs):
+        """Initialize the Box."""
+        self.__orient = Orient(orient)
         self.__children = []
-        wrapperclass = bananagui._get_wrapper('widgets.parents:Box')
+        wrapperclass = _get_wrapper('widgets.parents:Box')
         self._wrapper = wrapperclass(self, self.__orient)
         super().__init__(**kwargs)
 
@@ -231,15 +232,15 @@ class Box(abcoll.MutableSequence, Parent, Child):
     def orient(self):
         """The orient set on initialization.
 
-        This is always a bananagui.Orient member.
+        This is always a :class:`bananagui.Orient` member.
         """
         return self.__orient
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        if self.orient == bananagui.HORIZONTAL:
+        if self.orient == Orient.HORIZONTAL:
             # Not the default.
-            parts.insert(0, 'orient=bananagui.HORIZONTAL')
+            parts.insert(0, 'horizontal')
         return parts
 
     def __set_children(self, new):
@@ -271,10 +272,10 @@ class Box(abcoll.MutableSequence, Parent, Child):
     def __len__(self):
         return len(self.__children)
 
-    # MutableMapping doesn't do this because it doesn't require that
-    # subclasses support slicing. We also can't use functools.wraps()
-    # to get the doc because then abc will think that our insert is
-    # an abstract method that needs to be overrided.
+    # MutableSequence doesn't do this because it doesn't require that 
+    # subclasses support slicing. We also can't use functools.wraps() to 
+    # get the doc because then abc will think that our insert is an 
+    # abstract method that needs to be overrided.
     def insert(self, index, value):
         """Insert an item to the box at the index."""
         self[index:index] = [value]
@@ -284,18 +285,20 @@ class Box(abcoll.MutableSequence, Parent, Child):
 class Scroller(Bin, Child):
     """A container that adds scrollbars around its child.
 
-        ,-------------.
-        |           | |
-        |           | |
-        |    big    | |
-        |   child   | |
-        |   widget  | |
-        |           |o|
-        |           |o|
-        |           |o|
-        |___________|_|
-        |  ooo        |
-        `-------------'
+    .. code-block:: none
+
+       ,-------------.
+       |           | |
+       |           | |
+       |    big    | |
+       |   child   | |
+       |   widget  | |
+       |           |o|
+       |           |o|
+       |           |o|
+       |___________|_|
+       |  ooo        |
+       `-------------'
 
     The scroller displays a horizontal and a vertical scrollbar
     automatically when needed.
@@ -303,7 +306,7 @@ class Scroller(Bin, Child):
 
     def __init__(self, child=None, **kwargs):
         """Initialize the scroller."""
-        wrapperclass = bananagui._get_wrapper('widgets.parents:Scroller')
+        wrapperclass = _get_wrapper('widgets.parents:Scroller')
         self._wrapper = wrapperclass(self)
         super().__init__(child, **kwargs)
 
@@ -312,18 +315,20 @@ class Scroller(Bin, Child):
 class Group(Bin, Child):
     """A widget for grouping other related widgets together.
 
-    ,- Group -----------.
-    |                   |
-    |                   |
-    |    child widget   |
-    |                   |
-    |                   |
-    `-------------------'
+    .. code-block:: none
+
+       ,- Group -----------.
+       |                   |
+       |                   |
+       |    child widget   |
+       |                   |
+       |                   |
+       `-------------------'
     """
 
     def __init__(self, text='', child=None, **kwargs):
         """Initialize the Group widget."""
-        wrapperclass = bananagui._get_wrapper('widgets.parents:Group')
+        wrapperclass = _get_wrapper('widgets.parents:Group')
         self._wrapper = wrapperclass(self)
         self._prop_text = ''
         super().__init__(child, **kwargs)

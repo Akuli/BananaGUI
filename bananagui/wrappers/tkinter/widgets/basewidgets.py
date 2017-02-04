@@ -22,7 +22,7 @@
 import functools
 import tkinter as tk
 
-import bananagui
+from bananagui import Orient
 from . import tkinter_fills
 
 
@@ -117,8 +117,8 @@ class Widget:
 
 
 _expand_indexes = {
-    bananagui.HORIZONTAL: 0,
-    bananagui.VERTICAL: 1,
+    Orient.HORIZONTAL: 0,
+    Orient.VERTICAL: 1,
 }
 
 

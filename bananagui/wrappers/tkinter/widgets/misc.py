@@ -21,8 +21,7 @@
 
 import tkinter as tk
 
-import bananagui
-from bananagui import color
+from bananagui import Orient, color
 
 from .basewidgets import Child, run_when_ready
 from .. import mainloop
@@ -90,8 +89,8 @@ class Separator(Child):
 
     def create_widget(self, parent):
         widget = tk.Frame(parent.widget, border=1, relief='sunken')
-        if self.orientation == bananagui.HORIZONTAL:
+        if self.orientation == Orient.HORIZONTAL:
             widget['height'] = 3
-        if self.orientation == bananagui.VERTICAL:
+        if self.orientation == Orient.VERTICAL:
             widget['width'] = 3
         return widget

@@ -21,7 +21,7 @@
 
 # flake8: noqa
 
-"""The actual BananaGUI widgets."""
+"""This module contains BananaGUI's widget classes."""
 
 
 def _fix_modulenames():

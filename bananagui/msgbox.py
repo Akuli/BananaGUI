@@ -44,8 +44,7 @@ closed. For example, info(), warning(), error() and question() return
 the text of the clicked button or None.
 """
 
-import bananagui
-from bananagui import color, widgets
+from bananagui import _get_wrapper, color, widgets
 
 __all__ = ['info', 'warning', 'error', 'question', 'colordialog']
 
@@ -58,7 +57,7 @@ def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
                          % (defaultbutton,))
     # The wrapper functions can't import the MessageKind enum from this
     # module, so they get the name of tne enum member instead.
-    wrapperfunc = bananagui._get_wrapper('msgbox:message')
+    wrapperfunc = _get_wrapper('msgbox:message')
     return wrapperfunc(icon, parentwindow, msg, title, buttons,
                        defaultbutton)
 
@@ -103,7 +102,7 @@ def colordialog(parentwindow: widgets.Window, *, title: str = None,
         raise ValueError(
             "%r is not a valid '#RRGGBB' color, use "
             "bananagui.color to convert it" % (defaultcolor,))
-    wrapperfunc = bananagui._get_wrapper('msgbox:colordialog')
+    wrapperfunc = _get_wrapper('msgbox:colordialog')
     return wrapperfunc(parentwindow, defaultcolor, title)
 
 

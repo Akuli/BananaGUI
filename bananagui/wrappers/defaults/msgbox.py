@@ -19,8 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
-from bananagui import widgets
+from bananagui import Orient, widgets
 
 
 def message(icon, parentwindow, message, title, buttons, defaultbutton):
@@ -37,7 +36,7 @@ def message(icon, parentwindow, message, title, buttons, defaultbutton):
     dialog.add(mainbox)
 
     mainbox.append(widgets.Label(text=message))
-    buttonbox = widgets.Box(bananagui.HORIZONTAL, expand=(True, False))
+    buttonbox = widgets.Box(Orient.HORIZONTAL, expand=(True, False))
     mainbox.append(buttonbox)
 
     focus_this = None

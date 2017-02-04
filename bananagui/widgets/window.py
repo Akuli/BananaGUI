@@ -19,10 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Window widgets."""
-
-import bananagui
-from bananagui import types
+from bananagui import _get_wrapper, types
 from .parents import Bin
 
 
@@ -60,9 +57,9 @@ def _sizecheck(window, size):
     extra_setter=_closecheck,
     doc="""Two-tuple of smallest allowed width and height.
 
-    If the content of the window take up more space than this, this is
-    ignored. This is (0, 0) by default, so the window is always large
-    enough for its content.
+    If the content of the window take up more space than this, this is 
+    ignored. This is ``(0, 0)`` by default, so the window is always 
+    large enough for its content.
     """)
 @types.add_property(
     'hidden', type=bool, extra_setter=_closecheck,
@@ -75,19 +72,19 @@ def _sizecheck(window, size):
     'on_close',
     doc="""A callback that runs when the user tries to close the window.
 
-    This callback doesn't actually run when close() is called. The
-    close() method closes the window, but this runs when the *user*
-    tries to close the window. Usually you should connect this to
-    bananagui.mainloop.quit.
+    This callback doesn't actually run when :meth:`~close` is called. 
+    The :meth:`close` method closes the window, but this runs when the 
+    *user* tries to close the window. Usually you should connect this to
+    :func:`bananagui.mainloop.quit`.
     """)
 class BaseWindow(Bin):
-    """A window baseclass.
+    """A window baseclass."""
 
-    There's no maximum_size attribute because X doesn't support maximum
-    sizes that well. Tkinter implements a maximum size on X, but it
-    does that by moving the window to the upper left corner when it's
-    maximized.
-    """
+    # There's no *maximum_size* attribute because X doesn't support 
+    # maximum sizes that well. Tkinter implements a maximum size on X, 
+    # but it does that by moving the window to the upper left corner 
+    # when it's maximized.
+
     # Most things check that the window is closed. Things that come
     # from Bin don't, but I don't think that's worth overriding
     # everything here.
@@ -111,7 +108,7 @@ class BaseWindow(Bin):
 
     @property
     def closed(self):
-        """True if close() has been called."""
+        """True if :meth:`close` has been called."""
         return self.__closed
 
     def _repr_parts(self):
@@ -125,7 +122,7 @@ class BaseWindow(Bin):
         return parts
 
     def close(self):
-        """Close the window and set the closed attribute to True.
+        """Close the window and set :attr:`~closed` to True.
 
         This method can be called multiple times and it will do nothing
         after the first call.
@@ -143,30 +140,32 @@ class BaseWindow(Bin):
 class Window(BaseWindow):
     """A window that can have child windows.
 
-        ,---------------------------------------.
-        |           Window          | _ | o | X |
-        |---------------------------------------|
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        `---------------------------------------'
+    .. code-block:: none
 
-    The windows don't have a parent window. You can create multiple
+       ,---------------------------------------.
+       |           Window          | _ | o | X |
+       |---------------------------------------|
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       `---------------------------------------'
+
+    These windows don't have a parent window. You can create multiple 
     windows like this.
     """
 
     def __init__(self, title: str = "BananaGUI Window", *,
                  resizable=True, **kwargs):
         """Initialize the window."""
-        wrapperclass = bananagui._get_wrapper('widgets.window:Window')
+        wrapperclass = _get_wrapper('widgets.window:Window')
         self._wrapper = wrapperclass(self, title)
         super().__init__(title, resizable=resizable, **kwargs)
 
@@ -174,29 +173,28 @@ class Window(BaseWindow):
 class Dialog(BaseWindow):
     """A window that has a parent window.
 
-        ,---------------------------------------.
-        |       Parent window       | _ | o | X |
-        |---------------------------------------|
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |                                       |
-        |               ,-------------------------------.
-        |               |           Dialog          | X |
-        |               |-------------------------------|
-        |               |                               |
-        |               |                               |
-        `---------------|                               |
-                        |                               |
-                        |                               |
-                        `-------------------------------'
+    .. code-block:: none
 
-    This class takes a positional parentwindow argument on initialization.
-    The parent window must be an instance of Window and this window may
-    be centered over the parent window, it may be modal or whatever the
-    real GUI toolkit supports.
+       ,---------------------------------------.
+       |       Parent window       | _ | o | X |
+       |---------------------------------------|
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |                                       |
+       |               ,-------------------------------.
+       |               |           Dialog          | X |
+       |               |-------------------------------|
+       |               |                               |
+       |               |                               |
+       `---------------|                               |
+                       |                               |
+                       |                               |
+                       `-------------------------------'
+
+    The title of a Dialog defaults to the parent window's title.
     """
 
     def __init__(self, parentwindow: Window, title: str = None, *,
@@ -207,12 +205,16 @@ class Dialog(BaseWindow):
         """
         if title is None:
             title = parentwindow.title
-        wrapperclass = bananagui._get_wrapper('widgets.window:Dialog')
+        wrapperclass = _get_wrapper('widgets.window:Dialog')
         self._wrapper = wrapperclass(self, parentwindow._wrapper, title)
         self.__parentwindow = parentwindow
         super().__init__(title, resizable=resizable, **kwargs)
 
     @property
     def parentwindow(self):
-        """The parent window set on initialization."""
+        """The :class:`.Window` that this Dialog "belongs to".
+
+        The dialog may be centered over the parent window, it may be 
+        modal or whatever the real GUI toolkit supports.
+        """
         return self.__parentwindow

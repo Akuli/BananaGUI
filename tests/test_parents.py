@@ -23,7 +23,7 @@
 
 import pytest
 
-from bananagui import HORIZONTAL, widgets
+from bananagui import Orient, widgets
 
 
 def test_child_views(dummywrapper, capsys):
@@ -104,8 +104,8 @@ def test_box_listyness(dummywrapper):
 
 
 def test_box_repr(dummywrapper):
-    hbox = widgets.Box(HORIZONTAL)
+    hbox = widgets.Box(Orient.HORIZONTAL)
     vbox = widgets.Box()
     assert repr(hbox) == (
-        "<bananagui.widgets.Box object, orient=bananagui.HORIZONTAL, empty>")
+        "<bananagui.widgets.Box object, horizontal, empty>")
     assert repr(vbox) == "<bananagui.widgets.Box object, empty>"

@@ -21,14 +21,14 @@
 
 from gi.repository import Gtk
 
-import bananagui
+from bananagui import Align
 from .basewidgets import Child
 
 
 haligns_and_justifys = {
-    bananagui.LEFT: (Gtk.Align.START, Gtk.Justification.LEFT),
-    bananagui.CENTER: (Gtk.Align.CENTER, Gtk.Justification.FILL),
-    bananagui.RIGHT: (Gtk.Align.END, Gtk.Justification.RIGHT),
+    Align.LEFT: (Gtk.Align.START, Gtk.Justification.LEFT),
+    Align.CENTER: (Gtk.Align.CENTER, Gtk.Justification.FILL),
+    Align.RIGHT: (Gtk.Align.END, Gtk.Justification.RIGHT),
 }
 
 

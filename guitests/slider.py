@@ -19,8 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Orient, mainloop, widgets
 
 
 def value_changed(called_widget, *other_widgets):
@@ -34,7 +33,7 @@ def main():
     values = range(0, 51, 5)
 
     window = widgets.Window("Slider test", minimum_size=(300, 200))
-    mainbox = widgets.Box(bananagui.HORIZONTAL)
+    mainbox = widgets.Box(Orient.HORIZONTAL)
     window.add(mainbox)
 
     left_side = widgets.Box()
@@ -46,7 +45,7 @@ def main():
         widgets.Dummy()])
     mainbox.append(left_side)
 
-    vslider = widgets.Slider(values, bananagui.VERTICAL)
+    vslider = widgets.Slider(values, Orient.VERTICAL)
     mainbox.append(vslider)
 
     # Python's sets are awesome.

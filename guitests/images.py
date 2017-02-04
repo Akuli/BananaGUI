@@ -23,15 +23,14 @@
 
 import os
 
-import bananagui
-from bananagui import images, mainloop, widgets
+from bananagui import Orient, images, mainloop, widgets
 
 
 def main():
     window = widgets.Window("Image test")
     image = images.Image(os.path.join('guitests', 'banana.png'))
 
-    box = widgets.Box(bananagui.HORIZONTAL)
+    box = widgets.Box(Orient.HORIZONTAL)
     window.add(box)
 
     label = widgets.ImageLabel(image)

@@ -21,13 +21,13 @@
 
 import tkinter as tk
 
-import bananagui
+from bananagui import Align
 from .basewidgets import Child, run_when_ready
 
 
-anchors = {bananagui.LEFT: 'w',
-           bananagui.CENTER: 'center',
-           bananagui.RIGHT: 'e'}
+anchors = {Align.LEFT: 'w',
+           Align.CENTER: 'center',
+           Align.RIGHT: 'e'}
 
 
 class Label(Child):

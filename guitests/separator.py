@@ -19,8 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import bananagui
-from bananagui import mainloop, widgets
+from bananagui import Orient, mainloop, widgets
 
 
 def main():
@@ -34,11 +33,11 @@ def main():
     hsep = widgets.Separator()
     bigbox.append(hsep)
     print(hsep)
-    bottombox = widgets.Box(bananagui.HORIZONTAL)
+    bottombox = widgets.Box(Orient.HORIZONTAL)
     bigbox.append(bottombox)
 
     bottombox.append(widgets.Label("Bottom left"))
-    vsep = widgets.Separator(bananagui.VERTICAL)
+    vsep = widgets.Separator(Orient.VERTICAL)
     bottombox.append(vsep)
     print(vsep)
     bottombox.append(widgets.Label("Bottom right"))

@@ -21,9 +21,9 @@
 
 """Wrapper module for other GUI toolkits.
 
-With BananaGUI you can write a GUI application in Python, and then run
-the same code using any of the supported GUI toolkits, including PyQt5,
-GTK+ 3 and tkinter.
+With BananaGUI you can write a GUI application in Python, and then run 
+the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support 
+later.
 """
 
 import enum
@@ -38,13 +38,11 @@ __license__ = 'MIT'
 __version__ = '0.1-dev'
 
 
-@utils.global_members(__name__)
 class Orient(enum.IntEnum):
     HORIZONTAL = 1
     VERTICAL = 2
 
 
-@utils.global_members(__name__)
 class Align(enum.IntEnum):
     LEFT = 1
     CENTER = 2
@@ -59,9 +57,16 @@ class Align(enum.IntEnum):
 # must not be allowed. I don't think an enum with just one value is
 # worth it, so this is just an integer. The callbacks can also return
 # None if they are not supposed to run again.
+
+#: If a timeout callback function returns this, it will be called again. 
+#: See :func:`bananagui.mainloop.add_timeout` for more info.
 RUN_AGAIN = -1
 
 # This needs to be updated when new wrapper modules are added.
+
+#: A set of currently supported wrapper module names.
+#:
+#: Modifying this is not recommended.
 WRAPPERS = {'tkinter', 'gtk3', 'dummy'}
 
 _wrapper = None
@@ -76,38 +81,38 @@ def _load_wrapper(name):
 
 
 def load_wrapper(*args, init_mainloop=True):
-    """Import a BananaGUI wrapper module.
+    """Initialize BananaGUI.
 
-    This function must be exactly once before using most things in
-    BananaGUI. Submodules may be imported without calling this, but
-    that's about it. See help('bananagui.mainloop') for more info.
+    This function must be called before using many things in BananaGUI. 
+    See :mod:`bananagui.mainloop` for more information.
 
-    The arguments for this function should be valid BananaGUI wrapper
-    modules. For example, load_wrapper('tkinter') tells BananaGUI to use
-    tkinter as its GUI toolkit. The WRAPPERS variable contains a full
-    list of valid arguments for this function.
+    The arguments for this function should be valid BananaGUI wrapper 
+    modules. For example, ``load_wrapper('tkinter')`` tells BananaGUI to 
+    use tkinter as its GUI toolkit. The :data:`WRAPPERS` variable 
+    contains a full list of valid arguments for this function.
 
-    If multiple wrapper modules are given, this function attempt to load
-    each wrapper module until loading one of them succeeds.
+    If multiple arguments are given, this function attempts to load each 
+    wrapper module until loading one of them succeeds.
 
-    For convenience, bananagui.mainloop.init() will be called if
-    init_mainloop is True.
+    For convenience, :func:`bananagui.mainloop.init` will be called if 
+    *init_mainloop* is True.
     """
     if not args:
         raise TypeError("no wrappers were specified")
-    for arg in args:
-        if arg not in WRAPPERS:
-            raise ValueError("invalid wrapper name %r" % (arg,))
     if _wrapper is not None:
         raise RuntimeError("don't call load_wrapper() twice")
 
     if len(args) == 1:
+        if arg[0] not in WRAPPERS:
+            raise ValueError("invalid wrapper name %r" % (arg,))
         _load_wrapper(args[0])
         if init_mainloop:
             mainloop.init()
     else:
         # Attempt to load each wrapper.
         for arg in args:
+            if arg not in WRAPPERS:
+                raise ValueError("invalid wrapper name %r" % (arg,))
             try:
                 _load_wrapper(arg)
             # I have no idea what different toolkits can raise.
