@@ -8,16 +8,9 @@ tutorial](tutorial.rst) works just fine, but that's about it.
 If you want to build the docs and read them without an Internet 
 connection, you can also do that:
 
-1. Install sphinx.
-
-    ```
-    $ yourpython -m pip install --user sphinx
-    ```
-
-2. Run sphinx.
-
-    ```
-    $ cd /some/path/to/BananaGUI/docs
-    $ yourpython -m sphinx . _build
-    $ yourpython -m webbrowser _build/index.html
-    ```
+```
+$ yourpython -m pip install --user sphinx
+$ cd /some/path/to/BananaGUI/docs
+$ yourpython -m sphinx . _build
+$ yourpython -m webbrowser _build/index.html
+```
