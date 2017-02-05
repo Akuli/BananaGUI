@@ -154,9 +154,7 @@ class Child(Widget):
     BananaGUI keeps track of the parent internally. When a child is
     added to a parent widget, BananaGUI remembers it. The child can be
     removed from the parent widget and added into it again, but it
-    cannot be added to other parent widgets. For example:
-
-    .. code-block:: python
+    cannot be added to other parent widgets. For example::
 
        box1 = widgets.Box()
        box2 = widgets.Box()

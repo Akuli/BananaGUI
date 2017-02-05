@@ -84,9 +84,7 @@ The file is loaded like this:
 5. Imported modules are deleted from the namespace.
 
 In other words, the GUI file above does roughly the same thing as this
-Python code:
-
-.. code-block:: python
+Python code::
 
    from bananagui import widgets
 
@@ -98,9 +96,7 @@ Python code:
 The Python code is shorter than the GUI file above, so it doesn't really
 make sense to use the iniloader for small GUI's like this. It's more
 useful for big projects, because then the GUI can be in a separate file
-that is loaded from Python like this:
-
-.. code-block:: python
+that is loaded from Python like this::
 
    from bananagui import iniloader, load_wrapper, mainloop
 

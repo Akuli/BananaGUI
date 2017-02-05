@@ -199,9 +199,7 @@ class Box(abcoll.MutableSequence, Parent, Child):
        |  box[2]  |
        `----------'
 
-    To access the children just treat the Box object like a list:
-
-    .. code-block:: python
+    To access the children just treat the Box object like a list::
 
        box.append(child)   # add a child
        box.remove(child)   # remove a child
@@ -213,9 +211,7 @@ class Box(abcoll.MutableSequence, Parent, Child):
 
     Unfortunately ``random.shuffle(box)`` doesn't work because it wants
     to temporarily add the same children to the box twice. You need to
-    do this instead:
-
-    .. code-block:: python
+    do this instead::
 
        children = box[:]
        random.shuffle(children)

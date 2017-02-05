@@ -52,9 +52,7 @@ Importing and loading BananaGUI
 -------------------------------
 
 The first thing we need to do is to import everything we need from 
-BananaGUI.
-
-.. code-block:: python
+BananaGUI::
 
    from bananagui import load_wrapper, mainloop, widgets
 
@@ -62,9 +60,7 @@ Next we need to load a wrapper that wraps a GUI toolkit. The
 :func:`bananagui.load_wrapper` function takes a wrapper name as an 
 argument and loads that wrapper. We can also give it more than one name, 
 and BananaGUI will try to load the first wrapper, and if it fails it 
-will try the next one and so on.
-
-.. code-block:: python
+will try the next one and so on::
 
    load_wrapper('tkinter', 'gtk3')
 
@@ -93,18 +89,14 @@ display the text.
 
 :class:`bananagui.widgets.Window` is used for creating windows, and 
 :class:`bananagui.widgets.Label` is a widget that displays text. We can 
-create a window and add a label into it like this:
-
-.. code-block:: python
+create a window and add a label into it like this::
 
    window = widgets.Window("Hello")
    label = widgets.Label("Hello World!")
    window.add(label)
 
 You can also use the ``>>>`` prompt and the dummy wrapper to experiment 
-with these things.
-
-.. code-block:: python
+with these things::
 
    >>> from bananagui import load_wrapper, widgets
    >>> load_wrapper('dummy')
@@ -124,9 +116,7 @@ or you may notice other problems. We'll learn more about this in
 `The main loop`_.
 
 If you have a big project with many widgets, it may be useful to print a 
-tree of the widgets you have using :mod:`bananagui.widgettree`:
-
-.. code-block:: python
+tree of the widgets you have using :mod:`bananagui.widgettree`::
 
    >>> from bananagui import widgettree
    >>> widgettree.dump(window)
@@ -138,9 +128,7 @@ Attributes
 
 When we created a window like ``window = widgets.Window("Hello")``, the 
 ``"Hello"`` wasn't thrown away. You can still get that or change the 
-title of the window to whatever you want using ``window.title``.
-
-.. code-block:: python
+title of the window to whatever you want using ``window.title``::
 
    >>> window.title
    'Hello'
@@ -150,9 +138,7 @@ title of the window to whatever you want using ``window.title``.
    >>> window
    <bananagui.widgets.Window object, title='New title', empty>
 
-The text of the label works the same way:
-
-.. code-block:: python
+The text of the label works the same way::
 
    >>> label.text = 'New text'
    >>> label
@@ -173,9 +159,7 @@ BananaGUI uses the GUI toolkit's main event loop, and you can control it
 with the :mod:`bananagui.mainloop` module. It's easy to use: after 
 setting everything up, we call :func:`bananagui.mainloop.run` and wait 
 for something to stop it. When it's running, we can be sure that the 
-user sees the widgets we created.
-
-.. code-block:: python
+user sees the widgets we created::
 
    mainloop.run()
 
@@ -184,9 +168,7 @@ before this takes just a fraction of a second, but the mainloop is
 running all the time when the program is used. It might be anything from 
 a couple seconds to several hours.
 
-So now our code looks like this:
-
-.. code-block:: python
+So now our code looks like this::
 
    from bananagui import load_wrapper, mainloop, widgets
    
@@ -217,9 +199,7 @@ connected to a function, and then that function will be called when the
 user does something.
 
 Our window has a callback called ``on_close``, and it runs when the user 
-closes the window. Let's try it out on the ``>>>`` prompt.
-
-.. code-block:: python
+closes the window. Let's try it out on the ``>>>`` prompt::
 
    >>> from bananagui import load_wrapper, widgets
    >>> load_wrapper('dummy')
@@ -235,15 +215,11 @@ closes the window. Let's try it out on the ``>>>`` prompt.
 
 Usually you don't need to use the ``run()`` method yourself, BananaGUI 
 calls it when the user does something and runs your callbacks. So let's 
-solve the window closing problem.
-
-.. code-block:: python
+solve the window closing problem::
 
    window.on_close.connect(mainloop.quit)
 
-Now our code looks like this:
-
-.. code-block:: python
+Now our code looks like this::
 
    from bananagui import load_wrapper, mainloop, widgets
    
@@ -262,9 +238,7 @@ Bins
 
 What if we want to add two labels into one window? Try that out on the 
 ``>>>`` prompt, and you'll notice that the window doesn't like that at 
-all.
-
-.. code-block:: python
+all::
 
    >>> window = widgets.Window("Test")
    >>> window.add(widgets.Label("Test 1"))
@@ -279,16 +253,12 @@ children at all. This may feel stupid right now, but BananaGUI would be
 more complicated without widgets like this.
 
 You can get the child of a Bin widget after adding it using the 
-``child`` attribute.
-
-.. code-block:: python
+``child`` attribute::
 
    >>> window.child
    <bananagui.widgets.Label object, text='Test 1'>
 
-Or you can get rid of the child using the ``remove`` method:
-
-.. code-block:: python
+Or you can get rid of the child using the ``remove`` method::
 
    >>> window
    <bananagui.widgets.Window object, title='BananaGUI Window', contains a child>
@@ -318,9 +288,7 @@ Let's make a program that creates a window like this:
    |                        |
    `------------------------'
 
-Here's the program.
-
-.. code-block:: python
+Here's the program::
 
    from bananagui import load_wrapper, mainloop, widgets
    
@@ -338,9 +306,7 @@ Here's the program.
 If you run the program you'll notice that it displays two labels above 
 each other, just like we wanted it to do.
 
-Let's print a tree of it:
-
-.. code-block:: python
+Let's print a tree of it::
 
    >>> window = widgets.Window("Box test")
    >>> box = widgets.Box()
@@ -356,9 +322,7 @@ Let's print a tree of it:
 You might be wondering why we add a child widget to the window using a 
 method called ``add``, but boxes have an ``append`` method instead. 
 Lists also have a method called ``append``, and this is not just a 
-random coincidence. Boxes actually behave like lists in many ways:
-
-.. code-block:: python
+random coincidence. Boxes actually behave like lists in many ways::
 
    >>> box[0]
    <bananagui.widgets.Label object, text='Label 1'>
@@ -389,9 +353,7 @@ It's also possible to add widgets next to each other:
 All we need to do is to make the box horizontal using the *HORIZONTAL* 
 member of :class:`bananagui.Orient`. The boxes are vertical by default 
 because most of the time we use vertical boxes more than horizontal 
-boxes.
-
-.. code-block:: python
+boxes::
 
    from bananagui import Orient, load_wrapper, mainloop, widgets
    
@@ -412,28 +374,25 @@ Buttons
 So far our program displays some text and that's it. Really boring! We 
 want to have a button that does something when we click it.
 
-Creating a button is easy. Just create a 
-:class:`bananagui.widgets.Button` like ``widgets.Button("some text")``.
-
-.. code-block:: python
+Creating a button is easy. Just create a :class:`bananagui.widgets.Button`
+like ``widgets.Button("some text")``::
 
    >>> button = widgets.Button("Click me!")
    >>> button
    <bananagui.widgets.Button object, text='Click me!'>
 
 Button widgets have an ``on_click`` callback, just like the ``on_close`` 
-callback that windows have. It's ran when the button is clicked, and it 
-does nothing by default. See `Callbacks`_ for more information about 
-them.
-
-.. code-block:: python
+callback that windows have::
 
    >>> button.on_click
    <BananaGUI callback 'on_click' of bananagui.widgets.Button object>
 
-So here's a program that prints hello when the user clicks the button:
+See `Callbacks`_ for more information about callbacks if you didn't read 
+it already.
 
-.. code-block:: python
+The ``on_click`` callback is ran when the button is clicked, and it does 
+nothing by default. So here's a program that prints hello when the user 
+clicks the button::
 
    from bananagui import load_wrapper, mainloop, widgets
    
@@ -487,9 +446,8 @@ Passing arguments to callback functions
 ---------------------------------------
 
 If we want to make multiple buttons that print different things, do we 
-also need to define multiple functions that print different things?
-
-.. code-block:: python
+also need to define multiple functions that print different things? Our 
+code would look like this::
 
    def print_hello():
        print("Hello!")
@@ -507,9 +465,7 @@ different texts we need to define 15 functions.
 
 There's a better way. So far we have used the connect method like 
 ``some_callback.connect(function)``, but we can also use it like 
-``some_callback.connect(function, arguments)``.
-
-.. code-block:: python
+``some_callback.connect(function, arguments)``::
 
    >>> def print_something(thing):
    ...     print(thing)
@@ -520,18 +476,14 @@ There's a better way. So far we have used the connect method like
    Hello!
 
 Our ``print_something`` just prints whatever it gets, so we can also use 
-the print function directly:
-
-.. code-block:: python
+the print function directly::
 
    >>> button = widgets.Button()
    >>> button.on_click.connect(print, "Hello!")
    >>> button.on_click.run()     # BananaGUI runs print("Hello!")
    Hello!
 
-We can also use a for loop to create a bunch of buttons easily:
-
-.. code-block:: python
+We can also use a for loop to create a bunch of buttons easily::
 
    from bananagui import load_wrapper, mainloop, widgets
    
@@ -578,9 +530,7 @@ There Dialog widget is a lot like the Window widget, and you can use it
 to create message boxes when needed. But the :mod:`bananagui.msgbox` 
 module includes handy functions for commonly used dialogs, and it's 
 often easiest to use that. This program displays a hello world message 
-box when the button is clicked:
-
-.. code-block:: python
+box when the button is clicked::
 
    from bananagui import load_wrapper, mainloop, msgbox, widgets
    

@@ -21,9 +21,7 @@
 
 """Print a tree of a widget and its child widgets.
 
-Example:
-
-.. code-block:: python
+Example::
 
     >>> window = widgets.Window()
     >>> box = widgets.Box()
