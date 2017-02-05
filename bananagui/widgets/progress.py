@@ -79,32 +79,3 @@ class BouncingProgressbar(Child):
 
     def _repr_parts(self):
         return ['bouncing=' + repr(self.bouncing)] + super()._repr_parts()
-
-
-@types.add_property('spinning', type=bool,
-                    doc="True if the widget is currently spinning.")
-class Spinner(Child):
-    r"""A waiting spinner.
-
-    .. code-block:: none
-
-         .---.
-        /     \
-       | .   O |
-        \ - o /
-         `---'
-
-    The spinner doesn't spin by default. Set spinning to True to make
-    it spin.
-    """
-
-    def __init__(self, *, spinning=False, **kwargs):
-        """Initialize the spinner."""
-        self._prop_spinning = False
-        wrapperclass = _get_wrapper('widgets.progress:Spinner')
-        self._wrapper = wrapperclass(self)
-        super().__init__(**kwargs)
-        self.spinning = spinning
-
-    def _repr_parts(self):
-        return ['spinning=' + repr(self.spinning)] + super()._repr_parts()
