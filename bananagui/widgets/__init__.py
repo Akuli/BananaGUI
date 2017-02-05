@@ -46,6 +46,6 @@ from .progress import Progressbar, BouncingProgressbar, Spinner
 from .ranged import Slider, Spinbox
 from .textwidgets import TextBase, Entry, TextEdit
 #from .trayicon import TrayIcon
-from .window import BaseWindow, Window, Dialog
+from .window import Window, Dialog
 
 __all__ = _fix_modulenames()

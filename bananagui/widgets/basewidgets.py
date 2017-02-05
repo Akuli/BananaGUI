@@ -23,7 +23,11 @@ from bananagui import mainloop, types
 
 
 class Widget:
-    """A baseclass for all widgets."""
+    """A baseclass for all widgets.
+
+    All widgets inherit from this class, so all widgets have the methods 
+    that this class has.
+    """
 
     can_focus = False
 
@@ -110,34 +114,34 @@ class Widget:
     This is ``(True, True)`` by default, so the widget expands in both
     directions.
 
-    When multiple widgets are next to each
-    other in a container, at least one of them should expand in the
-    container's direction. Like this:
+    When multiple widgets are next to each other in a layout widget, at 
+    least one of them should expand in the layout widget's direction. 
+    Like this:
 
     .. code-block:: none
-    
+
        ,------------------------------------------------.
        |   non-   |                                     |
        |expanding |           expanding widget          |
        |  widget  |                                     |
        `------------------------------------------------'
-    
+
     Not like this:
-    
+
     .. code-block:: none
-    
+
        ,------------------------------------------------.
        |   non-   |   non-   |                          |
        |expanding |expanding |       empty space        |
        |  widget  |  widget  |                          |
        `------------------------------------------------'
-    
-    This way the children will behave consistently with all GUI
-    toolkits. You can use a Dummy widget to fill the empty space if
-    needed:
- 
+
+    This way the children will behave consistently with all GUI 
+    toolkits. You can use a :class:`.Dummy` widget to fill the empty 
+    space if needed:
+
     .. code-block:: none
-    
+
        ,------------------------------------------------.
        |   non-   |   non-   |                          |
        |expanding |expanding |       Dummy widget       |
@@ -168,8 +172,7 @@ class Child(Widget):
     #   box1.append(box2)
     #   box2.append(box1)   # raise an error with a descriptive message here
 
-    def __init__(self, *, tooltip=None, grayed_out=False,
-                 expand=(True, True)):
+    def __init__(self, tooltip=None, grayed_out=False, expand=(True, True)):
         """Set arguments as attributes."""
         self._parent = None     # Other files rely on this also.
         self._prop_tooltip = None

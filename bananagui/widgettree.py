@@ -23,6 +23,8 @@
 
 Example:
 
+.. code-block:: python
+
     >>> window = widgets.Window()
     >>> box = widgets.Box()
     >>> window.add(box)
@@ -39,10 +41,9 @@ Example:
         └── bananagui.widgets.Label object, text='label 4'
 
 If you would like to print a tree of widgets in a BananaGUI ini file,
-you can use bananagui.iniloader:
-
-    $ iniloader tree thefile.ini
+you can use :mod:`bananagui.iniloader`.
 """
+
 # Unfortunately there isn't a good way to require pytest fixtures from
 # doctests, so the docstring isn't tested.
 
@@ -92,8 +93,8 @@ def _dump_tree(widget, file, ascii_only, prefix=''):
 def dump(widget: widgets.Parent, file=None, *, ascii_only=False):
     """Print a tree of a parent widget and its child widgets.
 
-    The file defaults to sys.stdout. If ascii_only is true, no
-    non-ASCII characters will be used.
+    The *file* defaults to :data:`sys.stdout`. If *ascii_only* is true, 
+    no non-ASCII characters will be used.
     """
     # This allows monkeypatching sys.stdout.
     if file is None:
@@ -103,7 +104,7 @@ def dump(widget: widgets.Parent, file=None, *, ascii_only=False):
 
 
 def dumps(widget: widgets.Parent, **kwargs):
-    """Like dump(), but return a string instead of printing to a file."""
+    """Like :func:`~dump`, but return a string instead of writing to a file."""
     fakefile = io.StringIO()
     dump(widget, fakefile, **kwargs)
     return fakefile.getvalue()

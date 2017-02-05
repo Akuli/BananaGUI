@@ -61,6 +61,8 @@ class Entry(TextBase):
        ,-----------------------.
        | Enter something...    |
        `-----------------------'
+
+    .. seealso:: `Number selecting widgets`_.
     """
 
     def __init__(self, text='', *, secret=False, **kwargs):
@@ -95,6 +97,10 @@ class TextEdit(TextBase):
        | Line 3    |
        |           |
        `-----------'
+
+    .. note:: The TextEdit widget doesn't work that well right now. I'll
+              make a better TextEdit widget when I have time and it will 
+              have a different API, so don't rely on this widget.
     """
 
     def __init__(self, text='', *, tab='\t', **kwargs):

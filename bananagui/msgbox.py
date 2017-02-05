@@ -23,25 +23,25 @@
 
 All public functions in this module take these arguments:
 
-- *parentwindow:* A bananagui.widgets.Window object. Usually the dialog
-  will be centered on this window.
-- *title:* The title of the dialog, defaults to the parentwindow's
+- *parentwindow:* A :class:`bananagui.widgets.Window` object. Usually 
+  the dialog will be centered on this window.
+- *title:* The title of the dialog, defaults to *parentwindow*'s
   title.
 
-The info(), warning(), error() and question() functions also take these
-arguments:
+The :func:`~info`, :func:`~warning`, :func:`~error` and 
+:func:`~question` functions also take these arguments:
 
 - *buttons:* This should be an iterable of button texts that will be
-  added to the dialog. BananaGUI needs to iterate over this multiple
+  added to the dialog. BananaGUI may need to iterate over this multiple
   times, so I don't recommend using an iterator for this.
 - *defaultbutton:* This should be a string in *buttons*. The default
   button will have keyboard focus by default.
 - *text:* This is the text that will be shown in the dialog.
 - *title:* The title of the dialog, defaults to the parentwindow's title.
 
-Most functions return whatever the user chooses or None if the dialog is
-closed. For example, info(), warning(), error() and question() return
-the text of the clicked button or None.
+The functions return whatever the user chooses or None if the dialog is 
+closed. For example, :func:`info`, :func:`warning`, :func:`error` and
+:func:`question` return the text of the clicked button or None.
 """
 
 from bananagui import _get_wrapper, color, widgets
@@ -62,36 +62,35 @@ def _message(icon, parentwindow, msg, title, buttons, defaultbutton):
                        defaultbutton)
 
 
-def info(parentwindow: widgets.Window, message: str, buttons, *,
-         title: str = None, defaultbutton: str = None):
-    """Display an info message."""
+def info(parentwindow, message, buttons, *,
+         title=None, defaultbutton=None):
+    """Display an information message."""
     return _message('info', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def warning(parentwindow: widgets.Window, message: str, buttons, *,
-            title: str = None, defaultbutton: str = None):
+def warning(parentwindow, message, buttons, *,
+            title=None, defaultbutton=None):
     """Display a warning message."""
     return _message('warning', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def error(parentwindow: widgets.Window, message: str, buttons, *,
-          title: str = None, defaultbutton: str = None):
+def error(parentwindow, message, buttons, *,
+          title=None, defaultbutton=None):
     """Display an error message."""
     return _message('error', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def question(parentwindow: widgets.Window, message: str, buttons, *,
-             title: str = None, defaultbutton: str = None):
+def question(parentwindow, message, buttons, *,
+             title=None, defaultbutton=None):
     """Display a question message."""
     return _message('question', parentwindow, message, title, buttons,
                     defaultbutton)
 
 
-def colordialog(parentwindow: widgets.Window, *, title: str = None,
-                defaultcolor: str = color.BLACK):
+def colordialog(parentwindow, *, title=None, defaultcolor=color.BLACK):
     """Ask a color from the user.
 
     This returns the new color, or None if the user canceled the dialog.

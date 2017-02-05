@@ -35,8 +35,8 @@ class _ChildView(abcoll.Set):
     """A view of this widget's children.
 
     Dictionaries have a ``keys()`` method that returns a set-like view 
-    of the keys. This is similar, but this contains child widgets 
-    instead of keys.
+    of the keys. This is similar, but this contains :class:`.Child` 
+    widgets instead of keys.
 
     Subclasses of :class:`~Parent` provide different kinds of ways to 
     access the children, but all Parent widgets have a children 
@@ -120,7 +120,12 @@ class _BinChildView(_ChildView):
 
 
 class Bin(Parent):
-    """A widget that may contain one child widget."""
+    """Base class for widgets that may contain only one child at a time.
+
+    See `Layout widgets`_ if you want to have multiple widgets in a Bin 
+    widget. This whole concept may seem stupid, but BananaGUI would be 
+    more complicated without separate Bin widgets and layout widgets.
+    """
 
     _child_view_class = _BinChildView
 
@@ -215,6 +220,10 @@ class Box(abcoll.MutableSequence, Parent, Child):
        children = box[:]
        random.shuffle(children)
        box[:] = children
+
+    .. seealso:: The :class:`.Checkbox` widget has nothing to do with 
+                 this widget, but it has a similar name so you might be 
+                 looking for it.
     """
     # The wrapper should define append and remove methods.
 
@@ -281,9 +290,9 @@ class Box(abcoll.MutableSequence, Parent, Child):
         self[index:index] = [value]
 
 
-# TODO: allow scrolling in one direction only.
+# TODO: allow scrolling in one direction only and add tkinter support.
 class Scroller(Bin, Child):
-    """A container that adds scrollbars around its child.
+    """A widget that adds scrollbars around its child.
 
     .. code-block:: none
 
@@ -302,6 +311,8 @@ class Scroller(Bin, Child):
 
     The scroller displays a horizontal and a vertical scrollbar
     automatically when needed.
+
+    .. note:: This widget is currently not available on Tkinter.
     """
 
     def __init__(self, child=None, **kwargs):

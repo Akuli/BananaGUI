@@ -63,82 +63,28 @@ def _sizecheck(window, size):
     """)
 @types.add_property(
     'hidden', type=bool, extra_setter=_closecheck,
-    doc="""True if the window is not showing.
+    doc="""False if the window is showing.
 
-    Hiding the window is easier than creating a new window when a
-    window with the same content needs to be displayed multiple times.
+    Hiding the window is easier than creating a new window when a window 
+    with the same content needs to be displayed multiple times.
+
+    If you are wondering why your window isn't showing up, it's not 
+    necessarily hidden. There are other things that could be also wrong:
+
+    * The window might be closed because :meth:`~close` has been called.
+    * The mainloop might not be running. See :mod:`bananagui.mainloop`.
     """)
 @types.add_callback(
     'on_close',
     doc="""A callback that runs when the user tries to close the window.
 
     This callback doesn't actually run when :meth:`~close` is called. 
-    The :meth:`close` method closes the window, but this runs when the 
-    *user* tries to close the window. Usually you should connect this to
+    The close method closes the window, but this runs when the *user* 
+    tries to close the window. Usually you should connect this to
     :func:`bananagui.mainloop.quit`.
     """)
-class BaseWindow(Bin):
-    """A window baseclass."""
-
-    # There's no *maximum_size* attribute because X doesn't support 
-    # maximum sizes that well. Tkinter implements a maximum size on X, 
-    # but it does that by moving the window to the upper left corner 
-    # when it's maximized.
-
-    # Most things check that the window is closed. Things that come
-    # from Bin don't, but I don't think that's worth overriding
-    # everything here.
-
-    # TODO: window icon?
-
-    can_focus = True
-
-    def __init__(self, title, *, child=None, resizable=True,
-                 minimum_size=(0, 0), hidden=False, **kwargs):
-        self._prop_title = title
-        self._prop_resizable = True
-        self._prop_size = (200, 200)
-        self._prop_minimum_size = (0, 0)
-        self._prop_hidden = False
-        self.__closed = False
-        super().__init__(child, **kwargs)
-        self.resizable = resizable
-        self.minimum_size = minimum_size
-        self.hidden = hidden
-
-    @property
-    def closed(self):
-        """True if :meth:`close` has been called."""
-        return self.__closed
-
-    def _repr_parts(self):
-        # The title is first because it's easiest to identify the
-        # window based on the title.
-        parts = ['title=' + repr(self.title)] + super()._repr_parts()
-        if self.closed:
-            # This is the last thing and in caps because it's
-            # important. Not much can be done to closed Window objects.
-            parts.append('CLOSED')
-        return parts
-
-    def close(self):
-        """Close the window and set :attr:`~closed` to True.
-
-        This method can be called multiple times and it will do nothing
-        after the first call.
-        """
-        if not self.closed:
-            self._wrapper.close()
-            self.__closed = True
-
-    def wait(self):
-        """Wait until the window is closed."""
-        _closecheck(self)
-        self._wrapper.wait()
-
-
-class Window(BaseWindow):
-    """A window that can have child windows.
+class Window(Bin):
+    """A class that represents a window.
 
     .. code-block:: none
 
@@ -162,15 +108,73 @@ class Window(BaseWindow):
     windows like this.
     """
 
-    def __init__(self, title: str = "BananaGUI Window", *,
-                 resizable=True, **kwargs):
-        """Initialize the window."""
-        wrapperclass = _get_wrapper('widgets.window:Window')
-        self._wrapper = wrapperclass(self, title)
-        super().__init__(title, resizable=resizable, **kwargs)
+    # There's no *maximum_size* attribute because X doesn't support 
+    # maximum sizes that well. Tkinter implements a maximum size on X, 
+    # but it does that by moving the window to the upper left corner 
+    # when it's maximized.
+
+    # Most things check that the window is closed. Things that come
+    # from Bin don't, but I don't think that's worth overriding
+    # everything here.
+
+    # TODO: window icon?
+
+    can_focus = True
+
+    def __init__(self, title="BananaGUI Window", *, child=None, 
+                 resizable=True, minimum_size=(0, 0), hidden=False, 
+                 **kwargs):
+        self._prop_title = title
+        self._prop_resizable = True
+        self._prop_size = (200, 200)
+        self._prop_minimum_size = (0, 0)
+        self._prop_hidden = False
+        self.__closed = False
+        if not isinstance(self, Dialog):
+            # Dialogs have a separate wrapper class, so we don't want to 
+            # add the non-Dialog wrapper here.
+            wrapperclass = _get_wrapper('widgets.window:Window')
+            self._wrapper = wrapperclass(self, title)
+        super().__init__(child, **kwargs)
+        self.resizable = resizable
+        self.minimum_size = minimum_size
+        self.hidden = hidden
+
+    def close(self):
+        """Close the window and set :attr:`~closed` to True.
+
+        Closed windows are not displayed to the user, and most 
+        operations on a closed window raise an exception.
+
+        This method can be called multiple times and it will do nothing
+        after the first call.
+        """
+        if not self.closed:
+            self._wrapper.close()
+            self.__closed = True
+
+    @property
+    def closed(self):
+        """True if :meth:`close` has been called."""
+        return self.__closed
+
+    def _repr_parts(self):
+        # The title is first because it's easiest to identify the
+        # window based on the title.
+        parts = ['title=' + repr(self.title)] + super()._repr_parts()
+        if self.closed:
+            # This is the last thing and in caps because it's
+            # important. Not much can be done to closed Window objects.
+            parts.append('CLOSED')
+        return parts
+
+    def wait(self):
+        """Wait until the window is closed."""
+        _closecheck(self)
+        self._wrapper.wait()
 
 
-class Dialog(BaseWindow):
+class Dialog(Window):
     """A window that has a parent window.
 
     .. code-block:: none
@@ -194,15 +198,13 @@ class Dialog(BaseWindow):
                        |                               |
                        `-------------------------------'
 
-    The title of a Dialog defaults to the parent window's title.
+    This class inherits from :class:`.Window`. The title defaults to 
+    *parentwindow*'s title.
     """
 
-    def __init__(self, parentwindow: Window, title: str = None, *,
+    def __init__(self, parentwindow: Window, title=None, *,
                  resizable=False, **kwargs):
-        """Initialize the dialog.
-
-        The title defaults to parentwindow's title.
-        """
+        """Initialize the dialog."""
         if title is None:
             title = parentwindow.title
         wrapperclass = _get_wrapper('widgets.window:Dialog')

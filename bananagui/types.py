@@ -238,8 +238,11 @@ def add_property(name, *, add_changed=False, allow_none=False,
     def inner(cls):
         setattr(cls, name, property(getter, setter, doc=doc))
         if add_changed:
-            callbackdoc = "This callback is ran when %s changes." % name
-            add_callback('on_%s_changed' % name, doc=callbackdoc)(cls)
+            adder = add_callback(
+                'on_%s_changed' % name,
+                doc="This callback is ran when :attr:`%s` changes." % name,
+            )
+            adder(cls)
         return cls
 
     return inner

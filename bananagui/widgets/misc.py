@@ -42,7 +42,7 @@ class Checkbox(Child):
        | X |  Uncheck me!  |
        `-------------------'
 
-    The Checkbox widget has nothing to do with the Box widget.
+    The Checkbox widget has nothing to do with the :class:`.Box` widget.
     """
 
     can_focus = True

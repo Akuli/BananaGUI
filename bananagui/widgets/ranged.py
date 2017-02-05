@@ -72,9 +72,12 @@ class Spinbox(_Ranged, Child):
        | 123           | + | - |
        `-----------------------'
 
-    Currently spinboxes can't be used with floats because the allowed
-    values are represented by a Python range object, so you need to use
-    an Entry if you want to use floats.
+    You can use Entry widgets for selecting numbers, but this widget 
+    provides nicer + and - buttons.
+
+    Spinboxes can't be used with floats because the allowed values are 
+    represented by a Python range object, so you need to use an Entry if 
+    you want to use floats.
     """
 
     can_focus = True

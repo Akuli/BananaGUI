@@ -24,100 +24,111 @@
 This is nice compared to writing the GUI in plain Python when writing
 it in Python would be repetitive.
 
-SECURITY NOTE: Don't use this module with untrusted input! The imports
-and expressions are evaluated like any other Python code, so it's
-possible to do basically anything in them. This module is meant to be
-used when writing the GUI in plain Python would be tedious, NOT for
-running GUI files that come from random places.
+.. warning::
+
+   Don't use this module with untrusted input! The imports and 
+   expressions are evaluated like any other Python code, so it's 
+   possible to do basically anything in them. This module is meant to be 
+   used when writing the GUI in plain Python would be tedious, *not* for 
+   running GUI files that come from random places.
 
 With that out of the way, let's have a look at how this module is
 useful using this example GUI file:
 
-    # Hello World GUI for bananagui.iniloader.
-    from bananagui import widgets
+.. code-block:: none
 
-    [window]
-    class = widgets.Window
-    title = "Hello"
+   # Hello World GUI for bananagui.iniloader.
+   from bananagui import widgets
 
-    [label in window]
-    class = widgets.Label
-    text = "Hello World!"
+   [window]
+   class = widgets.Window
+   title = "Hello"
+
+   [label in window]
+   class = widgets.Label
+   text = "Hello World!"
 
 You can preview this file without loading it in Python manually:
 
-    $ iniloader preview the-gui-file.ini
+.. code-block:: none
+
+   $ iniloader preview the-gui-file.ini
 
 Or you can print a tree of the widgets you just created:
 
-    $ iniloader tree the-gui-file.ini
+.. code-block:: none
 
-See 'iniloader --help' for more info. You can also use
-'yourpython -m bananagui.iniloader' if the iniloader command doesn't
+   $ iniloader tree the-gui-file.ini
+
+See ``iniloader --help`` for more info. You can also use
+``yourpython -m bananagui.iniloader`` if the iniloader command doesn't 
 work for some reason.
 
 The file is loaded like this:
+
 1. A new namespace dictionary is created for the module.
 2. The imports at the top are executed in this namespace. They need to
    be at the top, and everything before the first section must be
    imports. All import statements are fully supported, and the import
-   section ends to the first line starting with '['.
-3. Each section starts with [a header] and ends to the next header or
-   end of file, and the content of sections consists of key=value pairs.
-   Next the window section is parsed. It creates a widgets.Window object
-   and sets it to a variable called window. The value of class will be
-   used as constructor and other arguments will be given to it as
-   keyword arguments.
+   section ends to the first line starting with ``[``.
+3. Each section starts with ``[a header]`` and ends to the next header or
+   end of file, and the content of sections consists of ``key = value`` 
+   pairs. Next the window section is parsed. It creates a
+   :class:`bananagui.widgets.Window` object and sets it to a variable 
+   called window. The value of class will be used as constructor and 
+   other arguments will be given to it as keyword arguments.
 4. The next section is otherwise similar, but the header is like
-   "child in parent". When the child widget has been created,
-   parent.add(child) or parent.append(child) will be called depending on
-   the type of the parent. In this case, the parent is a Window so
-   window.add(label) is called.
+   ``child in parent``. When the child widget has been created, the 
+   child will be added into it. In this case, the parent is a 
+   :class:`bananagui.widgets.Window` so ``window.add(label)`` is called.
 5. Imported modules are deleted from the namespace.
 
 In other words, the GUI file above does roughly the same thing as this
 Python code:
 
-    from bananagui import widgets
+.. code-block:: python
 
-    namespace = {}
-    namespace['window'] = widgets.Window(title="Hello")
-    namespace['label'] = widgets.Label(text="Hello World!")
-    namespace['window'].add(namespace['label'])
+   from bananagui import widgets
+
+   namespace = {}
+   namespace['window'] = widgets.Window(title="Hello")
+   namespace['label'] = widgets.Label(text="Hello World!")
+   namespace['window'].add(namespace['label'])
 
 The Python code is shorter than the GUI file above, so it doesn't really
 make sense to use the iniloader for small GUI's like this. It's more
 useful for big projects, because then the GUI can be in a separate file
 that is loaded from Python like this:
 
-    from bananagui import iniloader, load_wrapper, mainloop
+.. code-block:: python
 
-    load_wrapper('whatever you want')
-    with open('the-gui-file.ini', 'r') as f:
-        widgetdict = iniloader.load(f)
+   from bananagui import iniloader, load_wrapper, mainloop
 
-    # Now widgetdict is the namespace dictionary.
-    widgetdict['window'].on_close.connect(mainloop.quit)
-    mainloop.run()
+   load_wrapper('whatever you want')
+   with open('the-gui-file.ini', 'r') as f:
+       widgetdict = iniloader.load(f)
 
-Section names and the keys in the sections must be valid variable
-names, except the class key that specifies the constructor.
+   # Now widgetdict is the namespace dictionary.
+   widgetdict['window'].on_close.connect(mainloop.quit)
+   mainloop.run()
 
-The values of the sections can be any Python expressions, including
-comments, function calls, list comprehensions and so on. Other
-statements like function and class definitions are not supported because
-the GUI files are meant to be a faster way to write GUI's than writing
-Python, not a replacement for Python.
+Section names and the keys in the sections must be valid variable names, 
+except the ``class`` key that specifies the constructor. The values of 
+the sections can be any Python expressions, including comments, function 
+calls, list comprehensions and so on. They may refer to other variables 
+and imported modules.
 
 It's also possible to use multiline values by indenting everything
 except the first line:
 
-    [multiline_label]
-    class = widgets.Label
-    text = (
-      "Hello "
-      "multiline "
-      "world!")
+.. code-block:: none
+
+   [multiline_label]
+   class = widgets.Label
+   text = (
+     "Hello "
+     "multiline "
+     "world!")
 """
 
 import argparse
@@ -130,7 +141,7 @@ import sys
 
 from bananagui import load_wrapper, mainloop, widgets
 
-__all__ = ['ParsingError', 'load', 'loads', 'main']
+__all__ = ['load', 'loads', 'ParsingError', 'main']
 
 
 class ParsingError(Exception):
@@ -143,8 +154,7 @@ class ParsingError(Exception):
 
     def __init__(self, message, filename=None, lineno=None,
                  line=None, *, add_repr=True):
-        # Calling super().__init__() creates an args attribute that we
-        # don't need, so we don't call that. This is documented
+        # Calling super().__init__() is not needed. This is documented 
         # behavior, not a random implementation detail.
         self.message = message
         self.filename = filename
@@ -330,11 +340,8 @@ class _IniParser:
 def load(file) -> dict:
     """Load a GUI from a file object.
 
-    See help('bananagui.iniloader') for information about BananaGUI's
-    ini format and an important security notice.
-
-    This raises a ParsingError if the file has syntax problems, but
-    other errors may also be raised if something goes wrong with
+    This raises :exc:`~ParsingError` if the file has syntax problems, 
+    but other errors may also be raised if something goes wrong with 
     importing, creating the widgets or something else.
     """
     parser = _IniParser(file)
@@ -349,7 +356,7 @@ def load(file) -> dict:
 
 
 def loads(string: str) -> dict:
-    """Like load(), but for strings."""
+    """Like :func:`~load`, but takes a string instead of a file object."""
     fakefile = io.StringIO(string)
     fakefile.name = '<string>'  # for error messages
     return load(fakefile)
@@ -360,7 +367,7 @@ def loads(string: str) -> dict:
 def main():     # pragma: no cover
     """Run the command-line interface.
 
-    This uses sys.argv and may use sys.exit().
+    This uses :data:`sys.argv` and may use :func:`sys.exit`.
     """
     parser = argparse.ArgumentParser(add_help=False)
 

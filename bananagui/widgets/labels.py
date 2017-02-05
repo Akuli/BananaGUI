@@ -38,6 +38,8 @@ class Label(Child):
        ,---------------.
        |  Hello World! |
        `---------------'
+
+    .. seealso:: `Text editing widgets`_.
     """
     # TODO: Add fonts and colors?
 

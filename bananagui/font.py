@@ -112,13 +112,17 @@ class Font:
     _check_overline = _check_boolean
 
 
-@functools.lru_cache()
-def get_families() -> frozenset:
-    """Return a frozenset of all avaliable font families."""
-    if not mainloop._initialized:
-        raise RuntimeError("the mainloop wasn't initialized")
+_family_cache = set()
 
-    # The wrapper function can return anything iterable.
-    fonts = {'Monospace'}
-    fonts.update(_get_wrapper('font:get_families')())
-    return frozenset(fonts)
+
+def get_families() -> list:
+    """List all avaliable font families as strings."""
+    if not mainloop._initialized:
+        raise RuntimeError("the mainloop needs to be initialized")
+    if not _family_cache:
+        # The wrapper function can return anything iterable.
+        _family_cache.add('Monospace')
+        _family_cache.update(_get_wrapper('font:get_families')())
+    # It's important to return a copy here because someone might 
+    # mutate the returned list.
+    return sorted(_family_cache, key=str.casefold)

@@ -124,7 +124,7 @@ or you may notice other problems. We'll learn more about this in
 `The main loop`_.
 
 If you have a big project with many widgets, it may be useful to print a 
-tree of the widgets you have:
+tree of the widgets you have using :mod:`bananagui.widgettree`:
 
 .. code-block:: python
 
@@ -171,9 +171,9 @@ away, some don't.
 
 BananaGUI uses the GUI toolkit's main event loop, and you can control it 
 with the :mod:`bananagui.mainloop` module. It's easy to use: after 
-setting everything up, we call ``mainloop.run()`` and wait for something 
-to stop it. When it's running, we can be sure that the user sees the 
-widgets we created.
+setting everything up, we call :func:`bananagui.mainloop.run` and wait 
+for something to stop it. When it's running, we can be sure that the 
+user sees the widgets we created.
 
 .. code-block:: python
 
@@ -208,8 +208,9 @@ the program just keeps running! Most wrappers should allow interrupting
 the program normally by pressing Ctrl+C.
 
 So we need to improve the program to stop the mainloop when the user 
-closes the window. The mainloop module has a ``quit()`` function for 
-stopping ``run()``, but how can we call that when the window is closed?
+closes the window. There's a :func:`bananagui.mainloop.quit` function 
+for stopping :func:`bananagui.mainloop.run`, but how can we call that 
+when the window is closed?
 
 BananaGUI has **callbacks** for things like this. A callback can be 
 connected to a function, and then that function will be called when the 
@@ -254,7 +255,7 @@ Now our code looks like this:
    window.on_close.connect(mainloop.quit)
    mainloop.run()
 
-See also `Passing arguments to callback functions`_.
+.. seealso:: `Passing arguments to callback functions`_.
 
 Bins
 ----
@@ -272,10 +273,10 @@ all.
      ...
    ValueError: there's already a child, cannot add()
 
-This is because BananaGUI windows are ``widgets.Bin`` instances. Bin 
-widgets can have one child or no children at all. This may feel stupid 
-right now, but BananaGUI would be more complicated without widgets like 
-this.
+This is because BananaGUI windows are instances of 
+:class:`bananagui.widgets.Bin`. Bin widgets can have one child or no 
+children at all. This may feel stupid right now, but BananaGUI would be 
+more complicated without widgets like this.
 
 You can get the child of a Bin widget after adding it using the 
 ``child`` attribute.
@@ -300,8 +301,8 @@ Boxes
 
 The window can have only one child, but it doesn't mean that there's no 
 way to have two labels in it. The easiest way to do that is to create a 
-Box widget, and then add the labels into the box. Let's make a program 
-that creates a window like this:
+:class:`bananagui.widgets.Box`, and then add the labels into the box. 
+Let's make a program that creates a window like this:
 
 .. code-block:: none
 
@@ -385,8 +386,8 @@ It's also possible to add widgets next to each other:
    |             |             |
    `---------------------------'
 
-All we need to do is to make the box horizontal using 
-``bananagui.Orient.HORIZONTAL``. The boxes are vertical by default 
+All we need to do is to make the box horizontal using the *HORIZONTAL* 
+member of :class:`bananagui.Orient`. The boxes are vertical by default 
 because most of the time we use vertical boxes more than horizontal 
 boxes.
 
@@ -411,8 +412,8 @@ Buttons
 So far our program displays some text and that's it. Really boring! We 
 want to have a button that does something when we click it.
 
-Creating a button is easy. It's a lot like creating a label, all we need 
-to do is ``widgets.Button("some text")``.
+Creating a button is easy. Just create a 
+:class:`bananagui.widgets.Button` like ``widgets.Button("some text")``.
 
 .. code-block:: python
 
@@ -420,9 +421,10 @@ to do is ``widgets.Button("some text")``.
    >>> button
    <bananagui.widgets.Button object, text='Click me!'>
 
-Button widgets have an ``on_click`` [callback](#callbacks), just like 
-the ``on_close`` callback that windows have. It's ran when the button is 
-clicked, and it does nothing by default. See `Callbacks`_ for more information about them.
+Button widgets have an ``on_click`` callback, just like the ``on_close`` 
+callback that windows have. It's ran when the button is clicked, and it 
+does nothing by default. See `Callbacks`_ for more information about 
+them.
 
 .. code-block:: python
 
@@ -572,11 +574,11 @@ Now we have buttons that we can click, but they still print to the
 terminal! That's not good because we are making a GUI, and people expect 
 to get message boxes instead.
 
-The Dialog widget is a lot like the Window widget, and you can use it 
-to create message boxes when needed. But the ``bananagui.msgbox`` module 
-also includes handy functions for commonly used dialogs, and it's often 
-easiest to use that. This program displays a hello world message box 
-when the button is clicked:
+There Dialog widget is a lot like the Window widget, and you can use it 
+to create message boxes when needed. But the :mod:`bananagui.msgbox` 
+module includes handy functions for commonly used dialogs, and it's 
+often easiest to use that. This program displays a hello world message 
+box when the button is clicked:
 
 .. code-block:: python
 
