@@ -104,7 +104,7 @@ def load_wrapper(*args, init_mainloop=True):
 
     if len(args) == 1:
         if args[0] not in WRAPPERS:
-            raise ValueError("invalid wrapper name %r" % (arg,))
+            raise ValueError("invalid wrapper name %r" % args)
         _load_wrapper(args[0])
         if init_mainloop:
             mainloop.init()
