@@ -103,7 +103,7 @@ def load_wrapper(*args, init_mainloop=True):
         raise RuntimeError("don't call load_wrapper() twice")
 
     if len(args) == 1:
-        if arg[0] not in WRAPPERS:
+        if args[0] not in WRAPPERS:
             raise ValueError("invalid wrapper name %r" % (arg,))
         _load_wrapper(args[0])
         if init_mainloop:
