@@ -182,6 +182,14 @@ So now our code looks like this::
 Run this program. If everything works, then that's awesome! You have 
 created your first BananaGUI application.
 
+Note that :func:`bananagui.mainloop.run` does nothing with the dummy
+wrapper::
+
+   >>> from bananagui import load_wrapper, mainloop
+   >>> load_wrapper('dummy')
+   >>> mainloop.run()   # nothing happens
+   >>>
+
 Callbacks
 ---------
 
