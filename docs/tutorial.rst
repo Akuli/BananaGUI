@@ -64,6 +64,11 @@ will try the next one and so on::
 
    load_wrapper('tkinter', 'gtk3')
 
+By the way, the ``bananagui.load_wrapper()`` thing a few lines above 
+this line is a link. You can click it to get more info about the 
+``load_wrapper()`` function. BananaGUI's documentation contains many 
+other links like that too.
+
 If you are using Windows or OSX and you installed your Python yourself, 
 BananaGUI will probably use tkinter as its GUI toolkit. If you're using 
 Linux you probably don't have tkinter installed but you might have GTK+, 
