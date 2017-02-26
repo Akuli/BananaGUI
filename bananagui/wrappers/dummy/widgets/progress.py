@@ -31,10 +31,4 @@ class Progressbar(Child):
         pass
 
 
-class Spinner(Child):
-
-    def set_spinning(self, spinning):
-        pass
-
-
 BouncingProgressbar = Progressbar

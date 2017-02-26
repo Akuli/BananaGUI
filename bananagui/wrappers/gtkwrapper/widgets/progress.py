@@ -54,16 +54,3 @@ class BouncingProgressbar(Child):
             # The _on_timeout method knows when to stop, but we need to
             # move the progressbar back to the beginning now.
             self.widget.set_fraction(0)
-
-
-class Spinner(Child):
-
-    def __init__(self, bananawidget):
-        self.widget = Gtk.Spinner()
-        super().__init__(bananawidget)
-
-    def set_spinning(self, spinning):
-        if spinning:
-            self.widget.start()
-        else:
-            self.widget.stop()
