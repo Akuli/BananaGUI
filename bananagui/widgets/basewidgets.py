@@ -25,7 +25,7 @@ from bananagui import mainloop, types
 class Widget:
     """A baseclass for all widgets.
 
-    All widgets inherit from this class, so all widgets have the methods 
+    All widgets inherit from this class, so all widgets have the methods
     that this class has.
     """
 
@@ -114,8 +114,8 @@ class Widget:
     This is ``(True, True)`` by default, so the widget expands in both
     directions.
 
-    When multiple widgets are next to each other in a layout widget, at 
-    least one of them should expand in the layout widget's direction. 
+    When multiple widgets are next to each other in a layout widget, at
+    least one of them should expand in the layout widget's direction.
     Like this:
 
     .. code-block:: none
@@ -136,8 +136,8 @@ class Widget:
        |  widget  |  widget  |                          |
        `------------------------------------------------'
 
-    This way the children will behave consistently with all GUI 
-    toolkits. You can use a :class:`.Dummy` widget to fill the empty 
+    This way the children will behave consistently with all GUI
+    toolkits. You can use a :class:`.Dummy` widget to fill the empty
     space if needed:
 
     .. code-block:: none

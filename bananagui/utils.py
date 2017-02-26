@@ -22,7 +22,6 @@
 """BananaGUI's utility functions and other things."""
 
 import importlib
-import re
 
 
 def all_equal(iterable):

@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from bananagui import _get_wrapper, Orient, types, utils
+from bananagui import _get_wrapper, Orient, types
 from .basewidgets import Child
 
 
@@ -33,7 +33,7 @@ def _valuecheck(widget, value):
     'value', extra_setter=_valuecheck, add_changed=True,
     doc="""The widget's current value.
 
-    This needs to be in :attr:`~valuerange` and it's the smallest value 
+    This needs to be in :attr:`~valuerange` and it's the smallest value
     of valuerange by default.
     """)
 class _Ranged:
@@ -71,11 +71,11 @@ class Spinbox(_Ranged, Child):
        | 123           | + | - |
        `-----------------------'
 
-    You can use Entry widgets for selecting numbers, but this widget 
+    You can use Entry widgets for selecting numbers, but this widget
     provides nicer + and - buttons.
 
-    Spinboxes can't be used with floats because the allowed values are 
-    represented by a Python range object, so you need to use an Entry if 
+    Spinboxes can't be used with floats because the allowed values are
+    represented by a Python range object, so you need to use an Entry if
     you want to use floats.
     """
 

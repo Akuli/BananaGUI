@@ -65,7 +65,7 @@ class BouncingProgressbar(Child):
        |           OOOO    |
        `-------------------'
 
-    The progressbar doesn't bounce by default. Set :attr:`~bouncing` to 
+    The progressbar doesn't bounce by default. Set :attr:`~bouncing` to
     True to make it bounce.
     """
 

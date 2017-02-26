@@ -91,7 +91,7 @@ def _dump_tree(widget, file, ascii_only, prefix=''):
 def dump(widget: widgets.Parent, file=None, *, ascii_only=False):
     """Print a tree of a parent widget and its child widgets.
 
-    The *file* defaults to :data:`sys.stdout`. If *ascii_only* is true, 
+    The *file* defaults to :data:`sys.stdout`. If *ascii_only* is true,
     no non-ASCII characters will be used.
     """
     # This allows monkeypatching sys.stdout.

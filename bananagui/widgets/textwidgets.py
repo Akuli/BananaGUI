@@ -29,7 +29,7 @@ from .basewidgets import Child
 class TextBase(Child):
     """A base class for text editing widgets.
 
-    Setting *grayed_out* to True means that the user can't edit the 
+    Setting *grayed_out* to True means that the user can't edit the
     text.
     """
     # TODO: Add fonts and colors.
@@ -99,7 +99,7 @@ class TextEdit(TextBase):
        `-----------'
 
     .. note:: The TextEdit widget doesn't work that well right now. I'll
-              make a better TextEdit widget when I have time and it will 
+              make a better TextEdit widget when I have time and it will
               have a different API, so don't rely on this widget.
     """
 

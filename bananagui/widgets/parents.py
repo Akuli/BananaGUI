@@ -34,14 +34,14 @@ class Parent(Widget):
 
     def children(self):
         """Return an iterator of this widget's children.
-    
-        Dictionaries have a ``keys()`` method that returns a set-like 
-        view of the keys. This method is similar, but this returns an 
-        iterator instead of a view and the iterator yields 
+
+        Dictionaries have a ``keys()`` method that returns a set-like
+        view of the keys. This method is similar, but this returns an
+        iterator instead of a view and the iterator yields
         :class:`.Child` widgets instead of keys.
-    
-        Subclasses of :class:`~Parent` provide different kinds of ways to 
-        access the children, but all Parent widgets have a children 
+
+        Subclasses of :class:`~Parent` provide different kinds of ways to
+        access the children, but all Parent widgets have a children
         method that works consistently.
         """
         raise NotImplementedError("children() wasn't overrided")
@@ -82,8 +82,8 @@ class Parent(Widget):
 class Bin(Parent):
     """Base class for widgets that may contain only one child at a time.
 
-    See `Layout widgets`_ if you want to have multiple widgets in a Bin 
-    widget. This whole concept may seem stupid, but BananaGUI would be 
+    See `Layout widgets`_ if you want to have multiple widgets in a Bin
+    widget. This whole concept may seem stupid, but BananaGUI would be
     more complicated without separate Bin widgets and layout widgets.
     """
 
@@ -98,7 +98,7 @@ class Bin(Parent):
     def child(self):
         """The child in the widget.
 
-        This can be None and this is None by default. Use :meth:`~add` 
+        This can be None and this is None by default. Use :meth:`~add`
         and :meth:`remove` or an initialization argument to set this.
         """
         return self.__child
@@ -111,7 +111,7 @@ class Bin(Parent):
     def add(self, child: Child):
         """Add a child widget into this widget.
 
-        This widget must not contain another child. The :attr:`~child` 
+        This widget must not contain another child. The :attr:`~child`
         attribute will be set to the new child.
         """
         if self.child is not None:
@@ -164,8 +164,8 @@ class Box(collections.abc.MutableSequence, Parent, Child):
        random.shuffle(children)
        box[:] = children
 
-    .. seealso:: The :class:`.Checkbox` widget has nothing to do with 
-                 this widget, but it has a similar name so you might be 
+    .. seealso:: The :class:`.Checkbox` widget has nothing to do with
+                 this widget, but it has a similar name so you might be
                  looking for it.
     """
     # The wrapper should define append and remove methods.
@@ -226,9 +226,9 @@ class Box(collections.abc.MutableSequence, Parent, Child):
     def __len__(self):
         return len(self.__children)
 
-    # MutableSequence doesn't do this because it doesn't require that 
-    # subclasses support slicing. We also can't use functools.wraps() to 
-    # get the doc because then abc will think that our insert is an 
+    # MutableSequence doesn't do this because it doesn't require that
+    # subclasses support slicing. We also can't use functools.wraps() to
+    # get the doc because then abc will think that our insert is an
     # abstract method that needs to be overrided.
     def insert(self, index, value):
         """Insert an item to the box at the index."""

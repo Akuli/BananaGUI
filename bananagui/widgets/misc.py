@@ -72,7 +72,7 @@ class Dummy(Child):
        |           |
        `-----------'
 
-    This is useful for creating layouts with empty space that must be 
+    This is useful for creating layouts with empty space that must be
     filled with something. See :attr:`.Child.expand` for more info.
     """
 

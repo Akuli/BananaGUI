@@ -21,7 +21,6 @@
 
 from gi.repository import Gtk
 
-from bananagui import utils
 from . import orientations
 from .basewidgets import Child
 

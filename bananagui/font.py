@@ -21,8 +21,6 @@
 
 """Font-related things for BananaGUI."""
 
-import functools
-
 from bananagui import _get_wrapper, mainloop, types
 
 __all__ = ['get_families']
@@ -123,6 +121,6 @@ def get_families() -> list:
         # The wrapper function can return anything iterable.
         _family_cache.add('Monospace')
         _family_cache.update(_get_wrapper('font:get_families')())
-    # It's important to return a copy here because someone might 
+    # It's important to return a copy here because someone might
     # mutate the returned list.
     return sorted(_family_cache, key=str.casefold)

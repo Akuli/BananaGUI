@@ -23,12 +23,12 @@
 
 All public functions in this module take these arguments:
 
-- *parentwindow:* A :class:`bananagui.widgets.Window` object. Usually 
+- *parentwindow:* A :class:`bananagui.widgets.Window` object. Usually
   the dialog will be centered on this window.
 - *title:* The title of the dialog, defaults to *parentwindow*'s
   title.
 
-The :func:`~info`, :func:`~warning`, :func:`~error` and 
+The :func:`~info`, :func:`~warning`, :func:`~error` and
 :func:`~question` functions also take these arguments:
 
 - *buttons:* This should be an iterable of button texts that will be
@@ -39,12 +39,12 @@ The :func:`~info`, :func:`~warning`, :func:`~error` and
 - *text:* This is the text that will be shown in the dialog.
 - *title:* The title of the dialog, defaults to the parentwindow's title.
 
-The functions return whatever the user chooses or None if the dialog is 
+The functions return whatever the user chooses or None if the dialog is
 closed. For example, :func:`info`, :func:`warning`, :func:`error` and
 :func:`question` return the text of the clicked button or None.
 """
 
-from bananagui import _get_wrapper, color, widgets
+from bananagui import _get_wrapper, color
 
 __all__ = ['info', 'warning', 'error', 'question', 'colordialog']
 

@@ -21,7 +21,6 @@
 
 import tkinter as tk
 
-from bananagui import utils
 from .basewidgets import Child, run_when_ready
 
 

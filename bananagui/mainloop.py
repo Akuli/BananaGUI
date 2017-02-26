@@ -23,13 +23,13 @@ r"""This module provides access to the GUI toolkit's mainloop.
 
 The mainloop can be in three different states:
 
-* **Not initialized:** The mainloop is doing nothing, and it's not ready 
-  to run. This is the current state when this module has just been 
+* **Not initialized:** The mainloop is doing nothing, and it's not ready
+  to run. This is the current state when this module has just been
   imported for the first time.
 * **Initialized:** Now the mainloop is ready to run, but it's not running
-  yet. Widgets can be created and timeouts can be added, but the 
-  timeouts aren't guaranteed to run and the widgets aren't guaranteed to 
-  be visible yet. Typically the mainloop is in this state for a short 
+  yet. Widgets can be created and timeouts can be added, but the
+  timeouts aren't guaranteed to run and the widgets aren't guaranteed to
+  be visible yet. Typically the mainloop is in this state for a short
   time while the widgets are being created.
 * **Running:** Now the mainloop is running. Widgets are visible and
   timeouts run. New widgets can be still made and new timeouts can be
@@ -55,8 +55,8 @@ to another:
                                    function
                                   is running
 
-Note that :func:`bananagui.load_wrapper` will call :func:`~init` by 
-default and most applications don't run the mainloop more than once, so 
+Note that :func:`bananagui.load_wrapper` will call :func:`~init` by
+default and most applications don't run the mainloop more than once, so
 usually you don't need to worry about the "Not initialized" state.
 """
 
@@ -113,12 +113,12 @@ def quit():
 def add_timeout(seconds, callback, *args):
     """Run ``callback(*args)`` after waiting.
 
-    If the function returns :data:`bananagui.RUN_AGAIN` it will be 
-    called again after waiting again. Depending on the GUI toolkit, this 
+    If the function returns :data:`bananagui.RUN_AGAIN` it will be
+    called again after waiting again. Depending on the GUI toolkit, this
     may or may not work when the main loop is not running.
 
-    The waiting time is not guaranteed to be exact, but it's good enough 
-    for most purposes. Use something like :func:`time.time` if you need 
+    The waiting time is not guaranteed to be exact, but it's good enough
+    for most purposes. Use something like :func:`time.time` if you need
     to measure time in the callback function.
     """
     if seconds <= 0:

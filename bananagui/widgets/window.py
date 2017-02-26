@@ -57,18 +57,18 @@ def _sizecheck(window, size):
     extra_setter=_closecheck,
     doc="""Two-tuple of smallest allowed width and height.
 
-    If the content of the window take up more space than this, this is 
-    ignored. This is ``(0, 0)`` by default, so the window is always 
+    If the content of the window take up more space than this, this is
+    ignored. This is ``(0, 0)`` by default, so the window is always
     large enough for its content.
     """)
 @types.add_property(
     'hidden', type=bool, extra_setter=_closecheck,
     doc="""False if the window is showing.
 
-    Hiding the window is easier than creating a new window when a window 
+    Hiding the window is easier than creating a new window when a window
     with the same content needs to be displayed multiple times.
 
-    If you are wondering why your window isn't showing up, it's not 
+    If you are wondering why your window isn't showing up, it's not
     necessarily hidden. There are other things that could be also wrong:
 
     * The window might be closed because :meth:`~close` has been called.
@@ -78,8 +78,8 @@ def _sizecheck(window, size):
     'on_close',
     doc="""A callback that runs when the user tries to close the window.
 
-    This callback doesn't actually run when :meth:`~close` is called. 
-    The close method closes the window, but this runs when the *user* 
+    This callback doesn't actually run when :meth:`~close` is called.
+    The close method closes the window, but this runs when the *user*
     tries to close the window. Usually you should connect this to
     :func:`bananagui.mainloop.quit`.
     """)
@@ -104,13 +104,13 @@ class Window(Bin):
        |                                       |
        `---------------------------------------'
 
-    These windows don't have a parent window. You can create multiple 
+    These windows don't have a parent window. You can create multiple
     windows like this.
     """
 
-    # There's no *maximum_size* attribute because X doesn't support 
-    # maximum sizes that well. Tkinter implements a maximum size on X, 
-    # but it does that by moving the window to the upper left corner 
+    # There's no *maximum_size* attribute because X doesn't support
+    # maximum sizes that well. Tkinter implements a maximum size on X,
+    # but it does that by moving the window to the upper left corner
     # when it's maximized.
 
     # Most things check that the window is closed. Things that come
@@ -121,8 +121,8 @@ class Window(Bin):
 
     can_focus = True
 
-    def __init__(self, title="BananaGUI Window", *, child=None, 
-                 resizable=True, minimum_size=(0, 0), hidden=False, 
+    def __init__(self, title="BananaGUI Window", *, child=None,
+                 resizable=True, minimum_size=(0, 0), hidden=False,
                  **kwargs):
         self._prop_title = title
         self._prop_resizable = True
@@ -131,7 +131,7 @@ class Window(Bin):
         self._prop_hidden = False
         self.__closed = False
         if not isinstance(self, Dialog):
-            # Dialogs have a separate wrapper class, so we don't want to 
+            # Dialogs have a separate wrapper class, so we don't want to
             # add the non-Dialog wrapper here.
             wrapperclass = _get_wrapper('widgets.window:Window')
             self._wrapper = wrapperclass(self, title)
@@ -143,7 +143,7 @@ class Window(Bin):
     def close(self):
         """Close the window and set :attr:`~closed` to True.
 
-        Closed windows are not displayed to the user, and most 
+        Closed windows are not displayed to the user, and most
         operations on a closed window raise an exception.
 
         This method can be called multiple times and it will do nothing
@@ -198,7 +198,7 @@ class Dialog(Window):
                        |                               |
                        `-------------------------------'
 
-    This class inherits from :class:`.Window`. The title defaults to 
+    This class inherits from :class:`.Window`. The title defaults to
     *parentwindow*'s title.
     """
 
@@ -216,7 +216,7 @@ class Dialog(Window):
     def parentwindow(self):
         """The :class:`.Window` that this Dialog "belongs to".
 
-        The dialog may be centered over the parent window, it may be 
+        The dialog may be centered over the parent window, it may be
         modal or whatever the real GUI toolkit supports.
         """
         return self.__parentwindow

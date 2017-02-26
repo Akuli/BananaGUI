@@ -21,8 +21,8 @@
 
 """Wrapper module for other GUI toolkits.
 
-With BananaGUI you can write a GUI application in Python, and then run 
-the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support 
+With BananaGUI you can write a GUI application in Python, and then run
+the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support
 later.
 """
 
@@ -59,7 +59,7 @@ class Align(enum.IntEnum):
 # worth it, so this is just an integer. The callbacks can also return
 # None if they are not supposed to run again.
 
-#: If a timeout callback function returns this, it will be called again. 
+#: If a timeout callback function returns this, it will be called again.
 #: See :func:`bananagui.mainloop.add_timeout` for more info.
 RUN_AGAIN = -1
 
@@ -84,18 +84,18 @@ def _load_wrapper(name):
 def load_wrapper(*args, init_mainloop=True):
     """Initialize BananaGUI.
 
-    This function must be called before using many things in BananaGUI. 
+    This function must be called before using many things in BananaGUI.
     See :mod:`bananagui.mainloop` for more information.
 
-    The arguments for this function should be valid BananaGUI wrapper 
-    modules. For example, ``load_wrapper('tkinter')`` tells BananaGUI to 
-    use tkinter as its GUI toolkit. The :data:`WRAPPERS` variable 
+    The arguments for this function should be valid BananaGUI wrapper
+    modules. For example, ``load_wrapper('tkinter')`` tells BananaGUI to
+    use tkinter as its GUI toolkit. The :data:`WRAPPERS` variable
     contains a full list of valid arguments for this function.
 
-    If multiple arguments are given, this function attempts to load each 
+    If multiple arguments are given, this function attempts to load each
     wrapper module until loading one of them succeeds.
 
-    For convenience, :func:`bananagui.mainloop.init` will be called if 
+    For convenience, :func:`bananagui.mainloop.init` will be called if
     *init_mainloop* is True.
     """
     if not args:

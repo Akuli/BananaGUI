@@ -21,17 +21,17 @@
 
 """This module contains handy color constants and converting functions.
 
-BananaGUI uses case-insensitive 7-character hexadecimal colors, like 
-``'#ffffff'`` or ``'#fFfFff'``. If you're not familiar with hexadecimal 
-colors you probably can't guess what ``'#ff0000'`` and ``'#00ff00'`` 
-are. This module allows you to use ``bananagui.Color.RED`` and 
+BananaGUI uses case-insensitive 7-character hexadecimal colors, like
+``'#ffffff'`` or ``'#fFfFff'``. If you're not familiar with hexadecimal
+colors you probably can't guess what ``'#ff0000'`` and ``'#00ff00'``
+are. This module allows you to use ``bananagui.Color.RED`` and
 ``bananagui.Color.GREEN`` instead.
 
 Here's a full list of the color constants:
 
 %(constant-table)s
 
-Rest of this module contains functions for converting colors and 
+Rest of this module contains functions for converting colors and
 processing hexadecimal colors.
 """
 
@@ -64,6 +64,7 @@ def _generate_table():
         lines.append("| %-10s | ``'%s'`` |" % (name, value))
         lines.append("+------------+---------------+")
     return '\n'.join(lines)
+
 
 if __doc__ is not None:
     # Not running with Python's optimizations.
@@ -127,7 +128,7 @@ def hex2rgb(hexcolor: str) -> tuple:
     return tuple(rgb)
 
 
-# The _number is an integer or float as a group, may end with % or have 
+# The _number is an integer or float as a group, may end with % or have
 # whitespace around it.
 _number = r'\s*(\d*\.?\d*%?)\s*'
 _rgbstring_patterns = [

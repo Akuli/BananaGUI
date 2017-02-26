@@ -26,10 +26,10 @@ it in Python would be repetitive.
 
 .. warning::
 
-   Don't use this module with untrusted input! The imports and 
-   expressions are evaluated like any other Python code, so it's 
-   possible to do basically anything in them. This module is meant to be 
-   used when writing the GUI in plain Python would be tedious, *not* for 
+   Don't use this module with untrusted input! The imports and
+   expressions are evaluated like any other Python code, so it's
+   possible to do basically anything in them. This module is meant to be
+   used when writing the GUI in plain Python would be tedious, *not* for
    running GUI files that come from random places.
 
 With that out of the way, let's have a look at how this module is
@@ -61,7 +61,7 @@ Or you can print a tree of the widgets you just created:
    $ iniloader tree the-gui-file.ini
 
 See ``iniloader --help`` for more info. You can also use
-``yourpython -m bananagui.iniloader`` if the iniloader command doesn't 
+``yourpython -m bananagui.iniloader`` if the iniloader command doesn't
 work for some reason.
 
 The file is loaded like this:
@@ -72,14 +72,14 @@ The file is loaded like this:
    imports. All import statements are fully supported, and the import
    section ends to the first line starting with ``[``.
 3. Each section starts with ``[a header]`` and ends to the next header or
-   end of file, and the content of sections consists of ``key = value`` 
+   end of file, and the content of sections consists of ``key = value``
    pairs. Next the window section is parsed. It creates a
-   :class:`bananagui.widgets.Window` object and sets it to a variable 
-   called window. The value of class will be used as constructor and 
+   :class:`bananagui.widgets.Window` object and sets it to a variable
+   called window. The value of class will be used as constructor and
    other arguments will be given to it as keyword arguments.
 4. The next section is otherwise similar, but the header is like
-   ``child in parent``. When the child widget has been created, the 
-   child will be added into it. In this case, the parent is a 
+   ``child in parent``. When the child widget has been created, the
+   child will be added into it. In this case, the parent is a
    :class:`bananagui.widgets.Window` so ``window.add(label)`` is called.
 5. Imported modules are deleted from the namespace.
 
@@ -108,10 +108,10 @@ that is loaded from Python like this::
    widgetdict['window'].on_close.connect(mainloop.quit)
    mainloop.run()
 
-Section names and the keys in the sections must be valid variable names, 
-except the ``class`` key that specifies the constructor. The values of 
-the sections can be any Python expressions, including comments, function 
-calls, list comprehensions and so on. They may refer to other variables 
+Section names and the keys in the sections must be valid variable names,
+except the ``class`` key that specifies the constructor. The values of
+the sections can be any Python expressions, including comments, function
+calls, list comprehensions and so on. They may refer to other variables
 and imported modules.
 
 It's also possible to use multiline values by indenting everything
@@ -150,7 +150,7 @@ class ParsingError(Exception):
 
     def __init__(self, message, filename=None, lineno=None,
                  line=None, *, add_repr=True):
-        # Calling super().__init__() is not needed. This is documented 
+        # Calling super().__init__() is not needed. This is documented
         # behavior, not a random implementation detail.
         self.message = message
         self.filename = filename
@@ -336,8 +336,8 @@ class _IniParser:
 def load(file) -> dict:
     """Load a GUI from a file object.
 
-    This raises :exc:`~ParsingError` if the file has syntax problems, 
-    but other errors may also be raised if something goes wrong with 
+    This raises :exc:`~ParsingError` if the file has syntax problems,
+    but other errors may also be raised if something goes wrong with
     importing, creating the widgets or something else.
     """
     parser = _IniParser(file)

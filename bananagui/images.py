@@ -53,17 +53,17 @@ def _guess_filetype(path, default):
 class Image:
     """A mutable image.
 
-    Calling the Image class constructs a new image from a path to a 
-    file. For example, ``Image('banana.png')`` creates a new image of 
+    Calling the Image class constructs a new image from a path to a
+    file. For example, ``Image('banana.png')`` creates a new image of
     the file ``banana.png`` in the current working directory.
 
-    The filetype is typically also the file the file extension without a 
-    dot. Not all filetypes work with all GUI toolkits, but ``'gif'`` and 
-    ``'png'`` should be valid filetype values with all GUI toolkits. The 
-    filetype must be given explicitly if it can't be guessed from the 
+    The filetype is typically also the file the file extension without a
+    dot. Not all filetypes work with all GUI toolkits, but ``'gif'`` and
+    ``'png'`` should be valid filetype values with all GUI toolkits. The
+    filetype must be given explicitly if it can't be guessed from the
     file extension, like ``Image('magic-banana', 'gif')``.
 
-    You can use :class:`bananagui.widgets.ImageLabel` for displaying an 
+    You can use :class:`bananagui.widgets.ImageLabel` for displaying an
     image to the user.
     """
 
