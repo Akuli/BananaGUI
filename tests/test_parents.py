@@ -26,7 +26,7 @@ import pytest
 from bananagui import Orient, widgets
 
 
-def test_child_views(dummywrapper, capsys):
+def test_children(dummywrapper, capsys):
     window = widgets.Window()
     box = widgets.Box()
     window.add(box)
@@ -34,26 +34,17 @@ def test_child_views(dummywrapper, capsys):
     label2 = widgets.Label("label 2")
     box.extend([label1, label2])
 
-    assert window.children == {box}
-    assert box.children == {label1, label2}
-    assert len(window.children) == 1
-    assert len(box.children) == 2
-    assert list(window.children) == [box]
-    assert list(box.children) == [label1, label2]
-    assert box in window.children
-    assert None not in window.children
-    assert label1 in box.children
-    assert label2 in box.children
-    assert None not in box.children
-    assert repr(window.children) == "<children of a bananagui.widgets.Window>"
-    assert repr(box.children) == "<children of a bananagui.widgets.Box>"
-
-    # See _ChildView._from_iterable in bananagui/widgets/parents.py.
-    assert type(window.children | {'hi'}) is set
-    assert type(box.children | {'there'}) is set
+    pairs = [
+        # (widget, children)
+        (window, [box]),
+        (box, [label1, label2]),
+    ]
+    for widget, children in pairs:
+        assert list(widget.children()) == children
 
     assert (window.children.__doc__
             == box.children.__doc__
+            == widgets.Parent.children.__doc__
             == widgets.Window.children.__doc__
             == widgets.Box.children.__doc__)
 

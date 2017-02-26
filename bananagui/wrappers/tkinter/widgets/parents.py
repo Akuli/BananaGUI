@@ -42,7 +42,7 @@ class Parent(Widget):
             # It's a Child, not a Window or Dialog.
             assert parent is not None
             super().create(parent)
-        for child in self.bananawidget.children:
+        for child in self.bananawidget.children():
             child._wrapper.create(self)
 
     def _prepare_add(self, child):

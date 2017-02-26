@@ -21,6 +21,7 @@
 
 # TODO: Add a grid widget.
 
+import functools
 try:
     import collections.abc as abcoll
 except ImportError:
@@ -31,55 +32,27 @@ from bananagui import _get_wrapper, Orient, types, utils
 from .basewidgets import Child, Widget
 
 
-class _ChildView(abcoll.Set):
-    """A view of this widget's children.
-
-    Dictionaries have a ``keys()`` method that returns a set-like view 
-    of the keys. This is similar, but this contains :class:`.Child` 
-    widgets instead of keys.
-
-    Subclasses of :class:`~Parent` provide different kinds of ways to 
-    access the children, but all Parent widgets have a children 
-    attribute that works consistently.
-    """
-
-    def __init__(self, widget):
-        self._widget = widget
-
-    def __repr__(self):
-        cls = type(self._widget)
-        prefix = 'an' if cls.__module__[0] in 'aeiouy' else 'a'
-        return "<children of %s %s.%s>" % (
-            prefix, cls.__module__, cls.__name__)
-
-    # This method is here because the views behave like this without it:
-    #   >>> w = widgets.Window()
-    #   >>> w.children
-    #   <children of a bananagui.widgets.window.Window>
-    #   >>> w.children | {'hello'}
-    #   <children of a builtins.generator>
-    #   >>>
-    # Mapping views in collections.abc define a _from_iterable method
-    # like this one to solve this same problem. The _from_iterable
-    # method is not an implementation detail, see
-    # help(collections.abc.Set._from_iterable).
-    @classmethod
-    def _from_iterable(cls, iterable):
-        return set(iterable)
-
-
 # This and Bin aren't based on Child because Window is based on Bin.
 class Parent(Widget):
     """A base class for widgets that contain other widgets."""
 
     def children(self):
-        return type(self)._child_view_class(self)
-
-    children = property(children, doc=_ChildView.__doc__)
+        """Return an iterator of this widget's children.
+    
+        Dictionaries have a ``keys()`` method that returns a set-like 
+        view of the keys. This method is similar, but this returns an 
+        iterator instead of a view and the iterator yields 
+        :class:`.Child` widgets instead of keys.
+    
+        Subclasses of :class:`~Parent` provide different kinds of ways to 
+        access the children, but all Parent widgets have a children 
+        method that works consistently.
+        """
+        raise NotImplementedError("children() wasn't overrided")
 
     def _prepare_add(self, child):
         """Make sure child can be added to self and make it ready for it."""
-        if child in self.children:
+        if child in self.children():
             raise ValueError("cannot add the same child twice")
         if child._parent is None:
             child._parent = self
@@ -91,32 +64,23 @@ class Parent(Widget):
 
     def _prepare_remove(self, child):
         """Make sure that a child can be removed from self."""
-        if child not in self.children:
+        if child not in self.children():
             raise ValueError("cannot remove %r, hasn't been added" % (child,))
 
     def _repr_parts(self):
         parts = super()._repr_parts()
-        if not self.children:
+
+        length = 0
+        for child in self.children():
+            length += 1
+
+        if length == 0:
             parts.append('empty')
-        elif len(self.children) == 1:
+        elif length == 1:
             parts.append('contains a child')
         else:
-            parts.append('contains %d children' % len(self.children))
+            parts.append('contains %d children' % length)
         return parts
-
-
-class _BinChildView(_ChildView):
-    __doc__ = _ChildView.__doc__
-
-    def __len__(self):
-        return 0 if self._widget.child is None else 1
-
-    def __iter__(self):
-        if self._widget.child is not None:
-            yield self._widget.child
-
-    def __contains__(self, child):
-        return child is not None and child is self._widget.child
 
 
 class Bin(Parent):
@@ -126,8 +90,6 @@ class Bin(Parent):
     widget. This whole concept may seem stupid, but BananaGUI would be 
     more complicated without separate Bin widgets and layout widgets.
     """
-
-    _child_view_class = _BinChildView
 
     def __init__(self, child=None, **kwargs):
         """Initialize the widget and add the child if it's given."""
@@ -144,6 +106,11 @@ class Bin(Parent):
         and :meth:`remove` or an initialization argument to set this.
         """
         return self.__child
+
+    @functools.wraps(Parent.children)
+    def children(self):
+        if self.__child is not None:
+            yield self.__child
 
     def add(self, child: Child):
         """Add a child widget into this widget.
@@ -168,22 +135,6 @@ class Bin(Parent):
         self.__child = None
         self._wrapper.remove(child._wrapper)
         # child._parent is left as is here.
-
-
-# Box objects behave just like this view of them does. We still need
-# this view because the view needs to be an abcoll.Set but the Box
-# object is not a Set.
-class _BoxChildView(_ChildView):
-    __doc__ = _ChildView.__doc__
-
-    def __len__(self):
-        return len(self._widget)
-
-    def __iter__(self):
-        return iter(self._widget)
-
-    def __contains__(self, child):
-        return child in self._widget
 
 
 class Box(abcoll.MutableSequence, Parent, Child):
@@ -223,8 +174,6 @@ class Box(abcoll.MutableSequence, Parent, Child):
     """
     # The wrapper should define append and remove methods.
 
-    _child_view_class = _BoxChildView
-
     def __init__(self, orient=Orient.VERTICAL, **kwargs):
         """Initialize the Box."""
         self.__orient = Orient(orient)
@@ -240,6 +189,10 @@ class Box(abcoll.MutableSequence, Parent, Child):
         This is always a :class:`bananagui.Orient` member.
         """
         return self.__orient
+
+    @functools.wraps(Parent.children)
+    def children(self):
+        yield from self
 
     def _repr_parts(self):
         parts = super()._repr_parts()
