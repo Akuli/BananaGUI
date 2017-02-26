@@ -28,7 +28,7 @@ import sys
 try:
     import bananagui
 except ImportError:
-    # Python 3.2 or 3.3, enum is not installed yet.
+    # Python 3.3, enum is not installed yet.
     bananagui = None
 
 from setuptools import find_packages, setup

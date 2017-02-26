@@ -30,7 +30,7 @@ class Slider(Child):
     def __init__(self, bananawidget, orient, valuerange):
         self._minimum = min(valuerange)
         self._maximum = max(valuerange)
-        self._step = utils.rangestep(valuerange)
+        self._step = valuerange.step
         self._orient = orient.name.lower()
         super().__init__(bananawidget)
 

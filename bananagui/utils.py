@@ -62,51 +62,9 @@ def common_beginning(*iterables):
     return result
 
 
-def rangestep(range_object):
-    """Return a range object's step.
-
-    Unlike range_object.step, this also works on Python 3.2.
-
-    >>> rangestep(range(10))
-    1
-    >>> rangestep(range(5, 10))
-    1
-    >>> rangestep(range(5, 10, 2))
-    2
-    """
-    try:
-        return range_object.step
-    except AttributeError:  # pragma: no cover
-        if len(range_object) >= 2:
-            # The range has enough items for calculating the step.
-            return range_object[1] - range_object[0]
-        # This hacky code only runs on Python 3.2.
-        if repr(range_object).count(',') < 2:
-            # The repr doesn't show the step, so it's the default.
-            return 1
-        # The repr shows the step so we can get it from that.
-        match = re.search(r'(-?\d+)\)$', repr(range_object))
-        return int(match.group(1))
-
-
-try:
-    import_module = importlib.import_module
-except AttributeError:  # pragma: no cover
-    # Python 3.2, importlib.import_module doesn't import parent packages
-    # automatically.
-    def import_module(modulename):
-        """Import a module and its parent modules as needed."""
-        current = []
-        for part in modulename.split('.')[:-1]:
-            # Loop through and import the parent modules.
-            current.append(part)
-            importlib.import_module('.'.join(current))
-        return importlib.import_module(modulename)
-
-
 def global_members(modulename):
     """A decorator that exposes Enum members as global variables."""
-    module = import_module(modulename)
+    module = importlib.import_module(modulename)
 
     def inner(the_enum):
         # Iterating over the enum doesn't include aliases.

@@ -21,14 +21,10 @@
 
 """Things that BananaGUI uses internally."""
 
+import collections.abc
 import contextlib
 import sys
 import traceback
-try:
-    import collections.abc as abcoll
-except ImportError:     # pragma: no cover
-    # Python 3.2, no separate collections.abc.
-    import collections as abcoll
 
 __all__ = ['add_property', 'add_callback']
 
@@ -196,7 +192,7 @@ def add_property(name, *, add_changed=False, allow_none=False,
             # We don't want to allow iterators or sets because the
             # values need to be iterated over multiple times and they
             # need to be consistent.
-            if isinstance(new_value, abcoll.Set):
+            if isinstance(new_value, collections.abc.Set):
                 raise TypeError("%s value needs to be a sequence, not %r"
                                 % (name, new_value))
             if len(new_value) != how_many:

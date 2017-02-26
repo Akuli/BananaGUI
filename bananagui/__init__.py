@@ -28,8 +28,9 @@ later.
 
 import enum
 import functools
+import importlib
 
-from bananagui import mainloop, utils
+from bananagui import mainloop
 
 
 __author__ = 'Akuli'
@@ -76,7 +77,7 @@ def _load_wrapper(name):
     # Make sure the wrapper can be imported and THEN set _wrapper to it.
     global _wrapper
     fullname = 'bananagui.wrappers.' + name
-    utils.import_module(fullname)
+    importlib.import_module(fullname)
     _wrapper = fullname
 
 
@@ -138,12 +139,12 @@ def _get_wrapper(name):
 
     modulename, attribute = name.split(':')
     try:
-        wrappermodule = utils.import_module(_wrapper + '.' + modulename)
+        wrappermodule = importlib.import_module(_wrapper + '.' + modulename)
         return getattr(wrappermodule, attribute)
     except (ImportError, AttributeError):
         # Use a default, if any.
         try:
-            defaultmodule = utils.import_module(
+            defaultmodule = importlib.import_module(
                 'bananagui.wrappers.defaults.' + modulename)
             return getattr(defaultmodule, attribute)
         except (ImportError, AttributeError) as e:

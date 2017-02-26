@@ -29,8 +29,7 @@ from .basewidgets import Child
 class Slider(Child):
 
     def __init__(self, bananawidget, orientation, valuerange):
-        range_args = (min(valuerange), max(valuerange),
-                      utils.rangestep(valuerange))
+        range_args = (min(valuerange), max(valuerange), valuerange.step)
         self.widget = Gtk.Scale.new_with_range(
             orientations[orientation], *range_args)
         self.widget.connect('value-changed', self._do_value_changed)
@@ -41,10 +40,11 @@ class Slider(Child):
         if value in self.bananawidget.valuerange:
             self.bananawidget.value = value
             return
+
         # TODO: is there a better way to allow only values in the
         # range?
         difference = value - self.bananawidget.value
-        step = utils.rangestep(self.bananawidget.valuerange)
+        step = self.bananawidget.valuerange.step
         if abs(difference) < step/2:
             # Keeping the value where it is now is probably closest
             # to what the user wants.
@@ -65,8 +65,7 @@ class Slider(Child):
 class Spinbox(Child):
 
     def __init__(self, bananawidget, valuerange):
-        range_args = (min(valuerange), max(valuerange),
-                      utils.rangestep(valuerange))
+        range_args = (min(valuerange), max(valuerange), valuerange.step)
         self.widget = Gtk.SpinButton.new_with_range(*range_args)
         self.widget.connect('notify::value', self._do_value_changed)
         super().__init__(bananawidget)

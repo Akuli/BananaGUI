@@ -46,8 +46,7 @@ class _Ranged:
         if len(self.valuerange) < 2:
             raise ValueError("valuerange %r contains too little values"
                              % (self.valuerange,))
-        # Ranges can't have a step of 0.
-        if utils.rangestep(self.valuerange) < 0:
+        if self.valuerange.step < 0:
             raise ValueError("valuerange has negative step")
         super().__init__(*args, **kwargs)
 

@@ -2,7 +2,8 @@
 
 This is a wrapper around the Python Tkinter and GTK+ 3 bindings. You can
 write code using BananaGUI, and then run the same code using any of
-these toolkits. BananaGUI may feature PyQt5 support later.
+these toolkits. BananaGUI may feature PyQt5 support later. BananaGUI
+requires Python 3.3 or newer.
 
 ## Hello World!
 
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     main()
 ```
 
-See [the guitests directory](guitests) for more examples or read [the 
+See [the guitests directory](guitests) for more examples or read [the
 tutorial](https://github.com/Akuli/BananaGUI/wiki/Tutorial).
 
 ## Why BananaGUI?

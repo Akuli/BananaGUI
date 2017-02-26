@@ -19,23 +19,20 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# flake8: noqa
-
 """BananaGUI tests.
 
 This file sets up a BananaGUI wrapper. If you use the -m option to run
 the tests, this file will always be ran also.
 """
 
+import faulthandler
 import sys
-try:
-    import faulthandler
-    faulthandler.enable()
-except ImportError:
-    # Python 3.2.
-    pass
+
+# Not all GUI toolkits raise pythonic exceptions when something's wrong.
+faulthandler.enable()   # noqa
 
 import bananagui
+
 
 # We need to ignore everything except the last argument because there
 # are coverage's arguments in sys.argv when this is running under
@@ -45,4 +42,5 @@ if len(sys.argv) < 2:
           "       yourpython -m guitests.SUBMODULE WRAPPERMODULE",
           sep='\n', file=sys.stderr)
     sys.exit(1)
+
 bananagui.load_wrapper(sys.argv[-1])

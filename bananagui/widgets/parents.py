@@ -21,12 +21,8 @@
 
 # TODO: Add a grid widget.
 
+import collections.abc
 import functools
-try:
-    import collections.abc as abcoll
-except ImportError:
-    # Python 3.2, there's no separate collections.abc.
-    import collections as abcoll
 
 from bananagui import _get_wrapper, Orient, types, utils
 from .basewidgets import Child, Widget
@@ -137,7 +133,7 @@ class Bin(Parent):
         # child._parent is left as is here.
 
 
-class Box(abcoll.MutableSequence, Parent, Child):
+class Box(collections.abc.MutableSequence, Parent, Child):
     """A widget that contains other widgets next to or above each other.
 
     .. code-block:: none
