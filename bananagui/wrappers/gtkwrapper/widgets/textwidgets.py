@@ -39,6 +39,7 @@ class Entry(Child):
 
     def set_grayed_out(self, grayed_out):
         self.widget.set_editable(not grayed_out)
+        super().set_grayed_out(grayed_out)
 
     def set_secret(self, secret):
         self.widget.set_visibility(not secret)
