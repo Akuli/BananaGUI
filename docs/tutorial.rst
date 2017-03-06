@@ -226,6 +226,17 @@ closes the window. Let's try it out on the ``>>>`` prompt::
    >>> window.on_close.run()
    running the callback function
 
+You can connect multiple functions to one callback, and they will all be
+called when the callback runs.
+
+   >>> def another_callback():
+   ...     print("now the second callback function runs")
+   ... 
+   >>> window.on_close.connect(another_callback)
+   >>> window.on_close.run()
+   running the callback function
+   now the second callback function runs
+
 Usually you don't need to use the ``run()`` method yourself, BananaGUI 
 calls it when the user does something and runs your callbacks. So let's 
 solve the window closing problem::
