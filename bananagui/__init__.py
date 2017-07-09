@@ -31,7 +31,7 @@ def _load_dummy():
     return {}
 
 
-def _load_gtk():
+def _load_gtk3():
     import gi
     gi.require_version('Gtk', '3.0')
     gi.require_version('Gdk', '3.0')
@@ -47,7 +47,8 @@ def _load_tkinter():
             'font': font, 'messagebox': messagebox}
 
 
-_toolkits = {'dummy': _load_dummy, 'gtk3': _load_gtk, 'tkinter': _load_tkinter}
+_toolkits = {'dummy': _load_dummy, 'tkinter': _load_tkinter,
+             'gtk3': _load_gtk3}
 
 
 def _load_toolkit(name):

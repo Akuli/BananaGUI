@@ -43,18 +43,27 @@ class Label(base.ChildWidget):
         super().render(parent)
         if _modules.name == 'tkinter':
             self.real_widget = _modules.tk.Label(parent.real_widget)
+        elif _modules.name == 'gtk3':
+            self.real_widget = _modules.Gtk.Label()
         else:
             raise NotImplementedError
 
     def render_update(self):
-        self.real_widget['text'] = self.text
         # TODO: align
+        if _modules.name == 'tkinter':
+            self.real_widget['text'] = self.text
+        elif _modules.name == 'gtk3':
+            self.real_widget.set_text(self.text)
+        else:
+            raise NotImplementedError
 
     def unrender(self):
-        print("label unrendering")
         super().unrender()
-        self.real_widget.destroy()
-        self.real_widget = None
+        if _modules.name in {'tkinter', 'gtk3'}:
+            self.real_widget.destroy()
+            self.real_widget = None
+        else:
+            raise NotImplementedError
 
 
 #@types.add_property(

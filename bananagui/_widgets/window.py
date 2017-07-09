@@ -86,10 +86,11 @@ class Window(Bin):
         widgets to the window may change this, so setting this on
         initialization is not supported.
         """
-        print("getting size")
         if _modules.name == 'tkinter':
             widget = self.real_widget     # pep-8 line length
             return (widget.winfo_width(), widget.winfo_height())
+        if _modules.name == 'gtk3':
+            return self.real_widget.get_size()
         raise NotImplementedError
 
     @size.setter
@@ -106,17 +107,11 @@ class Window(Bin):
             # i know this sucks, but its not as easy as you might think
             # it is...
             self.real_widget.geometry('%dx%d' % size)
-        else:
+        elif _modules.name == 'gtk3':
+            self.real_widget.resize(*size)
             self.render_update()
-
-    def _on_tk_configure(self, event):
-        #print("_on_tk_configure", event)
-        self._size = (event.width, event.height)
-
-        # this is ran when the content's size changes
-        # tk windows can be squeezed to be too small for their content
-        # by default, so we need to fix that here
-        self.render_update()#called_from_config_callback=True)
+        else:
+            raise 
 
     def __init__(self, title="BananaGUI Window", child=None, *,
                  resizable=True, minimum_size=(0, 0), hidden=False, **kwargs):
@@ -139,6 +134,10 @@ class Window(Bin):
             self.real_widget = _modules.tk.Toplevel()
             self.real_widget.bind('<Configure>', self._on_tk_configure)
             self.real_widget.protocol('WM_DELETE_WINDOW', self.on_close.run)
+        elif _modules.name == 'gtk3':
+            self.real_widget = _modules.Gtk.Window()
+            self.real_widget.connect('configure-event', self._on_gtk_configure)
+            self.real_widget.connect('delete-event', self._on_gtk_delete_event)
         else:
             raise NotImplementedError
 
@@ -147,8 +146,27 @@ class Window(Bin):
     def __repr__(self):
         if self.closed:
             return '<closed %s widget>' % self._module_and_type()
-
         return '<%s widget, title=%r>' % (self._module_and_type(), self.title)
+
+    def _on_tk_configure(self, event):
+        #print("_on_tk_configure", event)
+        self._size = (event.width, event.height)
+
+        # this is ran when the content's size changes
+        # tk windows can be squeezed to be too small for their content
+        # by default, so we need to fix that here
+        # render_update() doesn't resize the window, size's setter does
+        # it instead
+        self.render_update()
+
+    def _on_gtk_configure(self, real_widget, event):
+        # gtk windows seem to always be large enough to hold their
+        # content, so no need to render_update()
+        self._size = real_widget.get_size()
+
+    def _on_gtk_delete_event(self, real_widget, event):
+        self.on_close.run()
+        return True       # don't let gtk close this window
 
     def close(self):
         """Close the window and set :attr:`~closed` to True.
@@ -191,6 +209,9 @@ class Window(Bin):
         if _modules.name == 'tkinter':
             assert child.expand == (True, True)   # lol
             child.real_widget.pack(fill='both', expand=True)
+        elif _modules.name == 'gtk3':
+            self.real_widget.add(child.real_widget)
+            child.real_widget.show()
         else:
             raise NotImplementedError
 
@@ -198,17 +219,19 @@ class Window(Bin):
         super().remove(child)
         child.unrender()    # undoes the GUI toolkit specific stuff above
 
-    def render_update(self):#, *, called_from_config_callback=False):
+    def render_update(self):
+        widget = self.real_widget      # pep8 line length
+
         if _modules.name == 'tkinter':
-            widget = self.real_widget      # pep8 line length and DRY
             if self.hidden:
                 widget.withdraw()
             else:
-                widget.title(self.title)
-                widget.resizable(self.resizable, self.resizable)
-                widget.minsize(
+                minimum_size = (
                     max(self.minimum_size[0], widget.winfo_reqwidth()),
                     max(self.minimum_size[1], widget.winfo_reqheight()))
+                widget.title(self.title)
+                widget.resizable(self.resizable, self.resizable)
+                widget.minsize(*minimum_size)
 
                 # for some reason, deiconifying when unnecessary causes
                 # weird freezing... it took a while to find this problem
@@ -216,6 +239,17 @@ class Window(Bin):
                 # prepared to track down weird issues
                 if widget.wm_state() == 'deiconified':
                     widget.deiconify()
+
+        elif _modules.name == 'gtk3':
+            if self.hidden:
+                self.real_widget.hide()
+            else:
+                self.real_widget.resize(*self.size)
+                self.real_widget.set_title(self.title)
+                self.real_widget.set_resizable(self.resizable)
+                self.real_widget.set_size_request(*self.minimum_size)
+                self.real_widget.show()
+
         else:
             raise NotImplementedError
 

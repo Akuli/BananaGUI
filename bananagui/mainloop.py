@@ -77,11 +77,7 @@ class _TkinterLoop:
         self._root.withdraw()    # hide it
 
     def run(self):
-        self.running = True
-        try:
-            self._root.mainloop()
-        finally:
-            self.running = False
+        self._root.mainloop()
 
     def quit(self):
         self._root.destroy()
@@ -93,6 +89,22 @@ class _TkinterLoop:
 
         schedule = functools.partial(self._root.after, ms, real_callback)
         schedule()
+
+
+class _Gtk3Loop:
+
+    # this looks kind of java... lol
+    def __init__(self):
+        self._loop = _modules.GLib.MainLoop()
+
+    def run(self):
+        self._loop.run()
+
+    def quit(self):
+        self._loop.quit()
+
+    def add_timeout(self, ms, callback):
+        _modules.GLib.timeout_add(ms, callback)
 
 
 _loop = None
@@ -109,6 +121,8 @@ def init():
 
     if _modules.name == 'tkinter':
         _loop = _TkinterLoop()
+    elif _modules.name == 'gtk3':
+        _loop = _Gtk3Loop()
     else:
         raise NotImplementedError
 
