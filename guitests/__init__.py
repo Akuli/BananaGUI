@@ -22,4 +22,4 @@ if len(sys.argv) < 2:
           sep='\n', file=sys.stderr)
     sys.exit(1)
 
-bananagui.load_wrapper(sys.argv[-1])
+bananagui.load(sys.argv[-1])

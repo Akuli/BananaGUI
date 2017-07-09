@@ -1,13 +1,12 @@
 """BananaGUI hello world test."""
 
-from bananagui import mainloop, widgets
+import bananagui
 
 
 def main():
-    window = widgets.Window("Hello World!")
-    window.add(widgets.Label("Hello World!"))
-    window.on_close.connect(mainloop.quit)
-    mainloop.run()
+    window = bananagui.Window("Hello World!", bananagui.Label("Hello World!"))
+    window.on_close.connect(bananagui.mainloop.quit)
+    bananagui.mainloop.run()
 
 
 if __name__ == '__main__':

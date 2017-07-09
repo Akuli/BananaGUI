@@ -15,10 +15,7 @@ def all_equal(iterable):
     """
     iterator = iter(iterable)
     first = next(iterator)
-    for element in iterator:
-        if element != first:
-            return False
-    return True
+    return all(element == first for element in iterator)
 
 
 def common_beginning(*iterables):

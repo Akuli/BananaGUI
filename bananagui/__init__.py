@@ -5,11 +5,20 @@ the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support
 later.
 """
 
-import enum
 import functools
 import importlib
+import types
+
+# most submodules import this, so it needs to be here
+# this contains the real GUI toolkit's modules
+_modules = types.SimpleNamespace()
 
 from bananagui import mainloop
+from bananagui._constants import Orient, Align, RUN_AGAIN
+from bananagui._types import Callback
+from bananagui._widgets.base import UpdatingProperty, Widget, ChildWidget
+from bananagui._widgets.labels import Label
+from bananagui._widgets.window import Window
 
 
 __author__ = 'Akuli'
@@ -18,115 +27,85 @@ __license__ = 'MIT'
 __version__ = '0.1-dev'
 
 
-class Orient(enum.IntEnum):
-    HORIZONTAL = 1
-    VERTICAL = 2
+def _load_dummy():
+    return {}
 
 
-class Align(enum.IntEnum):
-    LEFT = 1
-    CENTER = 2
-    RIGHT = 3
-
-    # These are aliases because LEFT and RIGHT are used more often.
-    TOP = LEFT
-    BOTTOM = RIGHT
-
-
-# This is not 0 or 1 because returning True or False from a callback
-# must not be allowed. I don't think an enum with just one value is
-# worth it, so this is just an integer. The callbacks can also return
-# None if they are not supposed to run again.
-
-#: If a timeout callback function returns this, it will be called again.
-#: See :func:`bananagui.mainloop.add_timeout` for more info.
-RUN_AGAIN = -1
-
-# This needs to be updated when new wrapper modules are added.
-
-#: A set of currently supported wrapper module names.
-#:
-#: Modifying this is not recommended.
-WRAPPERS = {'tkinter', 'gtk3', 'dummy'}
-
-_wrapper = None
+def _load_gtk():
+    import gi
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('Gdk', '3.0')
+    gi.require_version('GLib', '2.0')
+    from gi.repository import Gtk, Gdk, GLib
+    return {'Gtk': Gtk, 'Gdk': Gdk, 'GLib': GLib}
 
 
-def _load_wrapper(name):
-    # Make sure the wrapper can be imported and THEN set _wrapper to it.
-    global _wrapper
-    fullname = 'bananagui.wrappers.' + name
-    importlib.import_module(fullname)
-    _wrapper = fullname
+def _load_tkinter():
+    import tkinter
+    from tkinter import colorchooser, font, messagebox
+    return {'tk': tkinter, 'colorchooser': colorchooser,
+            'font': font, 'messagebox': messagebox}
 
 
-def load_wrapper(*args, init_mainloop=True):
-    """Initialize BananaGUI.
+_toolkits = {'dummy': _load_dummy, 'gtk3': _load_gtk, 'tkinter': _load_tkinter}
 
-    This function must be called before using many things in BananaGUI.
-    See :mod:`bananagui.mainloop` for more information.
 
-    The arguments for this function should be valid BananaGUI wrapper
-    modules. For example, ``load_wrapper('tkinter')`` tells BananaGUI to
-    use tkinter as its GUI toolkit. The :data:`WRAPPERS` variable
-    contains a full list of valid arguments for this function.
+def _load_toolkit(name):
+    # Make sure that all required modules can be imported and THEN set
+    # them to _modules.
+    kwargs = _toolkits[name]()
 
-    If multiple arguments are given, this function attempts to load each
-    wrapper module until loading one of them succeeds.
+    _modules.name = name
+    for attr, value in kwargs.items():
+        setattr(_modules, attr, value)
+
+
+def load(*toolkits, init_mainloop=True):
+    """Tell BananaGUI to use the specified GUI toolkit.
+
+    This function must be called before using most things in BananaGUI.
+    Most notably, all widgets need this.
+
+    The arguments for this function should be valid GUI toolkit names.
+    For example, ``load('tkinter')`` tells BananaGUI to use tkinter. The
+    :data:`WRAPPERS` variable contains a full list of valid arguments
+    for this function.
+
+    If multiple arguments are given, this function attempts to import
+    each GUI toolkit until importing one of them succeeds.
 
     For convenience, :func:`bananagui.mainloop.init` will be called if
     *init_mainloop* is True.
     """
-    if not args:
-        raise TypeError("no wrappers were specified")
-    if _wrapper is not None:
-        raise RuntimeError("don't call load_wrapper() twice")
+    if hasattr(_modules, 'name'):
+        raise RuntimeError("don't call load() twice")
+    if not toolkits:
+        raise TypeError("no toolkits were specified")
 
-    if len(args) == 1:
-        if args[0] not in WRAPPERS:
-            raise ValueError("invalid wrapper name %r" % args)
-        _load_wrapper(args[0])
+    if len(toolkits) == 1:
+        if toolkits[0] not in _toolkits:
+            raise ValueError("invalid toolkit name %r" % toolkits)
+
+        _load_toolkit(toolkits[0])
         if init_mainloop:
             mainloop.init()
+
     else:
-        # Attempt to load each wrapper.
-        for arg in args:
+        # Attempt to load each toolkit.
+        for arg in toolkits:
             if arg not in WRAPPERS:
-                raise ValueError("invalid wrapper name %r" % (arg,))
+                raise ValueError("invalid toolkit name %r" % (arg,))
+
             try:
-                _load_wrapper(arg)
-            # I have no idea what different toolkits can raise.
+                _load_toolkit(arg)
             except Exception:
+                # I have no idea what different toolkits can raise.
+                # TODO: log the error or somehow show it with the final
+                # ImportError raised below, maybe with __cause__ stuff?
                 continue
+
             if init_mainloop:
                 mainloop.init()
             return
-        raise ImportError("cannot load any of the requested wrapper modules")
 
-
-@functools.lru_cache()
-def _get_wrapper(name):
-    """Get an object from the wrapper module.
-
-    For example, if bananagui.load_wrapper('tkinter') has been ran,
-    _get_wrapper('a.b:c') imports bananagui.wrappers.tkinter.a.b and
-    returns its c attribute. An exception is raised if
-    bananagui.load_wrapper() has not been called.
-    """
-    if _wrapper is None:
-        raise RuntimeError("bananagui.load_wrapper() wasn't called")
-
-    modulename, attribute = name.split(':')
-    try:
-        wrappermodule = importlib.import_module(_wrapper + '.' + modulename)
-        return getattr(wrappermodule, attribute)
-    except (ImportError, AttributeError):
-        # Use a default, if any.
-        try:
-            defaultmodule = importlib.import_module(
-                'bananagui.wrappers.defaults.' + modulename)
-            return getattr(defaultmodule, attribute)
-        except (ImportError, AttributeError) as e:
-            # We don't have a default :(
-            raise NotImplementedError(
-                "cannot find a wrapper for %s" % name) from e
+        raise ImportError("cannot load any of the requested GUI toolkits")
