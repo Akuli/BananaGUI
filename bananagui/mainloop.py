@@ -91,7 +91,7 @@ class _TkinterLoop:
         schedule()
 
 
-class _Gtk3Loop:
+class _GLibLoop:
 
     # this looks kind of java... lol
     def __init__(self):
@@ -121,8 +121,8 @@ def init():
 
     if _modules.name == 'tkinter':
         _loop = _TkinterLoop()
-    elif _modules.name == 'gtk3':
-        _loop = _Gtk3Loop()
+    elif _modules.name.startswith('gtk'):
+        _loop = _GLibLoop()
     else:
         raise NotImplementedError
 
@@ -146,11 +146,11 @@ def run():
     _loop.running = True
     try:
         _loop.run()
+        if _loop.error is not None:
+            raise _loop.error
     finally:
-        _loop.running = False
-
-    if _loop.error is not None:
-        raise _loop.error
+        _loop.running = False    # TODO: do we really need this?
+        _loop = None
 
 
 def quit():

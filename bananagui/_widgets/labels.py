@@ -43,7 +43,7 @@ class Label(base.ChildWidget):
         super().render(parent)
         if _modules.name == 'tkinter':
             self.real_widget = _modules.tk.Label(parent.real_widget)
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             self.real_widget = _modules.Gtk.Label()
         else:
             raise NotImplementedError
@@ -52,14 +52,14 @@ class Label(base.ChildWidget):
         # TODO: align
         if _modules.name == 'tkinter':
             self.real_widget['text'] = self.text
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             self.real_widget.set_text(self.text)
         else:
             raise NotImplementedError
 
     def unrender(self):
         super().unrender()
-        if _modules.name in {'tkinter', 'gtk3'}:
+        if _modules.name == 'tkinter' or _modules.name.startswith('gtk'):
             self.real_widget.destroy()
             self.real_widget = None
         else:

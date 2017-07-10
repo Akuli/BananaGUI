@@ -89,7 +89,7 @@ class Window(Bin):
         if _modules.name == 'tkinter':
             widget = self.real_widget     # pep-8 line length
             return (widget.winfo_width(), widget.winfo_height())
-        if _modules.name == 'gtk3':
+        if _modules.name.startswith('gtk'):
             return self.real_widget.get_size()
         raise NotImplementedError
 
@@ -107,7 +107,7 @@ class Window(Bin):
             # i know this sucks, but its not as easy as you might think
             # it is...
             self.real_widget.geometry('%dx%d' % size)
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             self.real_widget.resize(*size)
             self.render_update()
         else:
@@ -134,7 +134,7 @@ class Window(Bin):
             self.real_widget = _modules.tk.Toplevel()
             self.real_widget.bind('<Configure>', self._on_tk_configure)
             self.real_widget.protocol('WM_DELETE_WINDOW', self.on_close.run)
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             self.real_widget = _modules.Gtk.Window()
             self.real_widget.connect('configure-event', self._on_gtk_configure)
             self.real_widget.connect('delete-event', self._on_gtk_delete_event)
@@ -209,7 +209,7 @@ class Window(Bin):
         if _modules.name == 'tkinter':
             assert child.expand == (True, True)   # lol
             child.real_widget.pack(fill='both', expand=True)
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             self.real_widget.add(child.real_widget)
             child.real_widget.show()
         else:
@@ -240,7 +240,7 @@ class Window(Bin):
                 if widget.wm_state() == 'deiconified':
                     widget.deiconify()
 
-        elif _modules.name == 'gtk3':
+        elif _modules.name.startswith('gtk'):
             if self.hidden:
                 self.real_widget.hide()
             else:

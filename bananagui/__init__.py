@@ -6,8 +6,8 @@ later.
 """
 
 import functools
-import importlib
 import types
+import warnings
 
 # most submodules import this, so it needs to be here
 # this contains the real GUI toolkit's modules
@@ -31,11 +31,19 @@ def _load_dummy():
     return {}
 
 
-def _load_gtk3():
+def _load_gtk(version):
     import gi
-    gi.require_version('Gtk', '3.0')
-    gi.require_version('Gdk', '3.0')
+
+    if version == 2:
+        # gi is meant to be used with gtk 3, so it warns about using it
+        # with gtk 2
+        warnings.filterwarnings(
+            'ignore', r'^You have imported the Gtk 2\.0 module\.')
+
+    gi.require_version('Gtk', '%d.0' % version)
+    gi.require_version('Gdk', '%d.0' % version)
     gi.require_version('GLib', '2.0')
+
     from gi.repository import Gtk, Gdk, GLib
     return {'Gtk': Gtk, 'Gdk': Gdk, 'GLib': GLib}
 
@@ -48,7 +56,8 @@ def _load_tkinter():
 
 
 _toolkits = {'dummy': _load_dummy, 'tkinter': _load_tkinter,
-             'gtk3': _load_gtk3}
+             'gtk2': functools.partial(_load_gtk, 2),
+             'gtk3': functools.partial(_load_gtk, 3)}
 
 
 def _load_toolkit(name):
