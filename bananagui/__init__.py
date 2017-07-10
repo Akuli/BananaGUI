@@ -18,6 +18,7 @@ from bananagui._constants import Orient, Align, RUN_AGAIN
 from bananagui._types import Callback
 from bananagui._widgets.base import UpdatingProperty, Widget, ChildWidget
 from bananagui._widgets.labels import Label
+from bananagui._widgets.buttons import Button
 from bananagui._widgets.window import Window
 
 

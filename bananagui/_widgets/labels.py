@@ -50,6 +50,7 @@ class Label(base.ChildWidget):
 
     def render_update(self):
         # TODO: align
+        super().render_update()
         if _modules.name == 'tkinter':
             self.real_widget['text'] = self.text
         elif _modules.name.startswith('gtk'):
