@@ -4,8 +4,26 @@ import abc
 import collections.abc
 import functools
 
-from bananagui import Orient, utils
+from bananagui import Orient
 from .base import UpdatingProperty, Widget, ChildWidget
+
+
+def _common_beginning(*iterables):
+    """Check how many common elements the beginnings of iterables have.
+
+    >>> common_beginning([1, 2, 3, 4], [1, 2, 4, 3])
+    2
+    >>> common_beginning([2, 1, 3, 4], [1, 2, 3, 4])
+    0
+    """
+    result = 0
+    for row in map(iter, zip(*iterables)):
+        first = next(row)
+        if not all(item == first for item in row):
+            break
+        result += 1
+
+    return result
 
 
 class Parent(Widget, metaclass=abc.ABCMeta):
@@ -178,7 +196,7 @@ class Bin(Parent, metaclass=abc.ABCMeta):
 #    def __set_children(self, new):
 #        # TODO: Maybe the old and new children have something else in
 #        # common than the beginning? Optimize this.
-#        common = utils.common_beginning(self.__children, new)
+#        common = _common_beginning(self.__children, new)
 #        for child in self.__children[common:]:
 #            self._prepare_remove(child)
 #            self._wrapper.remove(child._wrapper)
