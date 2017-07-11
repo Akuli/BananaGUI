@@ -27,8 +27,7 @@ class Button(ChildWidget):
         self.text = text
 
         #: A callback that runs when the button is clicked.
-        self.on_click = Callback(
-            "'on_click' of %s widget" % self._module_and_type())
+        self.on_click = Callback()
 
     def __repr__(self):
         return '<%s widget, text=%r>' % (self._module_and_type(), self.text)
