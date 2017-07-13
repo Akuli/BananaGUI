@@ -150,15 +150,13 @@ class Window(Bin):
     @size.setter
     def size(self, size):
         self._check_closed()
-
         if _modules.name == 'tkinter':
             self.real_widget.geometry('%dx%d' % size)
-            self.render_update()
         elif _modules.name.startswith('gtk'):
             self.real_widget.resize(*size)
-            self.render_update()
         else:
-            raise 
+            raise NotImplementedError
+        self.render_update()
 
     def wait(self):
         """Wait until the window is closed."""
@@ -168,7 +166,7 @@ class Window(Bin):
         elif _modules.name.startswith('gtk'):
             # This is based on gtk_dialog_run in the GtkDialog C code,
             # but this is a lot shorter because this doesn't restore the
-            # dialog to what it was before running this.
+            # window to what it was before running this.
             # https://github.com/GNOME/gtk/blob/master/gtk/gtkdialog.c
             self.__wait_loop = GLib.MainLoop()
             _modules.Gdk.threads_leave()
