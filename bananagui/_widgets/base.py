@@ -114,16 +114,6 @@ class Widget(metaclass=abc.ABCMeta):
 
         Implementations of this should call ``super().render_update()``.
         """
-        if _modules.name == 'tkinter':
-            _modules.tk_tooltip.set_tooltip(self.real_widget, self.tooltip)
-        elif _modules.name.startswith('gtk'):
-            if _modules.name == 'gtk2' and self.tooltip is None:
-                # set_tooltip_text() doesn't take None on Gtk 2
-                self.real_widget.set_tooltip_markup(None)
-            else:
-                self.real_widget.set_tooltip_text(self.tooltip)
-        else:
-            raise NotImplementedError
 
 
 class ChildWidget(Widget, metaclass=abc.ABCMeta):
@@ -189,12 +179,11 @@ class ChildWidget(Widget, metaclass=abc.ABCMeta):
     """)
 
     def __init__(self, *, tooltip=None, grayed_out=False, expand=(True, True)):
-        self._tooltip = tooltip
-        self._grayed_out = grayed_out
-        self._expand = expand
-
         self.real_widget = None
         super().__init__()
+        self.tooltip = tooltip
+        self.grayed_out = grayed_out
+        self.expand = expand
 
     @abc.abstractmethod
     def render(self, parent):
@@ -217,3 +206,24 @@ class ChildWidget(Widget, metaclass=abc.ABCMeta):
         """
         assert self.real_widget is not None, \
             "render() wasn't called or it didn't set self.real_widget"
+
+    def render_update(self):
+        if _modules.name == 'tkinter':
+            _modules.tk_tooltip.set_tooltip(self.real_widget, self.tooltip)
+            try:
+                self.real_widget['state'] = (
+                    'disabled' if self.grayed_out else 'normal')
+            except _modules.tk.TclError:
+                # some ttk widgets don't seem to support the state option
+                pass
+
+        elif _modules.name.startswith('gtk'):
+            # set_tooltip_text() doesn't take None on Gtk 2 for some reason
+            if _modules.name == 'gtk2' and self.tooltip is None:
+                self.real_widget.set_tooltip_markup(None)
+            else:
+                self.real_widget.set_tooltip_text(self.tooltip)
+            self.real_widget.set_sensitive(not self.grayed_out)
+
+        else:
+            raise NotImplementedError
