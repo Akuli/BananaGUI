@@ -52,8 +52,9 @@ def _load_gtk(version):
 def _load_tkinter():
     import tkinter
     from tkinter import colorchooser, font, messagebox
-    return {'tk': tkinter, 'colorchooser': colorchooser,
-            'font': font, 'messagebox': messagebox}
+    from bananagui import _tk_tooltip
+    return {'tk': tkinter, 'colorchooser': colorchooser, 'font': font,
+            'messagebox': messagebox, 'tk_tooltip': _tk_tooltip}
 
 
 _toolkits = {'dummy': _load_dummy, 'tkinter': _load_tkinter,

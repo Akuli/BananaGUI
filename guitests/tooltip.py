@@ -1,22 +1,9 @@
-from bananagui import mainloop, widgets
+import bananagui
 
 
-def main():
-    window = widgets.Window("Tooltip test")
+window = bananagui.Window("Tooltip test")
+label = bananagui.Label("Test Label", tooltip="Test Tooltip")
+window.add(label)
 
-    box = widgets.Box()
-    window.add(box)
-
-    toplabel = widgets.Label("Top label!", tooltip="Top label tooltip!")
-    bottomlabel = widgets.Label("Bottom label!",
-                                tooltip="Bottom label tooltip!")
-    box.extend([toplabel, bottomlabel])
-    print(toplabel)
-    print(bottomlabel)
-
-    window.on_close.connect(mainloop.quit)
-    mainloop.run()
-
-
-if __name__ == '__main__':
-    main()
+window.on_close.connect(bananagui.mainloop.quit)
+bananagui.mainloop.run()

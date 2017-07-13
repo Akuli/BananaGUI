@@ -1,6 +1,6 @@
 import abc
 
-from bananagui import mainloop
+from bananagui import _modules, mainloop
 
 
 class UpdatingProperty(property):
@@ -89,6 +89,7 @@ class Widget(metaclass=abc.ABCMeta):
         if self.real_widget is not None:
             self.render_update()
 
+    # this is also used in subclasses
     @classmethod
     def _module_and_type(cls):
         modulename = cls.__module__
@@ -108,11 +109,21 @@ class Widget(metaclass=abc.ABCMeta):
         This is ran when some property that effects how the widget
         should look is changed. For example, ``label.text = 'hi'`` first
         sets ``'hi'`` to a non-public ``label._text`` attribute, and
-        then runs ``label.render_update()``.
+        then runs ``label.render_update()``. :class:`UpdatingProperty`
+        is an easy way to create properties like this.
 
-        :class:`UpdatingProperty` is an easy way to create properties
-        that call this method automatically.
+        Implementations of this should call ``super().render_update()``.
         """
+        if _modules.name == 'tkinter':
+            _modules.tk_tooltip.set_tooltip(self.real_widget, self.tooltip)
+        elif _modules.name.startswith('gtk'):
+            if _modules.name == 'gtk2' and self.tooltip is None:
+                # set_tooltip_text() doesn't take None on Gtk 2
+                self.real_widget.set_tooltip_markup(None)
+            else:
+                self.real_widget.set_tooltip_text(self.tooltip)
+        else:
+            raise NotImplementedError
 
 
 class ChildWidget(Widget, metaclass=abc.ABCMeta):
@@ -120,11 +131,11 @@ class ChildWidget(Widget, metaclass=abc.ABCMeta):
 
     Child widgets aren't displayed to the user right away when they are
     created. Actually the real GUI toolkit's widget isn't created at all
-    until the :meth:`.render` method is called.
+    until the :meth:`~render` method is called.
     """
 
     tooltip = UpdatingProperty.with_attr('_tooltip', doc="""
-    The widget's tooltip text or None for no tooltip.
+    The widget's tooltip text as a string or None for no tooltip.
 
     This is None by default.
     """)
