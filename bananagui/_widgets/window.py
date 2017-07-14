@@ -206,10 +206,12 @@ class Window(Bin):
         child.render_update()
 
         if _modules.name == 'tkinter':
-            fills = {(False, False): 'none', (True, True): 'both',
-                     (True, False): 'x', (False, True): 'y'}
-            child.real_widget.pack(fill=fills[child.expand], expand=True)
-            self.render_update()   # LEL
+            # TODO: implement expandiness properly, see comments in base.py
+            #fills = {(False, False): 'none', (True, True): 'both',
+            #         (True, False): 'x', (False, True): 'y'}
+            #child.real_widget.pack(fill=fills[child.expand], expand=True)
+            child.real_widget.pack(fill='both', expand=True)
+            self.render_update()
         elif _modules.name.startswith('gtk'):
             self.real_widget.add(child.real_widget)
             child.real_widget.show()
@@ -223,19 +225,19 @@ class Window(Bin):
 
     def render_update(self):
         self._check_closed()
-        widget = self.real_widget      # pep8 line length
 
         if _modules.name == 'tkinter':
             if self.hidden:
-                widget.withdraw()
+                self.real_widget.withdraw()
             else:
-                widget.title(self.title)
-                widget.resizable(self.resizable, self.resizable)
+                self.real_widget.title(self.title)
+                self.real_widget.resizable(self.resizable, self.resizable)
                 if self.child is None:
-                    widget.minsize(0, 0)
+                    self.real_widget.minsize(0, 0)
                 else:
-                    widget.minsize(self.child.real_widget.winfo_reqwidth(),
-                                   self.child.real_widget.winfo_reqheight())
+                    self.real_widget.minsize(
+                        self.child.real_widget.winfo_reqwidth(),
+                        self.child.real_widget.winfo_reqheight())
 
         elif _modules.name.startswith('gtk'):
             if self.hidden:

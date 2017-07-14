@@ -137,6 +137,10 @@ class ChildWidget(Widget, metaclass=abc.ABCMeta):
     some reason.
     """)
 
+    # TODO: in most toolkits (Gtk2 and tkinter) expandiness is managed
+    # by the parent widget that this widget is in, so this needs a good
+    # way to tell the parent widget that this widget's expandiness has
+    # changed, currently this whole expand property does nothing :(
     expand = UpdatingProperty.with_attr('_expand', doc="""
     Two-tuple of horizontal and vertical expanding.
 
