@@ -1,12 +1,80 @@
-"""Things that BananaGUI uses internally."""
-
+import abc
 import collections.abc
 import contextlib
 import sys
 import traceback
 
 
-def _type_name(cls):
+class UpdatingObject(metaclass=abc.ABCMeta):
+    """An object for use with :class:`.UpdatingProperty`."""
+
+    @abc.abstractmethod
+    def update_state():
+        """Runs when the value of an :class:`.UpdatingProperty` changes."""
+
+
+class UpdatingProperty(property):
+    """A property that calls :meth:`UpdatingObject.update_state` automatically.
+
+    UpdatingProperty works otherwise just like a regular :class:`property`,
+    but after setting the value it also calls the widget's
+    :meth:`render_update <Widget.render_update>`` method. If the
+    widget's ``real_widget`` attribute is None the widget hasn't been
+    rendered yet, and this behaves just like a regular property.
+    """
+
+    @staticmethod
+    def _make_setter(user_setter):
+        # no need to use functools.wraps because setter docstrings and
+        # other info are usually not used anywhere anyway
+        def real_setter(self, value):
+            user_setter(self, value)
+            self.update_state()
+
+        return real_setter
+
+    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+        if fset is not None:
+            fset = self._make_setter(fset)
+        super().__init__(fget, fset, fdel, doc)
+
+    def setter(self, func):
+        return super().setter(self._make_setter(func))
+
+    @classmethod
+    def with_attr(cls, attrname, *, doc=None):
+        """A convenient way to create a minimal property.
+
+        This...
+
+        .. code-block:: python
+
+            class Thing(UpdatingObject):
+                stuff = UpdatingProperty.with_attr('_stuff')
+
+        ...is equivalent to this::
+
+            class Thing(UpdatingObject):
+
+                @UpdatingProperty
+                def stuff(self):
+                    return self._stuff
+
+                @stuff.setter
+                def stuff(self, value):
+                    self._stuff = value
+        """
+        def getter(self):
+            return getattr(self, attrname)
+
+        def setter(self, value):
+            setattr(self, attrname, value)
+
+        return cls(getter, setter, doc=doc)
+
+
+# this is not exposed in __init__.py, but other bananagui submodules use it
+def get_class_name(cls):
     if cls.__module__ == 'builtins':
         # builtins.str -> str
         return cls.__name__
@@ -53,8 +121,8 @@ class Callback:
         self._connections = []
 
     def __repr__(self):
-        signature = ', '.join(map(_type_name, self._argtypes))
-        return 'bananagui.Callback(%s)' % signature
+        signature = ', '.join(map(get_class_name, self._argtypes))
+        return '%s(%s)' % (get_class_name(type(self)), signature)
 
     def connect(self, func, *extra_args):
         """Schedule a function to be called when the callback is ran.
@@ -117,7 +185,7 @@ class Callback:
             self._blocklevel -= 1
 
     def run(self, *args):
-        """Run the connected functions as described in connect().
+        """Run the connected functions.
 
         This does nothing if code under a ``with the_callback.blocked()``
         is currently running somewhere. No exceptions are raised. If a
@@ -126,8 +194,8 @@ class Callback:
         """
         if (len(args) != len(self._argtypes)
                 or not all(map(isinstance, args, self._argtypes))):
-            good = ', '.join(map(_type_name, self._argtypes))
-            bad = ', '.join(_type_name(type(arg)) for arg in args)
+            good = ', '.join(map(get_class_name, self._argtypes))
+            bad = ', '.join(get_class_name(type(arg)) for arg in args)
             raise TypeError("should be run(%s), not run(%s)" % (good, bad))
 
         if self._blocklevel != 0:

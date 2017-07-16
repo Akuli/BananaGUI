@@ -1,5 +1,5 @@
-from bananagui import _modules, mainloop
-from bananagui._types import Callback
+from bananagui import _modules, _mainloop
+from bananagui._types import Callback, get_class_name
 from .base import UpdatingProperty
 from .parents import Bin
 
@@ -44,28 +44,8 @@ class Window(Bin):
     # but it does that by moving the window to the upper left corner
     # when it's maximized.
 
-    # TODO: better docstring for title?
-    title = UpdatingProperty.with_attr('_title', doc="""
-    The text in the top bar.
-    """)
-    resizable = UpdatingProperty.with_attr('_resizable', doc="""
-    True if the user can resize the window.
-    """)
-    hidden = UpdatingProperty.with_attr('_hidden', doc="""
-    False if the window is showing normally.
-
-    Hiding the window is easier than creating a new window when a window
-    with the same content needs to be displayed multiple times.
-
-    If you are wondering why your window isn't showing up, it's not
-    necessarily hidden. There are other things that could be also wrong:
-
-    * The window might be closed because :meth:`~close` has been called.
-    * The mainloop might not be running. See :mod:`bananagui.mainloop`.
-    """)
-
     def __init__(self, title="BananaGUI Window", child=None, *, resizable=True,
-                 hidden=False, default_size=(200, 200), **bin_kwargs):
+                 hidden=False, default_size=(200, 200), **kwargs):
         #: A callback that runs when the user tries to close the window.
         #:
         #: This callback doesn't actually run when :meth:`~close` is
@@ -106,7 +86,7 @@ class Window(Bin):
             if not subclass_did_it:
                 self.real_widget = _modules.Gtk.Window()
 
-            def on_delete_event(real_widget, junk):
+            def on_delete_event(*junk):
                 self.on_close.run()
                 return True     # don't let gtk close the window
 
@@ -116,22 +96,50 @@ class Window(Bin):
                 'configure-event',
                 lambda window, crap: self.on_resize.run(*window.get_size()))
 
+        elif _modules.name == 'dummy':
+            self.real_widget = object()     # lol
+            self.__size = default_size
+
         else:
             raise NotImplementedError
 
-        super().__init__(child, **bin_kwargs)
+        super().__init__(child, **kwargs)
 
     def __repr__(self):
         if self.closed:
-            return '<closed %s widget>' % self._module_and_type()
-        return '<%s widget, title=%r>' % (self._module_and_type(), self.title)
+            return '<closed %s widget at %#x>' % (
+                get_class_name(type(self)), id(self))
+
+        return '<%s widget, title=%r, contains %s>' % (
+            get_class_name(type(self)), self.title, self._content_info())
 
     def _check_closed(self):
         if self.closed:
             raise ValueError("the window has been closed")
 
-    # TODO: some way to run callbacks when the size changes?
-    @property
+    # TODO: better docstring for title?
+    title = UpdatingProperty.with_attr('_title', doc="""
+    The text in the top bar.
+    """)
+
+    resizable = UpdatingProperty.with_attr('_resizable', doc="""
+    True if the user can resize the window.
+    """)
+
+    hidden = UpdatingProperty.with_attr('_hidden', doc="""
+    False if the window is showing normally.
+
+    Hiding the window is easier than creating a new window when a window
+    with the same content needs to be displayed multiple times.
+
+    If you are wondering why your window isn't showing up, it's not
+    necessarily hidden. There are other things that could be also wrong:
+
+    * The window might be closed because :meth:`~close` has been called.
+    * BananaGUI might not be running. See :doc:`mainloop`.
+    """)
+
+    @UpdatingProperty
     def size(self):
         """The current window size.
 
@@ -145,6 +153,8 @@ class Window(Bin):
             return (widget.winfo_width(), widget.winfo_height())
         if _modules.name.startswith('gtk'):
             return self.real_widget.get_size()
+        if _modules.name == 'dummy':
+            return self.__size
         raise NotImplementedError
 
     @size.setter
@@ -154,9 +164,10 @@ class Window(Bin):
             self.real_widget.geometry('%dx%d' % size)
         elif _modules.name.startswith('gtk'):
             self.real_widget.resize(*size)
+        elif _modules.name == 'dummy':
+            self.__size = size
         else:
             raise NotImplementedError
-        self.render_update()
 
     def wait(self):
         """Wait until the window is closed."""
@@ -172,6 +183,13 @@ class Window(Bin):
             _modules.Gdk.threads_leave()
             self.__wait_loop.run()
             _modules.Gdk.threads_enter()
+        elif _modules.name != 'dummy':
+            raise NotImplementedError
+
+    @property
+    def closed(self):
+        """True if :meth:`close` has been called."""
+        return self.__closed
 
     def close(self):
         """Close the window and set :attr:`~closed` to True.
@@ -191,19 +209,17 @@ class Window(Bin):
             if self.__wait_loop is not None:
                 self.__wait_loop.quit()
             self.real_widget.destroy()
-        else:
+        elif _modules.name != 'dummy':
             raise NotImplementedError
+        self.__closed = True
 
-    @property
-    def closed(self):
-        """True if :meth:`close` has been called."""
-        return self.__closed
-
+    # TODO: the dialog add stuff is kind of a mess :(
     def add(self, child):
         self._check_closed()
         super().add(child)
-        child.render(self)
-        child.render_update()
+        if _modules.name != 'dummy':
+            child.render(self)
+            child.render_update()
 
         if _modules.name == 'tkinter':
             # TODO: implement expandiness properly, see comments in base.py
@@ -213,15 +229,18 @@ class Window(Bin):
             child.real_widget.pack(fill='both', expand=True)
             self.render_update()
         elif _modules.name.startswith('gtk'):
-            self.real_widget.add(child.real_widget)
             child.real_widget.show()
-        else:
+            if not isinstance(self, Dialog):
+                # Dialog does its own stuff instead of this
+                self.real_widget.add(child.real_widget)
+        elif _modules.name != 'dummy':
             raise NotImplementedError
 
     def remove(self, child):
         self._check_closed()
         super().remove(child)
-        child.unrender()    # undoes the GUI toolkit specific stuff above
+        if _modules.name != 'dummy':
+            child.unrender()    # undoes the GUI toolkit specific stuff above
 
     def render_update(self):
         self._check_closed()
@@ -247,7 +266,7 @@ class Window(Bin):
                 self.real_widget.set_resizable(self.resizable)
                 self.real_widget.show()
 
-        else:
+        elif _modules.name != 'dummy':
             raise NotImplementedError
 
 
@@ -317,18 +336,16 @@ class Dialog(Window):
         return self.__parentwindow
 
     def wait(self):
-        self._check_closed()
-        self.real_widget.run()
+        if _modules.name.startswith('gtk'):
+            self._check_closed()
+            self.real_widget.run()
+        else:
+            super().wait()
 
     def add(self, child):
+        super().add(child)
         if _modules.name.startswith('gtk'):
-            # TODO: is there a nicer way to skip the parent class when
-            # using super()? :D this kind of sucks
-            self._check_closed()
-            Bin.add(self, child)
             self.__content_area.pack_start(child.real_widget, True, True, 0)
-        else:
-            super().add(child)
 
     def remove(self, child):
         if _modules.name.startswith('gtk'):

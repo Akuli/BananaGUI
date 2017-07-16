@@ -1,80 +1,23 @@
 import abc
 
-from bananagui import _modules, mainloop
+from bananagui import _modules, _mainloop
+from bananagui._types import UpdatingObject, UpdatingProperty, get_class_name
 
 
-class UpdatingProperty(property):
-    """A property that calls :meth:`Widget.render_update` automatically.
-
-    UpdatingProperty works otherwise just like a regular :class:`property`,
-    but after setting the value it also calls the widget's
-    :meth:`render_update <Widget.render_update>`` method. If the
-    widget's ``real_widget`` attribute is None the widget hasn't been
-    rendered yet, and this behaves just like a regular property.
-    """
-
-    def _make_setter(self, user_setter):
-        # no need to use functools.wraps because setter docstrings
-        # aren't used anywhere anyway
-        def real_setter(widget, value):
-            user_setter(widget, value)
-            if widget.real_widget is not None:
-                widget.render_update()
-
-        return real_setter
-
-    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
-        if fset is not None:
-            fset = self._make_setter(fset)
-        super().__init__(fget, fset, fdel, doc)
-
-    def setter(self, func):
-        return super().setter(self._make_setter(func))
-
-    @classmethod
-    def with_attr(cls, attrname, *, doc=None):
-        """A convenient way to create a minimal property.
-
-        This...
-
-        .. code-block:: python
-
-            class Thing(bananagui.Widget):
-                stuff = UpdatingProperty.with_attr('_stuff')
-
-        ...is roughly equivalent to this::
-
-            class Thing(bananagui.Widget):
-
-                @UpdatingProperty
-                def stuff(self):
-                    return self._stuff
-
-                @stuff.setter
-                def stuff(self, value):
-                    self._stuff = value
-        """
-        def getter(self):
-            return getattr(self, attrname)
-
-        def setter(self, value):
-            setattr(self, attrname, value)
-
-        return cls(getter, setter, doc=doc)
-
-
-class Widget(metaclass=abc.ABCMeta):
+class Widget(UpdatingObject, metaclass=abc.ABCMeta):
     """A base class for all widgets.
 
     All widgets inherit from this class, so all widgets have the methods
     that this class has.
+
+    This class inherits from :class:`bananagui.UpdatingObject`.
     """
 
     # this is in __new__ because it runs before __init__
     def __new__(cls, *args, **kwargs):
         # this is actually needed only for rendering, but requiring it
         # here makes things easier to debug
-        mainloop._check_initialized()
+        _mainloop._check_initialized()
 
         # this explicit 2-argument super thing is needed i think before
         # 3.7 or something like that, and it doesn't accept *args and
@@ -84,23 +27,17 @@ class Widget(metaclass=abc.ABCMeta):
     def __init__(self):
         if not hasattr(self, 'real_widget'):
             raise RuntimeError(
-                "subclass __init__ didn't create a real_widget before "
+                "subclass __init__ didn't set self.real_widget before "
                 "calling super().__init__()")
-        if self.real_widget is not None:
-            self.render_update()
 
-    # this is also used in subclasses
-    @classmethod
-    def _module_and_type(cls):
-        modulename = cls.__module__
-        if modulename.startswith('bananagui.'):
-            modulename = 'bananagui'
-        return modulename + '.' + cls.__name__
+        # TODO: document this behavior
+        self.update_state()
 
     def __repr__(self):
         # hide the fact that it's from bananagui._widgets.something
         # also 'widget' instead of 'object'
-        return '<%s widget at %#x>' % (self._module_and_type(), id(self))
+        # subclasses do fancier stuff than this
+        return '<%s widget>' % get_class_name(type(self))
 
     @abc.abstractmethod
     def render_update(self):
@@ -114,6 +51,14 @@ class Widget(metaclass=abc.ABCMeta):
 
         Implementations of this should call ``super().render_update()``.
         """
+
+    def update_state(self):
+        """Runs :meth:`render_update` if :attr:`real_widget` is not None.
+
+        This implements :meth:`.UpdatingObject.update_state`.
+        """
+        if self.real_widget is not None:
+            self.render_update()
 
 
 class ChildWidget(Widget, metaclass=abc.ABCMeta):

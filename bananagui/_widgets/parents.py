@@ -4,16 +4,17 @@ import abc
 import collections.abc
 import functools
 
-from bananagui import Orient
+from bananagui import Orient, _modules
+from bananagui._types import get_class_name
 from .base import UpdatingProperty, Widget, ChildWidget
 
 
 def _common_beginning(*iterables):
     """Check how many common elements the beginnings of iterables have.
 
-    >>> common_beginning([1, 2, 3, 4], [1, 2, 4, 3])
+    >>> common_beginning('abcd', 'abdc')
     2
-    >>> common_beginning([2, 1, 3, 4], [1, 2, 3, 4])
+    >>> common_beginning('abcd', 'bacd')
     0
     """
     result = 0
@@ -31,22 +32,21 @@ class Parent(Widget, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def children(self):
-        """Return an iterator of this widget's children.
+        """Return a list of this widget's children.
 
         Dictionaries have a ``keys()`` method that returns a set-like
-        view of the keys. This method is similar, but this returns an
-        iterator instead of a view and the iterator yields
-        :class:`.Child` widgets instead of keys.
+        view of the keys. This method is similar, but this returns a
+        list of widgets.
 
-        Subclasses of :class:`~Parent` provide different kinds of ways to
-        access the children, but all Parent widgets have a children
-        method that works consistently.
+        Subclasses of Parent provide different kinds of ways to access
+        the children, but they all provide a children method that works
+        consistently.
         """
 
     def _prepare_add(self, child):
         """Make sure child can be added to self and make it ready for it."""
         if child in self.children():
-            raise ValueError("cannot add the same child twice")
+            raise ValueError("cannot add %r twice" % (child,))
 
     def _prepare_remove(self, child):
         """Make sure that a child can be removed from self."""
@@ -54,20 +54,19 @@ class Parent(Widget, metaclass=abc.ABCMeta):
             raise ValueError("cannot remove %r, it hasn't been added"
                              % (child,))
 
-    def _repr_parts(self):
-        parts = super()._repr_parts()
-
+    # subclasses use this in __repr__()
+    def _content_info(self):
         length = 0
         for child in self.children():
             length += 1
 
         if length == 0:
-            parts.append('empty')
-        elif length == 1:
-            parts.append('contains a child')
-        else:
-            parts.append('contains %d children' % length)
-        return parts
+            return 'nothing'
+        if length == 1:
+            # TODO: use 'an' instead of 'a' when needed
+            (the_child,) = self.children()
+            return 'a %s' % get_class_name(type(the_child))
+        return '%d widgets' % length
 
 
 class Bin(Parent, metaclass=abc.ABCMeta):
@@ -79,7 +78,7 @@ class Bin(Parent, metaclass=abc.ABCMeta):
     """
 
     def __init__(self, child=None, **kwargs):
-        self._child = None
+        self.__child = None
         super().__init__(**kwargs)
         if child is not None:
             self.add(child)
@@ -91,11 +90,10 @@ class Bin(Parent, metaclass=abc.ABCMeta):
         This can be None and this is None by default. Use :meth:`~add`
         and :meth:`remove` or an initialization argument to set this.
         """
-        return self._child
+        return self.__child
 
     def children(self):
-        if self.child is not None:
-            yield self.child
+        return [] if self.child is None else [self.child]
 
     def add(self, child):
         """Add a :class:`.ChildWidget` into this widget.
@@ -105,14 +103,15 @@ class Bin(Parent, metaclass=abc.ABCMeta):
         """
         if self.child is not None:
             raise ValueError("there's already a child widget, remove "
-                             "it before adding another child widget")
+                             "it before adding another widget")
         self._prepare_add(child)
-        self._child = child
+        self.__child = child
 
         # if it's not a child widget it's something like a window, so
         # it's always rendered and a subclass should override add() and
         # do whatever it needs to do
-        if isinstance(self, ChildWidget) and self.real_widget is not None:
+        if (self.real_widget is not None and _modules.name != 'dummy'
+                and isinstance(self, ChildWidget)):
             self.render_update()
 
     def remove(self, child):
@@ -122,7 +121,7 @@ class Bin(Parent, metaclass=abc.ABCMeta):
         be the old value of :attr:`~child`.
         """
         self._prepare_remove(child)   # makes sure that child is self.child
-        self._child = None
+        self.__child = None
 
         # see comments in add()
         if isinstance(self, ChildWidget) and self.real_widget is not None:

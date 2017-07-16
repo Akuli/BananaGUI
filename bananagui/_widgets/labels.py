@@ -1,4 +1,5 @@
 from bananagui import _modules, Align
+from bananagui._types import get_class_name
 from . import base
 
 
@@ -32,12 +33,12 @@ class Label(base.ChildWidget):
     """)
 
     def __init__(self, text='', *, align=Align.CENTER, **kwargs):
-        self._text = text
-        self._align = align
         super().__init__(**kwargs)
+        self.text = text
+        self.align = align
 
     def __repr__(self):
-        return '<%s widget, text=%r>' % (self._module_and_type(), self.text)
+        return '<%s widget, text=%r>' % (get_class_name(type(self)), self.text)
 
     def render(self, parent):
         super().render(parent)

@@ -27,15 +27,8 @@ All public features of BananaGUI are documented here.
 .. toctree::
    :maxdepth: 1
 
-   bananagui
-   clipboard
-   color
-   font
-   images
-   iniloader
-   mainloop
-   msgbox
    widgets
+   mainloop
    widgettree
 
 

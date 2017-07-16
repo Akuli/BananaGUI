@@ -5,21 +5,22 @@ the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support
 later.
 """
 
-import functools
 import types
 import warnings
 
 # most submodules import this, so it needs to be here
-# this contains the real GUI toolkit's modules
+# this contains the real GUI toolkit's modules, see _load_toolkit()
 _modules = types.SimpleNamespace()
 
-from bananagui import mainloop
 from bananagui._constants import Orient, Align, RUN_AGAIN
-from bananagui._types import Callback
-from bananagui._widgets.base import UpdatingProperty, Widget, ChildWidget
+from bananagui import _mainloop
+from bananagui._mainloop import run, quit, add_timeout
+from bananagui._types import UpdatingObject, UpdatingProperty, Callback
+from bananagui._widgets.base import Widget, ChildWidget
 from bananagui._widgets.labels import Label
 from bananagui._widgets.buttons import Button
-from bananagui._widgets.window import Window
+from bananagui._widgets.parents import Parent, Bin
+from bananagui._widgets.window import Window, Dialog
 
 
 __author__ = 'Akuli'
@@ -30,6 +31,14 @@ __version__ = '0.1-dev'
 
 def _load_dummy():
     return {}
+
+
+def _load_tkinter():
+    import tkinter
+    from tkinter import colorchooser, font, messagebox
+    from bananagui import _tk_tooltip
+    return {'tk': tkinter, 'colorchooser': colorchooser, 'font': font,
+            'messagebox': messagebox, 'tk_tooltip': _tk_tooltip}
 
 
 def _load_gtk(version):
@@ -49,75 +58,52 @@ def _load_gtk(version):
     return {'Gtk': Gtk, 'Gdk': Gdk, 'GLib': GLib}
 
 
-def _load_tkinter():
-    import tkinter
-    from tkinter import colorchooser, font, messagebox
-    from bananagui import _tk_tooltip
-    return {'tk': tkinter, 'colorchooser': colorchooser, 'font': font,
-            'messagebox': messagebox, 'tk_tooltip': _tk_tooltip}
-
-
-_toolkits = {'dummy': _load_dummy, 'tkinter': _load_tkinter,
-             'gtk2': functools.partial(_load_gtk, 2),
-             'gtk3': functools.partial(_load_gtk, 3)}
+_toolkits = {
+    'dummy': _load_dummy, 'tkinter': _load_tkinter,
+    'gtk2': (lambda: _load_gtk(2)), 'gtk3': (lambda: _load_gtk(3))}
 
 
 def _load_toolkit(name):
     # Make sure that all required modules can be imported and THEN set
     # them to _modules.
-    kwargs = _toolkits[name]()
+    if name not in _toolkits:
+        raise ValueError("invalid toolkit name %r" % name)
 
+    kwargs = _toolkits[name]()
     _modules.name = name
     for attr, value in kwargs.items():
         setattr(_modules, attr, value)
 
 
-def load(*toolkits, init_mainloop=True):
-    """Tell BananaGUI to use the specified GUI toolkit.
+def init(toolkit_name):
+    """Tell BananaGUI to use the given GUI toolkit and set up everything.
+
+    Currently valid toolkit names are ``'tkinter'``, ``'gtk2'`` and
+    ``'gtk3'``. The *toolkit_name* can also be a list or some other
+    iterable of toolkit names. For example, ``load(['gtk3', 'tkinter'])``
+    attempts to load GTK 3, but tkinter is used instead if it isn't
+    installed.
 
     This function must be called before using most things in BananaGUI.
-    Most notably, all widgets need this.
-
-    The arguments for this function should be valid GUI toolkit names.
-    For example, ``load('tkinter')`` tells BananaGUI to use tkinter. The
-    :data:`WRAPPERS` variable contains a full list of valid arguments
-    for this function.
-
-    If multiple arguments are given, this function attempts to import
-    each GUI toolkit until importing one of them succeeds.
-
-    For convenience, :func:`bananagui.mainloop.init` will be called if
-    *init_mainloop* is True.
+    For example, all widgets need this.
     """
     if hasattr(_modules, 'name'):
-        raise RuntimeError("don't call load() twice")
-    if not toolkits:
-        raise TypeError("no toolkits were specified")
+        raise RuntimeError("don't call bananagui.init() twice")
 
-    if len(toolkits) == 1:
-        if toolkits[0] not in _toolkits:
-            raise ValueError("invalid toolkit name %r" % toolkits)
-
-        _load_toolkit(toolkits[0])
-        if init_mainloop:
-            mainloop.init()
-
+    if isinstance(toolkit_name, str):
+        _load_toolkit(toolkit_name)
     else:
-        # Attempt to load each toolkit.
-        for arg in toolkits:
-            if arg not in WRAPPERS:
-                raise ValueError("invalid toolkit name %r" % (arg,))
-
+        for name in toolkit_name:
             try:
-                _load_toolkit(arg)
+                _load_toolkit(name)
+                break
             except Exception:
                 # I have no idea what different toolkits can raise.
                 # TODO: log the error or somehow show it with the final
                 # ImportError raised below, maybe with __cause__ stuff?
-                continue
+                pass
+        else:
+            # no breaks, nothing succeeded
+            raise ImportError("cannot load any of the requested GUI toolkits")
 
-            if init_mainloop:
-                mainloop.init()
-            return
-
-        raise ImportError("cannot load any of the requested GUI toolkits")
+    _mainloop._init()

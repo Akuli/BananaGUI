@@ -1,5 +1,5 @@
 from bananagui import _modules
-from bananagui._types import Callback
+from bananagui._types import Callback, get_class_name
 from .base import UpdatingProperty, ChildWidget
 
 
@@ -30,7 +30,7 @@ class Button(ChildWidget):
         self.on_click = Callback()
 
     def __repr__(self):
-        return '<%s widget, text=%r>' % (self._module_and_type(), self.text)
+        return '<%s widget, text=%r>' % (get_class_name(type(self)), self.text)
 
     def render(self, parent):
         super().render(parent)

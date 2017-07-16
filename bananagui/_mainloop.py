@@ -1,51 +1,12 @@
-r"""This module provides access to the GUI toolkit's mainloop.
-
-The mainloop can be in three different states:
-
-* **Not initialized:** The mainloop is doing nothing, and it's not ready
-  to run. This is the current state when this module has just been
-  imported for the first time.
-* **Initialized:** Now the mainloop is ready to run, but it's not running
-  yet. Widgets can be created and timeouts can be added, but the
-  timeouts aren't guaranteed to run and the widgets aren't guaranteed to
-  be visible yet. Typically the mainloop is in this state for a short
-  time while the widgets are being created.
-* **Running:** Now the mainloop is running. Widgets are visible and
-  timeouts run. New widgets can be still made and new timeouts can be
-  added. Applications are in this state most of the time.
-
-Different functions in this module can be used for going from one state
-to another:
-
-.. code-block:: none
-
-    ,-----------------.  init()  ,-------------.
-    | not initialized | -------> | initialized |
-    `-----------------'          `-------------'
-            /|\                         |
-             |                          | call run()
-             |                          V
-             |       quit()        ,---------.
-             `-------------------- | running |
-                                   `---------'
-                                   \____ ____/
-                                        V
-                                    the run()
-                                    function
-                                   is running
-
-Note that :func:`bananagui.load` will call :func:`~init` by default and
-most applications don't run the mainloop more than once, so usually you
-don't need to worry about the "not initialized" state.
-"""
+# TODO: support running the mainloop multiple times?
 
 import math
 import sys
+import threading
+import time
 import traceback
 
 from bananagui import _modules
-
-__all__ = ['init', 'run', 'quit', 'add_timeout']
 
 
 #class _DebugRoot(__import__('tkinter').Tk):
@@ -67,6 +28,27 @@ __all__ = ['init', 'run', 'quit', 'add_timeout']
 #            if name != 'call'
 #        })
 #        self.tk = tk
+
+
+
+class _DummyLoop:
+
+    def __init__(self):
+        self._done = threading.Event()
+
+    def run(self):
+        self._done.wait()
+
+    def quit(self):
+        self._done.set()
+
+    def add_timeout(self, ms, callback):
+        def real_callback():
+            time.sleep(ms / 1000)
+            while callback():
+                time.sleep(ms / 1000)
+
+        threading.Thread(target=real_callback).start()
 
 
 class _TkinterLoop:
@@ -110,11 +92,7 @@ class _GLibLoop:
 _loop = None
 
 
-def init():
-    """Set up the mainloop.
-
-    Note that :func:`bananagui.load_wrapper` runs this by default.
-    """
+def _init():
     global _loop
     if _loop is not None:
         raise RuntimeError("the mainloop is already initialized")
@@ -123,6 +101,8 @@ def init():
         _loop = _TkinterLoop()
     elif _modules.name.startswith('gtk'):
         _loop = _GLibLoop()
+    elif _modules.name == 'dummy':
+        _loop = _DummyLoop()
     else:
         raise NotImplementedError
 
@@ -136,7 +116,7 @@ def _check_initialized():
 
 
 def run():
-    """Run the mainloop until :func:`~quit` is called."""
+    """Run the mainloop until :func:`bananagui.quit` is called."""
     global _loop
     if _loop is None:
         raise RuntimeError("init() wasn't called")
@@ -154,7 +134,7 @@ def run():
 
 
 def quit():
-    """Make :func:`~run` return.
+    """Make :func:`bananagui.run` return.
 
     Quitting when the main loop is not running does nothing.
     """
@@ -163,19 +143,18 @@ def quit():
 
 
 def add_timeout(seconds, callback, *args):
-    """Run ``callback(*args)`` after waiting.
+    """Run ``callback(*args)`` after the given number of seconds.
 
     If the function returns :data:`bananagui.RUN_AGAIN` it will be
-    called again after waiting again. Depending on the GUI toolkit, this
-    may or may not work when the main loop is not running.
+    called again after waiting again.
 
     The waiting time can be an integer or a float. It's not guaranteed
     to be exact, but it's good enough for most purposes. Use something
     like :func:`time.time` if you need to measure time in the callback
     function.
 
-    Unlike in most other GUI toolkits, calling :func:`sys.exit` from a
-    callback works.
+    Callbacks may call :func:`sys.exit`; :func:`bananagui.quit` will be
+    called and :func:`bananagui.run` will then exit Python.
     """
     if seconds <= 0:
         raise ValueError("timeouts need to be positive, not " + repr(seconds))
@@ -192,7 +171,7 @@ def add_timeout(seconds, callback, *args):
     def real_callback():
         try:
             result = callback(*args)
-            if result == bananagui.RUN_AGAIN:
+            if result is bananagui.RUN_AGAIN:
                 return True
             if result is None:
                 return False

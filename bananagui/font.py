@@ -1,105 +1,105 @@
-"""Font-related things for BananaGUI."""
+import functools
 
-from bananagui import _get_wrapper, mainloop, types
+from bananagui import mainloop, _modules
+from bananagui._types import UpdatingProperty, UpdatingObject, get_class_name
 
-__all__ = ['get_families']
 
-
-# The wrapper doesn't need to provide anything for this, it just needs to
-# use this with widgets that have a font attribute.
-
-# TODO: update this and use this in rest of BananaGUI.
-
-@types.add_property('family')
-@types.add_property('size')
-@types.add_property('bold')
-@types.add_property('italic')
-@types.add_property('underline')
-@types.add_property('overline')
-class Font:
+# widgets should have properties that can be set to Font objects, but if
+# it hasn't been set, creates a new Font object when requested
+# TODO: tkinter's font sizes can be negative, handle them somehow
+class Font(UpdatingObject):
     """A class that represents a font.
 
-    Unlike in most other GUI toolkits, it's usually a bad idea to
-    create a new Font object. Instead, most widgets provide a font
-    attribute that can be used to retrieve the widget's current font as
-    a Font object and change that.
+    :mod:`bananagui.mainloop` needs to be initialized before creating
+    Font objects.
 
-    The family attribute is the font's family as a string. Usually it's
-    a bad idea to use hard-coded font families. If you want to customize
-    the fonts it's recommended to allow the users to choose the fonts
-    they want to use with a font dialog. If you just want to make a font
-    monospaced you can set this to a family called 'Monospace' so the
-    default monospace font will be used. The get_families() function
-    returns a list of possible family values.
+    Usually it's a bad idea to do this::
 
-    The size attribute is the font size in pixels. Usually it's a bad
-    idea to use hard-coded font families and sizes. If you just want to
-    make something bigger, you can do this:
+        font = bananagui.Font('DejaVu Sans', 12)
+
+    The problem here is that many systems don't have a "DejaVu Sans"
+    font installed, and not all users like their font exactly 12 pixels
+    high. Future versions of BananaGUI may feature some kind of font
+    dialog that lets users select fonts, but currently that's not
+    implemented. If you're really desperate you can make a font dialog
+    yourself with :meth:`Font.list_families`, a size :class:`.Spinbox`
+    and 3 :class:`Checkbox` widgets for :attr:`bold`, :attr:`italic` and
+    :attr:`underline`.
+
+    However, there's nothing wrong with doing something relative to the
+    fonts. For example, you can make the font bigger like this::
 
         some_widget.font.size *= 2
-
-    The bold, italic, underline and overline attributes are Booleans.
     """
 
-    def __init__(self, family, size, bold, italic, underline, overline):
+    family = UpdatingProperty.with_attr('_family')
+    size = UpdatingProperty.with_attr('_size')
+    bold = UpdatingProperty.with_attr('_bold')
+    italic = UpdatingProperty.with_attr('_italic')
+    underline = UpdatingProperty.with_attr('_underline')
+
+    def __init__(self, family, size, *, bold=False, italic=False,
+                 underline=False):#, overline=False):
+        mainloop._check_initialized()
         self._family = family
         self._size = size
         self._bold = bold
         self._italic = italic
         self._underline = underline
-        self._overline = overline
 
-        # The widget that created the font should add something to
-        # this. Everything in this list will be called with the font as
-        # the only argument when anything about the font changes.
-        self._on_changed = []
+        if _modules.name == 'tkinter':
+            self.real_font = _modules.font.Font()
+            self._monospace_family = None
+        else:
+            raise NotImplementedError
+        self.update_state()
 
     def __repr__(self):
-        words = ['family=%r' % self.family, 'size=%r' % self.size]
-        for attribute in ('bold', 'italic', 'underline', 'overline'):
+        parts = [repr(self.family), repr(self.size)]
+        for attribute in ['bold', 'italic', 'underline']:#, 'overline']:
             value = getattr(self, attribute)
             if value:
-                words.append('%s=%r' % (attribute, value))
-        return '<BananaGUI font, %s>' % ' '.join(words)
+                # the default is False, but this is True
+                parts.append('%s=%r' % (attribute, value))
+        return '%s(%s)' % (get_class_name(type(self)), ', '.join(parts))
 
-    def _run_callbacks(self, value):
-        for callback in self._on_changed:
-            callback(self)
+    def update_state(self):
+        if _modules.name == 'tkinter':
+            if self.family.casefold() == 'monospace':
+                tkfixed = _modules.font.Font(name='TkFixedFont', exists=True)
+                self.real_font['family'] = tkfixed.actual('family')
+            else:
+                self.real_font['family'] = self.family
+            self.real_font['size'] = self.size
+            self.real_font['weight'] = 'bold' if self.bold else 'normal'
+            self.real_font['slant'] = 'italic' if self.italic else 'roman'
+            self.real_font['underline'] = self.underline
+        else:
+            raise NotImplementedError
 
-    _set_family = _run_callbacks
-    _set_size = _run_callbacks
-    _set_bold = _run_callbacks
-    _set_italic = _run_callbacks
-    _set_underline = _run_callbacks
-    _set_overline = _run_callbacks
+    _family_cache = set()
 
-    def _check_family(self, family):
-        assert family in get_families(), "unknown family %r" % (family,)
+    @staticmethod
+    def list_families():
+        """Get a list of all valid :attr:`family` values."""
+        cache = Font._family_cache     # less typing ftw
+        if not cache:
+            cache.add('Monospace')
+            if _modules.name == 'tkinter':
+                # TODO: figure out why some families start with @ on
+                # windows and maybe do something with them instead of
+                # ignoring?
+                cache.update(family for family in _modules.font.families()
+                             if not family.startswith('@'))
+            elif _modules.name.startswith('gtk'):
+                # based on http://zetcode.com/gui/pygtk/pango/
+                dummy_widget = _modules.Gtk.Label()
+                context = dummy_widget.create_pango_context()
+                cache.update(
+                    family.get_name() for family in context.list_families())
+            else:
+                raise NotImplementedError
 
-    def _check_size(self, size):
-        assert isinstance(size, int) and size > 0, \
-            "font sizes must be positive integers"
-
-    def _check_boolean(self, value):
-        assert isinstance(value, bool), "%r is not a Boolean" % (value,)
-
-    _check_bold = _check_boolean
-    _check_italic = _check_boolean
-    _check_underline = _check_boolean
-    _check_overline = _check_boolean
-
-
-_family_cache = set()
-
-
-def get_families() -> list:
-    """List all avaliable font families as strings."""
-    if not mainloop._initialized:
-        raise RuntimeError("the mainloop needs to be initialized")
-    if not _family_cache:
-        # The wrapper function can return anything iterable.
-        _family_cache.add('Monospace')
-        _family_cache.update(_get_wrapper('font:get_families')())
-    # It's important to return a copy here because someone might
-    # mutate the returned list.
-    return sorted(_family_cache, key=str.casefold)
+        # it's important to return a copy of the cache because someone
+        # might mutate the returned list
+        return sorted(cache, key=str.casefold)
