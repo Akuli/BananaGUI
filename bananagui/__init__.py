@@ -5,6 +5,7 @@ the same code using GTK+ 3 or Tkinter. BananaGUI may feature Qt support
 later.
 """
 
+import threading
 import types
 import warnings
 
@@ -12,13 +13,12 @@ import warnings
 # this contains the real GUI toolkit's modules, see _load_toolkit()
 _modules = types.SimpleNamespace()
 
-from bananagui._constants import Orient, Align, RUN_AGAIN
-from bananagui import _mainloop
-from bananagui._mainloop import run, quit, add_timeout
+from bananagui._mainloop import init as _init_mainloop
+from bananagui._mainloop import run, quit, add_timeout, RUN_AGAIN
 from bananagui._types import UpdatingObject, UpdatingProperty, Callback
-from bananagui._widgets.base import Widget, ChildWidget
+from bananagui._widgets.base import Orient, Align, Widget, ChildWidget
 from bananagui._widgets.labels import Label
-from bananagui._widgets.buttons import Button
+#from bananagui._widgets.buttons import Button
 from bananagui._widgets.parents import Parent, Bin
 from bananagui._widgets.window import Window, Dialog
 
@@ -69,9 +69,9 @@ def _load_toolkit(name):
     if name not in _toolkits:
         raise ValueError("invalid toolkit name %r" % name)
 
-    kwargs = _toolkits[name]()
+    attributes = _toolkits[name]()
     _modules.name = name
-    for attr, value in kwargs.items():
+    for attr, value in attributes.items():
         setattr(_modules, attr, value)
 
 
@@ -80,13 +80,16 @@ def init(toolkit_name):
 
     Currently valid toolkit names are ``'tkinter'``, ``'gtk2'`` and
     ``'gtk3'``. The *toolkit_name* can also be a list or some other
-    iterable of toolkit names. For example, ``load(['gtk3', 'tkinter'])``
+    iterable of toolkit names. For example, ``init(['gtk3', 'tkinter'])``
     attempts to load GTK 3, but tkinter is used instead if it isn't
     installed.
 
     This function must be called before using most things in BananaGUI.
     For example, all widgets need this.
     """
+    if threading.current_thread() is not threading.main_thread():
+        raise RuntimeError(
+            "bananagui.init() must be called from the main thread")
     if hasattr(_modules, 'name'):
         raise RuntimeError("don't call bananagui.init() twice")
 
@@ -106,4 +109,4 @@ def init(toolkit_name):
             # no breaks, nothing succeeded
             raise ImportError("cannot load any of the requested GUI toolkits")
 
-    _mainloop._init()
+    _init_mainloop()

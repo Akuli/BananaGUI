@@ -5,8 +5,7 @@ import collections.abc
 import functools
 
 from bananagui import Orient, _modules
-from bananagui._types import get_class_name
-from .base import UpdatingProperty, Widget, ChildWidget
+from .base import UpdatingProperty, Widget, ChildWidget, Parent
 
 
 def _common_beginning(*iterables):
@@ -25,48 +24,6 @@ def _common_beginning(*iterables):
         result += 1
 
     return result
-
-
-class Parent(Widget, metaclass=abc.ABCMeta):
-    """A base class for widgets that contain other widgets."""
-
-    @abc.abstractmethod
-    def children(self):
-        """Return a list of this widget's children.
-
-        Dictionaries have a ``keys()`` method that returns a set-like
-        view of the keys. This method is similar, but this returns a
-        list of widgets.
-
-        Subclasses of Parent provide different kinds of ways to access
-        the children, but they all provide a children method that works
-        consistently.
-        """
-
-    def _prepare_add(self, child):
-        """Make sure child can be added to self and make it ready for it."""
-        if child in self.children():
-            raise ValueError("cannot add %r twice" % (child,))
-
-    def _prepare_remove(self, child):
-        """Make sure that a child can be removed from self."""
-        if child not in self.children():
-            raise ValueError("cannot remove %r, it hasn't been added"
-                             % (child,))
-
-    # subclasses use this in __repr__()
-    def _content_info(self):
-        length = 0
-        for child in self.children():
-            length += 1
-
-        if length == 0:
-            return 'nothing'
-        if length == 1:
-            # TODO: use 'an' instead of 'a' when needed
-            (the_child,) = self.children()
-            return 'a %s' % get_class_name(type(the_child))
-        return '%d widgets' % length
 
 
 class Bin(Parent, metaclass=abc.ABCMeta):
@@ -95,6 +52,9 @@ class Bin(Parent, metaclass=abc.ABCMeta):
     def children(self):
         return [] if self.child is None else [self.child]
 
+    # Dialog has a custom gtk add
+    _this_is_a_dialog = False
+
     def add(self, child):
         """Add a :class:`.ChildWidget` into this widget.
 
@@ -107,12 +67,22 @@ class Bin(Parent, metaclass=abc.ABCMeta):
         self._prepare_add(child)
         self.__child = child
 
-        # if it's not a child widget it's something like a window, so
-        # it's always rendered and a subclass should override add() and
-        # do whatever it needs to do
-        if (self.real_widget is not None and _modules.name != 'dummy'
-                and isinstance(self, ChildWidget)):
-            self.render_update()
+        child.render(self)
+        child.update_everything()
+
+        if _modules.name == 'tkinter':
+            # FIXME: implement expandiness properly, see comments in base.py
+            #fills = {(False, False): 'none', (True, True): 'both',
+            #         (True, False): 'x', (False, True): 'y'}
+            #child.real_widget.pack(fill=fills[child.expand], expand=True)
+            child.real_widget.pack(fill='both', expand=True)
+        elif _modules.name in ['gtk2', 'gtk3']:
+            child.real_widget.show()
+            if not self._this_is_a_dialog:
+                # Dialog does its own stuff instead of this
+                self.real_widget.add(child.real_widget)
+        else:   # pragma: no cover
+            raise NotImplementedError
 
     def remove(self, child):
         """Remove the child from the widget.
@@ -123,9 +93,13 @@ class Bin(Parent, metaclass=abc.ABCMeta):
         self._prepare_remove(child)   # makes sure that child is self.child
         self.__child = None
 
-        # see comments in add()
-        if isinstance(self, ChildWidget) and self.real_widget is not None:
-            self.render_update()
+        if _modules.name == 'tkinter':
+            child.real_widget.pack_forget()
+        elif _modules.name.startswith('gtk'):
+            if not self._this_is_a_dialog:
+                self.real_widget.remove(child.real_widget)
+        else:   # pragma: no cover
+            raise NotImplementedError
 
 
 #class Box(collections.abc.MutableSequence, Parent, Child):

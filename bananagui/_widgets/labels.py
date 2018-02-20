@@ -1,9 +1,8 @@
-from bananagui import _modules, Align
-from bananagui._types import get_class_name
-from . import base
+from bananagui import _modules
+from .base import Align, UpdatingProperty, ChildWidget
 
 
-class Label(base.ChildWidget):
+class Label(ChildWidget):
     """A widget that displays text.
 
     .. code-block:: none
@@ -19,26 +18,35 @@ class Label(base.ChildWidget):
     """
     # TODO: Add fonts and colors?
 
-    text = base.UpdatingProperty.with_attr('_text', doc="""
-    The text in the label.
-    """)
-
-    align = base.UpdatingProperty.with_attr('_align', doc=r"""
-    How the text is aligned in the label.
-
-    If the text contains ``\n`` characters, this also determines how the
-    text is justified.
-
-    This needs to be a :class:`bananagui.Align` member.
-    """)
-
     def __init__(self, text='', *, align=Align.CENTER, **kwargs):
         super().__init__(**kwargs)
         self.text = text
         self.align = align
 
     def __repr__(self):
-        return '<%s widget, text=%r>' % (get_class_name(type(self)), self.text)
+        return '<%s widget, text=%r>' % (self._get_class_name(), self.text)
+
+    @UpdatingProperty.updater_with_attr('_text')
+    def text(self):
+        """The text in the label."""
+        if _modules.name == 'tkinter':
+            self.real_widget['text'] = self.text
+        elif _modules.name.startswith('gtk'):
+            self.real_widget.set_text(self.text)
+        else:   # pragma: no cover
+            raise NotImplementedError
+
+    # TODO: implement this
+    @UpdatingProperty.updater_with_attr('_align')
+    def align(self):
+        r"""How the text is aligned in the label.
+
+        If the text contains ``\n`` characters, this also determines how the
+        text is justified.
+
+        This needs to be a :class:`bananagui.Align` member.
+        """
+        pass
 
     def render(self, parent):
         super().render(parent)
@@ -46,25 +54,7 @@ class Label(base.ChildWidget):
             self.real_widget = _modules.tk.Label(parent.real_widget)
         elif _modules.name.startswith('gtk'):
             self.real_widget = _modules.Gtk.Label()
-        else:
-            raise NotImplementedError
-
-    def render_update(self):
-        # TODO: align
-        super().render_update()
-        if _modules.name == 'tkinter':
-            self.real_widget['text'] = self.text
-        elif _modules.name.startswith('gtk'):
-            self.real_widget.set_text(self.text)
-        else:
-            raise NotImplementedError
-
-    def unrender(self):
-        super().unrender()
-        if _modules.name == 'tkinter' or _modules.name.startswith('gtk'):
-            self.real_widget.destroy()
-            self.real_widget = None
-        else:
+        else:   # pragma: no cover
             raise NotImplementedError
 
 

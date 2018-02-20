@@ -4,45 +4,91 @@ import contextlib
 import sys
 import traceback
 
+import bananagui    # for checking what it exposes
+from bananagui import _modules
 
-class UpdatingObject(metaclass=abc.ABCMeta):
+
+class UpdatingObject:
     """An object for use with :class:`.UpdatingProperty`."""
 
-    @abc.abstractmethod
-    def update_state():
-        """Runs when the value of an :class:`.UpdatingProperty` changes."""
+    def needs_updating(self):
+        """Return True if :meth:`Updating.Property` updaters should run.
+
+        This always returns True by default. Widgets return False when
+        the widget has not been rendered yet.
+        """
+        return True
+
+    def update_everything(self):
+        """Runs when the value of any :class:`.UpdatingProperty` changes.
+
+        *property_name* is the ``name`` that was used when creating
+        :class:`UpdatingProperty`.
+        """
+        for name, value in type(self).__dict__.items():     # lol
+            if isinstance(value, UpdatingProperty):
+                value._update(self)
 
 
 class UpdatingProperty(property):
-    """A property that calls :meth:`UpdatingObject.update_state` automatically.
+    """A property that runs an additional updater function after setting.
 
-    UpdatingProperty works otherwise just like a regular :class:`property`,
-    but after setting the value it also calls the widget's
-    :meth:`render_update <Widget.render_update>`` method. If the
-    widget's ``real_widget`` attribute is None the widget hasn't been
-    rendered yet, and this behaves just like a regular property.
+    Don't use the ``.fset`` attribute of UpdatingProperty objects; it
+    should be considered an implementation detail.
+
+    .. note::
+        This class can be used only in :class:`UpdatingObject` subclasses.
     """
 
-    @staticmethod
-    def _make_setter(user_setter):
-        # no need to use functools.wraps because setter docstrings and
-        # other info are usually not used anywhere anyway
-        def real_setter(self, value):
-            user_setter(self, value)
-            self.update_state()
-
-        return real_setter
-
-    def __init__(self, fget=None, fset=None, fdel=None, doc=None):
+    def __init__(self, fget=None, fset=None, fdel=None, fupdate=None,
+                 doc=None):
         if fset is not None:
             fset = self._make_setter(fset)
-        super().__init__(fget, fset, fdel, doc)
+        if doc is None and fget is not None:
+            doc = getattr(fget, '__doc__', None)
 
-    def setter(self, func):
-        return super().setter(self._make_setter(func))
+        super().__init__(fget, fset, fdel, doc)
+        self.__doc__ = doc
+        self.fupdate = fupdate
+
+    def _update(self, instance):
+        if instance.needs_updating() and self.fupdate is not None:
+            self.fupdate(instance)
+
+    def _make_setter(self, user_setter):
+        # no need to use functools.wraps because setter docstrings and
+        # other info are usually not used anywhere anyway
+        def real_setter(instance, value):
+            user_setter(instance, value)
+            self._update(instance)
+
+        real_setter._user_setter = user_setter
+        return real_setter
+
+    def _get_fset(self):
+        if self.fset is None:
+            return None
+        return self.fset._user_setter
+
+    def getter(self, fget):
+        return UpdatingProperty(
+            fget, self._get_fset(), self.fdel, self.fupdate, self.__doc__)
+
+    def setter(self, fset):
+        return UpdatingProperty(
+            self.fget, fset, self.fdel, self.fupdate, self.__doc__)
+
+    def deleter(self, fdel):
+        return UpdatingProperty(
+            self.fget, self._get_fset(), fdel, self.fupdate, self.__doc__)
+
+    def updater(self, fupdate):
+        """A decorator like ``@setter`` and ``@getter`` for the updater."""
+        return UpdatingProperty(
+            self.fget, self._get_fset(), self.fdel, fupdate, self.__doc__)
 
     @classmethod
-    def with_attr(cls, attrname, *, doc=None):
+    def updater_with_attr(cls, attrname, *, doc=None):
         """A convenient way to create a minimal property.
 
         This...
@@ -50,7 +96,9 @@ class UpdatingProperty(property):
         .. code-block:: python
 
             class Thing(UpdatingObject):
-                stuff = UpdatingProperty.with_attr('_stuff')
+                @UpdatingProperty.updater_with_attr('_stuff')
+                def stuff():
+                    ...update stuff...
 
         ...is equivalent to this::
 
@@ -63,22 +111,36 @@ class UpdatingProperty(property):
                 @stuff.setter
                 def stuff(self, value):
                     self._stuff = value
+
+                @stuff.updater
+                def stuff(self, value):
+                    ...update stuff...
+
+        If the *name* argument not specified, it defaults to
+        ``attrname.lstrip('_')``.
         """
-        def getter(self):
+        def fget(self):
             return getattr(self, attrname)
 
-        def setter(self, value):
+        def fset(self, value):
             setattr(self, attrname, value)
 
-        return cls(getter, setter, doc=doc)
+        def decorator(fupdate):
+            if doc is None and fupdate.__doc__ is not None:
+                the_doc = fupdate.__doc__
+            else:
+                the_doc = doc
+            return cls(fget, fset, None, fupdate, the_doc)
+
+        return decorator
 
 
-# this is not exposed in __init__.py, but other bananagui submodules use it
-def get_class_name(cls):
+def _get_class_name(cls):
     if cls.__module__ == 'builtins':
         # builtins.str -> str
         return cls.__name__
-    if cls.__module__.startswith('bananagui.'):
+    if (cls.__module__.startswith('bananagui.') and
+            getattr(bananagui, cls.__name__, None) is cls):
         # bananagui._types.Callback -> bananagui.Callback
         return 'bananagui.' + cls.__name__
     return cls.__module__ + '.' + cls.__name__
@@ -121,8 +183,8 @@ class Callback:
         self._connections = []
 
     def __repr__(self):
-        signature = ', '.join(map(get_class_name, self._argtypes))
-        return '%s(%s)' % (get_class_name(type(self)), signature)
+        signature = ', '.join(map(_get_class_name, self._argtypes))
+        return '%s(%s)' % (_get_class_name(type(self)), signature)
 
     def connect(self, func, *extra_args):
         """Schedule a function to be called when the callback is ran.
@@ -194,8 +256,8 @@ class Callback:
         """
         if (len(args) != len(self._argtypes)
                 or not all(map(isinstance, args, self._argtypes))):
-            good = ', '.join(map(get_class_name, self._argtypes))
-            bad = ', '.join(get_class_name(type(arg)) for arg in args)
+            good = ', '.join(map(_get_class_name, self._argtypes))
+            bad = ', '.join(map(_get_class_name, map(type, args)))
             raise TypeError("should be run(%s), not run(%s)" % (good, bad))
 
         if self._blocklevel != 0:

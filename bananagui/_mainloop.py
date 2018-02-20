@@ -9,26 +9,7 @@ import traceback
 from bananagui import _modules
 
 
-#class _DebugRoot(__import__('tkinter').Tk):
-#    tk = None
-#
-#    def __init__(self):
-#        super().__init__()
-#        real_tk = self.tk
-#
-#        class _FakeTk:
-#            def call(self, *args):
-#                print(args)
-#                return real_tk.call(*args)
-#
-#        tk = _FakeTk()
-#        tk.__dict__.update({
-#            name: getattr(self.tk, name)
-#            for name in dir(self.tk)
-#            if name != 'call'
-#        })
-#        self.tk = tk
-
+RUN_AGAIN = object()
 
 
 class _DummyLoop:
@@ -55,7 +36,6 @@ class _TkinterLoop:
 
     def __init__(self):
         self._root = _modules.tk.Tk()
-        #self._root = _DebugRoot()
         self._root.withdraw()    # hide it
 
     def run(self):
@@ -92,10 +72,9 @@ class _GLibLoop:
 _loop = None
 
 
-def _init():
+def init():
     global _loop
-    if _loop is not None:
-        raise RuntimeError("the mainloop is already initialized")
+    assert _loop is None, "_mainloop.init() was called twice"
 
     if _modules.name == 'tkinter':
         _loop = _TkinterLoop()
@@ -123,13 +102,13 @@ def run():
     if _loop.running:
         raise RuntimeError("two mainloops cannot be ran at the same time")
 
-    _loop.running = True
+    _loop.running = True    # for quit()
     try:
         _loop.run()
         if _loop.error is not None:
             raise _loop.error
     finally:
-        _loop.running = False    # TODO: do we really need this?
+        _loop.running = False
         _loop = None
 
 
@@ -177,6 +156,8 @@ def add_timeout(seconds, callback, *args):
                 return False
             raise ValueError("callback returned %r, expected None "
                              "or bananagui.RUN_AGAIN" % (result,))
+
+        # TODO: does it make sense to catch KeyboardInterrupt?
 
         # allow using sys.exit() in callbacks
         except SystemExit as err:

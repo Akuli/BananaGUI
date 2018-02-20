@@ -1,5 +1,7 @@
-from bananagui import _modules, _mainloop
-from bananagui._types import Callback, get_class_name
+import functools
+
+from bananagui import _modules
+from bananagui._types import Callback
 from .base import UpdatingProperty
 from .parents import Bin
 
@@ -45,18 +47,18 @@ class Window(Bin):
     # when it's maximized.
 
     def __init__(self, title="BananaGUI Window", child=None, *, resizable=True,
-                 hidden=False, default_size=(200, 200), **kwargs):
+                 hidden=False, **kwargs):
         #: A callback that runs when the user tries to close the window.
         #:
         #: This callback doesn't actually run when :meth:`~close` is
         #: called. The close method closes the window, but this runs
         #: when the *user* tries to close the window. Usually you should
-        #: connect this to :func:`bananagui.mainloop.quit` or
-        #: :meth:`close <close>`.
+        #: connect this to :func:`bananagui.mainloop.quit` or the
+        #: :meth:`close` method.
         self.on_close = Callback()
 
-        #: A callback that runs when the window is resized by setting
-        #: :attr:`~size` or by draggin the window's corners.
+        #: A callback that runs when the window is resized by dragging
+        #: the window's corners or with :meth:`resize`.
         #:
         #: The new width and height in pixels are passed to the
         #: connected callbacks.
@@ -66,7 +68,7 @@ class Window(Bin):
         self._child = child
         self._resizable = resizable
         self._hidden = hidden
-        self.__closed = False
+        self._closed = False
 
         # a subclass like Dialog can set self.real_widget before calling
         # super().__init__(), this is not documented because this is
@@ -75,14 +77,13 @@ class Window(Bin):
         if _modules.name == 'tkinter':
             if not subclass_did_it:
                 self.real_widget = _modules.tk.Toplevel()
-            self.real_widget.geometry('%dx%d' % default_size)
             self.real_widget.protocol('WM_DELETE_WINDOW', self.on_close.run)
             self.real_widget.bind(
                 '<Configure>',
                 lambda event: self.on_resize.run(event.width, event.height))
 
         elif _modules.name.startswith('gtk'):
-            self.__wait_loop = None       # see wait() below
+            self._wait_loop = None       # see wait() below
             if not subclass_did_it:
                 self.real_widget = _modules.Gtk.Window()
 
@@ -90,85 +91,123 @@ class Window(Bin):
                 self.on_close.run()
                 return True     # don't let gtk close the window
 
-            self.real_widget.set_default_size(*default_size)
             self.real_widget.connect('delete-event', on_delete_event)
             self.real_widget.connect(
                 'configure-event',
                 lambda window, crap: self.on_resize.run(*window.get_size()))
 
-        elif _modules.name == 'dummy':
-            self.real_widget = object()     # lol
-            self.__size = default_size
-
-        else:
+        else:   # pragma: no cover
             raise NotImplementedError
 
         super().__init__(child, **kwargs)
+        self.update_everything()
 
     def __repr__(self):
         if self.closed:
-            return '<closed %s widget at %#x>' % (
-                get_class_name(type(self)), id(self))
+            return '<closed %s widget, title was %r>' % (
+                self._get_class_name(), self.title)
 
         return '<%s widget, title=%r, contains %s>' % (
-            get_class_name(type(self)), self.title, self._content_info())
+            self._get_class_name(), self.title, self._content_info())
 
-    def _check_closed(self):
-        if self.closed:
-            raise ValueError("the window has been closed")
+    def check_closed_decorator(func):
+        @functools.wraps(func)
+        def fake_func(self, *args, **kwargs):
+            if self.closed:
+                raise RuntimeError("the window has been closed")
+            return func(self, *args, **kwargs)
+        return fake_func
 
     # TODO: better docstring for title?
-    title = UpdatingProperty.with_attr('_title', doc="""
-    The text in the top bar.
-    """)
+    @UpdatingProperty.updater_with_attr('_title')
+    @check_closed_decorator
+    def title(self):
+        """The text in the top bar."""
+        if _modules.name == 'tkinter':
+            self.real_widget.title(self.title)
+        elif _modules.name.startswith('gtk'):
+            self.real_widget.set_title(self.title)
+        else:   # pragma: no cover
+            raise NotImplementedError
 
-    resizable = UpdatingProperty.with_attr('_resizable', doc="""
-    True if the user can resize the window.
-    """)
+    @UpdatingProperty.updater_with_attr('_resizable')
+    @check_closed_decorator
+    def resizable(self):
+        """True if the user can resize the window."""
+        if _modules.name == 'tkinter':
+            self.real_widget.resizable(self.resizable, self.resizable)
+        elif _modules.name.startswith('gtk'):
+            self.real_widget.set_resizable(self.resizable)
+        else:   # pragma: no cover
+            raise NotImplementedError
 
-    hidden = UpdatingProperty.with_attr('_hidden', doc="""
-    False if the window is showing normally.
+    # TODO: what if the window is minimized? check corner cases
+    @UpdatingProperty.updater_with_attr('_hidden')
+    @check_closed_decorator
+    def hidden(self):
+        """False if the window is showing normally.
 
-    Hiding the window is easier than creating a new window when a window
-    with the same content needs to be displayed multiple times.
+        Hiding the window is easier than creating a new window when a window
+        with the same content needs to be displayed multiple times.
 
-    If you are wondering why your window isn't showing up, it's not
-    necessarily hidden. There are other things that could be also wrong:
+        If you are wondering why your window isn't showing up, it's not
+        necessarily hidden. There are other things that could be also wrong:
 
-    * The window might be closed because :meth:`~close` has been called.
-    * BananaGUI might not be running. See :doc:`mainloop`.
-    """)
+        * The window might be closed because :meth:`~close` has been called.
+        * BananaGUI might not be running. See :doc:`mainloop`.
+        """
+        if _modules.name == 'tkinter':
+            if self.hidden:
+                self.real_widget.withdraw()
+            else:
+                self.real_widget.deiconify()
+        elif _modules.name.startswith('gtk'):
+            if self.hidden:
+                self.real_widget.hide()
+            else:
+                self.real_widget.show()
+        else:   # pragma: no cover
+            raise NotImplementedError
 
-    @UpdatingProperty
+    @property
+    @check_closed_decorator
     def size(self):
         """The current window size.
 
-        Like most other sizes, this is a two-tuple of integers. Adding
-        widgets to the window may change this, so setting this on
-        initialization is not supported.
+        Like most other sizes, this is a two-tuple of integers. Setting
+        this directly is not supported, use :meth:`resize` instead
         """
-        self._check_closed()
         if _modules.name == 'tkinter':
             widget = self.real_widget     # pep-8 line length
             return (widget.winfo_width(), widget.winfo_height())
-        if _modules.name.startswith('gtk'):
-            return self.real_widget.get_size()
-        if _modules.name == 'dummy':
-            return self.__size
-        raise NotImplementedError
-
-    @size.setter
-    def size(self, size):
-        self._check_closed()
-        if _modules.name == 'tkinter':
-            self.real_widget.geometry('%dx%d' % size)
         elif _modules.name.startswith('gtk'):
-            self.real_widget.resize(*size)
-        elif _modules.name == 'dummy':
-            self.__size = size
-        else:
+            return self.real_widget.get_size()
+        else:   # pragma: no cover
             raise NotImplementedError
 
+    # TODO: handle tkinter minsize and stuff, windows should be barely
+    # enough to fit their content by default
+    @check_closed_decorator
+    def resize(self, new_width, new_height):
+        """Try to change :attr:`size`.
+
+        Usually calling this method changes the size, but there are no
+        guarantees that the size actually changes in BananaGUI. GUI
+        toolkits can only ask the window manager nicely if it would like
+        to change the window size, and that's what this method does.
+
+        .. note::
+            Adding more widgets to the window may change the size, so
+            it's best to call this method after creating the widgets.
+        """
+        if _modules.name == 'tkinter':
+            self.real_widget.geometry('%dx%d' % (new_width, new_height))
+        elif _modules.name.startswith('gtk'):
+            self.real_widget.resize(new_width, new_height)
+        else:   # pragma: no cover
+            raise NotImplementedError
+
+    @check_closed_decorator
     def wait(self):
         """Wait until the window is closed."""
         self._check_closed()
@@ -179,17 +218,17 @@ class Window(Bin):
             # but this is a lot shorter because this doesn't restore the
             # window to what it was before running this.
             # https://github.com/GNOME/gtk/blob/master/gtk/gtkdialog.c
-            self.__wait_loop = GLib.MainLoop()
+            self._wait_loop = _modules.GLib.MainLoop()
             _modules.Gdk.threads_leave()
-            self.__wait_loop.run()
+            self._wait_loop.run()
             _modules.Gdk.threads_enter()
-        elif _modules.name != 'dummy':
+        else:   # pragma: no cover
             raise NotImplementedError
 
     @property
     def closed(self):
         """True if :meth:`close` has been called."""
-        return self.__closed
+        return self._closed
 
     def close(self):
         """Close the window and set :attr:`~closed` to True.
@@ -206,68 +245,14 @@ class Window(Bin):
         if _modules.name == 'tkinter':
             self.real_widget.destroy()
         elif _modules.name.startswith('gtk'):
-            if self.__wait_loop is not None:
-                self.__wait_loop.quit()
+            if self._wait_loop is not None:
+                self._wait_loop.quit()
             self.real_widget.destroy()
-        elif _modules.name != 'dummy':
+        else:   # pragma: no cover
             raise NotImplementedError
-        self.__closed = True
+        self._closed = True
 
-    # TODO: the dialog add stuff is kind of a mess :(
-    def add(self, child):
-        self._check_closed()
-        super().add(child)
-        if _modules.name != 'dummy':
-            child.render(self)
-            child.render_update()
-
-        if _modules.name == 'tkinter':
-            # TODO: implement expandiness properly, see comments in base.py
-            #fills = {(False, False): 'none', (True, True): 'both',
-            #         (True, False): 'x', (False, True): 'y'}
-            #child.real_widget.pack(fill=fills[child.expand], expand=True)
-            child.real_widget.pack(fill='both', expand=True)
-            self.render_update()
-        elif _modules.name.startswith('gtk'):
-            child.real_widget.show()
-            if not isinstance(self, Dialog):
-                # Dialog does its own stuff instead of this
-                self.real_widget.add(child.real_widget)
-        elif _modules.name != 'dummy':
-            raise NotImplementedError
-
-    def remove(self, child):
-        self._check_closed()
-        super().remove(child)
-        if _modules.name != 'dummy':
-            child.unrender()    # undoes the GUI toolkit specific stuff above
-
-    def render_update(self):
-        self._check_closed()
-
-        if _modules.name == 'tkinter':
-            if self.hidden:
-                self.real_widget.withdraw()
-            else:
-                self.real_widget.title(self.title)
-                self.real_widget.resizable(self.resizable, self.resizable)
-                if self.child is None:
-                    self.real_widget.minsize(0, 0)
-                else:
-                    self.real_widget.minsize(
-                        self.child.real_widget.winfo_reqwidth(),
-                        self.child.real_widget.winfo_reqheight())
-
-        elif _modules.name.startswith('gtk'):
-            if self.hidden:
-                self.real_widget.hide()
-            else:
-                self.real_widget.set_title(self.title)
-                self.real_widget.set_resizable(self.resizable)
-                self.real_widget.show()
-
-        elif _modules.name != 'dummy':
-            raise NotImplementedError
+    del check_closed_decorator
 
 
 class Dialog(Window):
@@ -275,34 +260,36 @@ class Dialog(Window):
 
     .. code-block:: none
 
-       ,---------------------------------------.
-       |       Parent window       | _ | o | X |
-       |---------------------------------------|
-       |                                       |
-       |                                       |
-       |                                       |
-       |                                       |
-       |                                       |
-       |                                       |
-       |               ,-------------------------------.
-       |               |           Dialog          | X |
-       |               |-------------------------------|
-       |               |                               |
-       |               |                               |
-       `---------------|                               |
-                       |                               |
-                       |                               |
-                       `-------------------------------'
+        ,---------------------------------------.
+        |       Parent window       | _ | o | X |
+        |---------------------------------------|
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |                                       |
+        |               ,-------------------------------.
+        |               |           Dialog          | X |
+        |               |-------------------------------|
+        |               |                               |
+        |               |                               |
+        `---------------|                               |
+                        |                               |
+                        |                               |
+                        `-------------------------------'
 
     This class inherits from :class:`.Window`. The title defaults to
     *parentwindow*'s title.
     """
 
+    _this_is_a_dialog = True    # for Bin in parents.py
+
     def __init__(self, parentwindow, title=None, child=None, *,
                  resizable=False, **window_kwargs):
         if title is None:
             title = parentwindow.title
-        self.__parentwindow = parentwindow
+        self._parentwindow = parentwindow
 
         if _modules.name == 'tkinter':
             self.real_widget = _modules.tk.Toplevel()
@@ -311,16 +298,17 @@ class Dialog(Window):
             self.real_widget = _modules.Gtk.Dialog(parentwindow.real_widget)
 
             # gtk dialogs have an action area for buttons, we don't use
-            # it so let's hide it if that isn't deprecated yet...
-            version = (_modules.Gtk.MAJOR_VERSION, _modules.Gtk.MINOR_VERSION)
-            if version < (3, 12):
+            # it so let's hide it using the deprecated get_action_area()
+            try:
                 self.real_widget.get_action_area().set_border_width(0)
+            except AttributeError:
+                pass
 
             # gtk dialogs also have a separate content area, and
             # whatever is added to the dialog needs to go there
             # the content area is a Gtk.Box
-            self.__content_area = self.real_widget.get_content_area()
-        else:
+            self._content_area = self.real_widget.get_content_area()
+        else:   # pragma: no cover
             raise NotImplementedError
 
         super().__init__(title, child, resizable=resizable, **window_kwargs)
@@ -333,7 +321,7 @@ class Dialog(Window):
         centered over it too if the underlying GUI toolkit does it by
         default.
         """
-        return self.__parentwindow
+        return self._parentwindow
 
     def wait(self):
         if _modules.name.startswith('gtk'):
@@ -345,12 +333,12 @@ class Dialog(Window):
     def add(self, child):
         super().add(child)
         if _modules.name.startswith('gtk'):
-            self.__content_area.pack_start(child.real_widget, True, True, 0)
+            self._content_area.pack_start(child.real_widget, True, True, 0)
 
     def remove(self, child):
         if _modules.name.startswith('gtk'):
             self._check_closed()
             Bin.remove(self, child)
-            self.__content_area.remove(child.real_widget)
+            self._content_area.remove(child.real_widget)
         else:
             super().remove(child)
